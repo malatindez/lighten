@@ -1,4 +1,5 @@
 #pragma once
+
 #include "vec.hpp"
 
 namespace math {
