@@ -21,7 +21,7 @@ string(REPLACE "/" "\\" _source_path_msvc "${_source_path}")
 source_group("${_source_path_msvc}" FILES "${_source}")
 endforeach()
 
-add_executable(engine ${ENGINE_SOURCES})
+add_executable(engine WIN32 ${ENGINE_SOURCES})
 target_include_directories(engine PRIVATE ${ENGINE_SOURCES_DIR})
 
 
