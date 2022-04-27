@@ -37,3 +37,6 @@ _build
 
 ## Notepad++ files
 *.bak
+
+# vscode
+.vscode
