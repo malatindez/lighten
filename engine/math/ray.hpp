@@ -3,7 +3,7 @@
 namespace math {
 class ray {
  public:
-  ray() {}
+  ray() = default;
   ray(vec3 const& origin, vec3 const& direction)
       : origin_(origin), direction_(direction) {}
   [[nodiscard]] vec3 const& origin() const noexcept { return origin_; }

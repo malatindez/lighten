@@ -177,16 +177,16 @@ inline std::ostream& operator>>(std::ostream& os, type_vec3<T>& vec) {
 
 template <Primitive T, Primitive U>
 inline T dot(const type_vec3<T>& left, const type_vec3<U>& right) {
-  return left.data_[0] * right.data_[0] + left.data_[1] * right.data_[1] +
-         left.data_[2] * right.data_[2];
+  return left.x() * left.x() + left.y() * left.y() +
+      left.z() * left.z();
 }
 
 template <Primitive T, Primitive U>
 inline type_vec3<T> cross(const type_vec3<T>& left, const type_vec3<U>& right) {
   return type_vec3<T>{
-      left.data_[1] * right.data_[2] - left.data_[2] * right.data_[1],
-      left.data_[0] * right.data_[2] - left.data_[2] * right.data_[0],
-      left.data_[0] * right.data_[1] - left.data_[1] * right.data_[0]};
+      left.y() * right.z() - left.z() * right.y(),
+      left.x() * right.z() - left.z() * right.x(),
+      left.x() * right.y() - left.y() * right.x()};
 }
 
 template <Primitive T, Primitive U>

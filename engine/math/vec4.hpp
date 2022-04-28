@@ -181,8 +181,8 @@ inline std::ostream& operator>>(std::ostream& os, type_vec4<T>& vec) {
 
 template <Primitive T, Primitive U>
 inline T dot(const type_vec4<T>& left, const type_vec4<U>& right) {
-  return left.data_[0] * right.data_[0] + left.data_[1] * right.data_[1] +
-         left.data_[2] * right.data_[2] + left.data_[3] * right.data_[3];
+  return left.x() * left.x() + left.y() * left.y() +
+      left.z() * left.z() + left.w() * right.w();
 }
 
 using vec4 = type_vec4<float>;
