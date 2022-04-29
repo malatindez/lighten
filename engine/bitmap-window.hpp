@@ -1,7 +1,7 @@
 #pragma once
 #include <exception>
 
-#include "Window.hpp"
+#include "window.hpp"
 namespace engine {
 class BitmapWindow final : public Window {
  public:
@@ -26,6 +26,11 @@ class BitmapWindow final : public Window {
     bitmap_info_.bmiHeader.biHeight = size.y();
   }
 
+  BitmapWindow(BitmapWindow&& BitmapWindow) = delete;
+  BitmapWindow& operator=(BitmapWindow&& BitmapWindow) = delete;
+  BitmapWindow(BitmapWindow const& BitmapWindow) = delete;
+  BitmapWindow& operator=(BitmapWindow const& BitmapWindow) = delete;
+
   void SetMainLoopCallback(MainLoopCallback const& callback) override {
     main_loop_callback_ = callback;
   }
@@ -41,7 +46,7 @@ class BitmapWindow final : public Window {
   }
 
  private:
-  void OnSizeChanged() final {
+  void OnSizeChanged() override {
     const math::ivec2 size = this->size();
     bitmap_info_.bmiHeader.biWidth = size.x();
     bitmap_info_.bmiHeader.biHeight = size.y();

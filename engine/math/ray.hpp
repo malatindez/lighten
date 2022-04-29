@@ -1,4 +1,4 @@
-#pragma
+#pragma once
 #include "math/vec3.hpp"
 namespace engine::math {
 class ray {
