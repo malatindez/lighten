@@ -171,7 +171,7 @@ inline std::ostream &operator>>(std::ostream &os, type_vec2<T> &vec) {
 
 template <Primitive T, Primitive U>
 inline T dot(const type_vec2<T> &left, const type_vec2<U> &right) {
-  return left.x() * left.x() + left.y() * left.y();
+  return left.x() * right.x() + left.y() * right.y();
 }
 using vec2 = type_vec2<float>;
 using dvec2 = type_vec2<double>;
