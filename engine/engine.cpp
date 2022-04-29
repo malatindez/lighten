@@ -1,13 +1,9 @@
 #include "engine.hpp"
 
-#include "render.hpp"
-
 namespace engine {
 std::unique_ptr<Engine> Engine::engine_;
 
 using namespace engine::math;
-const math::ivec2 kWindowPosition{0};
-const math::ivec2 kWindowResolution{1280, 720};
 
 INT Engine::Start(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
                   int cmd_show) {
@@ -57,8 +53,7 @@ LRESULT Engine::OnPaint(Window &, HWND handle, UINT message, WPARAM w_param,
 
 LRESULT Engine::OnExitSizeMove(Window &window, HWND handle, UINT message,
                                WPARAM w_param, LPARAM l_param) {
-  auto &bmwnd = dynamic_cast<BitmapWindow &>(window);
-  draw(bmwnd.bitmap(), window.size());
+  Draw();
   return DefWindowProcW(handle, message, w_param, l_param);
 }
 
@@ -77,13 +72,46 @@ LRESULT Engine::OnKeyDown(Window &window, HWND handle, UINT message,
 
   return DefWindowProcW(handle, message, w_param, l_param);
 }
+
+vec3 color(Sphere sphere, Ray const &r) {
+  if (sphere.Hit(r)) {
+    return vec3{1, 0, 0};
+  }
+  vec3 unit_direction = r.direction().unit_vector();
+  float t = 0.5f * (unit_direction.y() + 1);
+  return (1.0f - t) * vec3{1} + t * vec3{0.5f, 0.7f, 1.0f};
+}
+
+void Engine::Draw() {
+  vec3 lower_left_corner{-2, -1, -1};
+  vec3 horizontal{4, 0, 0};
+  vec3 vertical{0, 2, 0};
+  vec3 origin{0};
+  ivec2 window_size = window_->size();
+  auto &bitmap = window_->bitmap();
+  for (int j = window_size.y() - 1; j >= 0; j--) {
+    for (int i = 0; i < window_size.x(); i++) {
+      float u = float(i) / float(window_size.x());
+      float v = float(j) / float(window_size.y());
+      Ray r(origin, lower_left_corner + u * horizontal + v * vertical);
+      vec3 col = color(sphere_, r);
+      auto ir = int(255.99 * col[0]) << 16;
+      auto ig = int(255.99 * col[1]) << 8;
+      auto ib = int(255.99 * col[2]);
+
+      bitmap[size_t(j) * window_size.x() + i] = ir | ig | ib;
+    }
+  }
+}
+
 Engine::Engine(HINSTANCE instance, HINSTANCE prev_instance, PWSTR, int cmd_show,
                std::unique_ptr<BitmapWindow> window)
     : window_(std::move(window)), instance_(instance),
-      prev_instance_(prev_instance) {
+      prev_instance_(prev_instance), sphere_{kSphereCoords, kSphereRadius} {
   // display the window on the screen
   ShowWindow(window_->handle(), cmd_show);
-  draw(window_->bitmap(), window_->size());
+
+  Draw();
   // register callbacks
   window_->SetCallback(WM_DESTROY, std::bind_front(&Engine::OnDestroy, this));
   window_->SetCallback(WM_PAINT, std::bind_front(&Engine::OnPaint, this));

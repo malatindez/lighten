@@ -1,9 +1,14 @@
 #pragma once
+#include "math/sphere.hpp"
 #include "misc/bitmap-window.hpp"
 #include "pch.hpp"
 
 namespace engine {
 
+const math::ivec2 kWindowPosition{0};
+const math::ivec2 kWindowResolution{1280, 720};
+const math::vec3 kSphereCoords{0, 0, -1};
+const float kSphereRadius{0.5f};
 class Engine final {
 public:
   INT Join() const {
@@ -26,6 +31,8 @@ private:
   LRESULT OnKeyDown(Window &window, HWND handle, UINT message, WPARAM w_param,
                     LPARAM l_param);
 
+  void Draw();
+
   Engine(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
          int cmd_show, std::unique_ptr<BitmapWindow> window);
   // delete move & copy semantics
@@ -37,6 +44,7 @@ private:
   std::unique_ptr<BitmapWindow> window_;
   HINSTANCE instance_;
   HINSTANCE prev_instance_;
+  math::Sphere sphere_;
   static std::unique_ptr<Engine> engine_;
 };
 [[nodiscard]] inline Engine &GetEngine() { return Engine::engine(); }
