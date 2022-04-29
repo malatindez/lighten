@@ -1,13 +1,11 @@
 #include <Windows.h>
 
+#include "BitmapWindow.hpp"
 #include "math/ray.hpp"
 #include "math/vec.hpp"
 
-// the WindowProc function prototype
-LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam,
-                            LPARAM lParam);
-
-using namespace math;
+using namespace engine;
+using namespace engine::math;
 
 const ivec2 kWindowPosition{0};
 const ivec2 kWindowResolution{1280, 720};
@@ -30,7 +28,7 @@ vec3 color(ray const& r) {
   return (1.0f - t) * vec3{1} + t * vec3{0.5f, 0.7f, 1.0f};
 }
 
-void draw(HDC hdc, ivec2 window_size) {
+void draw(std::vector<uint32_t>& bitmap, ivec2 window_size) {
   vec3 lower_left_corner{-2, -1, -1};
   vec3 horizontal{4, 0, 0};
   vec3 vertical{0, 2, 0};
@@ -41,20 +39,34 @@ void draw(HDC hdc, ivec2 window_size) {
       float v = float(j) / float(window_size.y());
       ray r(origin, lower_left_corner + u * horizontal + v * vertical);
       vec3 col = color(r);
-      auto ir = int(255.99 * col[0]);
+      auto ir = int(255.99 * col[0]) << 16;
       auto ig = int(255.99 * col[1]) << 8;
-      auto ib = int(255.99 * col[2]) << 16;
+      auto ib = int(255.99 * col[2]);
 
-      SetPixel(hdc, i, j, ir | ig | ib);
+      bitmap[j * window_size.x() + i] = ir | ig | ib;
     }
   }
 }
 
+LRESULT OnDestroy(Window&, HWND, UINT, WPARAM, LPARAM) {
+  PostQuitMessage(0);
+  return 0;
+}
+
+LRESULT OnPaint(Window&, HWND handle, UINT message, WPARAM w_param,
+                LPARAM l_param) {
+  return DefWindowProcW(handle, message, w_param, l_param);
+}
+
+LRESULT OnExitSizeMove(Window& window, HWND handle, UINT message,
+                       WPARAM w_param, LPARAM l_param) {
+  BitmapWindow& bmwnd = dynamic_cast<BitmapWindow&>(window);
+  draw(bmwnd.bitmap(), window.size());
+  return DefWindowProcW(handle, message, w_param, l_param);
+}
+
 // the entry point for any Windows program
-INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nShowCmd) {
-  // the handle for the window, filled by a function
-  HWND hWnd;
-  // this struct holds information for the window class
+INT WINAPI WinMain(HINSTANCE instance, HINSTANCE, LPSTR, INT cmd_show) {
   WNDCLASSEXW wc;
 
   // clear out the window class for use
@@ -63,59 +75,31 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nShowCmd) {
   // fill in the struct with the needed information
   wc.cbSize = sizeof(WNDCLASSEX);
   wc.style = CS_HREDRAW | CS_VREDRAW;
-  wc.lpfnWndProc = WindowProc;
-  wc.hInstance = hInstance;
-  wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+  wc.hInstance = instance;
+  wc.hCursor = LoadCursor(nullptr, IDC_CROSS);
   wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
-  wc.lpszClassName = L"WindowClass1";
-
-  // register the window class
-  RegisterClassExW(&wc);
 
   // create the window and use the result as the handle
-  hWnd = CreateWindowExW(NULL,
-                         L"WindowClass1",  // name of the window class
-                         L"Our First Windowed Program",  // title of the window
-                         WS_OVERLAPPEDWINDOW,            // window style
-                         kWindowPosition.x(),    // x-position of the window
-                         kWindowPosition.y(),    // y-position of the window
-                         kWindowResolution.x(),  // width of the window
-                         kWindowResolution.y(),  // height of the window
-                         nullptr,    // we have no parent window, nullptr
-                         nullptr,    // we aren't using menus, nullptr
-                         hInstance,  // application handle
-                         nullptr);   // used with multiple windows, nullptr
+  BitmapWindow window{wc,
+                      NULL,
+                      L"WindowClass1",  // name of the window class
+                      L"Our First Windowed Program",     // title of the window
+                      WS_OVERLAPPEDWINDOW | WS_VISIBLE,  // window style
+                      kWindowPosition,    // position of the window
+                      kWindowResolution,  // window size
+                      nullptr,            // we have no parent window, nullptr
+                      nullptr,            // we aren't using menus, nullptr
+                      instance,           // application handle
+                      nullptr};           // used with multiple windows, nullptr
 
   // display the window on the screen
-  ShowWindow(hWnd, nShowCmd);
+  ShowWindow(window.handle(), cmd_show);
+  draw(window.bitmap(), window.size());
+  // register callbacks
+  window.SetCallback(WM_DESTROY, OnDestroy);
+  window.SetCallback(WM_PAINT, OnPaint);
+  window.SetCallback(WM_EXITSIZEMOVE, OnExitSizeMove);
+  window.StartMainLoop();
 
-  draw(GetDC(hWnd), kWindowResolution);  // draw the image
-
-  // enter the main loop:
-
-  // this struct holds Windows event messages
-  MSG msg;
-  // wait for the next message in the queue, store the result in 'msg'
-  while (GetMessage(&msg, nullptr, 0, 0)) {
-    // translate keystroke messages into the right format
-    TranslateMessage(&msg);
-
-    // send the message to the WindowProc function
-    DispatchMessage(&msg);
-  }
-
-  // return this part of the WM_QUIT message to Windows
-  return int(msg.wParam);
-}
-
-// this is the main message handler for the program
-LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam,
-                            LPARAM lParam) {
-  if (message == WM_DESTROY) {
-    PostQuitMessage(0);
-    return 0;
-  }
-
-  // Handle any messages the switch statement didn't
-  return DefWindowProc(hWnd, message, wParam, lParam);
+  return 0;
 }
