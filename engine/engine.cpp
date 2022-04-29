@@ -99,16 +99,14 @@ LRESULT Engine::OnKeyRelease(Window &, HWND handle, UINT message,
 }
 LRESULT Engine::OnRButtonDown(Window &, HWND handle, UINT message,
                               WPARAM w_param, LPARAM l_param) {
-    OutputDebugString("onrbuttondown called\n");
   rbuttondown_ = true;
   ShowCursor(false);
   auto new_pos = window_->position() + window_->size() / 2;
-  SetCursorPos(new_pos.x(), new_pos.y());
+  SetCursorPos(new_pos.x, new_pos.y);
   return DefWindowProcW(handle, message, w_param, l_param);
 }
 LRESULT Engine::OnRButtonUp(Window &, HWND handle, UINT message, WPARAM w_param,
                             LPARAM l_param) {
-    OutputDebugString("onrbuttonup called\n");
   ShowCursor(true);
   rbuttondown_ = false;
   return DefWindowProcW(handle, message, w_param, l_param);
@@ -128,12 +126,14 @@ void Engine::MainLoop(Window &window) {
     auto middle = window_->position() + window_->size() / 2;
     POINT point;
     GetCursorPos(&point);
-    vec2 diff{ float(point.x) - float(middle.x()), float(middle.y()) - float(point.y) };
+    vec2 diff{float(point.x) - float(middle.x),
+              float(middle.y) - float(point.y)};
     diff /= window_->size().length();
-    MoveSphere(sphere_, {diff.x(), diff.y(), 0}, 1);
-    SetCursorPos(middle.x(), middle.y());
-    std::string t = std::to_string(diff.x()) + " " + std::to_string(diff.y()) + "\n";
-    t = std::to_string(middle.x()) + " " + std::to_string(middle.y()) + "\n";
+    MoveSphere(sphere_, {diff.x, diff.y, 0}, 1);
+    SetCursorPos(middle.x, middle.y);
+    std::string t =
+        std::to_string(diff.x) + " " + std::to_string(diff.y) + "\n";
+    t = std::to_string(middle.x) + " " + std::to_string(middle.y) + "\n";
     Draw();
   }
 }
@@ -143,7 +143,7 @@ vec3 color(Sphere sphere, Ray const &r) {
     return vec3{1, 0, 0};
   }
   vec3 unit_direction = r.direction().unit_vector();
-  float t = 0.5f * (unit_direction.y() + 1);
+  float t = 0.5f * (unit_direction.y + 1);
   return (1.0f - t) * vec3{1} + t * vec3{0.5f, 0.7f, 1.0f};
 }
 
@@ -154,17 +154,17 @@ void Engine::Draw() {
   vec3 origin{0};
   ivec2 window_size = window_->size();
   auto &bitmap = window_->bitmap();
-  for (int j = window_size.y() - 1; j >= 0; j--) {
-    for (int i = 0; i < window_size.x(); i++) {
-      float u = float(i) / float(window_size.x());
-      float v = float(j) / float(window_size.y());
+  for (int j = window_size.y - 1; j >= 0; j--) {
+    for (int i = 0; i < window_size.x; i++) {
+      float u = float(i) / float(window_size.x);
+      float v = float(j) / float(window_size.y);
       Ray r(origin, lower_left_corner + u * horizontal + v * vertical);
       vec3 col = color(sphere_, r);
-      auto ir = int(255.99 * col[0]) << 16;
-      auto ig = int(255.99 * col[1]) << 8;
-      auto ib = int(255.99 * col[2]);
+      auto ir = int(255.99 * col.r()) << 16;
+      auto ig = int(255.99 * col.g()) << 8;
+      auto ib = int(255.99 * col.b());
 
-      bitmap[size_t(j) * window_size.x() + i] = ir | ig | ib;
+      bitmap[size_t(j) * window_size.x + i] = ir | ig | ib;
     }
   }
 }

@@ -16,7 +16,7 @@ Window::Window(WindowClass const &window_class_template, DWORD extended_style,
   RegisterClassExW(&window_class);
   handle_ =
       CreateWindowExW(extended_style, class_name.c_str(), window_name.c_str(),
-                      style, position.x(), position.y(), size.x(), size.y(),
+                      style, position.x, position.y, size.x, size.y,
                       parent_window, menu, instance, lp_param);
   // save window handle in the window class
   SetWindowLongPtrW(handle_, 0, reinterpret_cast<LONG_PTR>(this));

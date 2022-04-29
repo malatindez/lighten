@@ -6,173 +6,171 @@ namespace engine::math {
 
 template <Primitive T> class type_vec2 final {
 public:
-  type_vec2(T value = 0) { data_[0] = data_[1] = value; }
-  type_vec2(T x, T y) {
-    data_[0] = x;
-    data_[1] = y;
+  constexpr type_vec2(T value = 0) { x = y = value; }
+  constexpr type_vec2(T x, T y) {
+    this->x = x;
+    this->y = y;
   }
-
-  [[nodiscard]] inline T x() const noexcept { return data_[0]; }
-  [[nodiscard]] inline T y() const noexcept { return data_[1]; }
-  [[nodiscard]] inline T operator[](int i) const { return data_[i]; }
-  [[nodiscard]] inline T &operator[](int i) { return data_[i]; }
-
-  [[nodiscard]] inline float length() const noexcept {
+  [[nodiscard]] constexpr float length() const noexcept {
     return std::sqrt(squared_length());
   }
-  [[nodiscard]] inline float squared_length() const noexcept {
-    float sum = 0;
-    for (int i = 0; i < 2; i++) {
-      sum += data_[i] * data_[i];
-    }
-    return sum;
+  [[nodiscard]] constexpr float squared_length() const noexcept {
+    return x * x + y * y;
   }
 
-  [[nodiscard]] inline type_vec2<T> unit_vector() const noexcept {
+  [[nodiscard]] constexpr type_vec2<T> unit_vector() const noexcept {
     return *this / length();
   }
-  inline void make_unit_vector() { operator/=(length()); }
+  constexpr void make_unit_vector() { operator/=(length()); }
 
-  [[nodiscard]] inline type_vec2<T> const &operator+() const noexcept {
+  [[nodiscard]] constexpr type_vec2<T> const &operator+() const noexcept {
     return *this;
   }
-  [[nodiscard]] inline type_vec2<T> operator-() const noexcept {
-    type_vec2<T> return_value{};
-    for (int i = 0; i < 2; i++) {
-      return_value[i] = -return_value[i];
-    }
-    return return_value;
+  [[nodiscard]] constexpr type_vec2<T> operator-() const noexcept {
+    return type_vec2<T>{-x, -y};
   }
 
   template <Primitive U>
-  inline type_vec2<T> &operator+=(U const value) noexcept {
-    for (int i = 0; i < 2; i++) {
-      data_[i] += value;
-    }
+  constexpr type_vec2<T> &operator+=(U const value) noexcept {
+    x += value;
+    y += value;
     return *this;
   }
   template <Primitive U>
-  inline type_vec2<T> &operator-=(U const value) noexcept {
-    for (int i = 0; i < 2; i++) {
-      data_[i] -= value;
-    }
+  constexpr type_vec2<T> &operator-=(U const value) noexcept {
+    x -= value;
+    y -= value;
     return *this;
   }
   template <Primitive U>
-  inline type_vec2<T> &operator*=(U const value) noexcept {
-    for (int i = 0; i < 2; i++) {
-      data_[i] *= value;
-    }
+  constexpr type_vec2<T> &operator*=(U const value) noexcept {
+    x *= value;
+    y *= value;
     return *this;
   }
   template <Primitive U>
-  inline type_vec2<T> &operator/=(U const value) noexcept {
-    for (int i = 0; i < 2; i++) {
-      data_[i] /= value;
-    }
+  constexpr type_vec2<T> &operator/=(U const value) noexcept {
+    x /= value;
+    y /= value;
     return *this;
   }
 
   template <Primitive U>
-  [[nodiscard]] inline type_vec2<T> operator+(U const value) const noexcept {
+  [[nodiscard]] constexpr type_vec2<T> operator+(U const value) const noexcept {
     type_vec2<T> return_value{*this};
     return_value += value;
     return return_value;
   }
   template <Primitive U>
-  [[nodiscard]] inline type_vec2<T> operator-(U const value) const noexcept {
+  [[nodiscard]] constexpr type_vec2<T> operator-(U const value) const noexcept {
     type_vec2<T> return_value{*this};
     return_value -= value;
     return return_value;
   }
   template <Primitive U>
-  [[nodiscard]] inline type_vec2<T> operator*(U const value) const noexcept {
+  [[nodiscard]] constexpr type_vec2<T> operator*(U const value) const noexcept {
     type_vec2<T> return_value{*this};
     return_value *= value;
     return return_value;
   }
   template <Primitive U>
-  [[nodiscard]] inline type_vec2<T> operator/(U const value) const noexcept {
+  [[nodiscard]] constexpr type_vec2<T> operator/(U const value) const noexcept {
     type_vec2<T> return_value{*this};
     return_value /= value;
     return return_value;
   }
-  template <typename U>
-  inline type_vec2<T> operator+=(type_vec2<U> const &other) noexcept {
-    for (int i = 0; i < 2; i++) {
-      data_[i] += other[i];
-    }
+  template <Primitive U>
+  constexpr type_vec2<T> &operator+=(type_vec2<U> const &other) noexcept {
+    x += other.x;
+    y += other.y;
     return *this;
   }
-  template <typename U>
-  inline type_vec2<T> operator-=(type_vec2<U> const &other) noexcept {
-    for (int i = 0; i < 2; i++) {
-      data_[i] -= other[i];
-    }
+  template <Primitive U>
+  constexpr type_vec2<T> &operator-=(type_vec2<U> const &other) noexcept {
+    x -= other.x;
+    y -= other.y;
     return *this;
   }
-  template <typename U>
-  inline type_vec2<T> operator*=(type_vec2<U> const &other) noexcept {
-    for (int i = 0; i < 2; i++) {
-      data_[i] *= other[i];
-    }
+  template <Primitive U>
+  constexpr type_vec2<T> &operator*=(type_vec2<U> const &other) noexcept {
+    x *= other.x;
+    y *= other.y;
     return *this;
   }
-  template <typename U>
-  inline type_vec2<T> operator/=(type_vec2<U> const &other) noexcept {
-    for (int i = 0; i < 2; i++) {
-      data_[i] /= other[i];
-    }
+  template <Primitive U>
+  constexpr type_vec2<T> &operator/=(type_vec2<U> const &other) noexcept {
+    x /= other.x;
+    y /= other.y;
     return *this;
   }
 
-  template <typename U>
-  [[nodiscard]] inline type_vec2<T>
+  template <Primitive U>
+  [[nodiscard]] constexpr type_vec2<T>
   operator+(type_vec2<U> const &other) const noexcept {
     type_vec2<T> return_value{*this};
     return_value += other;
     return return_value;
   }
-  template <typename U>
-  [[nodiscard]] inline type_vec2<T>
+  template <Primitive U>
+  [[nodiscard]] constexpr type_vec2<T>
   operator-(type_vec2<U> const &other) const noexcept {
     type_vec2<T> return_value{*this};
     return_value -= other;
     return return_value;
   }
-  template <typename U>
-  [[nodiscard]] inline type_vec2<T>
+  template <Primitive U>
+  [[nodiscard]] constexpr type_vec2<T>
   operator*(type_vec2<U> const &other) const noexcept {
     type_vec2<T> return_value{*this};
     return_value *= other;
     return return_value;
   }
-  template <typename U>
-  [[nodiscard]] inline type_vec2<T>
+  template <Primitive U>
+  [[nodiscard]] constexpr type_vec2<T>
   operator/(type_vec2<U> const &other) const noexcept {
     type_vec2<T> return_value{*this};
     return_value /= other;
     return return_value;
   }
 
-protected:
-  T data_[2];
+  T x;
+  T y;
 };
 template <Primitive T>
-inline std::istream &operator>>(std::istream &is, type_vec2<T> &vec) {
-  is >> vec.data_[0] >> vec.data_[1];
+constexpr std::istream &operator>>(std::istream &is, type_vec2<T> &vec) {
+  is >> vec.x >> vec.y;
   return is;
 }
 template <Primitive T>
-inline std::ostream &operator>>(std::ostream &os, type_vec2<T> &vec) {
-  os << vec.data_[0] << " " << vec.data_[1];
+constexpr std::ostream &operator>>(std::ostream &os, type_vec2<T> &vec) {
+  os << vec.x << " " << vec.y;
   return os;
 }
 
 template <Primitive T, Primitive U>
-inline T dot(const type_vec2<T> &left, const type_vec2<U> &right) {
-  return left.x() * right.x() + left.y() * right.y();
+constexpr T dot(type_vec2<T> const &left, type_vec2<U> const &right) {
+  return left.x * right.x + left.y * right.y;
 }
+template <Primitive T, Primitive U>
+constexpr T angle(type_vec2<T> const &left, type_vec2<U> const &right) {
+  return std::acos(dot(left, right) / left.length() / right.length());
+}
+
+template <Primitive T, Primitive U>
+[[nodiscard]] constexpr type_vec2<T> operator*(U const value,
+                                               type_vec2<T> const &vec) {
+  type_vec2<T> return_value{vec};
+  return_value *= value;
+  return return_value;
+}
+template <Primitive T, Primitive U>
+[[nodiscard]] constexpr type_vec2<T> operator/(U const value,
+                                               type_vec2<T> const &vec) {
+  type_vec2<T> return_value{vec};
+  return_value /= value;
+  return return_value;
+}
+
 using vec2 = type_vec2<float>;
 using dvec2 = type_vec2<double>;
 using ivec2 = type_vec2<int>;

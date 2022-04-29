@@ -8,7 +8,7 @@ BitmapWindow::BitmapWindow(WindowClass const &window_class,
                            LPVOID lp_param)
     : Window(window_class, extended_style, class_name, window_name, style,
              position, size, parent_window, menu, instance, lp_param) {
-  bitmap_.resize(size_t(size.x()) * size.y());
+  bitmap_.resize(size_t(size.x) * size.y);
 
   Window::SetMainLoopCallback(std::bind_front(&BitmapWindow::MainLoop, this));
 
@@ -18,22 +18,21 @@ BitmapWindow::BitmapWindow(WindowClass const &window_class,
   bitmap_info_.bmiHeader.biPlanes = 1;
   bitmap_info_.bmiHeader.biBitCount = 32;
   bitmap_info_.bmiHeader.biCompression = BI_RGB;
-  bitmap_info_.bmiHeader.biWidth = size.x();
-  bitmap_info_.bmiHeader.biHeight = size.y();
+  bitmap_info_.bmiHeader.biWidth = size.x;
+  bitmap_info_.bmiHeader.biHeight = size.y;
 }
 void BitmapWindow::OnSizeChanged() {
   const math::ivec2 size = this->size();
-  bitmap_info_.bmiHeader.biWidth = size.x();
-  bitmap_info_.bmiHeader.biHeight = size.y();
-  bitmap_.resize(size_t(size.x()) * size.y());
+  bitmap_info_.bmiHeader.biWidth = size.x;
+  bitmap_info_.bmiHeader.biHeight = size.y;
+  bitmap_.resize(size_t(size.x) * size.y);
 }
 void BitmapWindow::MainLoop(Window &) {
   if (main_loop_callback_ != nullptr) {
     main_loop_callback_(std::ref(*this));
   }
   // draw bitmap
-  StretchDIBits(hdc_, 0, 0, size().x(), size().y(), 0, 0, size().x(),
-                size().y(), bitmap_.data(), &bitmap_info_, DIB_RGB_COLORS,
-                SRCCOPY);
+  StretchDIBits(hdc_, 0, 0, size().x, size().y, 0, 0, size().x, size().y,
+                bitmap_.data(), &bitmap_info_, DIB_RGB_COLORS, SRCCOPY);
 }
 } // namespace engine
