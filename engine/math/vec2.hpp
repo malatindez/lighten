@@ -74,25 +74,25 @@ public:
   }
 
   template <Primitive U>
-  [[nodiscard]] inline type_vec2<T> &operator+(U const value) const noexcept {
+  [[nodiscard]] inline type_vec2<T> operator+(U const value) const noexcept {
     type_vec2<T> return_value{*this};
     return_value += value;
     return return_value;
   }
   template <Primitive U>
-  [[nodiscard]] inline type_vec2<T> &operator-(U const value) const noexcept {
+  [[nodiscard]] inline type_vec2<T> operator-(U const value) const noexcept {
     type_vec2<T> return_value{*this};
     return_value -= value;
     return return_value;
   }
   template <Primitive U>
-  [[nodiscard]] inline type_vec2<T> &operator*(U const value) const noexcept {
+  [[nodiscard]] inline type_vec2<T> operator*(U const value) const noexcept {
     type_vec2<T> return_value{*this};
     return_value *= value;
     return return_value;
   }
   template <Primitive U>
-  [[nodiscard]] inline type_vec2<T> &operator/(U const value) const noexcept {
+  [[nodiscard]] inline type_vec2<T> operator/(U const value) const noexcept {
     type_vec2<T> return_value{*this};
     return_value /= value;
     return return_value;
