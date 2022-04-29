@@ -1,5 +1,5 @@
 #include "engine.hpp"
-
+#include <iostream>
 namespace engine {
 std::unique_ptr<Engine> Engine::engine_;
 
@@ -57,20 +57,85 @@ LRESULT Engine::OnExitSizeMove(Window &window, HWND handle, UINT message,
   return DefWindowProcW(handle, message, w_param, l_param);
 }
 
-LRESULT Engine::OnKeyDown(Window &window, HWND handle, UINT message,
-                          WPARAM w_param, LPARAM l_param) {
-  switch (w_param) {
-  case 'W':
-    break;
-  case 'A':
-    break;
-  case 'S':
-    break;
-  case 'D':
-    break;
+void MoveSphere(Sphere &sphere, vec3 const &direction, float delta_time) {
+  sphere.SetCenter(sphere.center() + direction * delta_time);
+}
+
+const vec3 kUp{0, 1, 0};
+const vec3 kDown{0, -1, 0};
+const vec3 kLeft{-1, 0, 0};
+const vec3 kRight{1, 0, 0};
+
+LRESULT Engine::OnKeyDown(Window &, HWND handle, UINT message, WPARAM w_param,
+                          LPARAM l_param) {
+  // skip repeats
+  if (LOWORD(l_param) == 1) {
+    if (w_param == 'W') {
+      sphere_moving_direction_ += kUp;
+    } else if (w_param == 'A') {
+      sphere_moving_direction_ += kLeft;
+    } else if (w_param == 'S') {
+      sphere_moving_direction_ += kDown;
+    } else if (w_param == 'D') {
+      sphere_moving_direction_ += kRight;
+    }
+  }
+  return DefWindowProcW(handle, message, w_param, l_param);
+}
+
+LRESULT Engine::OnKeyRelease(Window &, HWND handle, UINT message,
+                             WPARAM w_param, LPARAM l_param) {
+  if (w_param == 'W') {
+    sphere_moving_direction_ -= kUp;
+  } else if (w_param == 'A') {
+    sphere_moving_direction_ -= kLeft;
+  } else if (w_param == 'S') {
+    sphere_moving_direction_ -= kDown;
+  } else if (w_param == 'D') {
+    sphere_moving_direction_ -= kRight;
   }
 
   return DefWindowProcW(handle, message, w_param, l_param);
+}
+LRESULT Engine::OnRButtonDown(Window &, HWND handle, UINT message,
+                              WPARAM w_param, LPARAM l_param) {
+    OutputDebugString("onrbuttondown called\n");
+  rbuttondown_ = true;
+  ShowCursor(false);
+  auto new_pos = window_->position() + window_->size() / 2;
+  SetCursorPos(new_pos.x(), new_pos.y());
+  return DefWindowProcW(handle, message, w_param, l_param);
+}
+LRESULT Engine::OnRButtonUp(Window &, HWND handle, UINT message, WPARAM w_param,
+                            LPARAM l_param) {
+    OutputDebugString("onrbuttonup called\n");
+  ShowCursor(true);
+  rbuttondown_ = false;
+  return DefWindowProcW(handle, message, w_param, l_param);
+}
+void Engine::MainLoop(Window &window) {
+  using namespace std::chrono;
+  const time_point<system_clock> now = system_clock::now();
+  delta_time_ =
+      duration_cast<microseconds>(now - last_time_point_).count() / 1e6;
+  last_time_point_ = now;
+  if (!rbuttondown_) {
+    if (sphere_moving_direction_.length() != 0) {
+      MoveSphere(sphere_, sphere_moving_direction_, delta_time_);
+      Draw();
+    }
+  } else {
+    auto middle = window_->position() + window_->size() / 2;
+    POINT point;
+    GetCursorPos(&point);
+    vec2 diff{ float(point.x) - float(middle.x()), float(middle.y()) - float(point.y) };
+    diff /= window_->size().length();
+    MoveSphere(sphere_, {diff.x(), diff.y(), 0}, 1);
+    SetCursorPos(middle.x(), middle.y());
+    std::string t = std::to_string(diff.x()) + " " + std::to_string(diff.y()) + "\n";
+    t = std::to_string(middle.x()) + " " + std::to_string(middle.y()) + "\n";
+    Draw();
+  }
 }
 
 vec3 color(Sphere sphere, Ray const &r) {
@@ -118,6 +183,12 @@ Engine::Engine(HINSTANCE instance, HINSTANCE prev_instance, PWSTR, int cmd_show,
   window_->SetCallback(WM_EXITSIZEMOVE,
                        std::bind_front(&Engine::OnExitSizeMove, this));
   window_->SetCallback(WM_KEYDOWN, std::bind_front(&Engine::OnKeyDown, this));
+  window_->SetCallback(WM_KEYUP, std::bind_front(&Engine::OnKeyRelease, this));
+  window_->SetCallback(WM_RBUTTONDOWN,
+                       std::bind_front(&Engine::OnRButtonDown, this));
+  window_->SetCallback(WM_RBUTTONUP,
+                       std::bind_front(&Engine::OnRButtonUp, this));
+  window_->SetMainLoopCallback(std::bind_front(&Engine::MainLoop, this));
 }
 
 } // namespace engine
