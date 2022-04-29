@@ -41,24 +41,11 @@ class BitmapWindow final : public Window {
   }
 
  private:
-  virtual void OnSizeChanged() final {
+  void OnSizeChanged() final {
     const math::ivec2 size = this->size();
     bitmap_info_.bmiHeader.biWidth = size.x();
     bitmap_info_.bmiHeader.biHeight = size.y();
     bitmap_.resize(size_t(size.x()) * size.y());
-  }
-  using u32 = uint32_t;
-  void draw_pixel(int x, int y, u32 color) {
-    u32* pixel = (u32*)bitmap_.data();
-    pixel += y * size().x() + x;
-    *pixel = color;
-  }
-
-  void clear_screen(u32 color) {
-    u32* pixel = (u32*)bitmap_.data();
-    for (int i = 0; i < size().x() * size().y(); ++i) {
-      *pixel++ = color;
-    }
   }
   void MainLoop(Window&) {
     if (main_loop_callback_ != nullptr) {
