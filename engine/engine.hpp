@@ -1,5 +1,5 @@
 #pragma once
-#include "bitmap-window.hpp"
+#include "misc/bitmap-window.hpp"
 #include "pch.hpp"
 
 namespace engine {
