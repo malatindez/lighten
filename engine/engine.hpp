@@ -5,7 +5,7 @@
 namespace engine {
 
 class Engine final {
- public:
+public:
   INT Join() const {
     window_->StartMainLoop();
     return 0;
@@ -17,7 +17,15 @@ class Engine final {
   // dereference nullptr and get undefined behaviour
   [[nodiscard]] static inline Engine &engine() noexcept { return *engine_; }
 
- private:
+private:
+  LRESULT OnDestroy(Window &, HWND, UINT, WPARAM, LPARAM);
+  LRESULT OnPaint(Window &, HWND handle, UINT message, WPARAM w_param,
+                  LPARAM l_param);
+  LRESULT OnExitSizeMove(Window &window, HWND handle, UINT message,
+                         WPARAM w_param, LPARAM l_param);
+  LRESULT OnKeyDown(Window &window, HWND handle, UINT message, WPARAM w_param,
+                    LPARAM l_param);
+
   Engine(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
          int cmd_show, std::unique_ptr<BitmapWindow> window);
   // delete move & copy semantics
@@ -32,4 +40,4 @@ class Engine final {
   static std::unique_ptr<Engine> engine_;
 };
 [[nodiscard]] inline Engine &GetEngine() { return Engine::engine(); }
-}  // namespace engine
+} // namespace engine

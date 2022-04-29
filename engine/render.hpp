@@ -38,4 +38,4 @@ void draw(std::vector<uint32_t> &bitmap, math::ivec2 window_size) {
     }
   }
 }
-}  // namespace engine
+} // namespace engine
