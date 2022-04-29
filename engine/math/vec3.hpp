@@ -2,7 +2,7 @@
 
 #include "vec.hpp"
 
-namespace math {
+namespace engine::math {
 
 template <Primitive T>
 class type_vec3 final {
@@ -177,16 +177,14 @@ inline std::ostream& operator>>(std::ostream& os, type_vec3<T>& vec) {
 
 template <Primitive T, Primitive U>
 inline T dot(const type_vec3<T>& left, const type_vec3<U>& right) {
-  return left.x() * left.x() + left.y() * left.y() +
-      left.z() * left.z();
+  return left.x() * left.x() + left.y() * left.y() + left.z() * left.z();
 }
 
 template <Primitive T, Primitive U>
 inline type_vec3<T> cross(const type_vec3<T>& left, const type_vec3<U>& right) {
-  return type_vec3<T>{
-      left.y() * right.z() - left.z() * right.y(),
-      left.x() * right.z() - left.z() * right.x(),
-      left.x() * right.y() - left.y() * right.x()};
+  return type_vec3<T>{left.y() * right.z() - left.z() * right.y(),
+                      left.x() * right.z() - left.z() * right.x(),
+                      left.x() * right.y() - left.y() * right.x()};
 }
 
 template <Primitive T, Primitive U>
@@ -208,4 +206,4 @@ using vec3 = type_vec3<float>;
 using dvec3 = type_vec3<double>;
 using ivec3 = type_vec3<int>;
 using bvec3 = type_vec3<bool>;
-};  // namespace math
+};  // namespace engine::math

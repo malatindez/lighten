@@ -2,7 +2,7 @@
 
 #include "vec.hpp"
 
-namespace math {
+namespace engine::math {
 
 template <Primitive T>
 class type_vec4 final {
@@ -189,4 +189,4 @@ using vec4 = type_vec4<float>;
 using dvec4 = type_vec4<double>;
 using ivec4 = type_vec4<int>;
 using bvec4 = type_vec4<bool>;
-};  // namespace math
+};  // namespace engine::math

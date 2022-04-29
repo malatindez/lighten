@@ -1,6 +1,6 @@
 #pragma
 #include "math/vec3.hpp"
-namespace math {
+namespace engine::math {
 class ray {
  public:
   ray() = default;
@@ -18,4 +18,4 @@ class ray {
   vec3 origin_;
   vec3 direction_;
 };
-};  // namespace math
+};  // namespace engine::math

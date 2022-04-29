@@ -1,6 +1,6 @@
 #pragma once
-#include <concepts>
 #include <cmath>
+#include <concepts>
 #include <istream>
 #include <ostream>
 
