@@ -6,7 +6,7 @@ namespace engine::math {
 
 template <Primitive T> class type_vec2 final {
 public:
-  constexpr type_vec2(T value = 0) { x = y = value; }
+  explicit constexpr type_vec2(T value = 0) { x = y = value; }
   constexpr type_vec2(T x, T y) {
     this->x = x;
     this->y = y;

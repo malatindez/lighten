@@ -6,12 +6,12 @@ namespace engine::math {
 
 template <Primitive T> class type_vec4 final {
 public:
-  constexpr type_vec4(T value = 0) { x = y = z = w = value; }
+  explicit constexpr type_vec4(T value = 0) { x = y = z = w = value; }
   constexpr type_vec4(T x, T y, T z, T w) {
-      this->x = x;
-      this->y = y;
-      this->z = z;
-      this->w = w;
+    this->x = x;
+    this->y = y;
+    this->z = z;
+    this->w = w;
   }
   [[nodiscard]] constexpr T r() const noexcept { return x; }
   [[nodiscard]] constexpr T g() const noexcept { return y; }
