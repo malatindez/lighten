@@ -69,7 +69,7 @@ const vec3 kRight{1, 0, 0};
 LRESULT Engine::OnKeyDown(Window &, HWND handle, UINT message, WPARAM w_param,
                           LPARAM l_param) {
   // skip repeats
-  if (LOWORD(l_param) == 1) {
+  if ((l_param & (1 << 30)) == 0) {
     if (w_param == 'W') {
       sphere_moving_direction_ += kUp;
     } else if (w_param == 'A') {
