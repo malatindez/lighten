@@ -9,8 +9,12 @@ namespace engine {
 
 const math::ivec2 kWindowPosition{0};
 const math::ivec2 kWindowResolution{1280, 720};
+// Square size of ray in pixels
+const int kResolutionScaling = 2;
+
 const math::vec3 kSphereCoords{0, 0, -1};
 const float kSphereRadius{0.5f};
+
 class Engine final {
 public:
   INT Join() const {

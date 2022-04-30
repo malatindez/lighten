@@ -153,9 +153,9 @@ void Engine::Draw() {
   vec3 vertical{0, 2, 0};
   vec3 origin{0};
   ivec2 window_size = window_->size();
-  auto &bitmap = window_->bitmap();
-  for (int j = window_size.y - 1; j >= 0; j--) {
-    for (int i = 0; i < window_size.x; i++) {
+  uint32_t *bitmap = window_->bitmap().data();
+  for (int j = window_size.y - 1; j >= 0; j -= kResolutionScaling) {
+    for (int i = 0; i < window_size.x; i += kResolutionScaling) {
       float u = float(i) / float(window_size.x);
       float v = float(j) / float(window_size.y);
       Ray r(origin, lower_left_corner + u * horizontal + v * vertical);
@@ -163,8 +163,16 @@ void Engine::Draw() {
       auto ir = int(255.99 * col.r()) << 16;
       auto ig = int(255.99 * col.g()) << 8;
       auto ib = int(255.99 * col.b());
-
-      bitmap[size_t(j) * window_size.x + i] = ir | ig | ib;
+      for (int k = 0; i + k < window_size.x && k < kResolutionScaling; k++) {
+        bitmap[size_t(j) * window_size.x + i + k] = ir | ig | ib;
+      }
+    }
+    for (int i = 1; i < kResolutionScaling; i++) {
+      if (j - i >= 0) {
+        memcpy(bitmap + size_t(j - i) * window_size.x,
+               bitmap + size_t(j) * window_size.x,
+               window_size.x * sizeof(uint32_t));
+      }
     }
   }
 }
