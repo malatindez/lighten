@@ -125,16 +125,21 @@ namespace engine
                                   WPARAM w_param, LPARAM l_param)
     {
         rbuttondown_ = true;
+
         ShowCursor(false);
+
         auto new_pos = window_->position() + window_->size() / 2;
         SetCursorPos(new_pos.x, new_pos.y);
+
         return DefWindowProcW(handle, message, w_param, l_param);
     }
     LRESULT Engine::OnRButtonUp(Window &, HWND handle, UINT message, WPARAM w_param,
                                 LPARAM l_param)
     {
         ShowCursor(true);
+
         rbuttondown_ = false;
+
         return DefWindowProcW(handle, message, w_param, l_param);
     }
     void Engine::MainLoop(Window &window)
@@ -143,7 +148,9 @@ namespace engine
         const time_point<system_clock> now = system_clock::now();
         delta_time_ =
             float(duration_cast<microseconds>(now - last_time_point_).count()) / 1e6f;
+
         last_time_point_ = now;
+
         if (!rbuttondown_)
         {
             if (sphere_moving_direction_.length() != 0)
@@ -155,16 +162,18 @@ namespace engine
         else
         {
             auto middle = window_->position() + window_->size() / 2;
+
             POINT point;
             GetCursorPos(&point);
-            vec2 diff{float(point.x) - float(middle.x),
-                      float(middle.y) - float(point.y)};
-            diff /= window_->size().length();
+
+            vec2 diff = vec2{float(point.x) - float(middle.x),
+                             float(middle.y) - float(point.y)} /
+                        window_->size().length();
+
             MoveSphere(sphere_, {diff.x, diff.y, 0}, 1);
+
             SetCursorPos(middle.x, middle.y);
-            std::string t =
-                std::to_string(diff.x) + " " + std::to_string(diff.y) + "\n";
-            t = std::to_string(middle.x) + " " + std::to_string(middle.y) + "\n";
+
             Draw();
         }
     }
@@ -176,7 +185,9 @@ namespace engine
             return vec3{1, 0, 0};
         }
         vec3 unit_direction = r.direction().unit_vector();
+
         float t = 0.5f * (unit_direction.y + 1);
+
         return (1.0f - t) * vec3{1} + t * vec3{0.5f, 0.7f, 1.0f};
     }
 
@@ -194,11 +205,14 @@ namespace engine
             {
                 float u = float(i) / float(window_size.x);
                 float v = float(j) / float(window_size.y);
+
                 Ray r(origin, lower_left_corner + u * horizontal + v * vertical);
                 vec3 col = color(sphere_, r);
+
                 auto ir = int(255.99 * col.r()) << 16;
                 auto ig = int(255.99 * col.g()) << 8;
                 auto ib = int(255.99 * col.b());
+
                 for (int k = 0; i + k < window_size.x && k < kResolutionScaling; k++)
                 {
                     bitmap[size_t(j) * window_size.x + i + k] = ir | ig | ib;
