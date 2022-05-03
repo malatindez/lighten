@@ -12,8 +12,6 @@ namespace engine
     {
         bitmap_.resize(size_t(size.x) * size.y);
 
-        Window::SetMainLoopCallback(std::bind_front(&BitmapWindow::MainLoop, this));
-
         hdc_ = GetDC(handle());
 
         bitmap_info_.bmiHeader.biSize = sizeof(bitmap_info_.bmiHeader);
@@ -30,14 +28,12 @@ namespace engine
         bitmap_info_.bmiHeader.biHeight = size.y;
         bitmap_.resize(size_t(size.x) * size.y);
     }
-    void BitmapWindow::MainLoop(Window &)
+
+    bool BitmapWindow::Update()
     {
-        if (main_loop_callback_ != nullptr)
-        {
-            main_loop_callback_(std::ref(*this));
-        }
-        // draw bitmap
+        bool rv = Window::Update();
         StretchDIBits(hdc_, 0, 0, size().x, size().y, 0, 0, size().x, size().y,
                       bitmap_.data(), &bitmap_info_, DIB_RGB_COLORS, SRCCOPY);
+        return rv;
     }
 } // namespace engine

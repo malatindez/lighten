@@ -32,27 +32,23 @@ namespace engine
             throw GetLastError();
         }
     }
-
-    void Window::StartMainLoop()
+    bool Window::Update()
     {
-        bool running = true;
-        while (running)
+        if (!running_)
         {
-            MSG msg;
-            while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-            {
-                if (msg.message == WM_QUIT)
-                {
-                    running = false;
-                }
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-            if (main_loop_callback_ != nullptr)
-            {
-                main_loop_callback_(std::ref(*this));
-            }
+            return false;
         }
+        MSG msg;
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+        {
+            if (msg.message == WM_QUIT)
+            {
+                running_ = false;
+            }
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        return true;
     }
 
     LRESULT CALLBACK Window::WindowProcCallback(HWND handle, UINT message,

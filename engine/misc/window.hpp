@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 
+#include "interfaces/Updatable.hpp"
 #include "pch.hpp"
 
 namespace engine
@@ -14,7 +15,7 @@ namespace engine
     using MainLoopCallback = std::function<void(Window &)>;
 
     // Simple WINAPI window wrapper
-    class Window
+    class Window : public interfaces::Updatable
     {
     public:
         Window(WindowClass const &window_class_template, DWORD extended_style,
@@ -36,19 +37,11 @@ namespace engine
             callbacks_.try_emplace(message, function);
         }
 
-        virtual void SetMainLoopCallback(MainLoopCallback const &callback)
-        {
-            main_loop_callback_ = callback;
-        }
-
         [[nodiscard]] constexpr HWND handle() const noexcept { return handle_; }
         [[nodiscard]] inline math::ivec2 size() const noexcept { return size_; }
-        [[nodiscard]] inline math::ivec2 position() const noexcept
-        {
-            return position_;
-        }
+        [[nodiscard]] inline math::ivec2 position() const noexcept { return position_; }
 
-        void StartMainLoop();
+        bool Update() override;
 
     protected:
         virtual void OnSizeChanged() {}
@@ -59,7 +52,7 @@ namespace engine
 
         static LRESULT CALLBACK StaticWindowProc(HWND handle, UINT message,
                                                  WPARAM w_param, LPARAM l_param);
-
+        bool running_ = true;
         HWND handle_;
         std::unordered_map<UINT, WindowCallback> callbacks_;
         MainLoopCallback main_loop_callback_;

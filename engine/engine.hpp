@@ -19,9 +19,9 @@ namespace engine
     class Engine final
     {
     public:
-        INT Join() const
+        INT Join()
         {
-            window_->StartMainLoop();
+            MainLoop();
             return 0;
         }
 
@@ -30,6 +30,11 @@ namespace engine
         // Start should be called before retrieving an engine otherwise we will
         // dereference nullptr and get undefined behaviour
         [[nodiscard]] static inline Engine &engine() noexcept { return *engine_; }
+
+        void AddUpdatable(std::shared_ptr<interfaces::Updatable> updatable)
+        {
+            update_list_.push_back(updatable);
+        }
 
     private:
         LRESULT OnDestroy(Window &, HWND, UINT, WPARAM, LPARAM);
@@ -45,27 +50,34 @@ namespace engine
                               WPARAM w_param, LPARAM l_param);
         LRESULT OnRButtonUp(Window &window, HWND handle, UINT message, WPARAM w_param,
                             LPARAM l_param);
-        void MainLoop(Window &window);
+
+        void MainLoop();
+
+        void Update();
+
+        void ProcessInput();
 
         void Draw();
 
         Engine(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
-               int cmd_show, std::unique_ptr<BitmapWindow> window);
+               int cmd_show, std::shared_ptr<BitmapWindow> window);
         // delete move & copy semantics
         Engine(Engine &&Engine) = delete;
         Engine(Engine const &Engine) = delete;
         Engine &operator=(Engine &&Engine) = delete;
         Engine &operator=(Engine const &Engine) = delete;
 
-        std::chrono::time_point<std::chrono::system_clock> last_time_point_;
+        std::vector<std::shared_ptr<interfaces::Updatable>> update_list_; // list of objects that should be updated with each frame
+        std::chrono::time_point<std::chrono::steady_clock> last_time_point_;
         float delta_time_;
-        std::unique_ptr<BitmapWindow> window_;
         HINSTANCE instance_;
         HINSTANCE prev_instance_;
         math::Sphere sphere_;
         math::ivec2 last_mouse_position_{0};
         math::vec3 sphere_moving_direction_{0};
-        bool rbuttondown_{false}; // whenever RMB is pressed WASD movement is locked
+        std::shared_ptr<BitmapWindow> window_;
+        bool rbuttondown_{false};  // whenever RMB is pressed WASD movement is locked
+        bool update_scene_ = true; // scene should be drawn again
         static std::unique_ptr<Engine> engine_;
     };
     [[nodiscard]] inline Engine &GetEngine() { return Engine::engine(); }

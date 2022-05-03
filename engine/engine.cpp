@@ -27,7 +27,7 @@ namespace engine
         wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
 
         // create the window and use the result as the handle
-        auto window = std::make_unique<BitmapWindow>(
+        auto window = std::make_shared<BitmapWindow>(
             wc, NULL,
             L"WindowClass1",                  // name of the window class
             L"Our First Windowed Program",    // title of the window
@@ -41,6 +41,7 @@ namespace engine
 
         engine_ = std::unique_ptr<Engine>(new Engine{
             instance, prev_instance, cmd_line, cmd_show, std::move(window)});
+
         return engine_->Join();
     }
 
@@ -98,7 +99,6 @@ namespace engine
         }
         return DefWindowProcW(handle, message, w_param, l_param);
     }
-
     LRESULT Engine::OnKeyRelease(Window &, HWND handle, UINT message,
                                  WPARAM w_param, LPARAM l_param)
     {
@@ -142,21 +142,42 @@ namespace engine
 
         return DefWindowProcW(handle, message, w_param, l_param);
     }
-    void Engine::MainLoop(Window &window)
+
+    void Engine::MainLoop()
     {
+
         using namespace std::chrono;
-        const time_point<system_clock> now = system_clock::now();
-        delta_time_ =
-            float(duration_cast<microseconds>(now - last_time_point_).count()) / 1e6f;
+        while (true)
+        {
+            const time_point<steady_clock> now = steady_clock::now();
 
-        last_time_point_ = now;
+            delta_time_ =
+                float(duration_cast<microseconds>(now - last_time_point_).count()) / 1e6f;
 
+            last_time_point_ = now;
+
+            Update();
+            ProcessInput();
+            Draw();
+        }
+    }
+
+    void Engine::Update()
+    {
+        for (auto it = update_list_.begin(); it != update_list_.end(); ++it)
+        {
+            (*it)->Update();
+        }
+    }
+
+    void Engine::ProcessInput()
+    {
         if (!rbuttondown_)
         {
             if (sphere_moving_direction_.length() != 0)
             {
                 MoveSphere(sphere_, sphere_moving_direction_, delta_time_);
-                Draw();
+                update_scene_ = true;
             }
         }
         else
@@ -174,11 +195,11 @@ namespace engine
 
             SetCursorPos(middle.x, middle.y);
 
-            Draw();
+            update_scene_ = true;
         }
     }
 
-    vec3 color(Sphere sphere, Ray const &r)
+    vec3 color(Sphere const &sphere, Ray const &r)
     {
         if (sphere.Hit(r))
         {
@@ -193,6 +214,10 @@ namespace engine
 
     void Engine::Draw()
     {
+        if (!update_scene_)
+        {
+            return;
+        }
         vec3 lower_left_corner{-2, -1, -1};
         vec3 horizontal{4, 0, 0};
         vec3 vertical{0, 2, 0};
@@ -231,14 +256,15 @@ namespace engine
     }
 
     Engine::Engine(HINSTANCE instance, HINSTANCE prev_instance, PWSTR, int cmd_show,
-                   std::unique_ptr<BitmapWindow> window)
-        : window_(std::move(window)), instance_(instance),
+                   std::shared_ptr<BitmapWindow> window)
+        : window_(window), instance_(instance),
           prev_instance_(prev_instance), sphere_{kSphereCoords, kSphereRadius}
     {
+        update_list_.push_back(window);
+
         // display the window on the screen
         ShowWindow(window_->handle(), cmd_show);
 
-        Draw();
         // register callbacks
         window_->SetCallback(WM_DESTROY, std::bind_front(&Engine::OnDestroy, this));
         window_->SetCallback(WM_PAINT, std::bind_front(&Engine::OnPaint, this));
@@ -250,7 +276,6 @@ namespace engine
                              std::bind_front(&Engine::OnRButtonDown, this));
         window_->SetCallback(WM_RBUTTONUP,
                              std::bind_front(&Engine::OnRButtonUp, this));
-        window_->SetMainLoopCallback(std::bind_front(&Engine::MainLoop, this));
     }
 
 } // namespace engine

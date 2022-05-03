@@ -18,10 +18,6 @@ namespace engine
         BitmapWindow(BitmapWindow const &BitmapWindow) = delete;
         BitmapWindow &operator=(BitmapWindow const &BitmapWindow) = delete;
 
-        void SetMainLoopCallback(MainLoopCallback const &callback) override
-        {
-            main_loop_callback_ = callback;
-        }
         [[nodiscard]] inline BITMAPINFO bitmap_info() const noexcept
         {
             return bitmap_info_;
@@ -36,9 +32,10 @@ namespace engine
             return bitmap_;
         }
 
+        bool Update() override;
+
     private:
         void OnSizeChanged() override;
-        void MainLoop(Window &);
         HDC hdc_;
         std::vector<uint32_t> bitmap_;
         BITMAPINFO bitmap_info_;
