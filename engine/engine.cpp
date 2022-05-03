@@ -147,7 +147,7 @@ namespace engine
     {
 
         using namespace std::chrono;
-        while (true)
+        while (window_->running())
         {
             const time_point<steady_clock> now = steady_clock::now();
 
@@ -261,9 +261,9 @@ namespace engine
           prev_instance_(prev_instance), sphere_{kSphereCoords, kSphereRadius}
     {
         update_list_.push_back(window);
-
         // display the window on the screen
         ShowWindow(window_->handle(), cmd_show);
+        Draw();
 
         // register callbacks
         window_->SetCallback(WM_DESTROY, std::bind_front(&Engine::OnDestroy, this));

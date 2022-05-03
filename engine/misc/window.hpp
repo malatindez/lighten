@@ -38,9 +38,9 @@ namespace engine
         }
 
         [[nodiscard]] constexpr HWND handle() const noexcept { return handle_; }
-        [[nodiscard]] inline math::ivec2 size() const noexcept { return size_; }
-        [[nodiscard]] inline math::ivec2 position() const noexcept { return position_; }
-
+        [[nodiscard]] constexpr math::ivec2 size() const noexcept { return size_; }
+        [[nodiscard]] constexpr math::ivec2 position() const noexcept { return position_; }
+        [[nodiscard]] constexpr bool running() const noexcept { return running_; }
         bool Update() override;
 
     protected:
