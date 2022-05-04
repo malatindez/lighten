@@ -6,6 +6,9 @@ namespace engine
     std::unique_ptr<Engine> Engine::engine_;
 
     using namespace engine::math;
+    using namespace std::chrono;
+    using namespace std::chrono_literals;
+    using namespace std::this_thread;
 
     INT Engine::Start()
     {
@@ -18,28 +21,31 @@ namespace engine
         running_ = false;
     }
 
+    bool Engine::FrameTimeElapsed() 
+    {
+        const time_point<steady_clock> now = steady_clock::now();
+
+        delta_time_ = duration_cast<duration<float>>(steady_clock::now() - last_time_point_).count();
+
+        if (delta_time_ >= kFrameDuration) {
+            last_time_point_ = now;
+            return true;
+        }
+        return false;
+    }
+
     void Engine::MainLoop()
     {
-        using namespace std::chrono_literals;
-        using namespace std::this_thread;
         while (running_)
         {
-            using namespace std::chrono;
-            const time_point<steady_clock> now = steady_clock::now();
 
-            delta_time_ = duration_cast<duration<float>>(now - last_time_point_).count();
-
-            // limit fps
-            while (delta_time_ < kFrameDuration)
-            {
-                std::this_thread::yield();
-                PeekOSMessages();
-                delta_time_ = duration_cast<duration<float>>(steady_clock::now() - last_time_point_).count();
-            }
             PeekOSMessages();
-            Update();
 
-            last_time_point_ = now;
+            if (FrameTimeElapsed()) {
+                Update();
+            }
+
+            std::this_thread::yield();
         }
     }
 

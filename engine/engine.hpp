@@ -62,6 +62,8 @@ namespace engine
         Engine &operator=(Engine &&Engine) = delete;
         Engine &operator=(Engine const &Engine) = delete;
 
+        bool FrameTimeElapsed();
+
         void MainLoop();
 
         void Update();
