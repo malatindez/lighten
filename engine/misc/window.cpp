@@ -32,7 +32,8 @@ namespace engine
             throw GetLastError();
         }
     }
-    bool Window::Update()
+
+    bool Window::Update(float)
     {
         if (!running_)
         {

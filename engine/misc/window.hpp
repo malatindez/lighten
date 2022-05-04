@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 
-#include "interfaces/Updatable.hpp"
+#include "interfaces/updatable.hpp"
 #include "pch.hpp"
 
 namespace engine
@@ -29,7 +29,7 @@ namespace engine
         Window(Window const &Window) = delete;
         Window &operator=(Window const &Window) = delete;
 
-        virtual ~Window() { DestroyWindow(handle_); }
+        ~Window() override { DestroyWindow(handle_); }
 
         // Windows event callback
         virtual void SetCallback(UINT message, WindowCallback const &function)
@@ -41,7 +41,8 @@ namespace engine
         [[nodiscard]] constexpr math::ivec2 size() const noexcept { return size_; }
         [[nodiscard]] constexpr math::ivec2 position() const noexcept { return position_; }
         [[nodiscard]] constexpr bool running() const noexcept { return running_; }
-        bool Update() override;
+
+        bool Update(float) override;
 
     protected:
         virtual void OnSizeChanged() {}

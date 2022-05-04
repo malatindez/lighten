@@ -32,7 +32,7 @@ namespace engine
             return bitmap_;
         }
 
-        bool Update() override;
+        bool Update(float) override;
 
     private:
         void OnSizeChanged() override;
