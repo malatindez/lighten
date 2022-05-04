@@ -1,27 +1,20 @@
 #pragma once
 
-#include "interfaces/updatable.hpp"
 #include "math/sphere.hpp"
 #include "misc/bitmap-window.hpp"
 namespace engine
 {
-    class Scene : public interfaces::Updatable
+    class Scene
     {
     public:
-        Scene(std::shared_ptr<BitmapWindow> window, math::Sphere sphere) : sphere_(sphere), window_(window) {}
-
-        void SetBitmapWindow(std::shared_ptr<BitmapWindow> window);
-
-        [[nodiscard]] math::Sphere &sphere() noexcept;
-
+        Scene() {}
         void UpdateScene() noexcept;
 
-        bool Update(float) override;
+        void Draw(BitmapWindow &window);
+
+        math::Sphere sphere{{0, 0, 0}, 1};
 
     private:
-        void Draw();
-        math::Sphere sphere_;
         bool update_scene_{true};
-        std::shared_ptr<BitmapWindow> window_ = nullptr;
     };
 }

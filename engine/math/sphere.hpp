@@ -6,18 +6,23 @@ namespace engine::math
     {
     public:
         Sphere(vec3 center, float radius) : center_(center), radius_(radius) {}
-        bool Hit(Ray const &r)
+        float Hit(Ray const &r)
 
             const noexcept
         {
             vec3 oc = r.origin() - center_;
-            // find sin of an angle between OC and d, where OC is the vector between ray
-            // origin and the center of the sphere, and d is the direction of the ray
-            float sinAngle =
-                (dot(oc, r.direction()) /
-                 std::sqrt(oc.squared_length() * r.direction().squared_length()));
-            sinAngle = std::sqrt(1 - sinAngle * sinAngle);
-            return sinAngle * oc.length() <= radius_;
+            float a = dot(r.direction(), r.direction());
+            float b = 2.0f * dot(oc, r.direction());
+            float c = dot(oc, oc) - radius_ * radius_;
+            float discriminant = b * b - 4 * a * c;
+            if (discriminant < 0)
+            {
+                return -1.0f;
+            }
+            else
+            {
+                return (-b - sqrt(discriminant)) / (2.0f * a);
+            }
         }
         [[nodiscard]] inline float radius() const noexcept { return radius_; }
         [[nodiscard]] inline vec3 center() const noexcept { return center_; }

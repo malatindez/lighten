@@ -14,6 +14,7 @@ namespace engine
     const math::ivec2 kWindowResolution{1280, 720};
 
     const float kFpsLimit = 60.0f;
+    const float kFrameDuration = 1.0f / kFpsLimit;
 
     const math::vec3 kSphereCoords{0, 0, -1};
     const float kSphereRadius{0.5f};
@@ -58,7 +59,6 @@ namespace engine
 
         void MainLoop();
 
-        void UpdateDelta();
 
         void Update();
 

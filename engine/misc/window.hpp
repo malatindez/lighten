@@ -12,8 +12,6 @@ namespace engine
     using WindowCallback =
         std::function<LRESULT(Window &, HWND, UINT, WPARAM, LPARAM)>;
 
-    using MainLoopCallback = std::function<void(Window &)>;
-
     // Simple WINAPI window wrapper
     class Window : public interfaces::Updatable
     {
@@ -56,7 +54,6 @@ namespace engine
         bool running_ = true;
         HWND handle_;
         std::unordered_map<UINT, WindowCallback> callbacks_;
-        MainLoopCallback main_loop_callback_;
         math::ivec2 position_;
         math::ivec2 size_;
     };

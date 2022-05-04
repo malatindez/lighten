@@ -9,7 +9,7 @@
 class Controller : public engine::interfaces::Updatable
 {
 public:
-    Controller(engine::Window &window, std::shared_ptr<engine::Scene> scene);
+    Controller(engine::BitmapWindow &window, std::shared_ptr<engine::Scene> scene);
 
     [[nodiscard]] inline bool key_state(uint64_t key) const noexcept
     {
@@ -44,5 +44,5 @@ private:
     bool lbuttonstate_ = false;
     bool rbuttonstate_ = false;
     std::shared_ptr<engine::Scene> scene_;
-    engine::Window &window_;
+    engine::BitmapWindow &window_;
 };

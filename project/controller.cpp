@@ -2,7 +2,7 @@
 #include "engine.hpp"
 using namespace engine;
 using namespace engine::math;
-Controller::Controller(Window &window, std::shared_ptr<Scene> scene) : scene_(scene), window_(window)
+Controller::Controller(BitmapWindow &window, std::shared_ptr<Scene> scene) : scene_(scene), window_(window)
 {
     window_.SetCallback(WM_KEYDOWN, std::bind_front(&Controller::OnKeyDown, this));
     window_.SetCallback(WM_KEYUP, std::bind_front(&Controller::OnKeyRelease, this));
@@ -93,8 +93,7 @@ bool Controller::Update(float delta_time)
             vec += kRight;
         }
 
-        Sphere &sphere = scene_->sphere();
-        sphere.SetCenter(sphere.center() + vec * delta_time);
+        scene_->sphere.SetCenter(scene_->sphere.center() + vec * delta_time);
 
         // update the scene if position of the sphere has changed
         if (vec.squared_length() != 0)
@@ -113,12 +112,13 @@ bool Controller::Update(float delta_time)
                          float(middle.y) - float(point.y)} /
                     window_.size().length();
 
-        Sphere &sphere = scene_->sphere();
-        sphere.SetCenter(sphere.center() + vec3{diff.x, diff.y, 0});
+        scene_->sphere.SetCenter(scene_->sphere.center() + vec3{diff.x, diff.y, 0});
 
         SetCursorPos(middle.x, middle.y);
 
         scene_->UpdateScene();
     }
+
+    scene_->Draw(window_);
     return true;
 }

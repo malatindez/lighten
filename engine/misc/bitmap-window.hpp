@@ -39,6 +39,5 @@ namespace engine
         HDC hdc_;
         std::vector<uint32_t> bitmap_;
         BITMAPINFO bitmap_info_;
-        MainLoopCallback main_loop_callback_;
     };
 } // namespace engine

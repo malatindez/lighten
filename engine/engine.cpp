@@ -20,32 +20,28 @@ namespace engine
 
     void Engine::MainLoop()
     {
-        using namespace std::chrono;
+        using namespace std::chrono_literals;
         using namespace std::this_thread;
         while (running_)
         {
-            UpdateDelta();
-            Update();
+            using namespace std::chrono;
+            const time_point<steady_clock> now = steady_clock::now();
 
+            delta_time_ = duration_cast<duration<float>>(now - last_time_point_).count();
+            
             // limit fps
-            if (delta_time_ < 1000000.0f / kFpsLimit)
+            while (delta_time_ < kFrameDuration)
             {
-                sleep_for(microseconds(size_t(1000000.0f / kFpsLimit - delta_time_)));
+                sleep_for(100us);
+                delta_time_ = duration_cast<duration<float>>(steady_clock::now() - last_time_point_).count();
             }
+            
+            Update();
+            
+            last_time_point_ = now;
         }
     }
 
-    void Engine::UpdateDelta()
-    {
-        using namespace std::chrono;
-        const time_point<steady_clock> now = steady_clock::now();
-
-        delta_time_ =
-            float(duration_cast<microseconds>(now - last_time_point_).count()) /
-            1e6f;
-
-        last_time_point_ = now;
-    }
 
     void Engine::Update()
     {

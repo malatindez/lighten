@@ -37,14 +37,15 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     // display the window on the screen
     ShowWindow(window->handle(), cmd_show);
 
-    auto scene = std::make_shared<Scene>(bmwindow, math::Sphere{{0, 0, -1}, 0.5f});
+    auto scene = std::make_shared<Scene>();
 
-    auto controller = std::make_shared<Controller>(*window, scene);
+    scene->sphere = math::Sphere{{0, 0, -1}, 0.5f};
+
+    auto controller = std::make_shared<Controller>(*bmwindow, scene);
 
     Engine &engine = GetEngine();
     engine.AddUpdatable(window);
     engine.AddUpdatable(controller);
-    engine.AddUpdatable(scene);
     engine.Start();
     PostQuitMessage(0);
     return 0;
