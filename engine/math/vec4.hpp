@@ -173,8 +173,7 @@ namespace engine::math
             return return_value;
         }
         template <Primitive U>
-        [[nodiscard]] constexpr type_vec4<T>
-        operator/(type_vec4<U> const &other) const noexcept
+        [[nodiscard]] constexpr type_vec4<T> operator/(type_vec4<U> const &other) const noexcept
         {
             type_vec4<T> return_value{*this};
             return_value /= other;

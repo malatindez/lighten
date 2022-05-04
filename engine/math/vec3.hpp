@@ -139,32 +139,28 @@ namespace engine::math
         }
 
         template <Primitive U>
-        [[nodiscard]] constexpr type_vec3<T>
-        operator+(type_vec3<U> const &other) const noexcept
+        [[nodiscard]] constexpr type_vec3<T> operator+(type_vec3<U> const &other) const noexcept
         {
             type_vec3<T> return_value{*this};
             return_value += other;
             return return_value;
         }
         template <Primitive U>
-        [[nodiscard]] constexpr type_vec3<T>
-        operator-(type_vec3<U> const &other) const noexcept
+        [[nodiscard]] constexpr type_vec3<T> operator-(type_vec3<U> const &other) const noexcept
         {
             type_vec3<T> return_value{*this};
             return_value -= other;
             return return_value;
         }
         template <Primitive U>
-        [[nodiscard]] constexpr type_vec3<T>
-        operator*(type_vec3<U> const &other) const noexcept
+        [[nodiscard]] constexpr type_vec3<T> operator*(type_vec3<U> const &other) const noexcept
         {
             type_vec3<T> return_value{*this};
             return_value *= other;
             return return_value;
         }
         template <Primitive U>
-        [[nodiscard]] constexpr type_vec3<T>
-        operator/(type_vec3<U> const &other) const noexcept
+        [[nodiscard]] constexpr type_vec3<T> operator/(type_vec3<U> const &other) const noexcept
         {
             type_vec3<T> return_value{*this};
             return_value /= other;
