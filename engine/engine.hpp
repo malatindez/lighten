@@ -70,7 +70,6 @@ namespace engine
 
         std::vector<std::shared_ptr<interfaces::Updatable>> update_list_;
 
-        std::vector<std::shared_ptr<Window>> windows_;
         static std::unique_ptr<Engine> engine_;
     };
     [[nodiscard]] inline Engine &GetEngine() { return Engine::engine(); }
