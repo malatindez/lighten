@@ -28,20 +28,20 @@ namespace engine
             const time_point<steady_clock> now = steady_clock::now();
 
             delta_time_ = duration_cast<duration<float>>(now - last_time_point_).count();
-            
+
             // limit fps
             while (delta_time_ < kFrameDuration)
             {
-                sleep_for(100us);
+                std::this_thread::yield();
+                PeekOSMessages();
                 delta_time_ = duration_cast<duration<float>>(steady_clock::now() - last_time_point_).count();
             }
-            
+            PeekOSMessages();
             Update();
-            
+
             last_time_point_ = now;
         }
     }
-
 
     void Engine::Update()
     {
@@ -54,6 +54,21 @@ namespace engine
             else
             {
                 it = update_list_.erase(it);
+            }
+        }
+    }
+
+    void Engine::PeekOSMessages()
+    {
+        for (auto it = windows_.begin(); it != windows_.end();)
+        {
+            if ((*it)->PeekOSMessages())
+            {
+                ++it;
+            }
+            else
+            {
+                it = windows_.erase(it);
             }
         }
     }

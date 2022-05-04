@@ -29,9 +29,9 @@ namespace engine
         bitmap_.resize(size_t(size.x) * size.y);
     }
 
-    bool BitmapWindow::Update(float x)
+    bool BitmapWindow::PeekOSMessages()
     {
-        bool rv = Window::Update(x);
+        bool rv = Window::PeekOSMessages();
         StretchDIBits(hdc_, 0, 0, size().x, size().y, 0, 0, size().x, size().y,
                       bitmap_.data(), &bitmap_info_, DIB_RGB_COLORS, SRCCOPY);
         return rv;

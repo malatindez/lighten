@@ -44,7 +44,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     auto controller = std::make_shared<Controller>(*bmwindow, scene);
 
     Engine &engine = GetEngine();
-    engine.AddUpdatable(window);
+    engine.AddWindow(window);
     engine.AddUpdatable(controller);
     engine.Start();
     PostQuitMessage(0);

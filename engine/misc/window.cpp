@@ -33,7 +33,7 @@ namespace engine
         }
     }
 
-    bool Window::Update(float)
+    bool Window::PeekOSMessages()
     {
         if (!running_)
         {

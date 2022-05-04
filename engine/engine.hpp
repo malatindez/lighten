@@ -43,6 +43,11 @@ namespace engine
         {
             update_list_.push_back(std::static_pointer_cast<interfaces::Updatable>(updatable));
         }
+        template <typename T>
+        void AddWindow(std::shared_ptr<T> const &window)
+        {
+            windows_.push_back(std::static_pointer_cast<Window>(window));
+        }
 
         [[nodiscard]] constexpr float delta_time() const noexcept
         {
@@ -59,14 +64,17 @@ namespace engine
 
         void MainLoop();
 
-
         void Update();
+
+        void PeekOSMessages();
 
         bool running_ = true;
 
         // time from previous update
         std::chrono::time_point<std::chrono::steady_clock> last_time_point_;
         float delta_time_ = 0;
+
+        std::vector<std::shared_ptr<Window>> windows_;
 
         std::vector<std::shared_ptr<interfaces::Updatable>> update_list_;
 

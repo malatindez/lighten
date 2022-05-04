@@ -32,7 +32,7 @@ namespace engine
             return bitmap_;
         }
 
-        bool Update(float) override;
+        bool PeekOSMessages() override;
 
     private:
         void OnSizeChanged() override;

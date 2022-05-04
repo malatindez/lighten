@@ -13,7 +13,7 @@ namespace engine
         std::function<LRESULT(Window &, HWND, UINT, WPARAM, LPARAM)>;
 
     // Simple WINAPI window wrapper
-    class Window : public interfaces::Updatable
+    class Window
     {
     public:
         Window(WindowClass const &window_class_template, DWORD extended_style,
@@ -27,7 +27,7 @@ namespace engine
         Window(Window const &Window) = delete;
         Window &operator=(Window const &Window) = delete;
 
-        ~Window() override { DestroyWindow(handle_); }
+        ~Window() { DestroyWindow(handle_); }
 
         // Windows event callback
         virtual void SetCallback(UINT message, WindowCallback const &function)
@@ -40,7 +40,7 @@ namespace engine
         [[nodiscard]] constexpr math::ivec2 position() const noexcept { return position_; }
         [[nodiscard]] constexpr bool running() const noexcept { return running_; }
 
-        bool Update(float) override;
+        virtual bool PeekOSMessages();
 
     protected:
         virtual void OnSizeChanged() {}
