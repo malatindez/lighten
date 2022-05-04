@@ -1,6 +1,8 @@
 #pragma once
+#include "interfaces/updatable.hpp"
 #include "math/sphere.hpp"
 #include "misc/bitmap-window.hpp"
+#include "misc/scene.hpp"
 #include "pch.hpp"
 
 #include <chrono>
@@ -10,8 +12,8 @@ namespace engine
 
     const math::ivec2 kWindowPosition{0};
     const math::ivec2 kWindowResolution{1280, 720};
-    // Square size of ray in pixels
-    const int kResolutionScaling = 2;
+
+    const float kFpsLimit = 60.0f;
 
     const math::vec3 kSphereCoords{0, 0, -1};
     const float kSphereRadius{0.5f};
@@ -19,65 +21,56 @@ namespace engine
     class Engine final
     {
     public:
-        INT Join()
+        [[nodiscard]] static inline Engine &engine() noexcept
         {
-            MainLoop();
-            return 0;
+            if (engine_)
+            {
+                return *engine_;
+            }
+
+            engine_ = std::unique_ptr<Engine>(new Engine{});
+
+            return *engine_;
         }
 
-        static INT Start(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
-                         int cmd_show);
-        // Start should be called before retrieving an engine otherwise we will
-        // dereference nullptr and get undefined behaviour
-        [[nodiscard]] static inline Engine &engine() noexcept { return *engine_; }
+        INT Start();
 
-        void AddUpdatable(std::shared_ptr<interfaces::Updatable> updatable)
+        void Exit();
+
+        template <typename T>
+        void AddUpdatable(std::shared_ptr<T> const &updatable)
         {
-            update_list_.push_back(updatable);
+            update_list_.push_back(std::static_pointer_cast<interfaces::Updatable>(updatable));
+        }
+
+        [[nodiscard]] constexpr float delta_time() const noexcept
+        {
+            return delta_time_;
         }
 
     private:
-        LRESULT OnDestroy(Window &, HWND, UINT, WPARAM, LPARAM);
-        LRESULT OnPaint(Window &, HWND handle, UINT message, WPARAM w_param,
-                        LPARAM l_param);
-        LRESULT OnExitSizeMove(Window &window, HWND handle, UINT message,
-                               WPARAM w_param, LPARAM l_param);
-        LRESULT OnKeyDown(Window &window, HWND handle, UINT message, WPARAM w_param,
-                          LPARAM l_param);
-        LRESULT OnKeyRelease(Window &window, HWND handle, UINT message,
-                             WPARAM w_param, LPARAM l_param);
-        LRESULT OnRButtonDown(Window &window, HWND handle, UINT message,
-                              WPARAM w_param, LPARAM l_param);
-        LRESULT OnRButtonUp(Window &window, HWND handle, UINT message, WPARAM w_param,
-                            LPARAM l_param);
-
-        void MainLoop();
-
-        void Update();
-
-        void ProcessInput();
-
-        void Draw();
-
-        Engine(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
-               int cmd_show, std::shared_ptr<BitmapWindow> window);
+        Engine() = default;
         // delete move & copy semantics
         Engine(Engine &&Engine) = delete;
         Engine(Engine const &Engine) = delete;
         Engine &operator=(Engine &&Engine) = delete;
         Engine &operator=(Engine const &Engine) = delete;
 
-        std::vector<std::shared_ptr<interfaces::Updatable>> update_list_; // list of objects that should be updated with each frame
+        void MainLoop();
+
+        void UpdateDelta();
+
+        void Update();
+
+        bool running_ = true;
+
+        // time from previous update
         std::chrono::time_point<std::chrono::steady_clock> last_time_point_;
-        float delta_time_;
-        HINSTANCE instance_;
-        HINSTANCE prev_instance_;
-        math::Sphere sphere_;
-        math::ivec2 last_mouse_position_{0};
-        math::vec3 sphere_moving_direction_{0};
-        std::shared_ptr<BitmapWindow> window_;
-        bool rbuttondown_{false};  // whenever RMB is pressed WASD movement is locked
-        bool update_scene_ = true; // scene should be drawn again
+        float delta_time_ = 0;
+
+        std::vector<std::shared_ptr<interfaces::Updatable>> update_list_;
+
+        std::vector<std::shared_ptr<Window>> windows_;
         static std::unique_ptr<Engine> engine_;
     };
     [[nodiscard]] inline Engine &GetEngine() { return Engine::engine(); }
