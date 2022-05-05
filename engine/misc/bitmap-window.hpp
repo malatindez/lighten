@@ -7,7 +7,7 @@ namespace engine
     class BitmapWindow final : public Window
     {
     public:
-        BitmapWindow(WindowClass const &window_class, DWORD extended_style,
+        BitmapWindow(WNDCLASSEXW const &window_class, DWORD extended_style,
                      std::wstring const &class_name, std::wstring const &window_name,
                      DWORD style, math::ivec2 position, math::ivec2 size,
                      HWND parent_window, HMENU menu, HINSTANCE instance,

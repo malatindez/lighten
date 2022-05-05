@@ -6,7 +6,6 @@
 
 namespace engine
 {
-    using WindowClass = WNDCLASSEXW;
     class Window;
 
     using WindowCallback =
@@ -16,7 +15,7 @@ namespace engine
     class Window
     {
     public:
-        Window(WindowClass const &window_class_template, DWORD extended_style,
+        Window(WNDCLASSEXW const &window_class_template, DWORD extended_style,
                std::wstring const &class_name, std::wstring const &window_name,
                DWORD style, math::ivec2 position, math::ivec2 size,
                HWND parent_window, HMENU menu, HINSTANCE instance, LPVOID lp_param);

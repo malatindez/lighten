@@ -1,7 +1,7 @@
 #include "misc/bitmap-window.hpp"
 namespace engine
 {
-    BitmapWindow::BitmapWindow(WindowClass const &window_class,
+    BitmapWindow::BitmapWindow(WNDCLASSEXW const &window_class,
                                DWORD extended_style, std::wstring const &class_name,
                                std::wstring const &window_name, DWORD style,
                                math::ivec2 position, math::ivec2 size,

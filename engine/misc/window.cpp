@@ -1,7 +1,7 @@
 #include "misc/window.hpp"
 namespace engine
 {
-    Window::Window(WindowClass const &window_class_template, DWORD extended_style,
+    Window::Window(WNDCLASSEXW const &window_class_template, DWORD extended_style,
                    std::wstring const &class_name, std::wstring const &window_name,
                    DWORD style, math::ivec2 position, math::ivec2 size,
                    HWND parent_window, HMENU menu, HINSTANCE instance,
@@ -9,10 +9,10 @@ namespace engine
         : position_(position), size_(size)
     {
         // Create custom window_class for this window
-        WindowClass window_class{window_class_template};
+        WNDCLASSEXW window_class{window_class_template};
         window_class.lpszClassName = class_name.c_str();
         window_class.lpfnWndProc = Window::StaticWindowProc;
-        window_class.cbSize = sizeof(WindowClass);
+        window_class.cbSize = sizeof(WNDCLASSEXW);
         window_class.cbWndExtra = sizeof(void *);
 
         RegisterClassExW(&window_class);
