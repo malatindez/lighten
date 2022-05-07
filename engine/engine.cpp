@@ -21,13 +21,14 @@ namespace engine
         running_ = false;
     }
 
-    bool Engine::FrameTimeElapsed() 
+    bool Engine::FrameTimeElapsed()
     {
         const time_point<steady_clock> now = steady_clock::now();
 
         delta_time_ = duration_cast<duration<float>>(steady_clock::now() - last_time_point_).count();
 
-        if (delta_time_ >= kFrameDuration) {
+        if (delta_time_ >= kFrameDuration)
+        {
             last_time_point_ = now;
             return true;
         }
@@ -41,7 +42,8 @@ namespace engine
 
             PeekOSMessages();
 
-            if (FrameTimeElapsed()) {
+            if (FrameTimeElapsed())
+            {
                 Update();
             }
 
