@@ -9,7 +9,7 @@ namespace engine::math
     template <Primitive T>
     struct vec<4, T>
     {
-        [[nodiscard]] static constexpr size_t size() { return 4; }
+        static constexpr size_t size = 4;
         constexpr vec() = default;
         explicit constexpr vec(T value) { x = y = z = w = value; }
         constexpr vec(T x, T y, T z, T w)
@@ -125,12 +125,12 @@ namespace engine::math
 
         [[nodiscard]] constexpr T &operator[](size_t i)
         {
-            assert(i < size());
+            assert(i < size);
             return data[i];
         }
         [[nodiscard]] constexpr T const &operator[](size_t i) const
         {
-            assert(i < size());
+            assert(i < size);
             return data[i];
         }
         union
@@ -154,9 +154,9 @@ namespace engine::math
                     T w, a, q;
                 };
             };
-            std::array<T, size()> data;
+            std::array<T, size> data;
         };
-        static_assert(sizeof(data) == size() * sizeof(T));
+        static_assert(sizeof(data) == size * sizeof(T));
     };
 
 }; // namespace engine::math
