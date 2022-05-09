@@ -41,3 +41,13 @@ target_include_directories(project PRIVATE ${PROJECT_SOURCES_DIR})
 target_include_directories(project PRIVATE ${ENGINE_SOURCES_DIR})
 
 set_target_properties(project PROPERTIES LINKER_LANGUAGE CXX)
+
+set(TEST_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test")
+file(GLOB_RECURSE TEST_SOURCES ${SRC_DIR} *.*)
+list(FILTER TEST_SOURCES INCLUDE REGEX ${TEST_SOURCES_DIR}/*)
+
+add_executable(tests ${TEST_SOURCES} ${ENGINE_SOURCES})
+target_include_directories(tests PRIVATE ${TEST_SOURCES})
+target_include_directories(tests PRIVATE ${ENGINE_SOURCES_DIR})
+
+set_target_properties(tests PROPERTIES LINKER_LANGUAGE CXX)
