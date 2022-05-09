@@ -1,26 +1,25 @@
 #pragma once
 
 #include "vec.hpp"
+#include <cstddef>
 
 namespace engine::math
 {
 
     template <Primitive T>
-    class type_vec4 final
+    struct vec<4, T>
     {
     public:
-        explicit constexpr type_vec4(T value = 0) { x = y = z = w = value; }
-        constexpr type_vec4(T x, T y, T z, T w)
+        [[nodiscard]] static constexpr size_t size() { return 4; }
+        constexpr vec() = default;
+        explicit constexpr vec(T value = 0) { x = y = z = w = value; }
+        constexpr vec(T x, T y, T z, T w)
         {
             this->x = x;
             this->y = y;
             this->z = z;
             this->w = w;
         }
-        [[nodiscard]] constexpr T r() const noexcept { return x; }
-        [[nodiscard]] constexpr T g() const noexcept { return y; }
-        [[nodiscard]] constexpr T b() const noexcept { return z; }
-        [[nodiscard]] constexpr T a() const noexcept { return w; }
 
         [[nodiscard]] constexpr float length() const noexcept
         {
@@ -31,23 +30,23 @@ namespace engine::math
             return x * x + y * y + z * z + w * w;
         }
 
-        [[nodiscard]] constexpr type_vec4<T> unit_vector() const noexcept
+        [[nodiscard]] constexpr vec<4, T> unit_vector() const noexcept
         {
             return *this / length();
         }
         constexpr void make_unit_vector() { operator/=(length()); }
 
-        [[nodiscard]] constexpr type_vec4<T> const &operator+() const noexcept
+        [[nodiscard]] constexpr vec<4, T> const &operator+() const noexcept
         {
             return *this;
         }
-        [[nodiscard]] constexpr type_vec4<T> operator-() const noexcept
+        [[nodiscard]] constexpr vec<4, T> operator-() const noexcept
         {
-            return type_vec4<T>{-x, -y, -z, -w};
+            return vec<4, T>{-x, -y, -z, -w};
         }
 
         template <Primitive U>
-        constexpr type_vec4<T> &operator+=(U const value) noexcept
+        constexpr vec<4, T> &operator+=(U const value) noexcept
         {
             x += value;
             y += value;
@@ -56,7 +55,7 @@ namespace engine::math
             return *this;
         }
         template <Primitive U>
-        constexpr type_vec4<T> &operator-=(U const value) noexcept
+        constexpr vec<4, T> &operator-=(U const value) noexcept
         {
             x -= value;
             y -= value;
@@ -65,7 +64,7 @@ namespace engine::math
             return *this;
         }
         template <Primitive U>
-        constexpr type_vec4<T> &operator*=(U const value) noexcept
+        constexpr vec<4, T> &operator*=(U const value) noexcept
         {
             x *= value;
             y *= value;
@@ -74,7 +73,7 @@ namespace engine::math
             return *this;
         }
         template <Primitive U>
-        constexpr type_vec4<T> &operator/=(U const value) noexcept
+        constexpr vec<4, T> &operator/=(U const value) noexcept
         {
             x /= value;
             y /= value;
@@ -82,37 +81,8 @@ namespace engine::math
             w /= value;
             return *this;
         }
-
         template <Primitive U>
-        [[nodiscard]] constexpr type_vec4<T> operator+(U const value) const noexcept
-        {
-            type_vec4<T> return_value{*this};
-            return_value += value;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr type_vec4<T> operator-(U const value) const noexcept
-        {
-            type_vec4<T> return_value{*this};
-            return_value -= value;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr type_vec4<T> operator*(U const value) const noexcept
-        {
-            type_vec4<T> return_value{*this};
-            return_value *= value;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr type_vec4<T> operator/(U const value) const noexcept
-        {
-            type_vec4<T> return_value{*this};
-            return_value /= value;
-            return return_value;
-        }
-        template <Primitive U>
-        constexpr type_vec4<T> &operator+=(type_vec4<U> const &other) noexcept
+        constexpr vec<4, T> &operator+=(vec<4, U> const &other) noexcept
         {
             x += other.x;
             y += other.y;
@@ -121,7 +91,7 @@ namespace engine::math
             return *this;
         }
         template <Primitive U>
-        constexpr type_vec4<T> &operator-=(type_vec4<U> const &other) noexcept
+        constexpr vec<4, T> &operator-=(vec<4, U> const &other) noexcept
         {
             x -= other.x;
             y -= other.y;
@@ -130,7 +100,7 @@ namespace engine::math
             return *this;
         }
         template <Primitive U>
-        constexpr type_vec4<T> &operator*=(type_vec4<U> const &other) noexcept
+        constexpr vec<4, T> &operator*=(vec<4, U> const &other) noexcept
         {
             x *= other.x;
             y *= other.y;
@@ -139,7 +109,7 @@ namespace engine::math
             return *this;
         }
         template <Primitive U>
-        constexpr type_vec4<T> &operator/=(type_vec4<U> const &other) noexcept
+        constexpr vec<4, T> &operator/=(vec<4, U> const &other) noexcept
         {
             x /= other.x;
             y /= other.y;
@@ -149,85 +119,102 @@ namespace engine::math
         }
 
         template <Primitive U>
-        [[nodiscard]] constexpr type_vec4<T>
-        operator+(type_vec4<U> const &other) const noexcept
+        [[nodiscard]] constexpr vec<4, T> operator+(U const value) const noexcept
         {
-            type_vec4<T> return_value{*this};
+            vec<4, T> return_value{*this};
+            return_value += value;
+            return return_value;
+        }
+        template <Primitive U>
+        [[nodiscard]] constexpr vec<4, T> operator-(U const value) const noexcept
+        {
+            vec<4, T> return_value{*this};
+            return_value -= value;
+            return return_value;
+        }
+        template <Primitive U>
+        [[nodiscard]] constexpr vec<4, T> operator*(U const value) const noexcept
+        {
+            vec<4, T> return_value{*this};
+            return_value *= value;
+            return return_value;
+        }
+        template <Primitive U>
+        [[nodiscard]] constexpr vec<4, T> operator/(U const value) const noexcept
+        {
+            vec<4, T> return_value{*this};
+            return_value /= value;
+            return return_value;
+        }
+        template <Primitive U>
+        [[nodiscard]] constexpr vec<4, T> operator+(vec<4, U> const &other) const noexcept
+        {
+            vec<4, T> return_value{*this};
             return_value += other;
             return return_value;
         }
         template <Primitive U>
-        [[nodiscard]] constexpr type_vec4<T>
-        operator-(type_vec4<U> const &other) const noexcept
+        [[nodiscard]] constexpr vec<4, T> operator-(vec<4, U> const &other) const noexcept
         {
-            type_vec4<T> return_value{*this};
+            vec<4, T> return_value{*this};
             return_value -= other;
             return return_value;
         }
         template <Primitive U>
-        [[nodiscard]] constexpr type_vec4<T>
-        operator*(type_vec4<U> const &other) const noexcept
+        [[nodiscard]] constexpr vec<4, T> operator*(vec<4, U> const &other) const noexcept
         {
-            type_vec4<T> return_value{*this};
+            vec<4, T> return_value{*this};
             return_value *= other;
             return return_value;
         }
         template <Primitive U>
-        [[nodiscard]] constexpr type_vec4<T> operator/(type_vec4<U> const &other) const noexcept
+        [[nodiscard]] constexpr vec<4, T> operator/(vec<4, U> const &other) const noexcept
         {
-            type_vec4<T> return_value{*this};
+            vec<4, T> return_value{*this};
             return_value /= other;
             return return_value;
         }
 
-        T x;
-        T y;
-        T z;
-        T w;
+        [[nodiscard]] constexpr T &operator[](size_t i)
+        {
+            assert(i < size());
+            return data[i];
+        }
+        [[nodiscard]] constexpr T const &operator[](size_t i) const
+        {
+            assert(i < size());
+            return data[i];
+        }
+        union
+        {
+            struct
+            {
+                union
+                {
+                    T x, r, s;
+                };
+                union
+                {
+                    T y, g, t;
+                };
+                union
+                {
+                    T z, b, p;
+                };
+                union
+                {
+                    T w, a, q;
+                };
+            };
+            std::array<T, size()> data;
+        };
+        static_assert(sizeof(data) == size() * sizeof(T));
     };
-    template <Primitive T>
-    constexpr std::istream &operator>>(std::istream &is, type_vec4<T> &vec)
-    {
-        is >> vec.x >> vec.y >> vec.z >> vec.w;
-        return is;
-    }
-    template <Primitive T>
-    constexpr std::ostream &operator>>(std::ostream &os, type_vec4<T> &vec)
-    {
-        os << vec.x << " " << vec.y << " " << vec.z << " " << vec.w;
-        return os;
-    }
 
-    template <Primitive T, Primitive U>
-    constexpr T dot(type_vec4<T> const &left, type_vec4<U> const &right)
-    {
-        return left.x * right.x + left.y * right.y + left.z * right.z +
-               left.w * right.w;
-    }
-    template <Primitive T, Primitive U>
-    constexpr T angle(type_vec4<T> const &left, type_vec4<U> const &right)
-    {
-        return std::acos(dot(left, right) / left.length() / right.length());
-    }
-    template <Primitive T, Primitive U>
-    [[nodiscard]] constexpr type_vec4<T> operator*(U const value,
-                                                   type_vec4<T> const &vec)
-    {
-        type_vec4<T> return_value{vec};
-        return_value *= value;
-        return return_value;
-    }
-    template <Primitive T, Primitive U>
-    [[nodiscard]] constexpr type_vec4<T> operator/(U const value,
-                                                   type_vec4<T> const &vec)
-    {
-        type_vec4<T> return_value{vec};
-        return_value /= value;
-        return return_value;
-    }
-
-    using vec4 = type_vec4<float>;
-    using dvec4 = type_vec4<double>;
-    using ivec4 = type_vec4<int>;
-    using bvec4 = type_vec4<bool>;
+    using vec4 = vec<4, float>;
+    using dvec4 = vec<4, double>;
+    using ivec4 = vec<4, int>;
+    using bvec4 = vec<4, bool>;
 }; // namespace engine::math
+
+#include "vec4.inl"
