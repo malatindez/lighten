@@ -27,27 +27,6 @@ namespace engine::math
             }
         }
 
-        [[nodiscard]] constexpr float length() const noexcept
-        {
-            return std::sqrt(squared_length());
-        }
-
-        [[nodiscard]] constexpr float squared_length() const noexcept
-        {
-            float return_value;
-            for (int i = 0; i < size; i++)
-            {
-                return_value += data[i] * data[i];
-            }
-            return return_value;
-        }
-
-        [[nodiscard]] constexpr vec<size, T> unit_vector() const noexcept
-        {
-            return *this / length();
-        }
-        constexpr void make_unit_vector() { operator/=(length()); }
-
         template <Primitive U>
         constexpr vec<size, T> &operator+=(U const value) noexcept
         {

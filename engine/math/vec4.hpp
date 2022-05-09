@@ -25,22 +25,6 @@ namespace engine::math
             x = y = z = w = 0;
         }
 
-        [[nodiscard]] constexpr float length() const noexcept
-        {
-            return std::sqrt(squared_length());
-        }
-
-        [[nodiscard]] constexpr float squared_length() const noexcept
-        {
-            return x * x + y * y + z * z + w * w;
-        }
-
-        [[nodiscard]] constexpr vec<4, T> unit_vector() const noexcept
-        {
-            return *this / length();
-        }
-        constexpr void make_unit_vector() { operator/=(length()); }
-
         [[nodiscard]] constexpr vec<4, T> const &operator+() const noexcept
         {
             return *this;

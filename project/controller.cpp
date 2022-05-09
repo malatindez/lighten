@@ -96,7 +96,7 @@ bool Controller::Update(float delta_time)
         scene_->sphere.SetCenter(scene_->sphere.center() + vec * delta_time);
 
         // update the scene if position of the sphere has changed
-        if (vec.squared_length() != 0)
+        if (squared_length(vec) != 0)
         {
             scene_->UpdateScene();
         }
@@ -110,7 +110,7 @@ bool Controller::Update(float delta_time)
 
         vec2 diff = vec2{float(point.x) - float(middle.x),
                          float(middle.y) - float(point.y)} /
-                    window_.size().length();
+                    length(window_.size());
 
         scene_->sphere.SetCenter(scene_->sphere.center() + vec3{diff.x, diff.y, 0});
 
