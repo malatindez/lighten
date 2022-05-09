@@ -3,8 +3,8 @@
 int main()
 {
     using namespace engine::math;
-    mat<2, 4, float> matrix1;
-    mat<4, 3, int> matrix2;
+    mat<3, 400, float> matrix1;
+    mat<400, 15, int> matrix2;
     for (int i = 0; i < matrix1.size.x; i++)
     {
         for (int j = 0; j < matrix1.size.y; j++)
