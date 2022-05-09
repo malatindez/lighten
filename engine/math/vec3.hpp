@@ -10,7 +10,7 @@ namespace engine::math
     {
         [[nodiscard]] static constexpr size_t size() { return 3; }
         constexpr vec() = default;
-        explicit constexpr vec(T value = 0) { x = y = z = value; }
+        explicit constexpr vec(T value) { x = y = z = value; }
         constexpr vec(T x, T y, T z)
         {
             this->x = x;
@@ -18,10 +18,16 @@ namespace engine::math
             this->z = z;
         }
 
+        void reset()
+        {
+            x = y = z = 0;
+        }
+
         [[nodiscard]] constexpr float length() const noexcept
         {
             return std::sqrt(squared_length());
         }
+
         [[nodiscard]] constexpr float squared_length() const noexcept
         {
             return x * x + y * y + z * z;
@@ -39,7 +45,7 @@ namespace engine::math
         }
         [[nodiscard]] constexpr vec<3, T> operator-() const noexcept
         {
-            return vec<3, T>{-x, -y, -z};
+            return vec<3, T>(-x, -y, -z);
         }
 
         template <Primitive U>
@@ -148,8 +154,4 @@ namespace engine::math
                          left.x * right.y - left.y * right.x};
     }
 
-    using vec3 = vec<3, float>;
-    using dvec3 = vec<3, double>;
-    using ivec3 = vec<3, int>;
-    using bvec3 = vec<3, bool>;
 }; // namespace engine::math

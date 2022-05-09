@@ -10,17 +10,23 @@ namespace engine::math
     {
         [[nodiscard]] static constexpr size_t size() { return 2; }
         constexpr vec() = default;
-        explicit constexpr vec(T value = 0) { x = y = value; }
+        explicit constexpr vec(T value) { x = y = value; }
         constexpr vec(T x, T y)
         {
             this->x = x;
             this->y = y;
         }
 
+        void reset()
+        {
+            x = y = 0;
+        }
+
         [[nodiscard]] constexpr float length() const noexcept
         {
             return std::sqrt(squared_length());
         }
+
         [[nodiscard]] constexpr float squared_length() const noexcept
         {
             return x * x + y * y;
@@ -125,10 +131,5 @@ namespace engine::math
         };
         static_assert(sizeof(data) == 2 * sizeof(T));
     };
-
-    using vec2 = vec<2, float>;
-    using dvec2 = vec<2, double>;
-    using ivec2 = vec<2, int>;
-    using bvec2 = vec<2, bool>;
 
 }; // namespace engine::math

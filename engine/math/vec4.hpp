@@ -11,7 +11,7 @@ namespace engine::math
     {
         [[nodiscard]] static constexpr size_t size() { return 4; }
         constexpr vec() = default;
-        explicit constexpr vec(T value = 0) { x = y = z = w = value; }
+        explicit constexpr vec(T value) { x = y = z = w = value; }
         constexpr vec(T x, T y, T z, T w)
         {
             this->x = x;
@@ -20,10 +20,16 @@ namespace engine::math
             this->w = w;
         }
 
+        void reset()
+        {
+            x = y = z = w = 0;
+        }
+
         [[nodiscard]] constexpr float length() const noexcept
         {
             return std::sqrt(squared_length());
         }
+
         [[nodiscard]] constexpr float squared_length() const noexcept
         {
             return x * x + y * y + z * z + w * w;
@@ -41,7 +47,7 @@ namespace engine::math
         }
         [[nodiscard]] constexpr vec<4, T> operator-() const noexcept
         {
-            return vec<4, T>{-x, -y, -z, -w};
+            return vec<4, T>(-x, -y, -z, -w);
         }
 
         template <Primitive U>
@@ -153,8 +159,4 @@ namespace engine::math
         static_assert(sizeof(data) == size() * sizeof(T));
     };
 
-    using vec4 = vec<4, float>;
-    using dvec4 = vec<4, double>;
-    using ivec4 = vec<4, int>;
-    using bvec4 = vec<4, bool>;
 }; // namespace engine::math
