@@ -8,7 +8,6 @@ namespace engine::math
     template <Primitive T>
     struct vec<3, T>
     {
-    public:
         [[nodiscard]] static constexpr size_t size() { return 3; }
         constexpr vec() = default;
         explicit constexpr vec(T value = 0) { x = y = z = value; }
@@ -108,62 +107,6 @@ namespace engine::math
             return *this;
         }
 
-        template <Primitive U>
-        [[nodiscard]] constexpr vec<3, T> operator+(U const value) const noexcept
-        {
-            vec<3, T> return_value{*this};
-            return_value += value;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr vec<3, T> operator-(U const value) const noexcept
-        {
-            vec<3, T> return_value{*this};
-            return_value -= value;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr vec<3, T> operator*(U const value) const noexcept
-        {
-            vec<3, T> return_value{*this};
-            return_value *= value;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr vec<3, T> operator/(U const value) const noexcept
-        {
-            vec<3, T> return_value{*this};
-            return_value /= value;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr vec<3, T> operator+(vec<3, U> const &other) const noexcept
-        {
-            vec<3, T> return_value{*this};
-            return_value += other;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr vec<3, T> operator-(vec<3, U> const &other) const noexcept
-        {
-            vec<3, T> return_value{*this};
-            return_value -= other;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr vec<3, T> operator*(vec<3, U> const &other) const noexcept
-        {
-            vec<3, T> return_value{*this};
-            return_value *= other;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr vec<3, T> operator/(vec<3, U> const &other) const noexcept
-        {
-            vec<3, T> return_value{*this};
-            return_value /= other;
-            return return_value;
-        }
         [[nodiscard]] constexpr T &operator[](size_t i)
         {
             assert(i < size());

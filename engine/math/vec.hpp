@@ -44,8 +44,48 @@ constexpr T angle(vec<size, T> const &left, vec<size, U> const &right)
 }
 
 template <size_t size, Primitive T, Primitive U>
-[[nodiscard]] constexpr vec<size, T> operator*(U const value,
-                                               vec<size, T> const &other)
+[[nodiscard]] constexpr vec<size, T> operator*(U const value, vec<size, T> const &vector)
 {
-    return vec<size, T>(other) *= value;
+    return vec<size, T>(vector) *= value;
+}
+
+template <size_t size, Primitive T, Primitive U>
+[[nodiscard]] constexpr vec<size, T> operator+(vec<size, T> const &vector, U const value) noexcept
+{
+    return vec<size, T>(vector) += value;
+}
+template <size_t size, Primitive T, Primitive U>
+[[nodiscard]] constexpr vec<size, T> operator-(vec<size, T> const &vector, U const value) noexcept
+{
+    return vec<size, T>(vector) -= value;
+}
+template <size_t size, Primitive T, Primitive U>
+[[nodiscard]] constexpr vec<size, T> operator*(vec<size, T> const &vector, U const value) noexcept
+{
+    return vec<size, T>(vector) *= value;
+}
+template <size_t size, Primitive T, Primitive U>
+[[nodiscard]] constexpr vec<size, T> operator/(vec<size, T> const &vector, U const value) noexcept
+{
+    return vec<size, T>(vector) /= value;
+}
+template <size_t size, Primitive T, Primitive U>
+[[nodiscard]] constexpr vec<size, T> operator+(vec<size, T> const &left, vec<size, U> const &right) noexcept
+{
+    return vec<size, T>(left) += right;
+}
+template <size_t size, Primitive T, Primitive U>
+[[nodiscard]] constexpr vec<size, T> operator-(vec<size, T> const &left, vec<size, U> const &right) noexcept
+{
+    return vec<size, T>(left) -= right;
+}
+template <size_t size, Primitive T, Primitive U>
+[[nodiscard]] constexpr vec<size, T> operator*(vec<size, T> const &left, vec<size, U> const &right) noexcept
+{
+    return vec<size, T>(left) *= right;
+}
+template <size_t size, Primitive T, Primitive U>
+[[nodiscard]] constexpr vec<size, T> operator/(vec<size, T> const &left, vec<size, U> const &right) noexcept
+{
+    return vec<size, T>(left) /= right;
 }

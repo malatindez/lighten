@@ -8,7 +8,6 @@ namespace engine::math
     template <Primitive T>
     struct vec<2, T>
     {
-    public:
         [[nodiscard]] static constexpr size_t size() { return 2; }
         constexpr vec() = default;
         explicit constexpr vec(T value = 0) { x = y = value; }
@@ -17,11 +16,7 @@ namespace engine::math
             this->x = x;
             this->y = y;
         }
-        constexpr vec(vec<2, T> const &other)
-        {
-            this->x = other.x;
-            this->y = other.y;
-        }
+
         [[nodiscard]] constexpr float length() const noexcept
         {
             return std::sqrt(squared_length());
@@ -41,9 +36,10 @@ namespace engine::math
         {
             return *this;
         }
+
         [[nodiscard]] constexpr vec<2, T> operator-() const noexcept
         {
-            return vec<2, T>{-x, -y};
+            return vec<2, T>(-static_cast<T>(x), -static_cast<T>(y));
         }
 
         template <Primitive U>
@@ -102,63 +98,6 @@ namespace engine::math
             y /= other.y;
             return *this;
         }
-
-        template <Primitive U>
-        [[nodiscard]] constexpr vec<2, T> operator+(U const value) const noexcept
-        {
-            vec<2, T> return_value{*this};
-            return_value += value;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr vec<2, T> operator-(U const value) const noexcept
-        {
-            vec<2, T> return_value{*this};
-            return_value -= value;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr vec<2, T> operator*(U const value) const noexcept
-        {
-            vec<2, T> return_value{*this};
-            return_value *= value;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr vec<2, T> operator/(U const value) const noexcept
-        {
-            vec<2, T> return_value{*this};
-            return_value /= value;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr vec<2, T> operator+(vec<2, U> const &other) const noexcept
-        {
-            vec<2, T> return_value{*this};
-            return_value += other;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr vec<2, T> operator-(vec<2, U> const &other) const noexcept
-        {
-            vec<2, T> return_value{*this};
-            return_value -= other;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr vec<2, T> operator*(vec<2, U> const &other) const noexcept
-        {
-            vec<2, T> return_value{*this};
-            return_value *= other;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr vec<2, T> operator/(vec<2, U> const &other) const noexcept
-        {
-            vec<2, T> return_value{*this};
-            return_value /= other;
-            return return_value;
-        }
         [[nodiscard]] constexpr T &operator[](size_t i)
         {
             assert(i < size());
@@ -191,4 +130,5 @@ namespace engine::math
     using dvec2 = vec<2, double>;
     using ivec2 = vec<2, int>;
     using bvec2 = vec<2, bool>;
+
 }; // namespace engine::math
