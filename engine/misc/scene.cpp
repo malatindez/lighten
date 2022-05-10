@@ -14,7 +14,7 @@ namespace engine
         {
             return vec3{1, 0, 0};
         }
-        vec3 unit_direction = r.direction().unit_vector();
+        vec3 unit_direction = normalize(r.direction());
 
         float t = 0.5f * (unit_direction.y + 1);
 
@@ -25,7 +25,7 @@ namespace engine
     {
         if (!update_scene_)
         {
-            return;
+            //return;
         }
         vec3 lower_left_corner{-2, -1, -1};
         vec3 horizontal{4, 0, 0};
@@ -43,9 +43,9 @@ namespace engine
                 Ray r(origin, lower_left_corner + u * horizontal + v * vertical);
                 vec3 col = color(sphere, r);
 
-                auto ir = int(255.99 * col.r()) << 16;
-                auto ig = int(255.99 * col.g()) << 8;
-                auto ib = int(255.99 * col.b());
+                auto ir = int(255.99 * col.r) << 16;
+                auto ig = int(255.99 * col.g) << 8;
+                auto ib = int(255.99 * col.b);
 
                 bitmap[size_t(j) * window_size.x + i] = ir | ig | ib;
             }
