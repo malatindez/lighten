@@ -41,5 +41,11 @@ namespace engine::math
 
     template <size_t size, Primitive T, Primitive U>
     constexpr T angle(vec<size, T> const &left, vec<size, U> const &right);
+
+    template <size_t size, Primitive T>
+    constexpr vec<size, T> cos(vec<size, T> const &vector);
+
+    template <size_t size, Primitive T>
+    constexpr vec<size, T> sin(vec<size, T> const &vector);
 }
 #include "vec_math.inl"

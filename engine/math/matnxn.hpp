@@ -9,12 +9,9 @@ namespace engine::math
         explicit constexpr mat(T value)
         {
             reset();
-            for (int i = 0; i < size.x; i++)
+            for (int i = 0; i < size.x && i < size.y; i++)
             {
-                for (int j = 0; j < size.y; j++)
-                {
-                    data[i][j] = value;
-                }
+                data[i][i] = value;
             }
         }
         // sets all values to zero

@@ -109,4 +109,26 @@ namespace engine::math
     {
         return std::acos(dot(left, right) / left.length() / right.length());
     }
+
+    template <size_t size, Primitive T>
+    constexpr vec<size, T> cos(vec<size, T> const &vector)
+    {
+        vec<size, T> return_value;
+        for (int i = 0; i < return_value.size; i++)
+        {
+            return_value[i] = std::cos(vector[i]);
+        }
+        return return_value;
+    }
+
+    template <size_t size, Primitive T>
+    constexpr vec<size, T> sin(vec<size, T> const &vector)
+    {
+        vec<size, T> return_value;
+        for (int i = 0; i < return_value.size; i++)
+        {
+            return_value[i] = std::sin(vector[i]);
+        }
+        return return_value;
+    }
 }
