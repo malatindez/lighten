@@ -18,103 +18,35 @@ namespace engine::math
             this->z = z;
         }
 
-        void reset()
-        {
-            x = y = z = 0;
-        }
+        constexpr void reset() noexcept;
 
-        [[nodiscard]] constexpr vec<3, T> const &operator+() const noexcept
-        {
-            return *this;
-        }
-        [[nodiscard]] constexpr vec<3, T> operator-() const noexcept
-        {
-            return vec<3, T>(-x, -y, -z);
-        }
+        [[nodiscard]] constexpr vec<3, T> const &operator+() const noexcept;
+        [[nodiscard]] constexpr vec<3, T> operator-() const noexcept;
 
         template <Primitive U>
-        constexpr vec<3, T> &operator+=(U const value) noexcept
-        {
-            x += value;
-            y += value;
-            z += value;
-            return *this;
-        }
+        constexpr vec<3, T> &operator+=(U const value) noexcept;
         template <Primitive U>
-        constexpr vec<3, T> &operator-=(U const value) noexcept
-        {
-            x -= value;
-            y -= value;
-            z -= value;
-            return *this;
-        }
+        constexpr vec<3, T> &operator-=(U const value) noexcept;
         template <Primitive U>
-        constexpr vec<3, T> &operator*=(U const value) noexcept
-        {
-            x *= value;
-            y *= value;
-            z *= value;
-            return *this;
-        }
+        constexpr vec<3, T> &operator*=(U const value) noexcept;
         template <Primitive U>
-        constexpr vec<3, T> &operator/=(U const value) noexcept
-        {
-            x /= value;
-            y /= value;
-            z /= value;
-            return *this;
-        }
+        constexpr vec<3, T> &operator/=(U const value) noexcept;
         template <Primitive U>
-        constexpr vec<3, T> &operator+=(vec<3, U> const &other) noexcept
-        {
-            x += other.x;
-            y += other.y;
-            z += other.z;
-            return *this;
-        }
+        constexpr vec<3, T> &operator+=(vec<3, U> const &other) noexcept;
         template <Primitive U>
-        constexpr vec<3, T> &operator-=(vec<3, U> const &other) noexcept
-        {
-            x -= other.x;
-            y -= other.y;
-            z -= other.z;
-            return *this;
-        }
+        constexpr vec<3, T> &operator-=(vec<3, U> const &other) noexcept;
         template <Primitive U>
-        constexpr vec<3, T> &operator*=(vec<3, U> const &other) noexcept
-        {
-            x *= other.x;
-            y *= other.y;
-            z *= other.z;
-            return *this;
-        }
+        constexpr vec<3, T> &operator*=(vec<3, U> const &other) noexcept;
         template <Primitive U>
-        constexpr vec<3, T> &operator/=(vec<3, U> const &other) noexcept
-        {
-            x /= other.x;
-            y /= other.y;
-            z /= other.z;
-            return *this;
-        }
+        constexpr vec<3, T> &operator/=(vec<3, U> const &other) noexcept;
 
-        [[nodiscard]] constexpr T &operator[](size_t i)
-        {
-            assert(i < size);
-            return data[i];
-        }
-        [[nodiscard]] constexpr T const &operator[](size_t i) const
-        {
-            assert(i < size);
-            return data[i];
-        }
+        [[nodiscard]] constexpr T &operator[](size_t i);
+        [[nodiscard]] constexpr T const &operator[](size_t i) const;
         union
         {
             struct
             {
-                union
-                {
-                    T x, r, s;
-                };
+                union { T x, r, s; };
                 union
                 {
                     T y, g, t;
@@ -130,12 +62,7 @@ namespace engine::math
     };
 
     template <Primitive T, Primitive U>
-    constexpr vec<3, T> cross(vec<3, T> const &left,
-                              vec<3, U> const &right)
-    {
-        return vec<3, T>{left.y * right.z - left.z * right.y,
-                         left.x * right.z - left.z * right.x,
-                         left.x * right.y - left.y * right.x};
-    }
+    constexpr vec<3, T> cross(vec<3, T> const &left, vec<3, U> const &right);
 
 }; // namespace engine::math
+#include "vec3.inl"

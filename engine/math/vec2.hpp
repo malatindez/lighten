@@ -17,87 +17,31 @@ namespace engine::math
             this->y = y;
         }
 
-        void reset()
-        {
-            x = y = 0;
-        }
 
-        [[nodiscard]] constexpr vec<2, T> const &operator+() const noexcept
-        {
-            return *this;
-        }
+        constexpr void reset() noexcept;
 
-        [[nodiscard]] constexpr vec<2, T> operator-() const noexcept
-        {
-            return vec<2, T>(-static_cast<T>(x), -static_cast<T>(y));
-        }
+        [[nodiscard]] constexpr vec<2, T> const &operator+() const noexcept;
+
+        [[nodiscard]] constexpr vec<2, T> operator-() const noexcept;
 
         template <Primitive U>
-        constexpr vec<2, T> &operator+=(U const value) noexcept
-        {
-            x += value;
-            y += value;
-            return *this;
-        }
+        constexpr vec<2, T> &operator+=(U const value) noexcept;
         template <Primitive U>
-        constexpr vec<2, T> &operator-=(U const value) noexcept
-        {
-            x -= value;
-            y -= value;
-            return *this;
-        }
+        constexpr vec<2, T> &operator-=(U const value) noexcept;
         template <Primitive U>
-        constexpr vec<2, T> &operator*=(U const value) noexcept
-        {
-            x *= value;
-            y *= value;
-            return *this;
-        }
+        constexpr vec<2, T> &operator*=(U const value) noexcept;
         template <Primitive U>
-        constexpr vec<2, T> &operator/=(U const value) noexcept
-        {
-            x /= value;
-            y /= value;
-            return *this;
-        }
+        constexpr vec<2, T> &operator/=(U const value) noexcept;
         template <Primitive U>
-        constexpr vec<2, T> &operator+=(vec<2, U> const &other) noexcept
-        {
-            x += other.x;
-            y += other.y;
-            return *this;
-        }
+        constexpr vec<2, T> &operator+=(vec<2, U> const &other) noexcept;
         template <Primitive U>
-        constexpr vec<2, T> &operator-=(vec<2, U> const &other) noexcept
-        {
-            x -= other.x;
-            y -= other.y;
-            return *this;
-        }
+        constexpr vec<2, T> &operator-=(vec<2, U> const &other) noexcept;
         template <Primitive U>
-        constexpr vec<2, T> &operator*=(vec<2, U> const &other) noexcept
-        {
-            x *= other.x;
-            y *= other.y;
-            return *this;
-        }
+        constexpr vec<2, T> &operator*=(vec<2, U> const &other) noexcept;
         template <Primitive U>
-        constexpr vec<2, T> &operator/=(vec<2, U> const &other) noexcept
-        {
-            x /= other.x;
-            y /= other.y;
-            return *this;
-        }
-        [[nodiscard]] constexpr T &operator[](size_t i)
-        {
-            assert(i < size);
-            return data[i];
-        }
-        [[nodiscard]] constexpr T const &operator[](size_t i) const
-        {
-            assert(i < size);
-            return data[i];
-        }
+        constexpr vec<2, T> &operator/=(vec<2, U> const &other) noexcept;
+        [[nodiscard]] constexpr T &operator[](size_t i);
+        [[nodiscard]] constexpr T const &operator[](size_t i) const;
         union
         {
             struct
@@ -117,3 +61,5 @@ namespace engine::math
     };
 
 }; // namespace engine::math
+
+#include "vec2.inl"
