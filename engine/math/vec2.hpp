@@ -17,7 +17,6 @@ namespace engine::math
             this->y = y;
         }
 
-
         constexpr void reset() noexcept;
 
         [[nodiscard]] constexpr vec<2, T> const &operator+() const noexcept;
@@ -46,14 +45,8 @@ namespace engine::math
         {
             struct
             {
-                union
-                {
-                    T x, r, s;
-                };
-                union
-                {
-                    T y, g, t;
-                };
+                union { T x, r, s; };
+                union { T y, g, t; };
             };
             std::array<T, 2> data;
         };

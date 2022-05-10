@@ -105,8 +105,6 @@ namespace engine::math
         return data[i];
     }
 
-    
-
     template <Primitive T, Primitive U>
     constexpr vec<3, T> cross(vec<3, T> const &left,
                               vec<3, U> const &right)

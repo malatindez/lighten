@@ -25,7 +25,7 @@ namespace engine
     {
         if (!update_scene_)
         {
-            //return;
+            // return;
         }
         vec3 lower_left_corner{-2, -1, -1};
         vec3 horizontal{4, 0, 0};

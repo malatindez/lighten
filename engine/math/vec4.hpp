@@ -48,22 +48,10 @@ namespace engine::math
         {
             struct
             {
-                union
-                {
-                    T x, r, s;
-                };
-                union
-                {
-                    T y, g, t;
-                };
-                union
-                {
-                    T z, b, p;
-                };
-                union
-                {
-                    T w, a, q;
-                };
+                union { T x, r, s; };
+                union { T y, g, t; };
+                union { T z, b, p; };
+                union { T w, a, q; };
             };
             std::array<T, size> data;
         };

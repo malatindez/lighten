@@ -47,14 +47,8 @@ namespace engine::math
             struct
             {
                 union { T x, r, s; };
-                union
-                {
-                    T y, g, t;
-                };
-                union
-                {
-                    T z, b, p;
-                };
+                union { T y, g, t; };
+                union { T z, b, p; };
             };
             std::array<T, 3> data;
         };
