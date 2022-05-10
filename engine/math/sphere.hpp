@@ -6,9 +6,7 @@ namespace engine::math
     {
     public:
         Sphere(vec3 center, float radius) : center_(center), radius_(radius) {}
-        float Hit(Ray const &r)
-
-            const noexcept
+        float Hit(Ray const &r) const noexcept
         {
             vec3 oc = r.origin() - center_;
             float a = dot(r.direction(), r.direction());

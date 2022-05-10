@@ -12,12 +12,16 @@ namespace engine::math
     constexpr std::ostream &operator<<(std::ostream &os, mat<a, b, T> matrix);
 
     template <Primitive T>
-    mat<4, 4, T> translate(mat<4, 4, T> const &matrix, vec<4, T> const &vec);
-    template <Primitive T>
     mat<4, 4, T> translate(mat<4, 4, T> const &matrix, vec<3, T> const &vec);
+
     template <Primitive T>
     mat<4, 4, T> rotate(mat<4, 4, T> const &matrix, T angle, vec<3, T> const &axis);
+
     template <Primitive T>
     mat<4, 4, T> scale(mat<4, 4, T> const &matrix, vec<3, T> const &scale);
+
+    template <size_t a, size_t b, Primitive T>
+    mat<b, a, T> transpose(mat<a, b, T> const &matrix);
+
 }
 #include "mat_math.inl"

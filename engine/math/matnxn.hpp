@@ -15,7 +15,7 @@ namespace engine::math
             }
         }
         // sets all values to zero
-        void reset()
+        constexpr void reset() noexcept
         {
             for (int i = 0; i < size.x; i++)
             {

@@ -19,7 +19,7 @@ namespace engine::math
             }
         }
 
-        void reset()
+        constexpr void reset() noexcept
         {
             for (int i = 0; i < size; i++)
             {

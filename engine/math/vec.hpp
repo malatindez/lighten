@@ -16,18 +16,23 @@ namespace engine::math
 #include "math/vec2.hpp"
 #include "math/vec3.hpp"
 #include "math/vec4.hpp"
-#include "math/vecn.hpp"
 #include "math/vec_math.hpp"
+#include "math/vecn.hpp"
 
 namespace engine::math
 {
     using vec2 = vec<2, float>;
     using dvec2 = vec<2, double>;
     using ivec2 = vec<2, int>;
+    using uivec2 = vec<2, unsigned int>;
+
     using vec3 = vec<3, float>;
     using dvec3 = vec<3, double>;
     using ivec3 = vec<3, int>;
+    using uivec3 = vec<3, unsigned int>;
+
     using vec4 = vec<4, float>;
     using dvec4 = vec<4, double>;
     using ivec4 = vec<4, int>;
+    using uivec4 = vec<4, unsigned int>;
 };
