@@ -1,7 +1,7 @@
 #pragma once
 #include <exception>
 
-#include "misc/window.hpp"
+#include "core/window.hpp"
 namespace engine
 {
     class BitmapWindow final : public Window

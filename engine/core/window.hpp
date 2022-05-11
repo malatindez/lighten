@@ -1,8 +1,10 @@
 #pragma once
 #include <unordered_map>
 
-#include "interfaces/updatable.hpp"
 #include "pch.hpp"
+
+#include "interfaces/updatable.hpp"
+#include "math/vec2.hpp"
 
 namespace engine
 {

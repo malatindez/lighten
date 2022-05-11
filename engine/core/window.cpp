@@ -1,4 +1,4 @@
-#include "misc/window.hpp"
+#include "core/window.hpp"
 namespace engine
 {
     Window::Window(WNDCLASSEXW const &window_class_template, DWORD extended_style,

@@ -1,4 +1,4 @@
-#include "misc/bitmap-window.hpp"
+#include "core/bitmap-window.hpp"
 namespace engine
 {
     BitmapWindow::BitmapWindow(WNDCLASSEXW const &window_class,
