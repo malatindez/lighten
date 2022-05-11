@@ -97,8 +97,7 @@ namespace engine::math
         return data[i];
     }
 
-    
-    template <Primitive T>
+        template <Primitive T>
     template <Primitive _> // primitives
     static constexpr size_t vec<2, T>::get_parameter_pack_size()
     {

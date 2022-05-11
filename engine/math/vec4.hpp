@@ -12,7 +12,7 @@ namespace engine::math
         using type = T;
         static constexpr size_t size = 4;
         constexpr vec() = default;
-        template<Primitive U>
+        template <Primitive U>
         explicit constexpr vec(U value) { x = y = z = w = static_cast<T>(value); }
         template<Primitive A, Primitive B, Primitive C, Primitive D>
         explicit constexpr vec(A a, B b, C c, D d) { x = a; y = b; z = c; w = d; }
@@ -59,15 +59,15 @@ namespace engine::math
             std::array<T, size> data;
         };
         static_assert(sizeof(data) == size * sizeof(T));
-        
+
     private:
         template <Primitive _>
-        static constexpr size_t get_parameter_pack_size(); 
+        static constexpr size_t get_parameter_pack_size();
         template <class V>
         static constexpr size_t get_parameter_pack_size();
         template <typename A, typename B, typename... C>
         static constexpr size_t get_parameter_pack_size();
-        
+
         template <Primitive U>
         constexpr void unpack_data(int offset, U u);
         template <class V>

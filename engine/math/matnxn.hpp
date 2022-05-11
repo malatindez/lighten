@@ -10,11 +10,13 @@ namespace engine::math
         static constexpr ivec2 size{a, b};
 
         constexpr mat() = default;
-        template<Primitive P>
-        explicit constexpr mat(P p) {
+        template <Primitive P>
+        explicit constexpr mat(P p)
+        {
             static_assert(a == b, "You cannot use one constructor argument on the non-square matrix!");
             reset();
-            for(int i = 0; i < a; i++) {
+            for (int i = 0; i < a; i++)
+            {
                 data[i][i] = static_cast<T>(p);
             }
         }
@@ -57,7 +59,7 @@ namespace engine::math
 
     private:
         template <Primitive _>
-        static constexpr size_t get_parameter_pack_size(); 
+        static constexpr size_t get_parameter_pack_size();
         template <class V>
         static constexpr size_t get_parameter_pack_size();
         template <typename A, typename B, typename... C>
@@ -69,7 +71,6 @@ namespace engine::math
         constexpr void unpack_data(int offset, V vec);
         template <typename A, typename B, typename... C>
         constexpr void unpack_data(int offset, A a, B b, C... c);
-                
     };
 
 }

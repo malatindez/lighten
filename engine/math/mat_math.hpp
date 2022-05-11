@@ -26,6 +26,5 @@ namespace engine::math
     template <size_t a, Primitive T>
     constexpr T det(mat<a, a, T> const &matrix);
 
-
 }
 #include "mat_math.inl"
