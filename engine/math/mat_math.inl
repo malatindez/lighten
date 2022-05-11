@@ -208,4 +208,41 @@ namespace engine::math
     {
         return adj(m) * (static_cast<T>(1) / det(m));
     }
+    template <Primitive T>
+    mat<4, 4, T> lookAt(vec<3, T> const &eye, vec<3, T> const &center, vec<3, T> const &world_up)
+    {
+        vec<3, T> const forward = normalize(eye - center);
+        vec<3, T> const right = normalize(cross(forward, world_up));
+        vec<3, T> const up = cross(forward, right);
+        mat<4, 4, T> return_value(1);
+        return_value[0][0] = right.x;
+        return_value[1][0] = right.y;
+        return_value[2][0] = right.z;
+        return_value[0][1] = up.x;
+        return_value[1][1] = up.y;
+        return_value[2][1] = up.z;
+        return_value[0][2] = -forward.x;
+        return_value[1][2] = -forward.y;
+        return_value[2][2] = -forward.z;
+        return_value[3][0] = -dot(right, eye);
+        return_value[3][1] = -dot(up, eye);
+        return_value[3][2] = -dot(forward, eye);
+        return return_value;
+    }
+    template <Primitive T>
+    mat<4, 4, T> perspective(T fov_y, T aspect_ratio, T z_near, T z_far)
+    {
+        assert(abs(aspect_ratio - std::numeric_limits::epsilon()) > static_cast<T>(0));
+
+        T const tan_half_fov_y = tan(fov_y / static_cast<T>(2));
+        
+		mat<4, 4, T> return_value(0);
+        return_value[0][0] = static_cast<T>(1) / (aspect_ratio * tan_half_fov_y);
+        return_value[1][1] = static_cast<T>(1) / (tan_half_fov_y);
+        return_value[2][2] = z_far / (z_near - z_far);
+        return_value[2][3] = -static_cast<T>(1);
+        return_value[3][2] = -(z_far * z_near) / (z_far - z_near);
+        return return_value;
+    }
+
 }

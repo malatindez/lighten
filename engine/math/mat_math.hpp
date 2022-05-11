@@ -36,5 +36,10 @@ namespace engine::math
     template <size_t a, Primitive T>
     constexpr mat<a, a, T> inv(mat<a, a, T> const &m);
 
+    template <Primitive T>
+    mat<4, 4, T> lookAt(vec<3, T> const &eye, vec<3, T> const &center, vec<3, T> const &up);
+    
+    template <Primitive T>
+    mat<4, 4, T> perspective(T fov_y, T aspect_ratio, T z_near, T z_far);
 }
 #include "mat_math.inl"
