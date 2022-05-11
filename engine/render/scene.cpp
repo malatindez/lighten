@@ -1,4 +1,4 @@
-#include "misc/scene.hpp"
+#include "render/scene.hpp"
 using namespace engine::math;
 
 namespace engine
