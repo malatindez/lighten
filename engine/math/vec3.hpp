@@ -8,14 +8,18 @@ namespace engine::math
     template <Primitive T>
     struct vec<3, T>
     {
+        using type = T;
         static constexpr size_t size = 3;
         constexpr vec() = default;
-        explicit constexpr vec(T value) { x = y = z = value; }
-        constexpr vec(T x, T y, T z)
+        template<Primitive U>
+        explicit constexpr vec(U value) { x = y = z = static_cast<T>(value); }
+        template<Primitive A, Primitive B, Primitive C>
+        explicit constexpr vec(A a, B b, C c) { x = a; y = b; z = c; }
+        template <typename... U>
+        explicit constexpr vec(U... data)
         {
-            this->x = x;
-            this->y = y;
-            this->z = z;
+            static_assert(get_parameter_pack_size<U...>() == size, "You have provided wrong amount of data");
+            unpack_data(0, data...);
         }
 
         constexpr void reset() noexcept;
@@ -53,6 +57,21 @@ namespace engine::math
             std::array<T, 3> data;
         };
         static_assert(sizeof(data) == 3 * sizeof(T));
+        
+    private:
+        template <Primitive _>
+        static constexpr size_t get_parameter_pack_size(); 
+        template <class V>
+        static constexpr size_t get_parameter_pack_size();
+        template <typename A, typename B, typename... C>
+        static constexpr size_t get_parameter_pack_size();
+        
+        template <Primitive U>
+        constexpr void unpack_data(int offset, U u);
+        template <class V>
+        constexpr void unpack_data(int offset, V vec);
+        template <typename A, typename B, typename... C>
+        constexpr void unpack_data(int offset, A a, B b, C... c);
     };
 
     template <Primitive T, Primitive U>

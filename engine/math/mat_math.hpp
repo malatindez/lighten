@@ -23,5 +23,9 @@ namespace engine::math
     template <size_t a, size_t b, Primitive T>
     mat<b, a, T> transpose(mat<a, b, T> const &matrix);
 
+    template <size_t a, Primitive T>
+    constexpr T det(mat<a, a, T> const &matrix);
+
+
 }
 #include "mat_math.inl"

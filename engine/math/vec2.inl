@@ -96,4 +96,49 @@ namespace engine::math
         assert(i < size);
         return data[i];
     }
+
+    
+    template <Primitive T>
+    template <Primitive _> // primitives
+    static constexpr size_t vec<2, T>::get_parameter_pack_size()
+    {
+        return 1;
+    }
+    template <Primitive T>
+    template <class V> // vectors
+    static constexpr size_t vec<2, T>::get_parameter_pack_size()
+    {
+        return V::size;
+    }
+    template <Primitive T>
+    template <typename A, typename B, typename... C>
+    static constexpr size_t vec<2, T>::get_parameter_pack_size()
+    {
+        return get_parameter_pack_size<A>() + get_parameter_pack_size<B, C...>();
+    }
+
+    template <Primitive T>
+    template <Primitive U> // primitives
+    constexpr void vec<2, T>::unpack_data(int offset, U u)
+    {
+        data[offset] = static_cast<T>(u);
+    }
+    template <Primitive T>
+    template <class V> // vectors
+    constexpr void vec<2, T>::unpack_data(int offset, V vec)
+    {
+        for (int i = 0; i < V::size; i++)
+        {
+            data[offset + i] = static_cast<T>(vec[i]);
+        }
+    }
+    template <Primitive T>
+    template <typename A, typename B, typename... C>
+    constexpr void vec<2, T>::unpack_data(int offset, A a, B b, C... c)
+    {
+        unpack_data(offset, a);
+        offset += get_parameter_pack_size<A>();
+        unpack_data(offset, b, c...);
+    }
+
 }

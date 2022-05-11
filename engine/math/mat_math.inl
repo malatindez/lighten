@@ -123,4 +123,51 @@ namespace engine::math
         }
         return return_value;
     }
+    template <Primitive T>
+    constexpr T det(mat<2, 2, T> const &m)
+    {
+        return m[0][0] * m[1][1] - m[1][0] * m[0][1];
+    }
+    template <Primitive T>
+    constexpr T det(mat<3, 3, T> const &m)
+    {
+        return 
+            + m[0][0] * (m[1][1] * m[2][2] - m[2][1] * m[1][2]) 
+            - m[1][0] * (m[0][1] * m[2][2] - m[2][1] * m[0][2]) 
+            + m[2][0] * (m[0][1] * m[1][2] - m[1][1] * m[0][2]);
+    }
+    template <Primitive T>
+    constexpr T det(mat<4, 4, T> const &m)
+    {
+        T const sub_det_00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
+        T const sub_det_01 = m[2][1] * m[3][3] - m[3][1] * m[2][3];
+        T const sub_det_02 = m[2][1] * m[3][2] - m[3][1] * m[2][2];
+        T const sub_det_03 = m[2][0] * m[3][3] - m[3][0] * m[2][3];
+        T const sub_det_04 = m[2][0] * m[3][2] - m[3][0] * m[2][2];
+        T const sub_det_05 = m[2][0] * m[3][1] - m[3][0] * m[2][1];
+
+        vec<4, T> sub_det(
+            +(m[1][1] * sub_det_00 - m[1][2] * sub_det_01 + m[1][3] * sub_det_02),
+            -(m[1][0] * sub_det_00 - m[1][2] * sub_det_03 + m[1][3] * sub_det_04),
+            +(m[1][0] * sub_det_01 - m[1][1] * sub_det_03 + m[1][3] * sub_det_05),
+            -(m[1][0] * sub_det_02 - m[1][1] * sub_det_04 + m[1][2] * sub_det_05));
+
+        return m[0][0] * sub_det[0] + m[0][1] * sub_det[1] +
+               m[0][2] * sub_det[2] + m[0][3] * sub_det[3];
+    }
+    
+    template <Primitive T>
+    constexpr mat<2, 2, T> adj(mat<2, 2, T> const &m)
+    {
+		return mat<2, 2, T>(
+			+m[1][1], -m[0][1],
+			-m[1][0], +m[0][0]);
+    }
+   // template <Primitive T>
+   // constexpr mat<3, 3, T> adj(mat<3, 3, T> const &m)
+   // {
+		//return mat<3, 3, T>(
+		//	+m[1][1], -m[0][1],
+		//	-m[1][0], +m[0][0]);
+  //  }
 }
