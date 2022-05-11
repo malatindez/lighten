@@ -14,12 +14,20 @@ void random_fill(mat<a, b, T> &matrix)
     }
 }
 constexpr float pi = 3.141592653589897932384626433;
+constexpr size_t t = vec<5, unsigned long long>::get_parameter_pack_size<int,int,vec2,ivec4>();
+                                                    
 int main()
 {
     mat4 matrix(1);
     std::cout << matrix << std::endl;
-    matrix = translate(matrix, {1, 2, 3});
+    matrix = translate(matrix, vec3{1, 2, 3});
     std::cout << matrix << std::endl;
-    matrix = rotate(matrix, pi / 2, {1, 1, 1});
+    matrix = rotate(matrix, pi / 2, vec3{1, 1, 1});
+
+
+    matrix = mat4(1, 2, vec2{5, 4},
+                dvec3{1, 2, 3}, 4,
+                1, vec<6, unsigned long long>{ vec2{5, 7}, 3,vec3{6, 7, 7}},
+                   4);
     std::cout << matrix << std::endl;
 }
