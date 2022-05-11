@@ -14,8 +14,7 @@ void random_fill(mat<a, b, T> &matrix)
     }
 }
 constexpr float pi = 3.141592653589897932384626433;
-constexpr size_t t = vec<5, unsigned long long>::get_parameter_pack_size<int,int,vec2,ivec4>();
-                                                    
+             
 int main()
 {
     mat4 matrix(1);
