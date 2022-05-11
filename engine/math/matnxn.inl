@@ -92,6 +92,16 @@ namespace engine::math
         }
         return *this;
     }
+    template <size_t a, size_t b, Primitive T>
+    template <Primitive U>
+    constexpr mat<a, b, T> &mat<a, b, T>::operator*=(U const value)
+    {
+        for (int i = 0; i < size.x; i++)
+        {
+            data[i] *= value;
+        }
+        return *this;
+    }
 
     template <size_t a, size_t b, Primitive T>
     template <Primitive _> // primitives

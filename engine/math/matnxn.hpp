@@ -20,6 +20,14 @@ namespace engine::math
                 data[i][i] = static_cast<T>(p);
             }
         }
+        template <Primitive P>
+        explicit constexpr mat(mat<a, b, P> p)
+        {
+            for (int i = 0; i < a * b; i++)
+            {
+                arr[i] = static_cast<T>(p.arr[i]);
+            }
+        }
         template <typename... U>
         explicit constexpr mat(U... data)
         {
@@ -41,7 +49,6 @@ namespace engine::math
         constexpr mat<a, b, T> &operator+=(mat<a, b, U> const &other);
         template <Primitive U>
         constexpr mat<a, b, T> &operator-=(mat<a, b, U> const &other);
-
         template <size_t c, Primitive U>
         constexpr mat<a, c, T> &operator*=(mat<b, c, U> const &other);
 
@@ -49,6 +56,8 @@ namespace engine::math
         constexpr mat<a, b, T> &operator+=(U const value);
         template <Primitive U>
         constexpr mat<a, b, T> &operator-=(U const value);
+        template <Primitive U>
+        constexpr mat<a, b, T> &operator*=(U const value);
 
         union
         {
@@ -72,6 +81,5 @@ namespace engine::math
         template <typename A, typename B, typename... C>
         constexpr void unpack_data(int offset, A a, B b, C... c);
     };
-
 }
 #include "matnxn.inl"

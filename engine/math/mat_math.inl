@@ -33,6 +33,16 @@ namespace engine::math
         }
         return return_value;
     }
+    template <size_t a, size_t b, Primitive T, Primitive U>
+    constexpr mat<a, b, T> operator*(mat<a, b, T> const &left, U const right)
+    {
+        return mat<a, b, T>(left) *= right;
+    }
+    template <size_t a, size_t b, Primitive T, Primitive U>
+    constexpr mat<a, b, T> operator*(U const left, mat<a, b, T> const &right)
+    {
+        return mat<a, b, T>(right) *= left;
+    }
 
     template <size_t a, size_t b, Primitive T>
     constexpr std::istream &operator>>(std::istream &is, mat<a, b, T> matrix)
@@ -131,10 +141,7 @@ namespace engine::math
     template <Primitive T>
     constexpr T det(mat<3, 3, T> const &m)
     {
-        return 
-            + m[0][0] * (m[1][1] * m[2][2] - m[2][1] * m[1][2]) 
-            - m[1][0] * (m[0][1] * m[2][2] - m[2][1] * m[0][2]) 
-            + m[2][0] * (m[0][1] * m[1][2] - m[1][1] * m[0][2]);
+        return +m[0][0] * (m[1][1] * m[2][2] - m[2][1] * m[1][2]) - m[1][0] * (m[0][1] * m[2][2] - m[2][1] * m[0][2]) + m[2][0] * (m[0][1] * m[1][2] - m[1][1] * m[0][2]);
     }
     template <Primitive T>
     constexpr T det(mat<4, 4, T> const &m)
@@ -155,19 +162,50 @@ namespace engine::math
         return m[0][0] * sub_det[0] + m[0][1] * sub_det[1] +
                m[0][2] * sub_det[2] + m[0][3] * sub_det[3];
     }
-    
+
     template <Primitive T>
     constexpr mat<2, 2, T> adj(mat<2, 2, T> const &m)
     {
-		return mat<2, 2, T>(
-			+m[1][1], -m[0][1],
-			-m[1][0], +m[0][0]);
+        return mat<2, 2, T>(
+            +m[1][1], -m[0][1],
+            -m[1][0], +m[0][0]);
     }
-   // template <Primitive T>
-   // constexpr mat<3, 3, T> adj(mat<3, 3, T> const &m)
-   // {
-		//return mat<3, 3, T>(
-		//	+m[1][1], -m[0][1],
-		//	-m[1][0], +m[0][0]);
-  //  }
+
+    template <size_t m_size, Primitive T>
+    constexpr mat<m_size, m_size, T> adj(mat<m_size, m_size, T> const &m)
+    {
+        mat<m_size, m_size, T> return_value;
+        mat<m_size - 1, m_size - 1, T> temp;
+        int sign = 1;
+        for (int i = 0; i < m_size; i++)
+        {
+            for (int j = 0; j < m_size; j++)
+            {
+                // create 3x3 matrix using m without column i and row j
+                for (int k = 0, s = 0; k < m_size; k++)
+                {
+                    if (k == j)
+                        continue;
+                    for (int l = 0, t = 0; l < m_size; l++)
+                    {
+                        if (l == i)
+                            continue;
+                        temp[s][t] = m[k][l];
+                        t++;
+                    }
+                    s++;
+                }
+                return_value[i][j] = sign * det(temp);
+                sign *= -1;
+            }
+            sign *= -1;
+        }
+        return return_value;
+    }
+
+    template <size_t a, Primitive T>
+    constexpr mat<a, a, T> inv(mat<a, a, T> const &m)
+    {
+        return adj(m) * (static_cast<T>(1) / det(m));
+    }
 }

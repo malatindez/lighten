@@ -17,16 +17,13 @@ constexpr float pi = 3.141592653589897932384626433;
              
 int main()
 {
-    mat4 matrix(1);
+    imat4 matrix(1);
+    matrix = imat4(12, 34, 12, 5, 102, 3, 451, 2, 52, 5, 12, 5, 2, 1, 2, 415);
+    mat4 inv_ = inv(mat4(matrix));
     std::cout << matrix << std::endl;
-    matrix = translate(matrix, vec3{1, 2, 3});
-    std::cout << matrix << std::endl;
-    matrix = rotate(matrix, pi / 2, vec3{1, 1, 1});
-
-
-    matrix = mat4(1, 2, vec2{5, 4},
-                dvec3{1, 2, 3}, 4,
-                1, vec<6, unsigned long long>{ vec2{5, 7}, 3,vec3{6, 7, 7}},
-                   4);
-    std::cout << matrix << std::endl;
+    std::cout << imat4(adj(mat4(matrix))) << std::endl;
+    std::cout << inv_ << std::endl;
+    mat4 a = mat4(matrix) * inv_;
+    std::cout << a << std::endl;
+    std::cout << imat4(a) << std::endl;
 }
