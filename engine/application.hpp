@@ -1,8 +1,8 @@
 #pragma once
 #include "interfaces/updatable.hpp"
 #include "math/sphere.hpp"
-#include "misc/bitmap-window.hpp"
-#include "misc/scene.hpp"
+#include "core/bitmap-window.hpp"
+#include "render/scene.hpp"
 #include "pch.hpp"
 
 #include <chrono>
