@@ -1,6 +1,5 @@
 #pragma once
 #include "mat.hpp"
-#include <iostream>
 namespace engine::math
 {
     template <size_t a, size_t b, Primitive T>

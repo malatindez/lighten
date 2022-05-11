@@ -16,7 +16,6 @@ namespace engine::math
 #include "math/vec2.hpp"
 #include "math/vec3.hpp"
 #include "math/vec4.hpp"
-#include "math/vec_math.hpp"
 #include "math/vecn.hpp"
 
 namespace engine::math

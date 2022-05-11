@@ -1,7 +1,7 @@
 #pragma once
 #include "interfaces/updatable.hpp"
-#include "misc/scene.hpp"
-#include "misc/window.hpp"
+#include "render/scene.hpp"
+#include "core/window.hpp"
 
 #include <memory>
 #include <unordered_map>

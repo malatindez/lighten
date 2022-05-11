@@ -39,7 +39,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
 
     auto scene = std::make_shared<Scene>();
 
-    scene->sphere = math::Sphere{{0, 0, -1}, 0.5f};
+    scene->sphere = math::Sphere{math::vec3{0, 0, -1}, 0.5f};
 
     auto controller = std::make_shared<Controller>(*bmwindow, scene);
 

@@ -1,5 +1,6 @@
 #pragma once
-#include "pch.hpp"
+#include "math.hpp"
+#include "math/ray.hpp"
 namespace engine::math
 {
     class Sphere

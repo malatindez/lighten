@@ -1,7 +1,6 @@
 #pragma once
 
 #include "vec.hpp"
-#include <cstddef>
 
 namespace engine::math
 {
