@@ -1,83 +1,68 @@
-#include "engine.hpp"
+#include "core/application.hpp"
+#include "core/events.hpp"
 #include <chrono>
 #include <thread>
 namespace engine
 {
-    std::unique_ptr<Engine> Engine::engine_;
+    std::unique_ptr<Application> Application::application_;
 
     using namespace engine::math;
     using namespace std::chrono;
     using namespace std::chrono_literals;
     using namespace std::this_thread;
 
-    INT Engine::Start()
+    void Application::OnEvent(Event &e)
     {
-        MainLoop();
-        return 0;
-    }
-
-    void Engine::Exit()
-    {
-        running_ = false;
-    }
-
-    bool Engine::FrameTimeElapsed()
-    {
-        const time_point<steady_clock> now = steady_clock::now();
-
-        delta_time_ = duration_cast<duration<float>>(steady_clock::now() - last_time_point_).count();
-
-        if (delta_time_ >= kFrameDuration)
+        for (auto it = application_->layers_.begin(); it != application_->layers_.end(); ++it)
         {
-            last_time_point_ = now;
-            return true;
+            (*it)->OnEvent(e);
+            if (e.handled)
+            {
+                return;
+            }
         }
-        return false;
     }
 
-    void Engine::MainLoop()
+    void Application::Init()
     {
+        if (application_)
+        {
+            return;
+        }
+        application_ = std::unique_ptr<Application>(new Application{});
+    }
+
+    void Application::Exit()
+    {
+        application_->running_ = false;
+    }
+
+    void Application::Run()
+    {
+        render.reset();
+        tick.reset();
         while (running_)
         {
+            AppUpdateEvent update;
+            Application::OnEvent(update);
+            assert(!update.handled);
 
-            PeekOSMessages();
-
-            if (FrameTimeElapsed())
+            if (tick.elapsed() > kTickDuration)
             {
-                Update();
+                AppTickEvent tick_event(tick.elapsed());
+                tick.reset();
+                Application::OnEvent(tick_event);
+                assert(!tick_event.handled);
             }
 
+            if (render.elapsed() > kFrameDuration)
+            {
+                AppRenderEvent render_event;
+                render.reset();
+                Application::OnEvent(render_event);
+                assert(!render_event.handled);
+            }
             std::this_thread::yield();
-        }
-    }
-
-    void Engine::Update()
-    {
-        for (auto it = update_list_.begin(); it != update_list_.end();)
-        {
-            if ((*it)->Update(delta_time_))
-            {
-                ++it;
-            }
-            else
-            {
-                it = update_list_.erase(it);
-            }
-        }
-    }
-
-    void Engine::PeekOSMessages()
-    {
-        for (auto it = windows_.begin(); it != windows_.end();)
-        {
-            if ((*it)->PeekOSMessages())
-            {
-                ++it;
-            }
-            else
-            {
-                it = windows_.erase(it);
-            }
         }
     }
 
