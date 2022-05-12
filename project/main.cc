@@ -1,7 +1,7 @@
 #include <Windows.h>
 
 #include "controller.hpp"
-#include "engine.hpp"
+#include "core/application.hpp"
 using namespace engine;
 
 // the entry point for any Windows program
@@ -43,10 +43,10 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
 
     auto controller = std::make_shared<Controller>(*bmwindow, scene);
 
-    Engine &engine = GetEngine();
-    engine.AddWindow(window);
-    engine.AddUpdatable(controller);
-    engine.Start();
+    Application &application = Application::Get();
+    application.AddWindow(window);
+    application.AddLayer();
+    application.Run();
     PostQuitMessage(0);
     return 0;
 }

@@ -1,4 +1,5 @@
 #include "pch.hpp"
+#include "math/math.hpp"
 #include <iostream>
 
 using namespace engine::math;

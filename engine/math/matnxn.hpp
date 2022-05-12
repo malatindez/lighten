@@ -78,7 +78,7 @@ namespace engine::math
         template <class V>
         constexpr void unpack_data(int offset, V vec);
         template <typename A, typename B, typename... C>
-        constexpr void unpack_data(int offset, A a, B b, C... c);
+        constexpr void unpack_data(int offset, A, B, C...);
     };
 }
 #include "matnxn.inl"

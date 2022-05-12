@@ -105,19 +105,19 @@ namespace engine::math
 
     template <size_t a, size_t b, Primitive T>
     template <Primitive _> // primitives
-    static constexpr size_t mat<a, b, T>::get_parameter_pack_size()
+    constexpr size_t mat<a, b, T>::get_parameter_pack_size()
     {
         return 1;
     }
     template <size_t a, size_t b, Primitive T>
     template <class V> // vectors
-    static constexpr size_t mat<a, b, T>::get_parameter_pack_size()
+    constexpr size_t mat<a, b, T>::get_parameter_pack_size()
     {
         return V::size;
     }
     template <size_t a, size_t b, Primitive T>
     template <typename A, typename B, typename... C>
-    static constexpr size_t mat<a, b, T>::get_parameter_pack_size()
+    constexpr size_t mat<a, b, T>::get_parameter_pack_size()
     {
         return get_parameter_pack_size<A>() + get_parameter_pack_size<B, C...>();
     }
@@ -139,10 +139,10 @@ namespace engine::math
     }
     template <size_t a, size_t b, Primitive T>
     template <typename A, typename B, typename... C>
-    constexpr void mat<a, b, T>::unpack_data(int offset, A a, B b, C... c)
+    constexpr void mat<a, b, T>::unpack_data(int offset, A first, B second, C... rest)
     {
-        unpack_data(offset, a);
+        unpack_data(offset, first);
         offset += get_parameter_pack_size<A>();
-        unpack_data(offset, b, c...);
+        unpack_data(offset, second, rest...);
     }
 }

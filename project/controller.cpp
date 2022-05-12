@@ -1,5 +1,5 @@
 #include "controller.hpp"
-#include "engine.hpp"
+#include "core/application.hpp"
 using namespace engine;
 using namespace engine::math;
 Controller::Controller(BitmapWindow &window, std::shared_ptr<Scene> scene) : scene_(scene), window_(window)
@@ -61,7 +61,7 @@ LRESULT Controller::OnExitSizeMove(Window &, HWND handle, UINT message,
 LRESULT Controller::OnDestroy(Window &, HWND handle, UINT message,
                               WPARAM w_param, LPARAM l_param) const
 {
-    GetEngine().Exit();
+    Application::Get().Exit();
     return DefWindowProcW(handle, message, w_param, l_param);
 }
 

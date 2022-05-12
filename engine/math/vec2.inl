@@ -99,19 +99,19 @@ namespace engine::math
 
         template <Primitive T>
     template <Primitive _> // primitives
-    static constexpr size_t vec<2, T>::get_parameter_pack_size()
+    constexpr size_t vec<2, T>::get_parameter_pack_size()
     {
         return 1;
     }
     template <Primitive T>
     template <class V> // vectors
-    static constexpr size_t vec<2, T>::get_parameter_pack_size()
+    constexpr size_t vec<2, T>::get_parameter_pack_size()
     {
         return V::size;
     }
     template <Primitive T>
     template <typename A, typename B, typename... C>
-    static constexpr size_t vec<2, T>::get_parameter_pack_size()
+    constexpr size_t vec<2, T>::get_parameter_pack_size()
     {
         return get_parameter_pack_size<A>() + get_parameter_pack_size<B, C...>();
     }
