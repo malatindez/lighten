@@ -66,12 +66,48 @@ namespace engine
             auto window_pos = reinterpret_cast<LPWINDOWPOS>(l_param);
             position_ = math::ivec2{window_pos->x, window_pos->y};
         }
-        // call callback if it exists
-        if (auto it = callbacks_.find(message); it != callbacks_.end())
+
+        if (message == WM_KEYDOWN)
         {
-            return it->second(std::ref(*this), handle, message, w_param, l_param);
+            KeyPressedEvent event{uint32_t(w_param), LOWORD(l_param)};
+            event_callback_(event);
         }
-        // handle any messages that callbacks didnt
+        else if (message == WM_KEYUP)
+        {
+            KeyReleasedEvent event{uint32_t(w_param)};
+            event_callback_(event);
+        }
+        else if (message == WM_MOUSEMOVE)
+        {
+            MouseMovedEvent event{math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
+            event_callback_(event);
+        }
+        else if (message == WM_LBUTTONDOWN)
+        {
+            MouseButtonPressedEvent event{0, math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
+            event_callback_(event);
+        }
+        else if (message == WM_LBUTTONUP)
+        {
+            MouseButtonReleasedEvent event{0, math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
+            event_callback_(event);
+        }
+        else if (message == WM_RBUTTONDOWN)
+        {
+            MouseButtonPressedEvent event{1, math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
+            event_callback_(event);
+        }
+        else if (message == WM_RBUTTONUP)
+        {
+            MouseButtonReleasedEvent event{1, math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
+            event_callback_(event);
+        }
+        else if (message == WM_DESTROY)
+        {
+            WindowCloseEvent event{handle_};
+            event_callback_(event);
+        }
+
         return DefWindowProcW(handle, message, w_param, l_param);
     }
 

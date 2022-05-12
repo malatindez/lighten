@@ -3,7 +3,8 @@
 
 #include "pch.hpp"
 
-#include "interfaces/updatable.hpp"
+#include "core/events/mouse-events.hpp"
+#include "events.hpp"
 #include "math/vec2.hpp"
 
 namespace engine
@@ -28,12 +29,11 @@ namespace engine
         Window(Window const &Window) = delete;
         Window &operator=(Window const &Window) = delete;
 
-        ~Window() { DestroyWindow(handle_); }
+        virtual ~Window() { DestroyWindow(handle_); }
 
-        // Windows event callback
-        virtual void SetCallback(UINT message, WindowCallback const &function)
+        void SetEventCallback(EventCallbackFn const &callback) noexcept
         {
-            callbacks_.try_emplace(message, function);
+            event_callback_ = callback;
         }
 
         [[nodiscard]] constexpr HWND handle() const noexcept { return handle_; }
@@ -47,14 +47,13 @@ namespace engine
         virtual void OnSizeChanged() {}
 
     private:
-        LRESULT CALLBACK WindowProcCallback(HWND handle, UINT message, WPARAM w_param,
-                                            LPARAM l_param);
+        LRESULT CALLBACK WindowProcCallback(HWND handle, UINT message, WPARAM w_param, LPARAM l_param);
+        static LRESULT CALLBACK StaticWindowProc(HWND handle, UINT message, WPARAM w_param, LPARAM l_param);
 
-        static LRESULT CALLBACK StaticWindowProc(HWND handle, UINT message,
-                                                 WPARAM w_param, LPARAM l_param);
+        EventCallbackFn event_callback_;
+
         bool running_ = true;
         HWND handle_;
-        std::unordered_map<UINT, WindowCallback> callbacks_;
         math::ivec2 position_;
         math::ivec2 size_;
     };
