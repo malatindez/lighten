@@ -159,7 +159,6 @@ namespace engine::math
         return adj(m) * (static_cast<T>(1) / det(m));
     }
 
-    
     template <Primitive T>
     mat<4, 4, T> translate(mat<4, 4, T> const &matrix, vec<3, T> const &vec)
     {
@@ -238,8 +237,8 @@ namespace engine::math
         assert(abs(aspect_ratio - std::numeric_limits::epsilon()) > static_cast<T>(0));
 
         T const tan_half_fov_y = tan(fov_y / static_cast<T>(2));
-        
-		mat<4, 4, T> return_value(0);
+
+        mat<4, 4, T> return_value(0);
         return_value[0][0] = static_cast<T>(1) / (aspect_ratio * tan_half_fov_y);
         return_value[1][1] = static_cast<T>(1) / (tan_half_fov_y);
         return_value[2][2] = z_far / (z_near - z_far);
