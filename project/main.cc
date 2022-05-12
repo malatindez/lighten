@@ -32,20 +32,22 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
         nullptr,                          // we aren't using menus, nullptr
         instance,                         // application handle
         nullptr);                         // used with multiple windows, nullptr
-    auto window = std::static_pointer_cast<Window>(bmwindow);
-
     // display the window on the screen
-    ShowWindow(window->handle(), cmd_show);
+    ShowWindow(bmwindow->handle(), cmd_show);
 
     auto scene = std::make_shared<Scene>();
 
     scene->sphere = math::Sphere{math::vec3{0, 0, -1}, 0.5f};
 
     auto controller = std::make_shared<Controller>(*bmwindow, scene);
+    
+    Application::Init();
+
+    bmwindow->SetEventCallback(Application::event_function());
+    
 
     Application &application = Application::Get();
-    application.AddWindow(window);
-    application.AddLayer();
+    application.AddLayer(controller);
     application.Run();
     PostQuitMessage(0);
     return 0;
