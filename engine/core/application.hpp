@@ -11,58 +11,61 @@
 namespace engine
 {
 
-    const math::ivec2 kWindowPosition{0};
-    const math::ivec2 kWindowResolution{1280, 720};
+  const math::ivec2 kWindowPosition{0};
+  const math::ivec2 kWindowResolution{1280, 720};
 
-    const float kFpsLimit = 60.0f;
-    const float kFrameDuration = 1.0f / kFpsLimit;
+  const float kFpsLimit = 60.0f;
+  const float kFrameDuration = 1.0f / kFpsLimit;
 
-    const float kTickrate = 120.0f;
-    const float kTickDuration = 1.0f / kTickrate;
+  const float kTickrate = 120.0f;
+  const float kTickDuration = 1.0f / kTickrate;
 
-    const math::vec3 kSphereCoords{0, 0, -1};
-    const float kSphereRadius{0.5f};
+  const math::vec3 kSphereCoords{0, 0, -1};
+  const float kSphereRadius{0.5f};
 
-    class Application final
+  class Application final
+  {
+  public:
+    [[nodiscard]] static inline Application &Get() noexcept
     {
-    public:
-        [[nodiscard]] static inline Application &Get() noexcept { return *application_; }
-        [[nodiscard]] static inline EventCallbackFn const &event_function() { return application_->event_function_; }
-        static void Exit();
+      return *application_;
+    }
+    [[nodiscard]] static inline EventCallbackFn const &event_function()
+    {
+      return application_->event_function_;
+    }
+    static void Exit();
 
-        static void OnEvent(Event &e);
+    static void OnEvent(Event &e);
 
-        template <class T>
-        inline void AddLayer(std::shared_ptr<T> t)
-        {
-            layers_.push_back(std::static_pointer_cast<Layer>(t));
-        }
+    template <class T>
+    inline void AddLayer(std::shared_ptr<T> t)
+    {
+      layers_.push_back(std::static_pointer_cast<Layer>(t));
+    }
 
-    private:
-        static void Init();
+  private:
+    static void Init();
 
-        void Run();
+    void Run();
 
-        Application()
-        {
-            event_function_ = std::bind_front(&Application::OnEvent);
-        }
-        // delete move & copy semantics
-        Application(Application &&Application) = delete;
-        Application(Application const &Application) = delete;
-        Application &operator=(Application &&Application) = delete;
-        Application &operator=(Application const &Application) = delete;
+    Application() { event_function_ = std::bind_front(&Application::OnEvent); }
+    // delete move & copy semantics
+    Application(Application &&Application) = delete;
+    Application(Application const &Application) = delete;
+    Application &operator=(Application &&Application) = delete;
+    Application &operator=(Application const &Application) = delete;
 
-        bool running_ = true;
+    bool running_ = true;
 
-        SteadyTimer render;
-        SteadyTimer tick;
+    SteadyTimer render;
+    SteadyTimer tick;
 
-        std::vector<std::shared_ptr<Layer>> layers_;
+    std::vector<std::shared_ptr<Layer>> layers_;
 
-        EventCallbackFn event_function_;
+    EventCallbackFn event_function_;
 
-        static std::unique_ptr<Application> application_;
-        friend INT WINAPI ::wWinMain(HINSTANCE, HINSTANCE, PWSTR, int cmd_show);
-    };
+    static std::unique_ptr<Application> application_;
+    friend INT WINAPI ::wWinMain(HINSTANCE, HINSTANCE, PWSTR, int cmd_show);
+  };
 } // namespace engine

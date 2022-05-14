@@ -28,4 +28,4 @@ namespace engine
     private:
         math::ivec2 size_;
     };
-}
+} // namespace engine

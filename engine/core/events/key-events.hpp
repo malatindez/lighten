@@ -34,4 +34,4 @@ namespace engine
     private:
         uint32_t const key_code_;
     };
-}
+} // namespace engine

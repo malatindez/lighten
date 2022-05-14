@@ -45,4 +45,4 @@ namespace engine::math
     template struct mat<4, 3, float>;
     template struct mat<4, 3, double>;
     template struct mat<4, 3, int>;
-}
+} // namespace engine::math

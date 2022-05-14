@@ -52,5 +52,5 @@ namespace engine::math
     using mat4x3 = mat<4, 3, float>;
     using dmat4x3 = mat<4, 3, double>;
     using imat4x3 = mat<4, 3, int>;
-}
+} // namespace engine::math
 #include "mat_math.hpp"

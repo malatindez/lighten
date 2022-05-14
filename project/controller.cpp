@@ -83,8 +83,8 @@ void Controller::Tick(float delta_time) const
         POINT point;
         GetCursorPos(&point);
 
-        vec2 diff = vec2{ float(point.x) - float(middle.x),
-                         float(middle.y) - float(point.y) } /
+        vec2 diff = vec2{ static_cast<float>(point.x) - static_cast<float>(middle.x),
+                         static_cast<float>(middle.y) - static_cast<float>(point.y) } /
             length(window_.size());
 
         scene_->sphere.SetCenter(scene_->sphere.center() + vec3{diff.x, diff.y, 0});

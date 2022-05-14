@@ -26,4 +26,4 @@ namespace engine
         EVENT_CLASS_TYPE(AppRender)
     };
 
-}
+} // namespace engine

@@ -52,4 +52,4 @@ namespace engine
 
         bool handled = false;
     };
-}
+} // namespace engine

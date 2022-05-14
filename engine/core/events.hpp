@@ -9,4 +9,4 @@
 namespace engine
 {
     using EventCallbackFn = std::function<void(Event &)>;
-}
+} // namespace engine

@@ -8,33 +8,45 @@ namespace engine::math
     constexpr std::ostream &operator<<(std::ostream &os, vec<size, T> &vec);
 
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T> operator*(U const value, vec<size, T> const &vector);
+    [[nodiscard]] constexpr vec<size, T> operator*(U const value,
+                                                   vec<size, T> const &vector);
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T> operator+(vec<size, T> const &vector, U const value) noexcept;
+    [[nodiscard]] constexpr vec<size, T> operator+(vec<size, T> const &vector,
+                                                   U const value) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T> operator-(vec<size, T> const &vector, U const value) noexcept;
+    [[nodiscard]] constexpr vec<size, T> operator-(vec<size, T> const &vector,
+                                                   U const value) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T> operator*(vec<size, T> const &vector, U const value) noexcept;
+    [[nodiscard]] constexpr vec<size, T> operator*(vec<size, T> const &vector,
+                                                   U const value) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T> operator/(vec<size, T> const &vector, U const value) noexcept;
+    [[nodiscard]] constexpr vec<size, T> operator/(vec<size, T> const &vector,
+                                                   U const value) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T> operator+(vec<size, T> const &left, vec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, T>
+    operator+(vec<size, T> const &left, vec<size, U> const &right) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T> operator-(vec<size, T> const &left, vec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, T>
+    operator-(vec<size, T> const &left, vec<size, U> const &right) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T> operator*(vec<size, T> const &left, vec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, T>
+    operator*(vec<size, T> const &left, vec<size, U> const &right) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T> operator/(vec<size, T> const &left, vec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, T>
+    operator/(vec<size, T> const &left, vec<size, U> const &right) noexcept;
 
     template <size_t size, Primitive T>
-    [[nodiscard]] constexpr float squared_length(vec<size, T> const &vector) noexcept;
+    [[nodiscard]] constexpr float
+    squared_length(vec<size, T> const &vector) noexcept;
     template <size_t size, Primitive T>
     [[nodiscard]] constexpr float length(vec<size, T> const &vector) noexcept;
 
     template <size_t size, Primitive T>
-    [[nodiscard]] constexpr vec<size, T> unit_vector(vec<size, T> const &vector) noexcept;
+    [[nodiscard]] constexpr vec<size, T>
+    unit_vector(vec<size, T> const &vector) noexcept;
     template <size_t size, Primitive T>
-    [[nodiscard]] constexpr vec<size, T> normalize(vec<size, T> const &vector) noexcept;
+    [[nodiscard]] constexpr vec<size, T>
+    normalize(vec<size, T> const &vector) noexcept;
 
     template <size_t size, Primitive T, Primitive U>
     constexpr T dot(vec<size, T> const &left, vec<size, U> const &right);
@@ -47,5 +59,5 @@ namespace engine::math
 
     template <size_t size, Primitive T>
     constexpr vec<size, T> sin(vec<size, T> const &vector);
-}
+} // namespace engine::math
 #include "vec_math.inl"

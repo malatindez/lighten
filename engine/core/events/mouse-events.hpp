@@ -52,5 +52,4 @@ namespace engine
         uint16_t const mouse_button_;
         math::ivec2 const coordinates_;
     };
-
-}
+} // namespace engine

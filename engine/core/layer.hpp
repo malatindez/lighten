@@ -21,4 +21,4 @@ namespace engine
   private:
     std::string debug_name_;
   };
-}
+} // namespace engine

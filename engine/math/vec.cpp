@@ -10,4 +10,4 @@ namespace engine::math
     template struct vec<4, float>;
     template struct vec<4, double>;
     template struct vec<4, int>;
-}
+} // namespace engine::math

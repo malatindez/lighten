@@ -34,4 +34,4 @@ namespace engine::math
     using dvec4 = vec<4, double>;
     using ivec4 = vec<4, int>;
     using uivec4 = vec<4, unsigned int>;
-};
+}; // namespace engine::math

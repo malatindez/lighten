@@ -19,4 +19,4 @@ namespace engine
     private:
         bool update_scene_{true};
     };
-}
+} // namespace engine
