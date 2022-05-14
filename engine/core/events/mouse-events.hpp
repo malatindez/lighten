@@ -44,7 +44,7 @@ namespace engine
         {
             return std::string(name()) + std::to_string(mouse_button_);
         }
-        [[nodiscard]] uint16_t mouse_button() const noexcept { return mouse_button_; };
+        [[nodiscard]] inline uint16_t mouse_button() const noexcept { return mouse_button_; };
         [[nodiscard]] inline math::ivec2 const &coordinates() const noexcept { return coordinates_; };
         EVENT_CLASS_CATEGORY(EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput)
         EVENT_CLASS_TYPE(MouseButtonReleased)

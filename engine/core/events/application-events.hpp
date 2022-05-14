@@ -13,7 +13,7 @@ namespace engine
     {
     public:
         explicit AppTickEvent(float delta_time) : delta_time_(delta_time) {}
-        [[nodiscard]] float delta_time() const noexcept { return delta_time_; }
+        [[nodiscard]] inline float delta_time() const noexcept { return delta_time_; }
         EVENT_CLASS_CATEGORY(EventCategoryApplication)
         EVENT_CLASS_TYPE(AppTick)
     private:
