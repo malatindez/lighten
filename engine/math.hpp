@@ -4,6 +4,7 @@
 #include "math/mat_math.hpp"
 #include "math/vec.hpp"
 #include "math/vec_math.hpp"
+#include "math/quaternion.hpp"
 
 #include <cmath>
 #include <type_traits>
