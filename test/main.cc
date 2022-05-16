@@ -6,13 +6,13 @@
 
 namespace math = engine::math;
 template <size_t a, size_t b, Primitive T>
-void random_fill(mat<a, b, T> &matrix)
+void random_fill(math::mat<a, b, T> &matrix)
 {
     for (int i = 0; i < matrix.size.x; i++)
     {
         for (int j = 0; j < matrix.size.y; j++)
         {
-            matrix[i][j] = rand_r() % 2;
+            matrix[i][j] = rand() % 2;
         }
     }
 }

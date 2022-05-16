@@ -3,6 +3,9 @@
 #include "core/bitmap-window.hpp"
 #include "math/ray.hpp"
 #include "math/sphere.hpp"
+#include "components/directional-light.hpp"
+#include "components/point-light.hpp"
+#include "components/spot-light.hpp"
 
 namespace engine
 {
@@ -14,9 +17,17 @@ namespace engine
 
         void Draw(BitmapWindow &window);
 
-        math::Sphere sphere{math::vec3{0, 0, 0}, 1};
+        bool FindIntersection()
+        {
+            
+        }
 
-    private:
-        bool update_scene_{true};
+        math::Sphere sphere{math::vec3{0, 0, 0}, 1};
+        
+        std::vector<components::SpotLight> spot_lights;
+        std::vector<components::PointLight> point_lights;
+        std::vector<components::DirectionalLight> directional_lights;
+
+        bool update_scene{true};
     };
 } // namespace engine
