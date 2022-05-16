@@ -6,8 +6,6 @@ namespace engine::components
 {
     struct PointLight
     {
-        math::vec3 position;
-
         math::vec3 color;
         float ambient_intensity;
         float diffuse_intensity;
@@ -20,9 +18,9 @@ namespace engine::components
         } attenuation;
 
         
-        void UpdateColor(LightData &light_data) const
+        void UpdateColor(Transform &transform, LightData &light_data) const
         {
-            math::vec3 const light_direction = - light_data.point + position;
+            math::vec3 const light_direction = - light_data.point + transform.position;
             float const t = math::dot(light_data.normal, light_direction);
             light_data.color += color * ambient_intensity;
             if (t < 0)

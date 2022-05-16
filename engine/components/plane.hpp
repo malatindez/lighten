@@ -6,16 +6,17 @@
 #include "transform.hpp"
 namespace engine::components
 {
-  struct plane
+  struct Plane
   {
   public:
-    static float Hit(math::Ray const &r, math::vec3 center, float radius) noexcept
+    float Hit(math::Ray const &r, math::vec3 center, float radius) noexcept
     {
+        return -1;
     }
 
-    [[nodiscard]] static bool CheckIntersection(entt::registry reg, entt::entity entity, math::Intersection &i, math::Ray const &ray)
+
+    [[nodiscard]] bool CheckIntersection(Transform &transform, math::Intersection& i, math::Ray const& ray)
     {
-      auto const &transform = reg.get<Transform>(entity);
       if (math::length(ray.origin() - transform.position) < i.t)
       {
         return false;

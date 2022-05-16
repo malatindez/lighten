@@ -6,7 +6,6 @@ namespace engine::components
 {
     struct SpotLight
     {
-        math::vec3 position;
         math::vec3 direction; // should be normalized
         float cut_off;
 
@@ -21,11 +20,11 @@ namespace engine::components
             float quadratic;
         } attenuation;
 
-        void UpdateColor(LightData &light_data)
+        void UpdateColor(Transform &transform, LightData &light_data)
         {
             assert(math::almost_equal(length(direction), 1.0f));
             
-            math::vec3 const light_direction = - light_data.point + position;
+            math::vec3 const light_direction = - light_data.point + transform.position;
             float const t = math::dot(light_data.normal, light_direction);
             if (t < 0)
             {

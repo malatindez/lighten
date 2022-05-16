@@ -18,7 +18,6 @@ namespace engine::components
             float b = 2.0f * math::dot(oc, r.direction());
             float c = math::dot(oc, oc) - radius;
             float discriminant = b * b - 4 * a * c;
-            assert(discriminant > 0);
             if (discriminant < 0)
             {
                 return -1.0f;
@@ -30,16 +29,15 @@ namespace engine::components
             }
         }
 
-        [[nodiscard]] static bool CheckIntersection(entt::registry reg, entt::entity entity, math::Intersection& i, math::Ray const& ray)
+        [[nodiscard]] static bool CheckIntersection(Transform &transform, math::Intersection& i, math::Ray const& ray)
         {
-            auto const& transform = reg.get<Transform>(entity);
-            if (math::length(ray.origin() - transform.position) - transform.scale.x < i.t)
+            if (math::length(ray.origin() - transform.position) - transform.scale.x > i.t)
             {
                 return false;
             }
             float t = Hit(ray, transform.position, transform.scale.x);
 
-            if (t < i.t)
+            if (t > i.t)
             {
                 return false;
             }
