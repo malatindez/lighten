@@ -3,7 +3,6 @@
 #include "core/timer.hpp"
 #include "events.hpp"
 #include "layer.hpp"
-#include "math/sphere.hpp"
 #include "misc/scene.hpp"
 #include "pch.hpp"
 #include <chrono>
@@ -49,7 +48,7 @@ namespace engine
 
     void Run();
 
-    Application() { event_function_ = std::bind_front(&Application::OnEvent); }
+    Application();
     // delete move & copy semantics
     Application(Application &&Application) = delete;
     Application(Application const &Application) = delete;
