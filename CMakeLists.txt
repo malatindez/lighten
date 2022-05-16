@@ -36,9 +36,16 @@ string(REPLACE "/" "\\" _source_path_msvc "${_source_path}")
 source_group("${_source_path_msvc}" FILES "${_source}")
 endforeach()
 
+if(MSVC)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+endif()
+
+add_subdirectory(third_party/entt)
+
 add_executable(project WIN32 ${PROJECT_SOURCES} ${ENGINE_SOURCES})
 target_include_directories(project PRIVATE ${PROJECT_SOURCES_DIR})
 target_include_directories(project PRIVATE ${ENGINE_SOURCES_DIR})
+target_link_libraries(project PUBLIC EnTT::EnTT)
 
 set_target_properties(project PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -49,5 +56,6 @@ list(FILTER TEST_SOURCES INCLUDE REGEX ${TEST_SOURCES_DIR}/*)
 add_executable(tests ${TEST_SOURCES} ${ENGINE_SOURCES})
 target_include_directories(tests PRIVATE ${TEST_SOURCES})
 target_include_directories(tests PRIVATE ${ENGINE_SOURCES_DIR})
+target_link_libraries(tests PUBLIC EnTT::EnTT)
 
 set_target_properties(tests PROPERTIES LINKER_LANGUAGE CXX)
