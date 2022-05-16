@@ -21,6 +21,18 @@ namespace engine::math
         data[i][i] = static_cast<T>(p);
       }
     }
+    template <size_t c, size_t d, Primitive P>
+    explicit constexpr mat(mat<c, d, P> p) requires(a > c && b > d)
+    {
+      reset();
+      for(int i = 0; i < c; i++)
+      {
+        for(int j = 0; j < d; j++)
+        {
+          data[i][j] = static_cast<T>(p.data[i][j]);
+        }
+      }
+    }
     template <Primitive P>
     explicit constexpr mat(mat<a, b, P> p)
     {
