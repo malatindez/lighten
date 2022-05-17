@@ -37,12 +37,13 @@ namespace engine::components
             }
             float t = Hit(ray, transform.position, transform.scale.x);
 
-            if (t > i.t)
+            if (t > i.t || t < 0)
             {
                 return false;
             }
             i.t = t;
             i.point = ray.direction() * t;
+            i.normal = normalize(i.point - transform.position);
             return true;
         }
     };
