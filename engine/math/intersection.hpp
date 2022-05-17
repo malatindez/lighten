@@ -6,6 +6,7 @@ namespace engine::math
     {
         float t;
         vec3 point;
+        vec3 normal;
 
         constexpr Intersection() = default;
         constexpr void reset() { t = std::numeric_limits<float>::infinity(); }
