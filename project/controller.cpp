@@ -19,7 +19,8 @@ void Controller::OnEvent(engine::Event &event)
         }
         else if (event.type() == EventType::AppRender)
         {
-            scene_->Draw(window_);
+            Camera cam{};
+            scene_->Draw(cam, window_);
         }
         else if (event.type() == EventType::WindowClose)
         {
@@ -49,47 +50,5 @@ const vec3 kRight{1, 0, 0};
 
 void Controller::Tick(float delta_time) const
 {
-    if (!input_.rbutton_down())
-    {
-        vec3 vec{0};
-        if (input_.key_state('W'))
-        {
-            vec += kUp;
-        }
-        if (input_.key_state('A'))
-        {
-            vec += kLeft;
-        }
-        if (input_.key_state('S'))
-        {
-            vec += kDown;
-        }
-        if (input_.key_state('D'))
-        {
-            vec += kRight;
-        }
-        scene_->sphere.SetCenter(scene_->sphere.center() + vec * delta_time);
-        
-        // update the scene if position of the sphere has changed
-        if (squared_length(vec) != 0)
-        {
-            scene_->UpdateScene();
-        }
-    }
-    else
-    {
-        auto middle = window_.position() + window_.size() / 2;
 
-        POINT point;
-        GetCursorPos(&point);
-
-        vec2 diff = vec2{ static_cast<float>(point.x) - static_cast<float>(middle.x),
-                         static_cast<float>(middle.y) - static_cast<float>(point.y) } /
-            length(window_.size());
-
-        scene_->sphere.SetCenter(scene_->sphere.center() + vec3{diff.x, diff.y, 0});
-
-        SetCursorPos(middle.x, middle.y);
-        scene_->UpdateScene();
-    }
 }
