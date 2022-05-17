@@ -2,10 +2,11 @@
 
 #include "core/bitmap-window.hpp"
 #include "math/ray.hpp"
-#include "math/sphere.hpp"
+#include "components/sphere.hpp"
 #include "components/directional-light.hpp"
 #include "components/point-light.hpp"
 #include "components/spot-light.hpp"
+#include "camera.hpp"
 
 namespace engine
 {
@@ -15,19 +16,11 @@ namespace engine
         Scene() = default;
         void UpdateScene() noexcept;
 
-        void Draw(BitmapWindow &window);
+        void Draw(Camera &cam, BitmapWindow &window);
 
-        bool FindIntersection()
-        {
-            
-        }
-
-        math::Sphere sphere{math::vec3{0, 0, 0}, 1};
+        math::Intersection FindIntersection(math::Ray const& ray);
         
-        std::vector<components::SpotLight> spot_lights;
-        std::vector<components::PointLight> point_lights;
-        std::vector<components::DirectionalLight> directional_lights;
-
         bool update_scene{true};
+        entt::registry registry;
     };
 } // namespace engine
