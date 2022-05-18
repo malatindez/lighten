@@ -42,7 +42,7 @@ namespace engine::components
                 return false;
             }
             i.t = t;
-            i.point = ray.direction() * t;
+            i.point = ray.PointAtParameter(t);
             i.normal = normalize(i.point - transform.position);
             return true;
         }
