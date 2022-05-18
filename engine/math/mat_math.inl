@@ -124,7 +124,7 @@ namespace engine::math
   }
 
   template <size_t m_size, Primitive T>
-  constexpr mat<m_size, m_size, T> adj(mat<m_size, m_size, T> const &m)
+  constexpr mat<m_size, m_size, T> adjugate(mat<m_size, m_size, T> const &m)
   {
     mat<m_size, m_size, T> return_value;
     mat<m_size - 1, m_size - 1, T> temp;
@@ -156,9 +156,9 @@ namespace engine::math
   }
 
   template <size_t a, Primitive T>
-  constexpr mat<a, a, T> inv(mat<a, a, T> const &m)
+  constexpr mat<a, a, T> inverse(mat<a, a, T> const &m)
   {
-    return adj(m) * (static_cast<T>(1) / det(m));
+    return adjugate(m) * (static_cast<T>(1) / det(m));
   }
 
   template <Primitive T>
@@ -221,7 +221,7 @@ namespace engine::math
   mat<4, 4, T> lookAt(vec<3, T> const &eye, vec<3, T> const &center,
                       vec<3, T> const &world_up)
   {
-    vec<3, T> const forward = normalize(eye - center);
+    vec<3, T> const forward = normalize(center - eye);
     vec<3, T> const right = normalize(cross(forward, world_up));
     vec<3, T> const up = cross(forward, right);
     mat<4, 4, T> return_value(1);
@@ -240,9 +240,9 @@ namespace engine::math
     return return_value;
   }
   template <Primitive T>
-  mat<4, 4, T> perspective(T fov_y, T aspect_ratio, T z_near, T z_far)
+  mat<4, 4, T> perspective(T fov_y, T aspect_ratio, T z_near, T z_far) requires (!std::numeric_limits<T>::is_integer)
   {
-    assert(abs(aspect_ratio - std::numeric_limits::epsilon()) >
+    assert(std::abs(aspect_ratio - std::numeric_limits<T>::epsilon()) >
            static_cast<T>(0));
 
     T const tan_half_fov_y = tan(fov_y / static_cast<T>(2));
@@ -252,7 +252,7 @@ namespace engine::math
     return_value[1][1] = static_cast<T>(1) / (tan_half_fov_y);
     return_value[2][2] = z_far / (z_near - z_far);
     return_value[2][3] = -static_cast<T>(1);
-    return_value[3][2] = -(z_far * z_near) / (z_far - z_near);
+    return_value[3][2] = -( 2 * z_far * z_near) / (z_far - z_near);
     return return_value;
   }
 

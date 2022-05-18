@@ -5,7 +5,7 @@ namespace engine::math
 {
 
   template <size_t L, Primitive T>
-  struct vec
+  struct vec 
   {
     using type = T;
     static constexpr size_t size = L;
@@ -37,6 +37,8 @@ namespace engine::math
     template <Primitive U>
     constexpr vec<L, T> &operator/=(U const value) noexcept;
     template <Primitive U>
+    constexpr vec<L, T> &operator%=(U const value) noexcept;
+    template <Primitive U>
     constexpr vec<L, T> &operator+=(vec<L, U> const &other) noexcept;
     template <Primitive U>
     constexpr vec<L, T> &operator-=(vec<L, U> const &other) noexcept;
@@ -44,7 +46,20 @@ namespace engine::math
     constexpr vec<L, T> &operator*=(vec<L, U> const &other) noexcept;
     template <Primitive U>
     constexpr vec<L, T> &operator/=(vec<L, U> const &other) noexcept;
+    template <Primitive U>
+    constexpr vec<L, T> &operator%=(vec<L, U> const &other) noexcept;
 
+    template <size_t n, Primitive U = T>
+    [[nodiscard]] constexpr vec<n, U> as_vec() requires(n >= 2 && n <= size)
+    {
+      vec<n, U> rv;
+      for (int i = 0; i < n; i++)
+      {
+        rv.data[i] = static_cast<U>(data[i]);
+      }
+      return rv;
+    }
+    
     [[nodiscard]] constexpr T &operator[](size_t i);
     [[nodiscard]] constexpr T const &operator[](size_t i) const;
     std::array<T, size> data;

@@ -54,6 +54,16 @@ namespace engine::math
   }
   template <size_t L, Primitive T>
   template <Primitive U>
+  constexpr vec<L, T> &vec<L, T>::operator%=(U const value) noexcept
+  {
+    for (int i = 0; i < size; i++)
+    {
+      data[i] %= value;
+    }
+    return *this;
+  }
+  template <size_t L, Primitive T>
+  template <Primitive U>
   constexpr vec<L, T> &vec<L, T>::operator+=(vec<L, U> const &other) noexcept
   {
     for (int i = 0; i < size; i++)
@@ -89,6 +99,16 @@ namespace engine::math
     for (int i = 0; i < size; i++)
     {
       data[i] /= other.data[i];
+    }
+    return *this;
+  }
+  template <size_t L, Primitive T>
+  template <Primitive U>
+  constexpr vec<L, T> &vec<L, T>::operator%=(vec<L, U> const &other) noexcept
+  {
+    for (int i = 0; i < size; i++)
+    {
+      data[i] %= other.data[i];
     }
     return *this;
   }

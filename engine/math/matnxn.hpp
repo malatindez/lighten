@@ -2,6 +2,7 @@
 #include "mat.hpp"
 namespace engine::math
 {
+
   template <size_t a, size_t b, Primitive T>
   struct mat
   {

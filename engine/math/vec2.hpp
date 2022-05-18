@@ -36,7 +36,9 @@ namespace engine::math
     template <Primitive U>
     constexpr vec<2, T> &operator*=(U const value) noexcept;
     template <Primitive U>
-    constexpr vec<2, T> &operator/=(U const value) noexcept;
+    constexpr vec<2, T>& operator/=(U const value) noexcept;
+    template <Primitive U>
+    constexpr vec<2, T>& operator%=(U const value) noexcept;
     template <Primitive U>
     constexpr vec<2, T> &operator+=(vec<2, U> const &other) noexcept;
     template <Primitive U>
@@ -45,6 +47,8 @@ namespace engine::math
     constexpr vec<2, T> &operator*=(vec<2, U> const &other) noexcept;
     template <Primitive U>
     constexpr vec<2, T> &operator/=(vec<2, U> const &other) noexcept;
+    template <Primitive U>
+    constexpr vec<2, T> &operator%=(vec<2, U> const& other) noexcept;
     [[nodiscard]] constexpr T &operator[](size_t i);
     [[nodiscard]] constexpr T const &operator[](size_t i) const;
     union

@@ -27,10 +27,10 @@ namespace engine::math
     constexpr T det(mat<a, a, T> const &matrix);
 
     template <size_t a, Primitive T>
-    constexpr mat<a, a, T> adj(mat<a, a, T> const &m);
+    constexpr mat<a, a, T> adjugate(mat<a, a, T> const &m);
 
     template <size_t a, Primitive T>
-    constexpr mat<a, a, T> inv(mat<a, a, T> const &m);
+    constexpr mat<a, a, T> inverse(mat<a, a, T> const &m);
 
     template <Primitive T>
     mat<4, 4, T> translate(mat<4, 4, T> const &matrix, vec<3, T> const &vec);

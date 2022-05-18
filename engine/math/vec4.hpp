@@ -14,7 +14,13 @@ namespace engine::math
         template <Primitive U>
         explicit constexpr vec(U value) { x = y = z = w = static_cast<T>(value); }
         template <Primitive A, Primitive B, Primitive C, Primitive D>
-        explicit constexpr vec(A a, B b, C c, D d) { x = a; y = b; z = c; w = d; }
+        explicit constexpr vec(A a, B b, C c, D d)
+        {
+            x = a;
+            y = b;
+            z = c;
+            w = d;
+        }
         template <typename... U>
         explicit constexpr vec(U... data)
         {
@@ -37,6 +43,8 @@ namespace engine::math
         template <Primitive U>
         constexpr vec<4, T> &operator/=(U const value) noexcept;
         template <Primitive U>
+        constexpr vec<4, T>& operator%=(U const value) noexcept;
+        template <Primitive U>
         constexpr vec<4, T> &operator+=(vec<4, U> const &other) noexcept;
         template <Primitive U>
         constexpr vec<4, T> &operator-=(vec<4, U> const &other) noexcept;
@@ -44,19 +52,43 @@ namespace engine::math
         constexpr vec<4, T> &operator*=(vec<4, U> const &other) noexcept;
         template <Primitive U>
         constexpr vec<4, T> &operator/=(vec<4, U> const &other) noexcept;
+        template <Primitive U>
+        constexpr vec<4, T> &operator%=(vec<4, U> const& other) noexcept;
 
+        template <size_t n, Primitive U = T>
+        [[nodiscard]] constexpr vec<n, U> as_vec() requires(n >= 2 && n <= size)
+        {
+            vec<n, U> rv;
+            for (int i = 0; i < n; i++)
+            {
+                rv.data[i] = static_cast<U>(data[i]);
+            }
+            return rv;
+        }
         [[nodiscard]] constexpr T &operator[](size_t i);
         [[nodiscard]] constexpr T const &operator[](size_t i) const;
         union
         {
             struct
             {
-                union { T x, r, s; };
-                union { T y, g, t; };
-                union { T z, b, p; };
-                union { T w, a, q; };
+                union
+                {
+                    T x, r, s;
+                };
+                union
+                {
+                    T y, g, t;
+                };
+                union
+                {
+                    T z, b, p;
+                };
+                union
+                {
+                    T w, a, q;
+                };
             };
-        std::array<T, size> data;
+            std::array<T, size> data;
         };
         static_assert(sizeof(data) == size * sizeof(T));
 

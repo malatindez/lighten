@@ -57,6 +57,15 @@ namespace engine::math
   }
   template <Primitive T>
   template <Primitive U>
+  constexpr vec<3, T>& vec<3, T>::operator%=(U const value) noexcept
+  {
+      x %= value;
+      y %= value;
+      z %= value;
+      return *this;
+  }
+  template <Primitive T>
+  template <Primitive U>
   constexpr vec<3, T> &vec<3, T>::operator+=(vec<3, U> const &other) noexcept
   {
     x += other.x;
@@ -92,6 +101,15 @@ namespace engine::math
     return *this;
   }
 
+  template <Primitive T>
+  template <Primitive U>
+  constexpr vec<3, T>& vec<3, T>::operator%=(vec<3, U> const& other) noexcept
+  {
+      x %= other.x;
+      y %= other.y;
+      z %= other.z;
+      return *this;
+  }
   template <Primitive T>
   [[nodiscard]] constexpr T &vec<3, T>::operator[](size_t i)
   {
