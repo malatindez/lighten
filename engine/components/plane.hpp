@@ -15,23 +15,25 @@ namespace engine::components
     }
 
 
-    [[nodiscard]] bool CheckIntersection(Transform &transform, math::Intersection& i, math::Ray const& ray)
+    [[nodiscard]] bool CheckIntersection(Transform const& transform, math::Intersection& i, math::Ray const& ray) const
     {
-      if (math::length(ray.origin() - transform.position) < i.t)
+      float denom = math::dot(normal_, ray.direction());
+      if(denom <= 1e-6f)
       {
-        return false;
+          return false;
       }
-      float t = Hit(ray, transform.position, transform.scale.x);
-
-      if (t < i.t)
+      math::vec3 a = transform.position - ray.origin();
+      float t = math::dot(a, normal_) / denom;
+      if (t > i.t || t <= 0)
       {
-        return false;
+          return false;
       }
       i.t = t;
-      i.point = ray.direction() * t;
+      i.normal = normal_;
+      i.point = ray.PointAtParameter(t);
       return true;
     }
-    void update_plane(math::vec3 const &first, math::vec3 const &second, math::vec3 const &)
+    void update_plane(math::vec3 const &first, math::vec3 const &second)
     {
       math::vec3 temp = math::cross(first, second);
       if (math::length(temp) == 0)
@@ -40,15 +42,15 @@ namespace engine::components
       }
       v_ = first;
       w_ = second;
-      cross_ = temp;
+      normal_ = math::normalize(temp);
     }
     [[nodiscard]] math::vec3 const &v() const noexcept { return v_; }
     [[nodiscard]] math::vec3 const &w() const noexcept { return w_; }
-    [[nodiscard]] math::vec3 const &cross() const noexcept { return cross_; }
+    [[nodiscard]] math::vec3 const &normal() const noexcept { return normal_; }
 
   private:
     math::vec3 v_;
     math::vec3 w_;
-    math::vec3 cross_;
+    math::vec3 normal_;
   };
 }
