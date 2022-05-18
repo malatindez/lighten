@@ -6,7 +6,7 @@
 #include "components/directional-light.hpp"
 #include "components/point-light.hpp"
 #include "components/spot-light.hpp"
-#include "camera.hpp"
+#include "components/camera.hpp"
 
 namespace engine
 {
@@ -16,7 +16,7 @@ namespace engine
         Scene() = default;
         void UpdateScene() noexcept;
 
-        void Draw(Camera &cam, BitmapWindow &window);
+        void Draw(components::Camera const&cam, BitmapWindow &window);
 
         math::Intersection FindIntersection(math::Ray const& ray);
         

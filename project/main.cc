@@ -2,8 +2,8 @@
 
 #include "controller.hpp"
 #include "core/application.hpp"
-#include "components/sphere.hpp"
-
+#include "misc/CameraController.hpp"
+#include "components/plane.hpp"
 using namespace engine;
 using namespace components;
 
@@ -45,18 +45,27 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     entt::entity sphere = registry.create();
     registry.emplace<Sphere>(sphere);
     Transform& sphere_transform = registry.emplace<Transform>(sphere);
+    sphere_transform.reset();
     sphere_transform.position = math::vec3{ 0,-1,-2 };
     sphere_transform.scale = math::vec3{ 0.5f };
+
+    entt::entity plane = registry.create();
+    Plane &plane_ = registry.emplace<Plane>(plane);
+    plane_.update_plane(math::vec3{ 0,0,1 }, math::vec3{ 1,0,0 });
+    Transform& plane_transform = registry.emplace<Transform>(plane);
+    plane_transform.reset();
+    plane_transform.position = math::vec3{ 0,-2, 0 };
+    plane_transform.scale = math::vec3{ 1.0f };
 
     entt::entity point_light_entity = registry.create();
     
     PointLight &point_light = registry.emplace<PointLight>(point_light_entity);
     Transform &pl_transform = registry.emplace<Transform>(point_light_entity);
     pl_transform.position = math::vec3 {0,-0.25f,0};
-    point_light.color = math::vec3{ 0.5f,0.0f,0.5f };
+    point_light.color = math::vec3{ 0.9f,0.0f,0.5f };
     point_light.ambient_intensity = 0.2f;
     point_light.diffuse_intensity = 0.3f;
-    point_light.specular_intensity = 0.1f;
+    point_light.specular_intensity = 0.5f;
     point_light.attenuation = PointLight::Attenuation
     {
         .constant = 1.0f,
@@ -71,24 +80,20 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     directional_light.diffuse_intensity = 0.3f;
     directional_light.specular_intensity = 0.1f;
 
-    auto controller = std::make_shared<Controller>(*bmwindow, scene);
 
     registry.emplace<DirectionalLight>(registry.create(), directional_light);
- //   math::Intersection nearest;
- //   math::Ray ray;
- //   nearest.reset();
-  //  auto group = registry.group<Transform, IIntersectable>();
-  // for(auto entity: group)
- //  {
- //      //group.get<IIntersectable>(entity)->CheckIntersection(nearest, ray);
- //  }
 
-    
+    entt::entity camera = registry.create();
+    Transform &camera_transform = registry.emplace<Transform>(camera);
+    Camera &cam = registry.emplace<Camera>(camera);
+    CameraController camera_controller(cam, camera_transform, bmwindow->size());
+
     Application::Init();
 
     bmwindow->SetEventCallback(Application::event_function());
     
 
+    auto controller = std::make_shared<Controller>(*bmwindow, scene, camera_controller);
     Application &application = Application::Get();
     application.AddLayer(controller);
     application.Run();

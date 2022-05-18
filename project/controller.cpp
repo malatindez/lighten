@@ -3,7 +3,9 @@
 using namespace engine;
 using namespace engine::math;
 
-Controller::Controller(BitmapWindow &window, std::shared_ptr<Scene> scene) : scene_(scene), window_(window) {}
+Controller::Controller(BitmapWindow &window,
+                       std::shared_ptr<Scene> scene,
+                       CameraController cam) : scene_(scene), window_(window), camera_controller_(cam) {}
 void Controller::OnEvent(engine::Event &event)
 {
     if (event.in_category(EventCategoryApplication))
@@ -19,8 +21,7 @@ void Controller::OnEvent(engine::Event &event)
         }
         else if (event.type() == EventType::AppRender)
         {
-            Camera cam{};
-            scene_->Draw(cam, window_);
+            scene_->Draw(camera_controller_.camera_, window_);
         }
         else if (event.type() == EventType::WindowClose)
         {
@@ -50,5 +51,4 @@ const vec3 kRight{1, 0, 0};
 
 void Controller::Tick(float delta_time) const
 {
-
 }
