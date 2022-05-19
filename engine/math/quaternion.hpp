@@ -1,6 +1,7 @@
 #pragma once
 #include "matnxn.hpp"
 #include <cstdint>
+#include <numbers>
 namespace engine::math
 {
     template <Primitive T>
@@ -92,6 +93,8 @@ namespace engine::math
 
         [[nodiscard]] constexpr T &operator[](size_t i);
         [[nodiscard]] constexpr T const &operator[](size_t i) const;
+
+
         union
         {
             struct
@@ -154,7 +157,6 @@ namespace engine::math
         return qua<T>(angles.x, vec<3, T>{1, 0, 0}) *
                qua<T>(angles.y, vec<3, T>{0, 1, 0}) *
                qua<T>(angles.z, vec<3, T>{0, 0, 1});
-        ;
     }
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> operator*(qua<T> const &q, qua<T> const &p)
@@ -177,9 +179,9 @@ namespace engine::math
         return inverse(q) * v;
     }
     template <Primitive T>
-    [[nodiscard]] qua<T> conjugate(qua<T> const &q);
+    [[nodiscard]] constexpr qua<T> conjugate(qua<T> const &q);
     template <Primitive T>
-    [[nodiscard]] qua<T> inverse(qua<T> const &q);
+    [[nodiscard]] constexpr qua<T> inverse(qua<T> const &q);
     template <Primitive T, Primitive U>
     [[nodiscard]] constexpr vec<3, T> cross(vec<3, T> const &left, vec<3, U> const &right);
     template <Primitive T, Primitive U>
@@ -189,6 +191,23 @@ namespace engine::math
     [[nodiscard]] mat<4, 4, T> rotate(mat<4, 4, T> const &matrix, qua<T> const &q)
     {
         return rotate(matrix, q.x, vec<3, T>{q.x, q.y, q.z});
+    }
+
+    template <Primitive T>
+    T length(qua<T> const& q)
+    {
+        return std::sqrt(dot(q, q));
+    }
+    template <Primitive T>
+    qua<T> normalize(qua<T> const& q)
+    {
+        T l = length(q);
+        if (l <= static_cast<T>(0))
+        {
+            return qua<T>(1,0,0,0);
+        }
+        T one_over_len = static_cast<T>(1) / l;
+        return qua<T>(q.w * one_over_len, q.x * one_over_len, q.y * one_over_len, q.z * one_over_len);
     }
 }
 

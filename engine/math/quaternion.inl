@@ -188,13 +188,13 @@ namespace engine::math
     }
 
     template <Primitive T>
-    qua<T> conjugate(qua<T> const &q)
+    qua<T> constexpr conjugate(qua<T> const &q)
     {
         return qua<T>(q.w, -q.x, -q.y, -q.z);
     }
 
     template <Primitive T>
-    qua<T> inverse(qua<T> const &q)
+    qua<T> constexpr inverse(qua<T> const &q)
     {
         return conjugate(q) / dot(q, q);
     }
