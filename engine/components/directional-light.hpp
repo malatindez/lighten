@@ -15,7 +15,7 @@ namespace engine::components
 
         
         
-        void UpdateColor(LightData &light_data)
+        inline void UpdateColor(LightData &light_data)
         {
             assert(math::almost_equal(length(direction), 1.0f));
             float const t = math::dot(light_data.normal, -direction);
