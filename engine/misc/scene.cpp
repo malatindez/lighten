@@ -5,7 +5,7 @@ namespace engine
 {
   void Scene::UpdateScene() noexcept { update_scene = true; }
 
-  void Scene::Draw(components::Camera const& cam, BitmapWindow &window)
+  void Scene::Draw(components::Camera const &cam, BitmapWindow &window)
   {
     if (!update_scene)
     {
@@ -15,9 +15,9 @@ namespace engine
     vec3 origin{0};
     ivec2 bitmap_size = window.bitmap_size();
     uint32_t *bitmap = window.bitmap().data();
-    vec4 BL{-1, -1, 1, 1}; 
-    vec4 BR{1, -1, 1, 1}; 
-    vec4 TL{-1, 1, 1, 1}; 
+    vec4 BL{-1, -1, 1, 1};
+    vec4 BR{1, -1, 1, 1};
+    vec4 TL{-1, 1, 1, 1};
     BL = BL * cam.inv_view_projection;
     BR = BR * cam.inv_view_projection;
     TL = TL * cam.inv_view_projection;
@@ -27,13 +27,13 @@ namespace engine
     math::vec4 BR_BL = BR - BL;
     math::vec4 TL_BL = TL - BL;
 
-    auto planes = registry.group<components::Plane>(entt::get<components::Transform>);
-    auto spheres = registry.group<components::Sphere>(entt::get<components::Transform>);
-    auto cubes = registry.group<components::Cube>(entt::get<components::Transform>);
+    auto planes = registry.group<components::Plane>(entt::get<components::Transform, components::Material>);
+    auto spheres = registry.group<components::Sphere>(entt::get<components::Transform, components::Material>);
+    auto cubes = registry.group<components::Cube>(entt::get<components::Transform, components::Material>);
 
     auto directional_lights = registry.view<components::DirectionalLight>();
-    auto point_lights = registry.group<components::PointLight>(entt::get < components::Transform>);
-    auto spot_lights = registry.group<components::SpotLight>(entt::get < components::Transform>);
+    auto point_lights = registry.group<components::PointLight>(entt::get<components::Transform>);
+    auto spot_lights = registry.group<components::SpotLight>(entt::get<components::Transform>);
 
     for (int j = 0; j < bitmap_size.y; j++)
     {
@@ -44,28 +44,35 @@ namespace engine
         math::vec4 a = BL + BR_BL * u + TL_BL * v;
         Ray ray(origin, normalize(a.as_vec<3>()));
         math::Intersection intersection;
+        components::Material mat;
         intersection.reset();
 
-        spheres.each([&intersection, &ray](const auto, auto& transform) { components::Sphere::CheckIntersection(transform, intersection, ray); });
-        planes.each([&intersection, &ray](const auto, auto const& plane, auto const& transform) { plane.CheckIntersection(transform, intersection, ray); });
-        cubes.each([&intersection, &ray](const auto, auto& transform) { components::Cube::CheckIntersection(transform, intersection, ray);  });
+        spheres.each([&intersection, &ray, &mat](const auto, auto &transform, auto &material)
+        { if(components::Sphere::CheckIntersection(transform, intersection, ray)) { mat = material; } });
+        planes.each([&intersection, &ray, &mat](const auto, auto const &plane, auto const &transform, auto &material)
+        { if(plane.CheckIntersection(transform, intersection, ray)) { mat = material; } });
+        cubes.each([&intersection, &ray, &mat](const auto, auto &transform, auto &material)
+        { if(components::Cube::CheckIntersection(transform, intersection, ray)) { mat = material; } });
 
         if (!intersection.exists())
         {
           bitmap[size_t(j) * bitmap_size.x + i] = 0;
           continue;
         }
-
+        
         components::LightData ld{
-            .color = math::vec3{0, 0, 0},
+            .color = math::vec3{0,0,0},
             .ray = ray,
             .point = intersection.point,
             .normal = intersection.normal,
             .view_dir = normalize(intersection.point - ray.origin())};
-        directional_lights.each([&ld](const auto, auto& dirlight) {dirlight.UpdateColor(ld); });
-        point_lights.each([&ld](const auto, auto const& point_light, auto const& transform) { point_light.UpdateColor(transform, ld); });
-        spot_lights.each([&ld](const auto, auto const& spot_light, auto const& transform) { spot_light.UpdateColor(transform, ld); });
-        ivec3 color{ 255.99f * ld.color };
+        directional_lights.each([&ld](const auto, auto &dirlight)
+                                { dirlight.UpdateColor(ld); });
+        point_lights.each([&ld](const auto, auto const &point_light, auto const &transform)
+                          { point_light.UpdateColor(transform, ld); });
+        spot_lights.each([&ld](const auto, auto const &spot_light, auto const &transform)
+                         { spot_light.UpdateColor(transform, ld); });
+        ivec3 color{255.99f * (mat.color * ld.color)};
         color %= 256;
         color.r <<= 16;
         color.g <<= 8;

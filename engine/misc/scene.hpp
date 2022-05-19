@@ -9,7 +9,7 @@
 #include "components/directional-light.hpp"
 #include "components/point-light.hpp"
 #include "components/spot-light.hpp"
-
+#include "components/material.hpp"
 #include "entt/entt.hpp"
 
 namespace engine
