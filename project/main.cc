@@ -4,6 +4,7 @@
 #include "core/application.hpp"
 #include "misc/camera-controller.hpp"
 #include "components/plane.hpp"
+#include "components/material.hpp"
 using namespace engine;
 using namespace components;
 
@@ -43,15 +44,24 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     entt::registry& registry = scene->registry;
 
     entt::entity sphere = registry.create();
+
+    registry.emplace<Material>(sphere, math::vec3{1.0f, 0.0, 0.0});
+
     registry.emplace<Sphere>(sphere);
+
     Transform& sphere_transform = registry.emplace<Transform>(sphere);
     sphere_transform.reset();
     sphere_transform.position = math::vec3{ 0,-1,-2 };
     sphere_transform.scale = math::vec3{ 0.5f };
 
+
     entt::entity plane = registry.create();
+
+    registry.emplace<Material>(plane, math::vec3{0.5f, 0.5f, 0.5f});
+
     Plane &plane_ = registry.emplace<Plane>(plane);
     plane_.update_plane(math::vec3{ 0,0,1 }, math::vec3{ 1,0,0 });
+
     Transform& plane_transform = registry.emplace<Transform>(plane);
     plane_transform.reset();
     plane_transform.position = math::vec3{ 0,-2, 0 };
@@ -59,13 +69,14 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
 
     entt::entity point_light_entity = registry.create();
     
-    PointLight &point_light = registry.emplace<PointLight>(point_light_entity);
     Transform &pl_transform = registry.emplace<Transform>(point_light_entity);
     pl_transform.position = math::vec3 {0,-0.25f,0};
+
+    PointLight &point_light = registry.emplace<PointLight>(point_light_entity);
     point_light.color = math::vec3{ 0.9f,0.0f,0.5f };
-    point_light.ambient_intensity = 0.2f;
-    point_light.diffuse_intensity = 0.3f;
-    point_light.specular_intensity = 0.5f;
+    point_light.ambient_intensity = 0.1f;
+    point_light.diffuse_intensity = 0.2f;
+    point_light.specular_intensity = 1.5f;
     point_light.attenuation = PointLight::Attenuation
     {
         .constant = 1.0f,
