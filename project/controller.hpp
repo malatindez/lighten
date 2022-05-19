@@ -4,7 +4,7 @@
 #include "core/bitmap-window.hpp"
 #include "core/layer.hpp"
 #include "input.hpp"
-#include "misc/CameraController.hpp"
+#include "misc/camera-controller.hpp"
 
 #include <memory>
 #include <unordered_map>
@@ -17,7 +17,7 @@ public:
     void OnEvent(engine::Event &event) override;
  
 private:
-    void Tick(float delta_time) const;
+    void Tick(float delta_time);
     engine::CameraController camera_controller_;
     Input input_;
     std::shared_ptr<engine::Scene> scene_;
