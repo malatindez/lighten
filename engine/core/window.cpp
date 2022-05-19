@@ -6,7 +6,7 @@ namespace engine
                  DWORD style, math::ivec2 position, math::ivec2 size,
                  HWND parent_window, HMENU menu, HINSTANCE instance,
                  LPVOID lp_param)
-      : position_(position), size_(size)
+      : position_(position), window_size_(size)
   {
     // Create custom window_class for this window
     WNDCLASSEXW window_class{window_class_template};
@@ -58,7 +58,7 @@ namespace engine
     // update the window size if it has changed
     if (message == WM_SIZE)
     {
-      size_ = math::ivec2{LOWORD(l_param), HIWORD(l_param)};
+      window_size_ = math::ivec2{LOWORD(l_param), HIWORD(l_param)};
       OnSizeChanged();
     } // update window position if it has changed
     else if (message == WM_WINDOWPOSCHANGED)

@@ -31,13 +31,21 @@ namespace engine
     {
       return bitmap_;
     }
+    [[nodiscard]] constexpr math::ivec2 const & bitmap_size() const noexcept 
+    {
+      return bitmap_size_;
+    }
+    [[nodiscard]] constexpr int resolution_scale() const { return resolution_scale_; }
+    [[nodiscard]] void SetResolutionScale(int resolution_scale) { resolution_scale_ = resolution_scale; OnSizeChanged(); }
 
     bool PeekOSMessages() override;
-
+    
   private:
     void OnSizeChanged() override;
     HDC hdc_;
     std::vector<uint32_t> bitmap_;
     BITMAPINFO bitmap_info_;
+    int resolution_scale_ = 8;
+    math::ivec2 bitmap_size_;
   };
 } // namespace engine

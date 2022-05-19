@@ -37,9 +37,9 @@ namespace engine
     }
 
     [[nodiscard]] constexpr HWND handle() const noexcept { return handle_; }
-    [[nodiscard]] constexpr math::ivec2 const &size() const noexcept
+    [[nodiscard]] constexpr math::ivec2 const &window_size() const noexcept
     {
-      return size_;
+      return window_size_;
     }
     [[nodiscard]] constexpr math::ivec2 const &position() const noexcept
     {
@@ -63,6 +63,6 @@ namespace engine
     bool running_ = true;
     HWND handle_;
     math::ivec2 position_;
-    math::ivec2 size_;
+    math::ivec2 window_size_;
   };
 }; // namespace engine
