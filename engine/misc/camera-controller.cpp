@@ -77,6 +77,9 @@ namespace engine
         forward_.x  = camera_.inv_view[2].x = rotation[2].x;
         forward_.y  = camera_.inv_view[2].y = rotation[2].y;
         forward_.z  = camera_.inv_view[2].z = rotation[2].z;
+        camera_.inv_view[3][0] = transform_.position[0];
+        camera_.inv_view[3][1] = transform_.position[1];
+        camera_.inv_view[3][2] = transform_.position[2];
     }
 
     void CameraController::UpdateMatrices()
@@ -88,9 +91,6 @@ namespace engine
         update_matrices_ = false;
 
         UpdateBasis();
-        camera_.inv_view[3][0] = transform_.position[0];
-        camera_.inv_view[3][1] = transform_.position[1];
-        camera_.inv_view[3][2] = transform_.position[2];
         camera_.view = math::invert_orthonormal(camera_.inv_view);
         camera_.view_projection = camera_.view * camera_.projection;
         camera_.inv_view_projection = camera_.inv_projection * camera_.inv_view;
