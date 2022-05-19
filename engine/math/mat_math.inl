@@ -271,10 +271,10 @@ namespace engine::math
       dst[3][0] = -src[3].x * dst.data[0][0] - src[3].x * dst.data[0][1] - src[3].x * dst.data[0][2];
       dst[3][1] = -src[3].y * dst.data[1][0] - src[3].y * dst.data[1][1] - src[3].y * dst.data[1][2];
       dst[3][2] = -src[3].z * dst.data[2][0] - src[3].z * dst.data[2][1] - src[3].z * dst.data[2][2];
-      dst[0][3] = src[0][3];
-      dst[1][3] = src[1][3];
-      dst[2][3] = src[2][3];
-      dst[3][3] = src[3][3];
+      dst[0][3] = 0;
+      dst[1][3] = 0;
+      dst[2][3] = 0;
+      dst[3][3] = 1;
   }
   template <Primitive T>
   void invert_orthogonal(mat<4, 4, T> const& src, mat<4, 4, T>& dst)
@@ -317,10 +317,10 @@ namespace engine::math
           - src[3].z * dst.data[2][0] / lengths[2] 
           - src[3].z * dst.data[2][1] / lengths[2]
           - src[3].z * dst.data[2][2] / lengths[2];
-      dst[0][3] = src[0][3];
-      dst[1][3] = src[1][3];
-      dst[2][3] = src[2][3];
-      dst[3][3] = src[3][3];
+      dst[0][3] = 0;
+      dst[1][3] = 0;
+      dst[2][3] = 0;
+      dst[3][3] = 1;
 
   }
   template <Primitive T>
