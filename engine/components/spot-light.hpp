@@ -20,7 +20,7 @@ namespace engine::components
             float quadratic;
         } attenuation;
 
-        void UpdateColor(Transform &transform, LightData &light_data)
+        inline void UpdateColor(Transform const &transform, LightData &light_data) const
         {
             assert(math::almost_equal(length(direction), 1.0f));
             
@@ -31,14 +31,14 @@ namespace engine::components
                 return;
             }
             float distance = math::length(light_direction);
-            float attenuation = 1.0 /
+            float attenuation = 1.0f /
                                 (this->attenuation.constant +
                                  this->attenuation.linear * distance +
                                  this->attenuation.quadratic * distance * distance);
             
             if(cut_off < dot(direction, normalize(-light_direction)))
             {
-                color += this->color * attenuation * ambient_intensity;
+                light_data.color += this->color * attenuation * ambient_intensity;
                 return;
             }
             math::vec3 const reflect_dir = 2.0f * 
