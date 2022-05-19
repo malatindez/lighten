@@ -29,7 +29,7 @@ namespace engine::components
             }
         }
 
-        [[nodiscard]] static bool CheckIntersection(Transform &transform, math::Intersection& i, math::Ray const& ray)
+        static bool CheckIntersection(Transform &transform, math::Intersection& i, math::Ray const& ray)
         {
             if (math::length(ray.origin() - transform.position) - transform.scale.x > i.t)
             {
