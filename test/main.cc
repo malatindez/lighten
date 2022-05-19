@@ -20,13 +20,11 @@ constexpr float pi = 3.141592653589897932384626433;
 
 int main()
 {
-    math::imat4 matrix(1);
-    matrix = math::imat4(12, 34, 12, 5, 102, 3, 451, 2, 52, 5, 12, 5, 2, 1, 2, 415);
-    math::mat inv_ = math::inv(math::mat(matrix));
+    math::mat4 matrix(1);
+    matrix = math::mat4(12, 34, 12, 5, 102, 3, 451, 2, 52, 5, 12, 5, 2, 1, 2, 415);
     std::cout << matrix << std::endl;
-    std::cout << math::imat4(math::adj(math::mat(matrix))) << std::endl;
-    std::cout << inv_ << std::endl;
-    math::mat a = math::mat(matrix) * inv_;
-    std::cout << a << std::endl;
-    std::cout << math::imat4(a) << std::endl;
+    matrix = math::invert_orthogonal(matrix);
+    std::cout << matrix << std::endl;
+    matrix = math::inverse(matrix);
+    std::cout << matrix << std::endl;
 }
