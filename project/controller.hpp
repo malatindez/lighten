@@ -5,6 +5,7 @@
 #include "core/layer.hpp"
 #include "input.hpp"
 #include "misc/camera-controller.hpp"
+#include "math.hpp"
 
 #include <memory>
 #include <unordered_map>
@@ -22,4 +23,5 @@ private:
     Input input_;
     std::shared_ptr<engine::Scene> scene_;
     engine::BitmapWindow &window_;
+    engine::math::ivec2 saved_mouse_position_{ 0 };
 };
