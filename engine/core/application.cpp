@@ -61,6 +61,7 @@ namespace engine
         render.reset();
         Application::OnEvent(render_event);
         assert(!render_event.handled);
+        OutputDebugStringA((std::to_string(1.0f / render.elapsed()) + "\n").c_str());
       }
       std::this_thread::yield();
     }
