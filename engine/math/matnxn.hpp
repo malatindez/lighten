@@ -11,11 +11,8 @@ namespace engine::math
 
     constexpr mat() = default;
     template <Primitive P>
-    explicit constexpr mat(P p)
+    explicit constexpr mat(P p) requires (a == b)
     {
-      static_assert(
-          a == b,
-          "You cannot use one constructor argument on the non-square matrix!");
       reset();
       for (int i = 0; i < a; i++)
       {
