@@ -7,7 +7,7 @@ namespace engine::components
 {
     struct Cube
     {
-        [[nodiscard]] static bool CheckIntersection(Transform &transform, math::Intersection& i, math::Ray const& ray) {
+        static bool CheckIntersection(Transform &transform, math::Intersection& i, math::Ray const& ray) {
             return false;
         }
     };
