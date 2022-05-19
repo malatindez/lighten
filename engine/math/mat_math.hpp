@@ -47,5 +47,15 @@ namespace engine::math
 
     template <Primitive T>
     mat<4, 4, T> perspective(T fov_y, T aspect_ratio, T z_near, T z_far);
+
+    template <Primitive T>
+    void invert_orthonormal(mat<4, 4, T> const&src, mat<4, 4, T>& dst);
+    template <Primitive T>
+    void invert_orthogonal(mat<4, 4, T> const&src, mat<4, 4, T>& dst);
+    template <Primitive T>
+    mat<4, 4, T> invert_orthonormal(mat<4, 4, T> const&src);
+    template <Primitive T>
+    mat<4, 4, T> invert_orthogonal(mat<4, 4, T> const&src);
+
 } // namespace engine::math
 #include "mat_math.inl"

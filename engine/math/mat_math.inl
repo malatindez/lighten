@@ -256,4 +256,83 @@ namespace engine::math
     return return_value;
   }
 
+  template <Primitive T>
+  void invert_orthonormal(mat<4, 4, T> const& src, mat<4, 4, T>& dst)
+  {
+      dst[0][0] = src[2][2];
+      dst[1][1] = src[1][1];
+      dst[2][2] = src[0][0];
+      dst[0][1] = src[1][0];
+      dst[1][0] = src[0][1];
+      dst[0][2] = src[2][0];
+      dst[2][0] = src[0][2];
+      dst[1][2] = src[2][1];
+      dst[2][1] = src[1][2];
+      dst[3][0] = -src[3].x * dst.data[0][0] - src[3].x * dst.data[0][1] - src[3].x * dst.data[0][2];
+      dst[3][1] = -src[3].y * dst.data[1][0] - src[3].y * dst.data[1][1] - src[3].y * dst.data[1][2];
+      dst[3][2] = -src[3].z * dst.data[2][0] - src[3].z * dst.data[2][1] - src[3].z * dst.data[2][2];
+      dst[0][0] = dst[0][1] = dst[0][2] = 0.0f;
+      dst[0][3] = 1.f;
+  }
+  template <Primitive T>
+  void invert_orthogonal(mat<4, 4, T> const& src, mat<4, 4, T>& dst)
+  {
+      dst[0][0] = src[2][2];
+      dst[1][1] = src[1][1];
+      dst[2][2] = src[0][0];
+      dst[0][1] = src[1][0];
+      dst[1][0] = src[0][1];
+      dst[0][2] = src[2][0];
+      dst[2][0] = src[0][2];
+      dst[1][2] = src[2][1];
+      dst[2][1] = src[1][2];
+
+      vec3 lengths{
+          std::sqrt(dst[0][0] * dst[0][0] + dst[0][1] * dst[0][1] + dst[0][2] * dst[0][2]),
+          std::sqrt(dst[1][0] * dst[1][0] + dst[1][1] * dst[1][1] + dst[1][2] * dst[1][2]),
+          std::sqrt(dst[2][0] * dst[2][0] + dst[2][1] * dst[2][1] + dst[2][2] * dst[2][2]),
+      };
+
+      dst[0][0] = 1.0f / (dst[0][0] * lengths[0]);
+      dst[0][1] = 1.0f / (dst[0][1] * lengths[0]);
+      dst[0][2] = 1.0f / (dst[0][2] * lengths[0]);
+      dst[1][0] = 1.0f / (dst[1][0] * lengths[1]);
+      dst[1][1] = 1.0f / (dst[1][1] * lengths[1]);
+      dst[1][2] = 1.0f / (dst[1][2] * lengths[1]);
+      dst[2][0] = 1.0f / (dst[2][0] * lengths[2]);
+      dst[2][1] = 1.0f / (dst[2][1] * lengths[2]);
+      dst[2][2] = 1.0f / (dst[2][2] * lengths[2]);
+
+      dst[3][0] = 
+          - src[3].x * dst.data[0][0] / lengths[0] 
+          - src[3].x * dst.data[0][1] / lengths[0]
+          - src[3].x * dst.data[0][2] / lengths[0];
+      dst[3][1] = 
+          - src[3].y * dst.data[1][0] / lengths[1] 
+          - src[3].y * dst.data[1][1] / lengths[1]
+          - src[3].y * dst.data[1][2] / lengths[1];
+      dst[3][2] = 
+          - src[3].z * dst.data[2][0] / lengths[2] 
+          - src[3].z * dst.data[2][1] / lengths[2]
+          - src[3].z * dst.data[2][2] / lengths[2];
+      dst[0][0] = dst[0][1] = dst[0][2] = 0.0f;
+      dst[0][3] = 1.f;
+
+  }
+  template <Primitive T>
+  mat<4, 4, T> invert_orthonormal(mat<4, 4, T> const& src)
+  {
+      mat<4, 4, T> return_value;
+      return_value.reset();
+      invert_orthonormal(src, return_value);
+      return return_value;
+  }
+  template <Primitive T>
+  mat<4, 4, T> invert_orthogonal(mat<4, 4, T> const& src)
+  {
+      mat<4, 4, T> return_value;
+      return_value.reset();
+      invert_orthogonal(src, return_value);
+      return return_value;
+  }
 } // namespace engine::math
