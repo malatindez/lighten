@@ -6,12 +6,11 @@ namespace engine::components
     class Camera
     {
     public:
-        math::mat4 view;
-        math::mat4 projection;
-        math::mat4 view_projection;
-        math::mat4 inv_view;
-        math::mat4 inv_projection;
-        math::mat4 inv_view_projection;
-        math::quat rotation;
+        math::mat4 view{1};
+        math::mat4 projection{1};
+        math::mat4 view_projection{1};
+        math::mat4 inv_view{1};
+        math::mat4 inv_projection{1};
+        math::mat4 inv_view_projection{1};
     };
 }
