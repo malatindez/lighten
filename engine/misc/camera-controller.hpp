@@ -10,10 +10,11 @@ namespace engine
     public:
         CameraController(components::Camera &camera, components::Transform &transform, math::ivec2 const &size) : camera_(camera), transform_(transform), size_(size)
         {
-            UpdateCamera();
+            SetProjectionMatrix(math::perspective(fovy_, float(size_.x) / size_.y, z_far_, z_near_));
+            UpdateMatrices();
         }
 
-        void UpdateCamera();
+        void SetProjectionMatrix(math::mat4 const& proj) { camera_.projection = proj; camera_.inv_projection = math::inverse(proj); }
 
         void SetWorldOffset(math::vec3 const &offset);
         void AddWorldOffset(math::vec3 const &offset);

@@ -2,16 +2,6 @@
 #include "camera-controller.hpp"
 namespace engine
 {
-    void CameraController::UpdateCamera()
-    {
-        camera_.view = math::lookAt(transform_.position, forward_, kWorldUp);
-        camera_.projection = math::perspective(fovy_, float(size_.x) / size_.y, z_near_, z_far_);
-        camera_.view_projection = camera_.projection * camera_.view;
-        camera_.inv_view = math::inverse(camera_.view);
-        camera_.inv_projection = math::inverse(camera_.projection);
-        camera_.inv_view_projection = camera_.inv_projection * camera_.inv_view;
-        UpdateMatrices();
-    }
     void CameraController::SetWorldOffset(math::vec3 const &offset)
     {
         transform_.position = offset; // overwrites
