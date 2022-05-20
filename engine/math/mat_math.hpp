@@ -21,7 +21,7 @@ namespace engine::math
                                                    mat<a, b, T> const &right);
 
     template <size_t a, size_t b, Primitive T>
-    mat<b, a, T> transpose(mat<a, b, T> const &matrix);
+    constexpr mat<b, a, T> transpose(mat<a, b, T> const &matrix);
 
     template <size_t a, Primitive T>
     constexpr T det(mat<a, a, T> const &matrix);
@@ -33,29 +33,29 @@ namespace engine::math
     constexpr mat<a, a, T> inverse(mat<a, a, T> const &m);
 
     template <Primitive T>
-    mat<4, 4, T> translate(mat<4, 4, T> const &matrix, vec<3, T> const &vec);
+    constexpr mat<4, 4, T> translate(mat<4, 4, T> const &matrix, vec<3, T> const &vec);
 
     template <Primitive T>
-    mat<4, 4, T> rotate(mat<4, 4, T> const &matrix, T angle, vec<3, T> const &axis);
+    constexpr mat<4, 4, T> rotate(mat<4, 4, T> const &matrix, T angle, vec<3, T> const &axis);
 
     template <Primitive T>
-    mat<4, 4, T> scale(mat<4, 4, T> const &matrix, vec<3, T> const &scale);
+    constexpr mat<4, 4, T> scale(mat<4, 4, T> const &matrix, vec<3, T> const &scale);
 
     template <Primitive T>
-    mat<4, 4, T> lookAt(vec<3, T> const &eye, vec<3, T> const &center,
+    constexpr mat<4, 4, T> lookAt(vec<3, T> const &eye, vec<3, T> const &center,
                         vec<3, T> const &up);
 
     template <Primitive T>
-    mat<4, 4, T> perspective(T fov_y, T aspect_ratio, T z_near, T z_far);
+    constexpr mat<4, 4, T> perspective(T fov_y, T aspect_ratio, T z_near, T z_far);
 
     template <Primitive T>
-    void invert_orthonormal(mat<4, 4, T> const&src, mat<4, 4, T>& dst);
+    constexpr void invert_orthonormal(mat<4, 4, T> const&src, mat<4, 4, T>& dst);
     template <Primitive T>
-    void invert_orthogonal(mat<4, 4, T> const&src, mat<4, 4, T>& dst);
+    constexpr void invert_orthogonal(mat<4, 4, T> const&src, mat<4, 4, T>& dst);
     template <Primitive T>
-    mat<4, 4, T> invert_orthonormal(mat<4, 4, T> const&src);
+    constexpr mat<4, 4, T> invert_orthonormal(mat<4, 4, T> const&src);
     template <Primitive T>
-    mat<4, 4, T> invert_orthogonal(mat<4, 4, T> const&src);
+    constexpr mat<4, 4, T> invert_orthogonal(mat<4, 4, T> const&src);
 
 } // namespace engine::math
 #include "mat_math.inl"

@@ -73,7 +73,7 @@ namespace engine::math
   }
 
   template <size_t a, size_t b, Primitive T>
-  mat<b, a, T> transpose(mat<a, b, T> const &matrix)
+  constexpr mat<b, a, T> transpose(mat<a, b, T> const &matrix)
   {
     mat<b, a, T> return_value;
     for (int i = 0; i < a; i++)
@@ -162,7 +162,7 @@ namespace engine::math
   }
 
   template <Primitive T>
-  mat<4, 4, T> translate(mat<4, 4, T> const &matrix, vec<3, T> const &vec)
+  constexpr mat<4, 4, T> translate(mat<4, 4, T> const &matrix, vec<3, T> const &vec)
   {
     mat<4, 4, T> return_value;
     return_value[0] = matrix[0];
@@ -174,7 +174,7 @@ namespace engine::math
   }
 
   template <Primitive T>
-  mat<4, 4, T> rotate(mat<4, 4, T> const &matrix, T angle,
+  constexpr mat<4, 4, T> rotate(mat<4, 4, T> const &matrix, T angle,
                       vec<3, T> const &vector)
   {
     T const c = std::cos(angle);
@@ -207,7 +207,7 @@ namespace engine::math
   }
 
   template <Primitive T>
-  mat<4, 4, T> scale(mat<4, 4, T> const &matrix, vec<3, T> const &scale)
+  constexpr mat<4, 4, T> scale(mat<4, 4, T> const &matrix, vec<3, T> const &scale)
   {
     mat<4, 4, T> return_value;
     return_value[0] = matrix[0] * scale[0];
@@ -218,7 +218,7 @@ namespace engine::math
   }
 
   template <Primitive T>
-  mat<4, 4, T> lookAt(vec<3, T> const &eye, vec<3, T> const &center,
+  constexpr mat<4, 4, T> lookAt(vec<3, T> const &eye, vec<3, T> const &center,
                       vec<3, T> const &world_up)
   {
     vec<3, T> const forward = normalize(center - eye);
@@ -240,7 +240,7 @@ namespace engine::math
     return return_value;
   }
   template <Primitive T>
-  mat<4, 4, T> perspective(T fov_y, T aspect_ratio, T z_near, T z_far) requires (!std::numeric_limits<T>::is_integer)
+  constexpr mat<4, 4, T> perspective(T fov_y, T aspect_ratio, T z_near, T z_far) requires (!std::numeric_limits<T>::is_integer)
   {
     assert(std::abs(aspect_ratio - std::numeric_limits<T>::epsilon()) >
            static_cast<T>(0));
@@ -250,14 +250,14 @@ namespace engine::math
     mat<4, 4, T> return_value(0);
     return_value[0][0] = static_cast<T>(1) / (aspect_ratio * tan_half_fov_y);
     return_value[1][1] = static_cast<T>(1) / (tan_half_fov_y);
-    return_value[2][2] = z_far / (z_near - z_far);
-    return_value[2][3] = -static_cast<T>(1);
-    return_value[3][2] = -( 2 * z_far * z_near) / (z_far - z_near);
+    return_value[2][2] = z_far / (z_far - z_near);
+    return_value[2][3] = static_cast<T>(1);
+    return_value[3][2] = -( z_far * z_near) / (z_far - z_near);
     return return_value;
   }
 
   template <Primitive T>
-  void invert_orthonormal(mat<4, 4, T> const& src, mat<4, 4, T>& dst)
+  constexpr void invert_orthonormal(mat<4, 4, T> const& src, mat<4, 4, T>& dst)
   {
       dst[0][0] = src[2][2];
       dst[1][1] = src[1][1];
@@ -277,7 +277,7 @@ namespace engine::math
       dst[3][3] = 1;
   }
   template <Primitive T>
-  void invert_orthogonal(mat<4, 4, T> const& src, mat<4, 4, T>& dst)
+  constexpr void invert_orthogonal(mat<4, 4, T> const& src, mat<4, 4, T>& dst)
   {
       dst[0][0] = src[2][2];
       dst[1][1] = src[1][1];
@@ -324,7 +324,7 @@ namespace engine::math
 
   }
   template <Primitive T>
-  mat<4, 4, T> invert_orthonormal(mat<4, 4, T> const& src)
+  constexpr mat<4, 4, T> invert_orthonormal(mat<4, 4, T> const& src)
   {
       mat<4, 4, T> return_value;
       return_value.reset();
@@ -332,7 +332,7 @@ namespace engine::math
       return return_value;
   }
   template <Primitive T>
-  mat<4, 4, T> invert_orthogonal(mat<4, 4, T> const& src)
+  constexpr mat<4, 4, T> invert_orthogonal(mat<4, 4, T> const& src)
   {
       mat<4, 4, T> return_value;
       return_value.reset();
