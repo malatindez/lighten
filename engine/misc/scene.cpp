@@ -1,4 +1,5 @@
 #include "misc/scene.hpp"
+#include <sstream>
 using namespace engine::math;
 
 namespace engine
@@ -12,7 +13,7 @@ namespace engine
       // return;
     }
     update_scene = false;
-    vec3 origin{0};
+    vec3 origin{cam.view[3][0],cam.view[3][1],cam.view[3][2]};
     ivec2 bitmap_size = window.bitmap_size();
     uint32_t *bitmap = window.bitmap().data();
     vec4 BL{-1, -1, 1, 1};
@@ -24,8 +25,15 @@ namespace engine
     BL /= BL.w;
     BR /= BR.w;
     TL /= TL.w;
+    BL -= vec4(origin, 0);
+    BR -= vec4(origin, 0);
+    TL -= vec4(origin, 0);
     math::vec4 BR_BL = BR - BL;
-    math::vec4 TL_BL = TL - BL;
+    
+    math::vec4 TL_BL = TL - BL; 
+    std::stringstream s;
+    s << BR_BL << std::endl << TL_BL << std::endl;
+    OutputDebugStringA(s.str().c_str());
 
     auto planes = registry.group<components::Plane>(entt::get<components::Transform, components::Material>);
     auto spheres = registry.group<components::Sphere>(entt::get<components::Transform, components::Material>);
@@ -42,8 +50,10 @@ namespace engine
         float u = ((static_cast<float>(i)) / static_cast<float>(bitmap_size.x));
         float v = ((static_cast<float>(j)) / static_cast<float>(bitmap_size.y));
         math::vec4 a = BL + BR_BL * u + TL_BL * v;
+       // a /= cam.z_near_;
         Ray ray(origin, normalize(a.as_vec<3>()));
         math::Intersection intersection;
+    
         components::Material mat;
         intersection.reset();
 
