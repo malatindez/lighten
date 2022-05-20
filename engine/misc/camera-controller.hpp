@@ -10,11 +10,20 @@ namespace engine
     public:
         CameraController(components::Camera &camera, components::Transform &transform, math::ivec2 const &size) : camera_(camera), transform_(transform), size_(size)
         {
-            SetProjectionMatrix(math::perspective(fovy_, float(size_.x) / size_.y, z_far_, z_near_));
+            SetProjectionMatrix(
+                math::perspective(
+                    camera.fovy_, 
+                    static_cast<float>(size_.x) / size_.y, 
+                    camera.z_far_,
+                     camera.z_near_));
             UpdateMatrices();
         }
 
-        void SetProjectionMatrix(math::mat4 const& proj) { camera_.projection = proj; camera_.inv_projection = math::inverse(proj); }
+        void SetProjectionMatrix(math::mat4 const& proj) 
+        { 
+            camera_.projection = proj; 
+            camera_.inv_projection = math::inverse(proj); 
+        }
 
         void SetWorldOffset(math::vec3 const &offset);
         void AddWorldOffset(math::vec3 const &offset);
@@ -40,9 +49,9 @@ namespace engine
         [[nodiscard]] constexpr math::vec3 up() const noexcept { return up_; }
         [[nodiscard]] constexpr math::vec3 forward() const noexcept { return forward_; }
 
-        [[nodiscard]] constexpr float fovy() const noexcept { return fovy_; }
-        [[nodiscard]] constexpr float z_near() const noexcept { return z_near_; }
-        [[nodiscard]] constexpr float z_far() const noexcept { return z_far_; }
+        [[nodiscard]] constexpr float fovy() const noexcept { return camera_.fovy_; }
+        [[nodiscard]] constexpr float z_near() const noexcept { return camera_.z_near_; }
+        [[nodiscard]] constexpr float z_far() const noexcept { return camera_.z_far_; }
 
         static constexpr math::vec3 kWorldUp{0, 1, 0};
 
@@ -55,9 +64,6 @@ namespace engine
         math::vec3 up_{0, 1, 0};
         math::vec3 forward_{0, 0, 1};
 
-        float fovy_ = math::radians(45.0f);
-        float z_near_ = 0.02f;
-        float z_far_ = 20.0f;
 
         bool update_matrices_ = true;
         bool update_basis_ = true;
