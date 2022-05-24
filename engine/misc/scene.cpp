@@ -13,27 +13,8 @@ namespace engine
       // return;
     }
     update_scene = false;
-    vec3 origin{cam.view[3][0],cam.view[3][1],cam.view[3][2]};
     ivec2 bitmap_size = window.bitmap_size();
     uint32_t *bitmap = window.bitmap().data();
-    vec4 BL{-1, -1, 1, 1};
-    vec4 BR{1, -1, 1, 1};
-    vec4 TL{-1, 1, 1, 1};
-    BL = BL * cam.inv_view_projection;
-    BR = BR * cam.inv_view_projection;
-    TL = TL * cam.inv_view_projection;
-    BL /= BL.w;
-    BR /= BR.w;
-    TL /= TL.w;
-    BL -= vec4(origin, 0);
-    BR -= vec4(origin, 0);
-    TL -= vec4(origin, 0);
-    math::vec4 BR_BL = BR - BL;
-    
-    math::vec4 TL_BL = TL - BL; 
-    std::stringstream s;
-    s << BR_BL << std::endl << TL_BL << std::endl;
-    OutputDebugStringA(s.str().c_str());
 
     auto planes = registry.group<components::Plane>(entt::get<components::Transform, components::Material>);
     auto spheres = registry.group<components::Sphere>(entt::get<components::Transform, components::Material>);
