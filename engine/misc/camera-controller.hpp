@@ -29,9 +29,9 @@ namespace engine
         void AddWorldOffset(math::vec3 const &offset);
         void AddRelativeOffset(math::vec3 const &offset);
 
-        void SetWorldAngles(math::vec3 const &angles);
-        void AddWorldAngles(math::vec3 const &angles);
-        void AddRelativeAngles(math::vec3 const &angles);
+        void SetWorldAngles(float roll, float pitch, float yaw);
+        void AddWorldAngles(float roll, float pitch, float yaw);
+        void AddRelativeAngles(float roll, float pitch, float yaw);
         
         void UpdateBasis();
 

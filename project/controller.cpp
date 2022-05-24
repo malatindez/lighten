@@ -73,14 +73,16 @@ void Controller::Tick(float delta_time)
     if(input_.key_state(VK_CONTROL)) { offset += kDown; }
     if(input_.key_state(VK_SPACE)) { offset += kUp; }
     camera_controller_.AddRelativeOffset(offset * delta_time);
-    math::vec3 angles{0,0,0};
-    if (input_.key_state('Q')) { angles.z -= 10.0f * delta_time * engine::math::radians(2.0f); }
-    if (input_.key_state('E')) { angles.z += 10.0f * delta_time * engine::math::radians(2.0f); }
+    float roll = 0;
+    float pitch = 0;
+    float yaw = 0;
+    if (input_.key_state('Q')) { roll -= 10.0f * delta_time * engine::math::radians(2.0f); }
+    if (input_.key_state('E')) { roll += 10.0f * delta_time * engine::math::radians(2.0f); }
     // 0.001 degree per pixel
     if (input_.lbutton_down()) {
-        angles.x = float(saved_mouse_position_.x - input_.mouse_position().x) * kMouseSensivity * engine::math::radians(2.0f);
-        angles.y = float(input_.mouse_position().y - saved_mouse_position_.y) * kMouseSensivity * engine::math::radians(2.0f);
+        pitch = float(saved_mouse_position_.x - input_.mouse_position().x) * kMouseSensivity * engine::math::radians(2.0f);
+        yaw = float(input_.mouse_position().y - saved_mouse_position_.y) * kMouseSensivity * engine::math::radians(2.0f);
     }
-    camera_controller_.AddRelativeAngles(angles);
+    camera_controller_.AddRelativeAngles(roll, pitch, yaw);
     camera_controller_.UpdateMatrices();
 }

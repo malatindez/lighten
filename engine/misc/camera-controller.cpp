@@ -19,33 +19,33 @@ namespace engine
         transform_.position += offset[0] * right_ + offset[1] * up_ + offset[2] * forward_;
         update_matrices_ = true;
     }
-    void CameraController::SetWorldAngles(math::vec3 const &angles)
+    void CameraController::SetWorldAngles(float roll, float pitch, float yaw)
     {
         update_basis_ = true;
         update_matrices_ = true;
-        transform_.rotation = math::quat(angles.x, math::vec3{0.f, 0.f, 1.f});
-        transform_.rotation *= math::quat(angles.y, math::vec3{1.f, 0.f, 0.f});
-        transform_.rotation *= math::quat(angles.z, math::vec3{0.f, 1.f, 0.f});
+        transform_.rotation = math::quat(roll, math::vec3{0.f, 0.f, 1.f});
+        transform_.rotation *= math::quat(pitch, math::vec3{1.f, 0.f, 0.f});
+        transform_.rotation *= math::quat(yaw, math::vec3{0.f, 1.f, 0.f});
         transform_.rotation = normalize(transform_.rotation);
     }
 
-    void CameraController::AddWorldAngles(math::vec3 const &angles)
+    void CameraController::AddWorldAngles(float roll, float pitch, float yaw)
     {
         update_basis_ = true;
         update_matrices_ = true;
-        transform_.rotation *= math::quat(angles.x, math::vec3{0.f, 0.f, 1.f});
-        transform_.rotation *= math::quat(angles.y, math::vec3{1.f, 0.f, 0.f});
-        transform_.rotation *= math::quat(angles.z, math::vec3{0.f, 1.f, 0.f});
+        transform_.rotation *= math::quat(roll, math::vec3{0.f, 0.f, 1.f});
+        transform_.rotation *= math::quat(pitch, math::vec3{1.f, 0.f, 0.f});
+        transform_.rotation *= math::quat(yaw, math::vec3{0.f, 1.f, 0.f});
         transform_.rotation = normalize(transform_.rotation);
     }
 
-    void CameraController::AddRelativeAngles(math::vec3 const &angles)
+    void CameraController::AddRelativeAngles(float roll, float pitch, float yaw)
     {
         update_basis_ = true;
         update_matrices_ = true;
-        transform_.rotation *= math::quat(angles.x, forward_);
-        transform_.rotation *= math::quat(angles.y, right_);
-        transform_.rotation *= math::quat(angles.z, up_);
+        transform_.rotation *= math::quat(roll, forward_);
+        transform_.rotation *= math::quat(pitch, right_);
+        transform_.rotation *= math::quat(yaw, up_);
         transform_.rotation = normalize(transform_.rotation);
     }
 
