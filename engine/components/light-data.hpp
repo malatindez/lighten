@@ -1,10 +1,10 @@
 #pragma once
 #include "math.hpp"
+#include "misc/color.hpp"
 namespace engine::components
 {
     struct LightData
     {
-        using Color = math::vec3;
         Color color;
         math::Ray const ray;
         math::vec3 const point;
