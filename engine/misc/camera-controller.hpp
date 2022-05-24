@@ -53,7 +53,6 @@ namespace engine
         [[nodiscard]] constexpr float z_near() const noexcept { return camera_.z_near_; }
         [[nodiscard]] constexpr float z_far() const noexcept { return camera_.z_far_; }
 
-        static constexpr math::vec3 kWorldUp{0, 1, 0};
 
     private:
         components::Camera &camera_;

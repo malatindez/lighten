@@ -33,9 +33,7 @@ namespace engine::components
                                  attenuation.linear * distance +
                                  attenuation.quadratic * distance * distance);
 
-            math::vec3 const reflect_dir = math::normalize(2.0f * 
-                    math::dot(light_data.normal, light_direction) * 
-                    (light_data.normal - light_direction));
+            math::vec3 const reflect_dir = math::reflect_normal(light_data.normal, light_direction);
             
             float diffuse = diffuse_intensity * t;
             float u = dot(light_data.view_dir, reflect_dir);

@@ -61,6 +61,8 @@ const vec3 kRight{1, 0, 0};
 const vec3 kForward{0, 0, 1};
 const vec3 kBackwards{0, 0, -1};
 
+const float kMouseSensivity = 1 / 1000.0f;
+
 void Controller::Tick(float delta_time)
 {
     math::vec3 offset{0,0,0};
@@ -72,19 +74,13 @@ void Controller::Tick(float delta_time)
     if(input_.key_state(VK_SPACE)) { offset += kUp; }
     camera_controller_.AddRelativeOffset(offset * delta_time);
     math::vec3 angles{0,0,0};
-    if (input_.key_state('Q')) { angles.z -= 10.0f * delta_time * 2.0f * static_cast<float>(std::numbers::pi) / 180.0f; }
-    if (input_.key_state('E')) { angles.z += 10.0f * delta_time * 2.0f * static_cast<float>(std::numbers::pi) / 180.0f; }
+    if (input_.key_state('Q')) { angles.z -= 10.0f * delta_time * engine::math::radians(2.0f); }
+    if (input_.key_state('E')) { angles.z += 10.0f * delta_time * engine::math::radians(2.0f); }
     // 0.001 degree per pixel
     if (input_.lbutton_down()) {
-        angles.x = float(saved_mouse_position_.x - input_.mouse_position().x) / 1000.0f * 2.0f * static_cast<float>(std::numbers::pi) / 180.0f;
-        angles.y = float(input_.mouse_position().y - saved_mouse_position_.y) / 1000.0f * 2.0f * static_cast<float>(std::numbers::pi) / 180.0f;
+        angles.x = float(saved_mouse_position_.x - input_.mouse_position().x) * kMouseSensivity * engine::math::radians(2.0f);
+        angles.y = float(input_.mouse_position().y - saved_mouse_position_.y) * kMouseSensivity * engine::math::radians(2.0f);
     }
     camera_controller_.AddRelativeAngles(angles);
     camera_controller_.UpdateMatrices();
-    std::stringstream s;
-    s << camera_controller_.camera().inv_view << std::endl;
-    s << camera_controller_.camera().view << std::endl;
-    s << camera_controller_.camera().inv_view_projection << std::endl;
-    s << camera_controller_.camera().view_projection << std::endl;
-    OutputDebugStringA(s.str().c_str());
 }

@@ -15,18 +15,20 @@ namespace engine::components
             // figure out how can we adjust this formula to the sphere scaled by different factors
             math::vec3 oc = r.origin() - center;
             float a = math::dot(r.direction(), r.direction());
-            float b = 2.0f * math::dot(oc, r.direction());
+            float b = math::dot(oc, r.direction());
             float c = math::dot(oc, oc) - radius;
-            float discriminant = b * b - 4 * a * c;
+            float discriminant = b * b - a * c;
             if (discriminant < 0)
             {
                 return -1.0f;
             }
-            else
+            float d = sqrt(discriminant);
+            if(-b - d < 0.0f)
             {
-                float d = sqrt(discriminant);
-                return std::min(std::abs(-b - d), std::abs(-b + d)) / (2.0f * a);
+                return (-b + d) / a;
             }
+            return (-b - d) / a;
+            
         }
 
         static bool CheckIntersection(Transform &transform, math::Intersection& i, math::Ray const& ray)

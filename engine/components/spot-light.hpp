@@ -41,9 +41,7 @@ namespace engine::components
                 light_data.color += this->color * attenuation * ambient_intensity;
                 return;
             }
-            math::vec3 const reflect_dir = 2.0f * 
-                    math::dot(light_data.normal, light_direction) * 
-                    (light_data.normal - light_direction);
+            math::vec3 const reflect_dir =  math::reflect_normal(light_data.normal, light_direction);
 
             float diffuse = attenuation * diffuse_intensity * t;
             float u = dot(light_data.view_dir, reflect_dir);

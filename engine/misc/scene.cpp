@@ -42,16 +42,16 @@ namespace engine
     auto directional_lights = registry.view<components::DirectionalLight>();
     auto point_lights = registry.group<components::PointLight>(entt::get<components::Transform>);
     auto spot_lights = registry.group<components::SpotLight>(entt::get<components::Transform>);
-
     for (int j = 0; j < bitmap_size.y; j++)
     {
       for (int i = 0; i < bitmap_size.x; i++)
       {
         float u = ((static_cast<float>(i)) / static_cast<float>(bitmap_size.x));
         float v = ((static_cast<float>(j)) / static_cast<float>(bitmap_size.y));
-        math::vec4 a = BL + BR_BL * u + TL_BL * v;
-       // a /= cam.z_near_;
-        Ray ray(origin, normalize(a.as_vec<3>()));
+        math::vec4 near_ = vec4(u, v, -1, 1) * cam.inv_view_projection;
+        math::vec4 far_ = vec4(u, v, 1, 1) * cam.inv_view_projection;
+        math::vec3 origin(near_.as_vec<3>() / near_.w);
+        math::Ray ray(origin, normalize(far_.as_vec<3>() / far_.w - origin));
         math::Intersection intersection;
     
         components::Material mat;

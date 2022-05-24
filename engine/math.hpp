@@ -28,4 +28,14 @@ namespace engine::math
     {
         return (x / 180.0f) * std::numbers::pi;
     }
+    template<class T>
+    [[nodiscard]] constexpr math::vec<3, T> reflect(math::vec<3, T> const &normal,math::vec<3, T> const &dir)
+    {
+        return 2.0f * math::dot(normal, dir) * (normal - dir);
+    }
+    template<class T>
+    [[nodiscard]] constexpr math::vec<3, T> reflect_normal(math::vec<3, T> const &normal,math::vec<3, T> const &dir)
+    {
+        return normalize(2.0f * math::dot(normal, dir) * (normal - dir));
+    }
 }
