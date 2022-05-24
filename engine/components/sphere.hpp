@@ -13,22 +13,27 @@ namespace engine::components
         {
             // TODO
             // figure out how can we adjust this formula to the sphere scaled by different factors
-            math::vec3 oc = r.origin() - center;
-            float a = math::dot(r.direction(), r.direction());
-            float b = math::dot(oc, r.direction());
-            float c = math::dot(oc, oc) - radius;
-            float discriminant = b * b - a * c;
+            const math::vec3 oc = r.origin() - center;
+            const float a = math::dot(r.direction(), r.direction());
+            const float b = math::dot(oc, r.direction());
+            const float c = math::dot(oc, oc) - radius;
+            const float discriminant = b * b - a * c;
             if (discriminant < 0)
             {
                 return -1.0f;
             }
-            float d = sqrt(discriminant);
-            if(-b - d < 0.0f)
+            const float d = std::sqrt(discriminant);
+            float rv0 = (-b - d) / a;
+            float rv1 = (-b + d) / a;
+            if(rv0 > rv1)
             {
-                return (-b + d) / a;
+                std::swap(rv0, rv1);
             }
-            return (-b - d) / a;
-            
+            if(rv0 < 0)
+            {
+                return rv1;
+            }
+            return rv0;
         }
 
         static bool CheckIntersection(Transform &transform, math::Intersection& i, math::Ray const& ray)

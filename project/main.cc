@@ -92,10 +92,11 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     directional_light.specular_intensity = 0.1f;
 
 
- //   registry.emplace<DirectionalLight>(registry.create(), directional_light);
+    registry.emplace<DirectionalLight>(registry.create(), directional_light);
 
     entt::entity camera = registry.create();
     Transform &camera_transform = registry.emplace<Transform>(camera);
+    camera_transform.position = math::vec3{0,0,-5};
     Camera &cam = registry.emplace<Camera>(camera);
     CameraController camera_controller(cam, camera_transform, bmwindow->window_size());
 

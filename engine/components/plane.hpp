@@ -18,7 +18,7 @@ namespace engine::components
     bool CheckIntersection(Transform const& transform, math::Intersection& i, math::Ray const& ray) const
     {
       float denom = math::dot(normal_, ray.direction());
-      if(denom <= 1e-6f)
+      if( abs(denom) <= 1e-6f)
       {
           return false;
       }

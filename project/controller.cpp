@@ -61,8 +61,6 @@ const vec3 kRight{1, 0, 0};
 const vec3 kForward{0, 0, 1};
 const vec3 kBackwards{0, 0, -1};
 
-const float kMouseSensivity = 1 / 1000.0f;
-
 void Controller::Tick(float delta_time)
 {
     math::vec3 offset{0,0,0};
@@ -76,12 +74,12 @@ void Controller::Tick(float delta_time)
     float roll = 0;
     float pitch = 0;
     float yaw = 0;
-    if (input_.key_state('Q')) { roll -= 10.0f * delta_time * engine::math::radians(2.0f); }
-    if (input_.key_state('E')) { roll += 10.0f * delta_time * engine::math::radians(2.0f); }
-    // 0.001 degree per pixel
+    // 180 degrees per second
+    if (input_.key_state('Q')) { roll -= delta_time * engine::math::radians(180.0f); } 
+    if (input_.key_state('E')) { roll += delta_time * engine::math::radians(180.0f); }
     if (input_.lbutton_down()) {
-        pitch = float(saved_mouse_position_.x - input_.mouse_position().x) * kMouseSensivity * engine::math::radians(2.0f);
-        yaw = float(input_.mouse_position().y - saved_mouse_position_.y) * kMouseSensivity * engine::math::radians(2.0f);
+        yaw = delta_time *  float( saved_mouse_position_.x - input_.mouse_position().x) / window_.window_size().x * engine::math::radians(90.0f);
+        pitch = delta_time *  float(input_.mouse_position().y - saved_mouse_position_.y) / window_.window_size().y * engine::math::radians(90.0f);
     }
     camera_controller_.AddRelativeAngles(roll, pitch, yaw);
     camera_controller_.UpdateMatrices();
