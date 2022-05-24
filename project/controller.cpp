@@ -79,7 +79,7 @@ void Controller::Tick(float delta_time)
     if (input_.key_state('E')) { roll += delta_time * engine::math::radians(180.0f); }
     if (input_.lbutton_down()) {
         yaw = delta_time *  float( saved_mouse_position_.x - input_.mouse_position().x) / window_.window_size().x * engine::math::radians(90.0f);
-        pitch = delta_time *  float(input_.mouse_position().y - saved_mouse_position_.y) / window_.window_size().y * engine::math::radians(90.0f);
+        pitch = delta_time *  float(saved_mouse_position_.y - input_.mouse_position().y) / window_.window_size().y * engine::math::radians(90.0f);
     }
     camera_controller_.AddRelativeAngles(roll, pitch, yaw);
     camera_controller_.UpdateMatrices();
