@@ -100,6 +100,14 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     Camera &cam = registry.emplace<Camera>(camera);
     CameraController camera_controller(cam, camera_transform, bmwindow->window_size());
 
+    
+    entt::entity cube = registry.create();
+    Transform &cube_transform = registry.emplace<Transform>(cube);
+    cube_transform.position = math::vec3{0,2,-2};
+    Cube &cube_ = registry.emplace<Cube>(cube);
+    cube_.TransformUpdated(cube_transform);
+    registry.emplace<Material>(cube, math::vec3{1.0f, 1.0f, 0.0f});
+
     Application::Init();
 
     bmwindow->SetEventCallback(Application::event_function());
