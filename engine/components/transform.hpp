@@ -17,8 +17,8 @@ namespace engine::components
     [[nodiscard]] math::mat4 model() const noexcept 
     { 
       math::mat4 mat(1);
-      mat = math::scale(mat, scale);
-      mat = math::rotate(mat, rotation);
+      mat = math::scale(mat, scale);      
+      mat = mat * rotation.as_mat4();
       mat = math::translate(mat, position);
       return mat;
     };
