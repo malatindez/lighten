@@ -8,15 +8,19 @@ namespace engine
     class CameraController
     {
     public:
-        CameraController(components::Camera &camera, components::Transform &transform, math::ivec2 const &size) : camera_(camera), transform_(transform), size_(size)
+        CameraController(components::Camera &camera, components::Transform &transform, math::ivec2 const &window_size) : camera_(camera), transform_(transform), window_size_(window_size)
+        {
+            UpdateProjectionMatrix();
+            UpdateMatrices();
+        }
+        void UpdateProjectionMatrix()
         {
             SetProjectionMatrix(
                 math::perspective(
-                    camera.fovy_, 
-                    static_cast<float>(size_.x) / size_.y, 
-                    camera.z_far_,
-                     camera.z_near_));
-            UpdateMatrices();
+                    camera_.fovy_,
+                    static_cast<float>(window_size_.x) / static_cast<float>(window_size_.y),
+                    camera_.z_far_,
+                    camera_.z_near_));
         }
 
         void SetProjectionMatrix(math::mat4 const& proj) 
@@ -39,7 +43,7 @@ namespace engine
 
         [[nodiscard]] constexpr components::Camera const &camera() const noexcept { return camera_; }
         [[nodiscard]] constexpr components::Transform const &transform() const noexcept { return transform_; }
-        [[nodiscard]] constexpr math::ivec2 const &size() const noexcept { return size_; }
+        [[nodiscard]] constexpr math::ivec2 const &size() const noexcept { return window_size_; }
 
         [[nodiscard]] constexpr math::vec3 const &position() const noexcept { return transform_.position; }
         [[nodiscard]] constexpr math::vec3 const &scale() const noexcept { return transform_.scale; }
@@ -57,7 +61,7 @@ namespace engine
     private:
         components::Camera &camera_;
         components::Transform &transform_;
-        math::ivec2 const &size_;
+        math::ivec2 const &window_size_;
 
         math::vec3 right_{1, 0, 0};
         math::vec3 up_{0, 1, 0};

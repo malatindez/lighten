@@ -18,14 +18,14 @@ namespace engine
     class WindowResizeEvent final : public Event
     {
     public:
-        explicit WindowResizeEvent(math::ivec2 &&size) : size_{std::move(size)} {}
-        explicit WindowResizeEvent(math::ivec2 const &size) : size_{size} {}
-        WindowResizeEvent(int x, int y) : size_{x, y} {}
-        [[nodiscard]] inline math::ivec2 const &size() const noexcept { return size_; }
+        explicit WindowResizeEvent(math::ivec2 &&size) : window_size_{std::move(size)} {}
+        explicit WindowResizeEvent(math::ivec2 const &size) : window_size_{size} {}
+        WindowResizeEvent(int x, int y) : window_size_{x, y} {}
+        [[nodiscard]] inline math::ivec2 const &size() const noexcept { return window_size_; }
 
         EVENT_CLASS_CATEGORY(EventCategoryApplication)
         EVENT_CLASS_TYPE(WindowResize)
     private:
-        math::ivec2 size_;
+        math::ivec2 window_size_;
     };
 } // namespace engine

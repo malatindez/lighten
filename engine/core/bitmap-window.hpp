@@ -45,7 +45,11 @@ namespace engine
     HDC hdc_;
     std::vector<uint32_t> bitmap_;
     BITMAPINFO bitmap_info_;
+#ifdef _DEBUG
     int resolution_scale_ = 8;
+#else
+    int resolution_scale_ = 2;
+#endif
     math::ivec2 bitmap_size_;
   };
 } // namespace engine

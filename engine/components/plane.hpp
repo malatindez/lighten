@@ -11,22 +11,21 @@ namespace engine::components
   public:
     float Hit(math::Ray const &r, math::vec3 center, float radius) noexcept
     {
-        return -1;
+      return -1;
     }
 
-
-    bool CheckIntersection(Transform const& transform, math::Intersection& i, math::Ray const& ray) const
+    bool CheckIntersection(Transform const &transform, math::Intersection &i, math::Ray const &ray) const
     {
       float denom = math::dot(normal_, ray.direction());
-      if( abs(denom) <= 1e-6f)
+      if (abs(denom) <= 1e-6f)
       {
-          return false;
+        return false;
       }
       math::vec3 a = transform.position - ray.origin();
       float t = math::dot(a, normal_) / denom;
       if (t > i.t || t <= 0)
       {
-          return false;
+        return false;
       }
       i.t = t;
       i.normal = normal_;

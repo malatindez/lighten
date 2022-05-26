@@ -190,7 +190,7 @@ namespace engine::math
     template <Primitive T>
     [[nodiscard]] mat<4, 4, T> rotate(mat<4, 4, T> const &matrix, qua<T> const &q)
     {
-        return rotate(matrix, q.x, vec<3, T>{q.x, q.y, q.z});
+        return rotate(matrix, q.w, vec<3, T>{q.x, q.y, q.z});
     }
 
     template <Primitive T>
