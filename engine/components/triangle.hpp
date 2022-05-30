@@ -17,12 +17,11 @@ namespace engine::components
         {
             assert(!std::_Is_nan(normal_.x));
             float ndotdir = math::dot(normal_, ray.direction());
-            if (fabs(math::dot(normal_, ray.direction())) < 1e-6f)
+            if (fabs(ndotdir) < 1e-6f)
             {
                 return false;
             }
-            float d = math::dot(normal_, points_[0].get());
-            float t = -(math::dot(normal_, points_[0].get() - ray.origin())) / ndotdir;
+            float t = math::dot(points_[0].get() - ray.origin(), normal_) / ndotdir;
             if (t > i.t || t < 0)
             {
                 return false;
