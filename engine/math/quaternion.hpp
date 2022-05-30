@@ -1,5 +1,6 @@
 #pragma once
 #include "matnxn.hpp"
+#include "vec_math.hpp"
 #include <cstdint>
 #include <numbers>
 namespace engine::math
@@ -11,12 +12,11 @@ namespace engine::math
         using type = T;
         static constexpr size_t size = 4;
         constexpr explicit qua() = default;
-        constexpr explicit qua(T w, T x, T y, T z)
-        {
+        constexpr explicit qua(T w, T x, T y, T z)  {
+            this->w = w;
             this->x = x;
             this->y = y;
             this->z = z;
-            this->w = w;
         }
         constexpr void reset()
         {
@@ -26,10 +26,15 @@ namespace engine::math
 
         constexpr explicit qua(T radians, vec<3, T> axis)
         {
-            x = axis.x;
-            y = axis.y;
-            z = axis.z;
-            w = radians;
+            if (math::length(axis) != 0) 
+            {
+                axis = normalize(axis);
+            }
+            w = math::cos(radians / 2);
+            float const s = math::sin(radians / 2);
+            x = axis.x * s;
+            y = axis.y * s;
+            z = axis.z * s;
         }
 
         [[nodiscard]] constexpr mat<3, 3, T> as_mat3() const noexcept
@@ -46,15 +51,15 @@ namespace engine::math
             T qwz(w * z);
 
             return_value[0][0] = T(1) - T(2) * (qyy + qzz);
-            return_value[0][1] = T(2) * (qxy + qwz);
-            return_value[0][2] = T(2) * (qxz - qwy);
+            return_value[0][1] = T(2) * (qxy - qwz);
+            return_value[0][2] = T(2) * (qxz + qwy);
 
-            return_value[1][0] = T(2) * (qxy - qwz);
+            return_value[1][0] = T(2) * (qxy + qwz);
             return_value[1][1] = T(1) - T(2) * (qxx + qzz);
-            return_value[1][2] = T(2) * (qyz + qwx);
+            return_value[1][2] = T(2) * (qyz - qwx);
 
-            return_value[2][0] = T(2) * (qxz + qwy);
-            return_value[2][1] = T(2) * (qyz - qwx);
+            return_value[2][0] = T(2) * (qxz - qwy);
+            return_value[2][1] = T(2) * (qyz + qwx);
             return_value[2][2] = T(1) - T(2) * (qxx + qyy);
             return return_value;
         }
@@ -64,11 +69,11 @@ namespace engine::math
         }
         [[nodiscard]] constexpr vec<3, T> axis() const noexcept
         {
-            return vec<3, T>{y, z, w};
+            return vec<3, T>{x, y, z};
         }
         [[nodiscard]] constexpr T radians() const noexcept
         {
-            return x;
+            return w;
         }
 
         [[nodiscard]] constexpr qua<T> const &operator+() const noexcept;
@@ -154,9 +159,16 @@ namespace engine::math
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> QuaternionFromEuler(vec<3, T> angles)
     {
-        return qua<T>(angles.x, vec<3, T>{1, 0, 0}) *
-               qua<T>(angles.y, vec<3, T>{0, 1, 0}) *
-               qua<T>(angles.z, vec<3, T>{0, 0, 1});
+        return qua<T>(angles.x, vec<3, T>{1, 0, 0})*
+            qua<T>(angles.y, vec<3, T>{0, 1, 0})*
+            qua<T>(angles.z, vec<3, T>{0, 0, 1});
+    }
+    template <Primitive T>
+    [[nodiscard]] constexpr qua<T> QuaternionFromEuler(T roll, T pitch, T yaw) requires(std::is_floating_point_v<T>)
+    {
+        return qua<T>(pitch, vec<3, T>{1, 0, 0})*
+            qua<T>(yaw, vec<3, T>{0, 1, 0})*
+            qua<T>(roll , vec<3, T>{0, 0, 1});
     }
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> operator*(qua<T> const &q, qua<T> const &p)
@@ -188,18 +200,18 @@ namespace engine::math
     [[nodiscard]] constexpr vec<3, T> cross(vec<3, U> const &left, qua<T> const &right);
 
     template <Primitive T>
-    [[nodiscard]] mat<4, 4, T> rotate(mat<4, 4, T> const &matrix, qua<T> const &q)
+    [[nodiscard]] constexpr mat<4, 4, T> rotate(mat<4, 4, T> const &matrix, qua<T> const &q)
     {
         return rotate(matrix, q.w, vec<3, T>{q.x, q.y, q.z});
     }
 
     template <Primitive T>
-    T length(qua<T> const& q)
+    [[nodiscard]] constexpr T length(qua<T> const& q)
     {
         return std::sqrt(dot(q, q));
     }
     template <Primitive T>
-    qua<T> normalize(qua<T> const& q)
+    [[nodiscard]] constexpr qua<T> normalize(qua<T> const& q)
     {
         T l = length(q);
         if (l <= static_cast<T>(0))
