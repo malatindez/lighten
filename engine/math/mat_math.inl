@@ -175,7 +175,7 @@ namespace engine::math
 
   template <Primitive T>
   constexpr mat<4, 4, T> rotate(mat<4, 4, T> const &matrix, T angle,
-                      vec<3, T> const &vector)
+                                vec<3, T> const &vector)
   {
     T const c = math::cos(angle);
     T const s = math::sin(angle);
@@ -219,7 +219,7 @@ namespace engine::math
 
   template <Primitive T>
   constexpr mat<4, 4, T> lookAt(vec<3, T> const &eye, vec<3, T> const &center,
-                      vec<3, T> const &world_up)
+                                vec<3, T> const &world_up)
   {
     vec<3, T> const forward = normalize(center - eye);
     vec<3, T> const right = normalize(cross(forward, world_up));
@@ -240,7 +240,7 @@ namespace engine::math
     return return_value;
   }
   template <Primitive T>
-  constexpr mat<4, 4, T> perspective(T fov_y, T aspect_ratio, T z_near, T z_far) requires (!std::numeric_limits<T>::is_integer)
+  constexpr mat<4, 4, T> perspective(T fov_y, T aspect_ratio, T z_near, T z_far) requires(!std::numeric_limits<T>::is_integer)
   {
     assert(std::abs(aspect_ratio - std::numeric_limits<T>::epsilon()) >
            static_cast<T>(0));
@@ -252,91 +252,84 @@ namespace engine::math
     return_value[1][1] = static_cast<T>(1) / (tan_half_fov_y);
     return_value[2][2] = z_far / (z_far - z_near);
     return_value[2][3] = static_cast<T>(1);
-    return_value[3][2] = -( z_far * z_near) / (z_far - z_near);
+    return_value[3][2] = -(z_far * z_near) / (z_far - z_near);
     return return_value;
   }
 
   template <Primitive T>
-  constexpr void invert_orthonormal(mat<4, 4, T> const& src, mat<4, 4, T>& dst)
+  constexpr void invert_orthonormal(mat<4, 4, T> const &src, mat<4, 4, T> &dst)
   {
-      dst[0][0] = src[2][2];
-      dst[1][1] = src[1][1];
-      dst[2][2] = src[0][0];
-      dst[0][1] = src[1][0];
-      dst[1][0] = src[0][1];
-      dst[0][2] = src[2][0];
-      dst[2][0] = src[0][2];
-      dst[1][2] = src[2][1];
-      dst[2][1] = src[1][2];
-      dst[3][0] = -src[3].x * dst.data[0][0] - src[3].x * dst.data[0][1] - src[3].x * dst.data[0][2];
-      dst[3][1] = -src[3].y * dst.data[1][0] - src[3].y * dst.data[1][1] - src[3].y * dst.data[1][2];
-      dst[3][2] = -src[3].z * dst.data[2][0] - src[3].z * dst.data[2][1] - src[3].z * dst.data[2][2];
-      dst[0][3] = 0;
-      dst[1][3] = 0;
-      dst[2][3] = 0;
-      dst[3][3] = 1;
+    dst[0][0] = src[2][2];
+    dst[1][1] = src[1][1];
+    dst[2][2] = src[0][0];
+    dst[0][1] = src[1][0];
+    dst[1][0] = src[0][1];
+    dst[0][2] = src[2][0];
+    dst[2][0] = src[0][2];
+    dst[1][2] = src[2][1];
+    dst[2][1] = src[1][2];
+    dst[3][0] = -src[3].x * dst.data[0][0] - src[3].x * dst.data[0][1] - src[3].x * dst.data[0][2];
+    dst[3][1] = -src[3].y * dst.data[1][0] - src[3].y * dst.data[1][1] - src[3].y * dst.data[1][2];
+    dst[3][2] = -src[3].z * dst.data[2][0] - src[3].z * dst.data[2][1] - src[3].z * dst.data[2][2];
+    dst[0][3] = 0;
+    dst[1][3] = 0;
+    dst[2][3] = 0;
+    dst[3][3] = 1;
   }
   template <Primitive T>
-  constexpr void invert_orthogonal(mat<4, 4, T> const& src, mat<4, 4, T>& dst)
+  constexpr void invert_orthogonal(mat<4, 4, T> const &src, mat<4, 4, T> &dst)
   {
-      dst[0][0] = src[2][2];
-      dst[1][1] = src[1][1];
-      dst[2][2] = src[0][0];
-      dst[0][1] = src[1][0];
-      dst[1][0] = src[0][1];
-      dst[0][2] = src[2][0];
-      dst[2][0] = src[0][2];
-      dst[1][2] = src[2][1];
-      dst[2][1] = src[1][2];
+    dst[0][0] = src[2][2];
+    dst[1][1] = src[1][1];
+    dst[2][2] = src[0][0];
+    dst[0][1] = src[1][0];
+    dst[1][0] = src[0][1];
+    dst[0][2] = src[2][0];
+    dst[2][0] = src[0][2];
+    dst[1][2] = src[2][1];
+    dst[2][1] = src[1][2];
 
-      vec3 lengths{
-          std::sqrt(dst[0][0] * dst[0][0] + dst[0][1] * dst[0][1] + dst[0][2] * dst[0][2]),
-          std::sqrt(dst[1][0] * dst[1][0] + dst[1][1] * dst[1][1] + dst[1][2] * dst[1][2]),
-          std::sqrt(dst[2][0] * dst[2][0] + dst[2][1] * dst[2][1] + dst[2][2] * dst[2][2]),
-      };
+    vec3 lengths{
+        std::sqrt(dst[0][0] * dst[0][0] + dst[0][1] * dst[0][1] + dst[0][2] * dst[0][2]),
+        std::sqrt(dst[1][0] * dst[1][0] + dst[1][1] * dst[1][1] + dst[1][2] * dst[1][2]),
+        std::sqrt(dst[2][0] * dst[2][0] + dst[2][1] * dst[2][1] + dst[2][2] * dst[2][2]),
+    };
 
-      dst[0][0] = 1.0f / (dst[0][0] * lengths[0]);
-      dst[0][1] = 1.0f / (dst[0][1] * lengths[0]);
-      dst[0][2] = 1.0f / (dst[0][2] * lengths[0]);
-      dst[1][0] = 1.0f / (dst[1][0] * lengths[1]);
-      dst[1][1] = 1.0f / (dst[1][1] * lengths[1]);
-      dst[1][2] = 1.0f / (dst[1][2] * lengths[1]);
-      dst[2][0] = 1.0f / (dst[2][0] * lengths[2]);
-      dst[2][1] = 1.0f / (dst[2][1] * lengths[2]);
-      dst[2][2] = 1.0f / (dst[2][2] * lengths[2]);
+    dst[0][0] = 1.0f / (dst[0][0] * lengths[0]);
+    dst[0][1] = 1.0f / (dst[0][1] * lengths[0]);
+    dst[0][2] = 1.0f / (dst[0][2] * lengths[0]);
+    dst[1][0] = 1.0f / (dst[1][0] * lengths[1]);
+    dst[1][1] = 1.0f / (dst[1][1] * lengths[1]);
+    dst[1][2] = 1.0f / (dst[1][2] * lengths[1]);
+    dst[2][0] = 1.0f / (dst[2][0] * lengths[2]);
+    dst[2][1] = 1.0f / (dst[2][1] * lengths[2]);
+    dst[2][2] = 1.0f / (dst[2][2] * lengths[2]);
 
-      dst[3][0] = 
-          - src[3].x * dst.data[0][0] / lengths[0] 
-          - src[3].x * dst.data[0][1] / lengths[0]
-          - src[3].x * dst.data[0][2] / lengths[0];
-      dst[3][1] = 
-          - src[3].y * dst.data[1][0] / lengths[1] 
-          - src[3].y * dst.data[1][1] / lengths[1]
-          - src[3].y * dst.data[1][2] / lengths[1];
-      dst[3][2] = 
-          - src[3].z * dst.data[2][0] / lengths[2] 
-          - src[3].z * dst.data[2][1] / lengths[2]
-          - src[3].z * dst.data[2][2] / lengths[2];
-      dst[0][3] = 0;
-      dst[1][3] = 0;
-      dst[2][3] = 0;
-      dst[3][3] = 1;
-
+    dst[3][0] =
+        -src[3].x * dst.data[0][0] / lengths[0] - src[3].x * dst.data[0][1] / lengths[0] - src[3].x * dst.data[0][2] / lengths[0];
+    dst[3][1] =
+        -src[3].y * dst.data[1][0] / lengths[1] - src[3].y * dst.data[1][1] / lengths[1] - src[3].y * dst.data[1][2] / lengths[1];
+    dst[3][2] =
+        -src[3].z * dst.data[2][0] / lengths[2] - src[3].z * dst.data[2][1] / lengths[2] - src[3].z * dst.data[2][2] / lengths[2];
+    dst[0][3] = 0;
+    dst[1][3] = 0;
+    dst[2][3] = 0;
+    dst[3][3] = 1;
   }
   template <Primitive T>
-  constexpr mat<4, 4, T> invert_orthonormal(mat<4, 4, T> const& src)
+  constexpr mat<4, 4, T> invert_orthonormal(mat<4, 4, T> const &src)
   {
-      mat<4, 4, T> return_value;
-      return_value.reset();
-      invert_orthonormal(src, return_value);
-      return return_value;
+    mat<4, 4, T> return_value;
+    return_value.reset();
+    invert_orthonormal(src, return_value);
+    return return_value;
   }
   template <Primitive T>
-  constexpr mat<4, 4, T> invert_orthogonal(mat<4, 4, T> const& src)
+  constexpr mat<4, 4, T> invert_orthogonal(mat<4, 4, T> const &src)
   {
-      mat<4, 4, T> return_value;
-      return_value.reset();
-      invert_orthogonal(src, return_value);
-      return return_value;
+    mat<4, 4, T> return_value;
+    return_value.reset();
+    invert_orthogonal(src, return_value);
+    return return_value;
   }
 } // namespace engine::math

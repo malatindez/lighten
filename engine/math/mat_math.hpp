@@ -43,19 +43,19 @@ namespace engine::math
 
     template <Primitive T>
     constexpr mat<4, 4, T> lookAt(vec<3, T> const &eye, vec<3, T> const &center,
-                        vec<3, T> const &up);
+                                  vec<3, T> const &up);
 
     template <Primitive T>
     constexpr mat<4, 4, T> perspective(T fov_y, T aspect_ratio, T z_near, T z_far);
 
     template <Primitive T>
-    constexpr void invert_orthonormal(mat<4, 4, T> const&src, mat<4, 4, T>& dst);
+    constexpr void invert_orthonormal(mat<4, 4, T> const &src, mat<4, 4, T> &dst);
     template <Primitive T>
-    constexpr void invert_orthogonal(mat<4, 4, T> const&src, mat<4, 4, T>& dst);
+    constexpr void invert_orthogonal(mat<4, 4, T> const &src, mat<4, 4, T> &dst);
     template <Primitive T>
-    constexpr mat<4, 4, T> invert_orthonormal(mat<4, 4, T> const&src);
+    constexpr mat<4, 4, T> invert_orthonormal(mat<4, 4, T> const &src);
     template <Primitive T>
-    constexpr mat<4, 4, T> invert_orthogonal(mat<4, 4, T> const&src);
+    constexpr mat<4, 4, T> invert_orthogonal(mat<4, 4, T> const &src);
 
 } // namespace engine::math
 #include "mat_math.inl"

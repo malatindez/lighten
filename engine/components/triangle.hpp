@@ -9,7 +9,7 @@ namespace engine::components
     class Triangle
     {
     public:
-        Triangle(math::vec3 &a, math::vec3 &b, math::vec3 &c) : points_{a,b,c}
+        Triangle(math::vec3 &a, math::vec3 &b, math::vec3 &c) : points_{a, b, c}
         {
             UpdateNormal();
         }
@@ -60,6 +60,7 @@ namespace engine::components
             math::vec3 const v0v2 = points_[2].get() - points_[0].get();
             normal_ = math::cross(v0v1, v0v2);
         }
+
     private:
         std::array<std::reference_wrapper<math::vec3>, 3> points_;
         math::vec3 normal_;

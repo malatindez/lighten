@@ -1,20 +1,18 @@
 #pragma once
-#include "math.hpp"
 #include "light-data.hpp"
+#include "math.hpp"
 #include <cmath>
 namespace engine::components
 {
     struct DirectionalLight
     {
         math::vec3 direction;
-        
+
         math::vec3 color;
         float ambient_intensity;
         float diffuse_intensity;
         float specular_intensity;
 
-        
-        
         inline void UpdateColor(LightData &light_data)
         {
             assert(math::almost_equal(length(direction), 1.0f));
@@ -27,10 +25,7 @@ namespace engine::components
             math::vec3 const reflect_dir = math::reflect_normal(light_data.normal, -direction);
 
             light_data.color += color *
-                     (
-                      diffuse_intensity * t
-                      + specular_intensity * math::pow(std::max(dot(light_data.view_dir, reflect_dir), 0.0f), 32)
-                     );
+                                (diffuse_intensity * t + specular_intensity * math::pow(std::max(dot(light_data.view_dir, reflect_dir), 0.0f), 32));
         }
     };
 } // namespace engine

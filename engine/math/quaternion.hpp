@@ -12,7 +12,8 @@ namespace engine::math
         using type = T;
         static constexpr size_t size = 4;
         constexpr explicit qua() = default;
-        constexpr explicit qua(T w, T x, T y, T z)  {
+        constexpr explicit qua(T w, T x, T y, T z)
+        {
             this->w = w;
             this->x = x;
             this->y = y;
@@ -26,7 +27,7 @@ namespace engine::math
 
         constexpr explicit qua(T radians, vec<3, T> axis)
         {
-            if (math::length(axis) != 0) 
+            if (math::length(axis) != 0)
             {
                 axis = normalize(axis);
             }
@@ -99,27 +100,14 @@ namespace engine::math
         [[nodiscard]] constexpr T &operator[](size_t i);
         [[nodiscard]] constexpr T const &operator[](size_t i) const;
 
-
         union
         {
             struct
             {
-                union
-                {
-                    T x, r, s;
-                };
-                union
-                {
-                    T y, g, t;
-                };
-                union
-                {
-                    T z, b, p;
-                };
-                union
-                {
-                    T w, a, q;
-                };
+                union { T x, r, s; };
+                union { T y, g, t; };
+                union { T z, b, p; };
+                union { T w, a, q; };
             };
             std::array<T, size> data;
         };
@@ -130,7 +118,7 @@ namespace engine::math
     constexpr std::istream &operator>>(std::istream &is, vec<size, T> &vec);
     template <size_t size, Primitive T>
     constexpr std::ostream &operator<<(std::ostream &os, vec<size, T> &vec);
-    
+
     template <size_t size, Primitive T, Primitive U>
     [[nodiscard]] constexpr vec<size, T> operator*(U const value, vec<size, T> const &vector);
     template <size_t size, Primitive T, Primitive U>
@@ -159,16 +147,16 @@ namespace engine::math
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> QuaternionFromEuler(vec<3, T> angles)
     {
-        return qua<T>(angles.x, vec<3, T>{1, 0, 0})*
-            qua<T>(angles.y, vec<3, T>{0, 1, 0})*
-            qua<T>(angles.z, vec<3, T>{0, 0, 1});
+        return qua<T>(angles.x, vec<3, T>{1, 0, 0}) *
+               qua<T>(angles.y, vec<3, T>{0, 1, 0}) *
+               qua<T>(angles.z, vec<3, T>{0, 0, 1});
     }
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> QuaternionFromEuler(T roll, T pitch, T yaw) requires(std::is_floating_point_v<T>)
     {
-        return qua<T>(pitch, vec<3, T>{1, 0, 0})*
-            qua<T>(yaw, vec<3, T>{0, 1, 0})*
-            qua<T>(roll , vec<3, T>{0, 0, 1});
+        return qua<T>(pitch, vec<3, T>{1, 0, 0}) *
+               qua<T>(yaw, vec<3, T>{0, 1, 0}) *
+               qua<T>(roll, vec<3, T>{0, 0, 1});
     }
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> operator*(qua<T> const &q, qua<T> const &p)
@@ -206,17 +194,17 @@ namespace engine::math
     }
 
     template <Primitive T>
-    [[nodiscard]] constexpr T length(qua<T> const& q)
+    [[nodiscard]] constexpr T length(qua<T> const &q)
     {
         return std::sqrt(dot(q, q));
     }
     template <Primitive T>
-    [[nodiscard]] constexpr qua<T> normalize(qua<T> const& q)
+    [[nodiscard]] constexpr qua<T> normalize(qua<T> const &q)
     {
         T l = length(q);
         if (l <= static_cast<T>(0))
         {
-            return qua<T>(1,0,0,0);
+            return qua<T>(1, 0, 0, 0);
         }
         T one_over_len = static_cast<T>(1) / l;
         return qua<T>(q.w * one_over_len, q.x * one_over_len, q.y * one_over_len, q.z * one_over_len);

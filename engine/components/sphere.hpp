@@ -9,7 +9,7 @@ namespace engine::components
     struct Sphere
     {
     public:
-        static float Hit(math::Ray const &r, math::vec3 center, float radius) noexcept
+        static constexpr float Hit(math::Ray const &r, math::vec3 center, float radius) noexcept
         {
             // TODO
             // figure out how can we adjust this formula to the sphere scaled by different factors
@@ -38,10 +38,6 @@ namespace engine::components
 
         static bool CheckIntersection(Transform const &transform, math::Intersection &i, math::Ray const &ray)
         {
-            if (math::length(ray.origin() - transform.position) - transform.scale.x > i.t)
-            {
-                return false;
-            }
             float t = Hit(ray, transform.position, transform.scale.x);
 
             if (t > i.t || t < 0)

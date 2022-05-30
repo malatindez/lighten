@@ -1,40 +1,20 @@
 #pragma once
-
 #include "math/mat.hpp"
 #include "math/mat_math.hpp"
+#include "math/mathpch.h"
+#include "math/quaternion.hpp"
 #include "math/vec.hpp"
 #include "math/vec_math.hpp"
-#include "math/quaternion.hpp"
-
-#include <cmath>
-#include <type_traits>
-#include <algorithm>
-#include <limits>
-#include <numbers>
 
 namespace engine::math
 {
-    template<class T>
-    [[nodiscard]] bool almost_equal(T x, T y, int ulp = 2) requires (!std::numeric_limits<T>::is_integer)
-    {
-        // the machine epsilon has to be scaled to the magnitude of the values used
-        // and multiplied by the desired precision in ULPs (units in the last place)
-        return std::fabs(x - y) <= std::numeric_limits<T>::epsilon() * std::fabs(x + y) * ulp
-            // unless the result is subnormal
-            || std::fabs(x - y) < std::numeric_limits<T>::min();
-    }
-    template<class T>
-    [[nodiscard]] constexpr T radians(T x) noexcept requires (!std::numeric_limits<T>::is_integer)
-    {
-        return (x / 180.0f) * std::numbers::pi;
-    }
-    template<class T>
-    [[nodiscard]] constexpr math::vec<3, T> reflect(math::vec<3, T> const &normal,math::vec<3, T> const &dir)
+    template <class T>
+    [[nodiscard]] constexpr math::vec<3, T> reflect(math::vec<3, T> const &normal, math::vec<3, T> const &dir)
     {
         return 2.0f * math::dot(normal, dir) * (normal - dir);
     }
-    template<class T>
-    [[nodiscard]] constexpr math::vec<3, T> reflect_normal(math::vec<3, T> const &normal,math::vec<3, T> const &dir)
+    template <class T>
+    [[nodiscard]] constexpr math::vec<3, T> reflect_normal(math::vec<3, T> const &normal, math::vec<3, T> const &dir)
     {
         return normalize(2.0f * math::dot(normal, dir) * (normal - dir));
     }

@@ -8,7 +8,8 @@ namespace engine
                              HWND parent_window, HMENU menu, HINSTANCE instance,
                              LPVOID lp_param)
       : Window(window_class, extended_style, class_name, window_name, style,
-               position, size, parent_window, menu, instance, lp_param), bitmap_size_(size / resolution_scale_)
+               position, size, parent_window, menu, instance, lp_param),
+        bitmap_size_(size / resolution_scale_)
   {
     bitmap_.resize(size_t(bitmap_size_.x) * bitmap_size_.y);
 

@@ -43,7 +43,7 @@ namespace engine::math
         template <Primitive U>
         constexpr vec<4, T> &operator/=(U const value) noexcept;
         template <Primitive U>
-        constexpr vec<4, T>& operator%=(U const value) noexcept;
+        constexpr vec<4, T> &operator%=(U const value) noexcept;
         template <Primitive U>
         constexpr vec<4, T> &operator+=(vec<4, U> const &other) noexcept;
         template <Primitive U>
@@ -53,7 +53,7 @@ namespace engine::math
         template <Primitive U>
         constexpr vec<4, T> &operator/=(vec<4, U> const &other) noexcept;
         template <Primitive U>
-        constexpr vec<4, T> &operator%=(vec<4, U> const& other) noexcept;
+        constexpr vec<4, T> &operator%=(vec<4, U> const &other) noexcept;
 
         template <size_t n, Primitive U = T>
         [[nodiscard]] constexpr vec<n, U> as_vec() requires(n >= 2 && n <= size)
@@ -71,22 +71,10 @@ namespace engine::math
         {
             struct
             {
-                union
-                {
-                    T x, r, s;
-                };
-                union
-                {
-                    T y, g, t;
-                };
-                union
-                {
-                    T z, b, p;
-                };
-                union
-                {
-                    T w, a, q;
-                };
+                union { T x, r, s; };
+                union { T y, g, t; };
+                union { T z, b, p; };
+                union { T w, a, q; };
             };
             std::array<T, size> data;
         };

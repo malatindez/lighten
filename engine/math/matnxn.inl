@@ -14,7 +14,7 @@ namespace engine::math
     }
     for (int i = 0, j = 0; i < a && j < b; i++, j++)
     {
-        data[i][j] = 1;
+      data[i][j] = 1;
     }
   }
 

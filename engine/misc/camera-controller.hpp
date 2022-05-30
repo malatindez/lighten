@@ -23,10 +23,10 @@ namespace engine
                     camera_.z_near_));
         }
 
-        void SetProjectionMatrix(math::mat4 const& proj) 
-        { 
-            camera_.projection = proj; 
-            camera_.inv_projection = math::inverse(proj); 
+        void SetProjectionMatrix(math::mat4 const &proj)
+        {
+            camera_.projection = proj;
+            camera_.inv_projection = math::inverse(proj);
         }
 
         void SetWorldOffset(math::vec3 const &offset);
@@ -36,7 +36,7 @@ namespace engine
         void SetWorldAngles(float roll, float pitch, float yaw);
         void AddWorldAngles(float roll, float pitch, float yaw);
         void AddRelativeAngles(float roll, float pitch, float yaw);
-        
+
         void UpdateBasis();
 
         void UpdateMatrices();
@@ -57,7 +57,6 @@ namespace engine
         [[nodiscard]] constexpr float z_near() const noexcept { return camera_.z_near_; }
         [[nodiscard]] constexpr float z_far() const noexcept { return camera_.z_far_; }
 
-
     private:
         components::Camera &camera_;
         components::Transform &transform_;
@@ -66,7 +65,6 @@ namespace engine
         math::vec3 right_{1, 0, 0};
         math::vec3 up_{0, 1, 0};
         math::vec3 forward_{0, 0, 1};
-
 
         bool update_matrices_ = true;
         bool update_basis_ = true;

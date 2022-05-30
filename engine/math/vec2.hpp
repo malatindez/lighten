@@ -14,7 +14,11 @@ namespace engine::math
     template <Primitive U>
     explicit constexpr vec(U value) { x = y = static_cast<T>(value); }
     template <Primitive A, Primitive B>
-    explicit constexpr vec(A a, B b) { x = a; y = b; }
+    explicit constexpr vec(A a, B b)
+    {
+      x = a;
+      y = b;
+    }
     template <typename... U>
     explicit constexpr vec(U... data)
     {
@@ -36,9 +40,9 @@ namespace engine::math
     template <Primitive U>
     constexpr vec<2, T> &operator*=(U const value) noexcept;
     template <Primitive U>
-    constexpr vec<2, T>& operator/=(U const value) noexcept;
+    constexpr vec<2, T> &operator/=(U const value) noexcept;
     template <Primitive U>
-    constexpr vec<2, T>& operator%=(U const value) noexcept;
+    constexpr vec<2, T> &operator%=(U const value) noexcept;
     template <Primitive U>
     constexpr vec<2, T> &operator+=(vec<2, U> const &other) noexcept;
     template <Primitive U>
@@ -48,7 +52,7 @@ namespace engine::math
     template <Primitive U>
     constexpr vec<2, T> &operator/=(vec<2, U> const &other) noexcept;
     template <Primitive U>
-    constexpr vec<2, T> &operator%=(vec<2, U> const& other) noexcept;
+    constexpr vec<2, T> &operator%=(vec<2, U> const &other) noexcept;
     [[nodiscard]] constexpr T &operator[](size_t i);
     [[nodiscard]] constexpr T const &operator[](size_t i) const;
     union

@@ -34,25 +34,25 @@ namespace engine
         math::vec3 origin(near_.as_vec<3>() / near_.w);
         math::Ray ray(origin, normalize(far_.as_vec<3>() / far_.w - origin));
         math::Intersection intersection;
-    
+
         components::Material mat;
         intersection.reset();
 
         spheres.each([&intersection, &ray, &mat](auto const, auto &transform, auto &material)
-        { if(components::Sphere::CheckIntersection(transform, intersection, ray)) { mat = material; } });
+                     { if(components::Sphere::CheckIntersection(transform, intersection, ray)) { mat = material; } });
         planes.each([&intersection, &ray, &mat](auto const, auto const &plane, auto const &transform, auto &material)
-        { if(plane.CheckIntersection(transform, intersection, ray)) { mat = material; } });
+                    { if(plane.CheckIntersection(transform, intersection, ray)) { mat = material; } });
         cubes.each([&intersection, &ray, &mat](auto const, auto &transform, auto &material)
-        { if(components::Cube::CheckIntersection(transform, intersection, ray)) { mat = material; } });
+                   { if(components::Cube::CheckIntersection(transform, intersection, ray)) { mat = material; } });
 
         if (!intersection.exists())
         {
           bitmap[size_t(j) * bitmap_size.x + i] = 0;
           continue;
         }
-        
+
         components::LightData ld{
-            .color = math::vec3{0,0,0},
+            .color = math::vec3{0, 0, 0},
             .ray = ray,
             .point = intersection.point,
             .normal = intersection.normal,

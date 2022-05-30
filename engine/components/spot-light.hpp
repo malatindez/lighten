@@ -1,6 +1,6 @@
 #pragma once
-#include "math.hpp"
 #include "light-data.hpp"
+#include "math.hpp"
 #include <cmath>
 namespace engine::components
 {
@@ -23,8 +23,8 @@ namespace engine::components
         inline void UpdateColor(Transform const &transform, LightData &light_data) const
         {
             assert(math::almost_equal(length(direction), 1.0f));
-            
-            math::vec3 const light_direction = - light_data.point + transform.position;
+
+            math::vec3 const light_direction = -light_data.point + transform.position;
             float const t = math::dot(light_data.normal, light_direction);
             if (t < 0)
             {
@@ -35,20 +35,19 @@ namespace engine::components
                                 (this->attenuation.constant +
                                  this->attenuation.linear * distance +
                                  this->attenuation.quadratic * distance * distance);
-            
-            if(cut_off < dot(direction, normalize(-light_direction)))
+
+            if (cut_off < dot(direction, normalize(-light_direction)))
             {
                 light_data.color += this->color * attenuation * ambient_intensity;
                 return;
             }
-            math::vec3 const reflect_dir =  math::reflect_normal(light_data.normal, light_direction);
+            math::vec3 const reflect_dir = math::reflect_normal(light_data.normal, light_direction);
 
             float diffuse = attenuation * diffuse_intensity * t;
             float u = dot(light_data.view_dir, reflect_dir);
-            float specular = attenuation* specular_intensity* static_cast<float>(math::pow(std::max(u, 0.0f), 32));
-            
-            light_data.color += color * (ambient_intensity + diffuse + specular);
+            float specular = attenuation * specular_intensity * static_cast<float>(math::pow(std::max(u, 0.0f), 32));
 
+            light_data.color += color * (ambient_intensity + diffuse + specular);
         }
     };
 } // namespace engine

@@ -11,7 +11,7 @@ namespace engine::math
 
     constexpr mat() = default;
     template <Primitive P>
-    explicit constexpr mat(P p) requires (a == b)
+    explicit constexpr mat(P p) requires(a == b)
     {
       reset();
       for (int i = 0; i < a; i++)
@@ -23,9 +23,9 @@ namespace engine::math
     explicit constexpr mat(mat<c, d, P> p) requires(a > c && b > d)
     {
       reset();
-      for(int i = 0; i < c; i++)
+      for (int i = 0; i < c; i++)
       {
-        for(int j = 0; j < d; j++)
+        for (int j = 0; j < d; j++)
         {
           data[i][j] = static_cast<T>(p.data[i][j]);
         }

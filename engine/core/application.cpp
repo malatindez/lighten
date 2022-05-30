@@ -16,7 +16,7 @@ namespace engine
       return;
     }
 
-    for (auto const&layer : application_->layers_)
+    for (auto const &layer : application_->layers_)
     {
       layer->OnEvent(e);
       if (e.handled)
@@ -66,9 +66,9 @@ namespace engine
       std::this_thread::yield();
     }
   }
-    Application::Application() 
-    { 
-      event_function_ = std::bind_front(&Application::OnEvent); 
-    }
+  Application::Application()
+  {
+    event_function_ = std::bind_front(&Application::OnEvent);
+  }
 
 } // namespace engine

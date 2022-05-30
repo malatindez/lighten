@@ -5,7 +5,7 @@ namespace engine::math
 {
 
   template <size_t L, Primitive T>
-  struct vec 
+  struct vec
   {
     using type = T;
     static constexpr size_t size = L;
@@ -59,7 +59,7 @@ namespace engine::math
       }
       return rv;
     }
-    
+
     [[nodiscard]] constexpr T &operator[](size_t i);
     [[nodiscard]] constexpr T const &operator[](size_t i) const;
     std::array<T, size> data;

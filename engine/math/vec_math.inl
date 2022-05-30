@@ -75,14 +75,14 @@ namespace engine::math
     return vec<size, T>(left) /= right;
   }
   template <size_t size, Primitive T, Primitive U>
-  [[nodiscard]] constexpr vec<size, T> operator%(vec<size, T> const& left, U const value) noexcept
+  [[nodiscard]] constexpr vec<size, T> operator%(vec<size, T> const &left, U const value) noexcept
   {
-      return vec<size, T>(left) %= value;
+    return vec<size, T>(left) %= value;
   }
   template <size_t size, Primitive T, Primitive U>
-  [[nodiscard]] constexpr vec<size, T> operator%(vec<size, T> const& left, vec<size, U> const& right) noexcept
+  [[nodiscard]] constexpr vec<size, T> operator%(vec<size, T> const &left, vec<size, U> const &right) noexcept
   {
-      return vec<size, T>(left) %= right;
+    return vec<size, T>(left) %= right;
   }
 
   template <size_t size, Primitive T>

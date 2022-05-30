@@ -62,15 +62,15 @@ namespace engine
         update_basis_ = false;
 
         math::mat3 rotation = transform_.rotation.as_mat3();
-        right_.x    = camera_.inv_view[0].x = rotation[0].x;
-        right_.y    = camera_.inv_view[0].y = rotation[0].y;
-        right_.z    = camera_.inv_view[0].z = rotation[0].z;
-        up_.x       = camera_.inv_view[1].x = rotation[1].x;
-        up_.y       = camera_.inv_view[1].y = rotation[1].y;
-        up_.z       = camera_.inv_view[1].z = rotation[1].z;
-        forward_.x  = camera_.inv_view[2].x = rotation[2].x;
-        forward_.y  = camera_.inv_view[2].y = rotation[2].y;
-        forward_.z  = camera_.inv_view[2].z = rotation[2].z;
+        right_.x = camera_.inv_view[0].x = rotation[0].x;
+        right_.y = camera_.inv_view[0].y = rotation[0].y;
+        right_.z = camera_.inv_view[0].z = rotation[0].z;
+        up_.x = camera_.inv_view[1].x = rotation[1].x;
+        up_.y = camera_.inv_view[1].y = rotation[1].y;
+        up_.z = camera_.inv_view[1].z = rotation[1].z;
+        forward_.x = camera_.inv_view[2].x = rotation[2].x;
+        forward_.y = camera_.inv_view[2].y = rotation[2].y;
+        forward_.z = camera_.inv_view[2].z = rotation[2].z;
     }
 
     void CameraController::UpdateMatrices()
