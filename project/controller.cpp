@@ -60,6 +60,10 @@ const vec3 kLeft{-1, 0, 0};
 const vec3 kRight{1, 0, 0};
 const vec3 kForward{0, 0, 1};
 const vec3 kBackwards{0, 0, -1};
+
+const float kRollSpeed = engine::math::radians(180.0f);
+const float kMoveSpeed = 2.0f;
+
 #include <numbers>
 void Controller::Tick(float delta_time)
 {
@@ -78,8 +82,8 @@ void Controller::Tick(float delta_time)
     if(input_.key_state(VK_SPACE)) { offset += kUp; }
 
     // 180 degrees per second
-    if (input_.key_state('Q')) { roll -= delta_time * engine::math::radians(180.0f); } 
-    if (input_.key_state('E')) { roll += delta_time * engine::math::radians(180.0f); }
+    if (input_.key_state('Q')) { roll -= delta_time * kRollSpeed; } 
+    if (input_.key_state('E')) { roll += delta_time * kRollSpeed; }
     if (input_.lbutton_down()) {
         yaw = delta_time *  float( saved_mouse_position_.x - input_.mouse_position().x) / window_.window_size().x * engine::math::radians(90.0f);
         pitch = delta_time *  float(saved_mouse_position_.y - input_.mouse_position().y) / window_.window_size().y * engine::math::radians(90.0f);
@@ -88,7 +92,7 @@ void Controller::Tick(float delta_time)
         camera_controller_.AddRelativeAngles(roll, pitch, yaw);
     }
     if (length(offset) != 0) {
-        camera_controller_.AddRelativeOffset(offset * delta_time);
+        camera_controller_.AddRelativeOffset(kMoveSpeed * offset * delta_time);
     }
     camera_controller_.UpdateMatrices();
 }
