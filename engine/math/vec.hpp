@@ -1,13 +1,6 @@
 #pragma once
-#include <array>
-#include <assert.h>
-#include <cmath>
-#include <concepts>
-#include <istream>
-#include <ostream>
+#include "mathpch.h"
 
-template <typename T>
-concept Primitive = std::floating_point<T> || std::integral<T>;
 namespace engine::math
 {
     template <size_t L, Primitive T>
