@@ -12,6 +12,10 @@ namespace engine::math
     {
       data[i].reset();
     }
+    for (int i = 0, j = 0; i < a && j < b; i++, j++)
+    {
+        data[i][j] = 1;
+    }
   }
 
   template <size_t a, size_t b, Primitive T>
