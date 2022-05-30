@@ -2,14 +2,14 @@
 namespace engine::components
 {
     static inline std::array<math::vec3, 8> kCubeVertices{
-        math::vec3{0.5f, 0.5f, -0.5f},
-        math::vec3{0.5f, -0.5f, -0.5f},
-        math::vec3{0.5f, 0.5f, 0.5f},
-        math::vec3{0.5f, -0.5f, 0.5f},
-        math::vec3{-0.5f, 0.5f, -0.5f},
-        math::vec3{-0.5f, -0.5f, -0.5f},
-        math::vec3{-0.5f, 0.5f, 0.5f},
         math::vec3{-0.5f, -0.5f, 0.5f},
+        math::vec3{-0.5f, 0.5f, 0.5f},
+        math::vec3{-0.5f, -0.5f, -0.5f},
+        math::vec3{-0.5f, 0.5f, -0.5f},
+        math::vec3{0.5f, -0.5f, 0.5f},
+        math::vec3{0.5f, 0.5f, 0.5f},
+        math::vec3{0.5f, -0.5f, -0.5f},
+        math::vec3{0.5f, 0.5f, -0.5f},
     };
     static inline std::array<math::vec3, 6> kCubeNormals{
         math::vec3{0, 1, 0},
