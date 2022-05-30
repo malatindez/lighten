@@ -29,7 +29,7 @@ namespace engine::components
             light_data.color += color *
                      (
                       diffuse_intensity * t
-                      + specular_intensity * std::pow(std::max(dot(light_data.view_dir, reflect_dir), 0.0f), 32)
+                      + specular_intensity * math::pow(std::max(dot(light_data.view_dir, reflect_dir), 0.0f), 32)
                      );
         }
     };

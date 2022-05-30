@@ -177,8 +177,8 @@ namespace engine::math
   constexpr mat<4, 4, T> rotate(mat<4, 4, T> const &matrix, T angle,
                       vec<3, T> const &vector)
   {
-    T const c = std::cos(angle);
-    T const s = std::sin(angle);
+    T const c = math::cos(angle);
+    T const s = math::sin(angle);
     vec<3, T> axis = normalize(vector);
     vec<3, T> temp = (T(1) - c) * axis;
     mat<4, 4, T> rotate;

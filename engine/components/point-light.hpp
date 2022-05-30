@@ -37,7 +37,7 @@ namespace engine::components
             
             float diffuse = diffuse_intensity * t;
             float u = dot(light_data.view_dir, reflect_dir);
-            float specular = specular_intensity* static_cast<float>(std::pow(std::max(u, 0.0f), 32));
+            float specular = specular_intensity* static_cast<float>(math::pow(std::max(u, 0.0f), 32));
             
             light_data.color += color * attenuation_ * (ambient_intensity + diffuse + specular);
             

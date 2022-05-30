@@ -138,7 +138,7 @@ namespace engine::math
     vec<size, T> return_value;
     for (int i = 0; i < return_value.size; i++)
     {
-      return_value[i] = std::cos(vector[i]);
+      return_value[i] = math::cos(vector[i]);
     }
     return return_value;
   }
@@ -149,7 +149,7 @@ namespace engine::math
     vec<size, T> return_value;
     for (int i = 0; i < return_value.size; i++)
     {
-      return_value[i] = std::sin(vector[i]);
+      return_value[i] = math::sin(vector[i]);
     }
     return return_value;
   }
