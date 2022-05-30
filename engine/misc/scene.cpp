@@ -42,8 +42,8 @@ namespace engine
         { if(components::Sphere::CheckIntersection(transform, intersection, ray)) { mat = material; } });
         planes.each([&intersection, &ray, &mat](auto const, auto const &plane, auto const &transform, auto &material)
         { if(plane.CheckIntersection(transform, intersection, ray)) { mat = material; } });
-        cubes.each([&intersection, &ray, &mat](auto const, auto const &cube, auto &transform, auto &material)
-        { if(cube.CheckIntersection(transform, intersection, ray)) { mat = material; } });
+        cubes.each([&intersection, &ray, &mat](auto const, auto &transform, auto &material)
+        { if(components::Cube::CheckIntersection(transform, intersection, ray)) { mat = material; } });
 
         if (!intersection.exists())
         {
