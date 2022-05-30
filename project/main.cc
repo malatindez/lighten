@@ -53,6 +53,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     sphere_transform.reset();
     sphere_transform.position = math::vec3{ 0,-1,-2 };
     sphere_transform.scale = math::vec3{ 0.5f };
+        sphere_transform.UpdateMatrices();
 
 
     entt::entity plane = registry.create();
@@ -65,12 +66,14 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     Transform& plane_transform = registry.emplace<Transform>(plane);
     plane_transform.reset();
     plane_transform.position = math::vec3{ 0,-2, 0 };
+    plane_transform.UpdateMatrices();
     plane_transform.scale = math::vec3{ 1.0f };
 
     entt::entity point_light_entity = registry.create();
     
     Transform &pl_transform = registry.emplace<Transform>(point_light_entity);
     pl_transform.position = math::vec3 {0,-0.25f,0};
+    pl_transform.UpdateMatrices();
 
     PointLight &point_light = registry.emplace<PointLight>(point_light_entity);
     point_light.color = math::vec3{ 0.9f,0.0f,0.5f };
@@ -97,6 +100,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     entt::entity camera = registry.create();
     Transform &camera_transform = registry.emplace<Transform>(camera);
     camera_transform.position = math::vec3{0,0,-5};
+    camera_transform.UpdateMatrices();
     Camera &cam = registry.emplace<Camera>(camera);
     CameraController camera_controller(cam, camera_transform, bmwindow->window_size());
 
@@ -104,8 +108,8 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     entt::entity cube = registry.create();
     Transform &cube_transform = registry.emplace<Transform>(cube);
     cube_transform.position = math::vec3{0,2,-2};
-    Cube &cube_ = registry.emplace<Cube>(cube);
-    cube_.TransformUpdated(cube_transform);
+    cube_transform.UpdateMatrices();
+    registry.emplace<Cube>(cube);
     registry.emplace<Material>(cube, math::vec3{1.0f, 1.0f, 0.0f});
 
     Application::Init();
