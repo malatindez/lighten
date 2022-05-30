@@ -10,8 +10,8 @@ namespace engine::math
         : origin_(origin), direction_(direction) {}
     [[nodiscard]] vec3 const &origin() const noexcept { return origin_; }
     [[nodiscard]] vec3 const &direction() const noexcept { return direction_; }
-    void SetOrigin(vec3 const &origin) noexcept { origin_ = origin; }
-    void SetDirection(vec3 const &direction) noexcept { direction_ = direction; }
+    [[nodiscard]] vec3 &origin() noexcept { return origin_; }
+    [[nodiscard]] vec3 &direction() noexcept { return direction_; }
     [[nodiscard]] vec3 PointAtParameter(float t) const
     {
       return origin_ + direction_ * t;
