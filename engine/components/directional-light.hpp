@@ -22,10 +22,12 @@ namespace engine::components
             {
                 return;
             }
-            math::vec3 const reflect_dir = math::reflect_normal(light_data.normal, -direction);
+            math::vec3 const reflect_dir = math::reflect_normal_safe(light_data.normal, -direction);
+            assert(!std::_Is_nan(reflect_dir.x));
 
             light_data.color += color *
                                 (diffuse_intensity * t + specular_intensity * math::pow(std::max(dot(light_data.view_dir, reflect_dir), 0.0f), 32));
+            assert(!std::_Is_nan(light_data.color.r));
         }
     };
 } // namespace engine

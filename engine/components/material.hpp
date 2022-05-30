@@ -6,5 +6,6 @@ namespace engine::components
   {
   public:
     math::vec3 color{0.6f};
+    bool processes_light = false;
   };
 } // namespace engine::components

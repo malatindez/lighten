@@ -14,8 +14,18 @@ namespace engine::math
         return 2.0f * math::dot(normal, dir) * (normal - dir);
     }
     template <class T>
-    [[nodiscard]] constexpr math::vec<3, T> reflect_normal(math::vec<3, T> const &normal, math::vec<3, T> const &dir)
+    [[nodiscard]] constexpr math::vec<3, T> reflect_normal(math::vec<3, T> const& normal, math::vec<3, T> const& dir)
     {
         return normalize(2.0f * math::dot(normal, dir) * (normal - dir));
+    }
+    template <class T>
+    [[nodiscard]] constexpr math::vec<3, T> reflect_normal_safe(math::vec<3, T> const& normal, math::vec<3, T> const& dir)
+    {
+        math::vec<3, T> t = 2.0f * math::dot(normal, dir) * (normal - dir);
+        if (math::length(t) <= 1e-6f)
+        {
+            return t;
+        }
+        return normalize(t);
     }
 }

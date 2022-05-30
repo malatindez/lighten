@@ -4,5 +4,6 @@ namespace engine
 {
     struct Color : math::vec<3, float>
     {
+        using math::vec<3, float>::vec;
     };
 }

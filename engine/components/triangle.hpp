@@ -9,10 +9,7 @@ namespace engine::components
     class Triangle
     {
     public:
-        Triangle(math::vec3 &a, math::vec3 &b, math::vec3 &c) : points_{a, b, c}
-        {
-            UpdateNormal();
-        }
+        Triangle(math::vec3 &a, math::vec3 &b, math::vec3 &c, math::vec3 &normal) : points_{a, b, c}, normal_(normal) { }
         bool CheckIntersection(Transform const &, math::Intersection &i, math::Ray const &ray) const noexcept
         {
             assert(!std::_Is_nan(normal_.x));
@@ -54,16 +51,9 @@ namespace engine::components
             i.t = t;
             return true;
         }
-        void UpdateNormal()
-        {
-            math::vec3 const v0v1 = points_[1].get() - points_[0].get();
-            math::vec3 const v0v2 = points_[2].get() - points_[0].get();
-            normal_ = math::cross(v0v1, v0v2);
-        }
-
     private:
         std::array<std::reference_wrapper<math::vec3>, 3> points_;
-        math::vec3 normal_;
+        math::vec3 &normal_;
         // TODO
         // create vector class which uses reference wrappers to wrap vec<n, T>
         // use it here so we can use less memory and apply this class to a mesh

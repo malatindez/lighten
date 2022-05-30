@@ -41,13 +41,15 @@ namespace engine::components
                 light_data.color += this->color * attenuation * ambient_intensity;
                 return;
             }
-            math::vec3 const reflect_dir = math::reflect_normal(light_data.normal, light_direction);
+            math::vec3 const reflect_dir = math::reflect_normal_safe(light_data.normal, light_direction);
+            assert(!std::_Is_nan(reflect_dir.x));
 
             float diffuse = attenuation * diffuse_intensity * t;
             float u = dot(light_data.view_dir, reflect_dir);
             float specular = attenuation * specular_intensity * static_cast<float>(math::pow(std::max(u, 0.0f), 32));
 
             light_data.color += color * (ambient_intensity + diffuse + specular);
+            assert(!std::_Is_nan(light_data.color.r));
         }
     };
 } // namespace engine
