@@ -6,6 +6,7 @@ namespace engine::components
     class Camera
     {
     public:
+        constexpr math::vec3 position() const noexcept { return math::vec3{ inv_view[3][0], inv_view[3][1], inv_view[3][2] }; }
         math::mat4 view{1};
         math::mat4 projection{1};
         math::mat4 view_projection{1};

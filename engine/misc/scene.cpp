@@ -29,10 +29,8 @@ namespace engine
       {
         float u = ((static_cast<float>(i)) / static_cast<float>(bitmap_size.x)) * 2 - 1;
         float v = ((static_cast<float>(j)) / static_cast<float>(bitmap_size.y)) * 2 - 1;
-        math::vec4 near_ = vec4(u, v, -1, 1) * cam.inv_view_projection;
-        math::vec4 far_ = vec4(u, v, 1, 1) * cam.inv_view_projection;
-        math::vec3 origin(near_.as_vec<3>() / near_.w);
-        math::Ray ray(origin, normalize(far_.as_vec<3>() / far_.w - origin));
+        math::vec4 near_ = vec4(u, v, 1, 1) * cam.inv_view_projection;
+        math::Ray ray(cam.position(), normalize(near_.as_vec<3>() / near_.w - cam.position()));
         math::Intersection intersection;
 
         components::Material mat;
