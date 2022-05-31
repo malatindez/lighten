@@ -7,6 +7,7 @@
 #include "components/plane.hpp"
 #include "components/point-light.hpp"
 #include "components/sphere.hpp"
+#include "components/mesh.hpp"
 #include "components/spot-light.hpp"
 #include "core/bitmap-window.hpp"
 #include "entt/entt.hpp"

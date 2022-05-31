@@ -19,6 +19,7 @@ namespace engine
     auto planes = registry.group<components::Plane>(entt::get<components::Transform, components::Material>);
     auto spheres = registry.group<components::Sphere>(entt::get<components::Transform, components::Material>);
     auto cubes = registry.group<components::Cube>(entt::get<components::Transform, components::Material>);
+    auto meshes = registry.group<components::Mesh>(entt::get<components::Transform, components::Material>);
 
     auto directional_lights = registry.view<components::DirectionalLight>();
     auto point_lights = registry.group<components::PointLight>(entt::get<components::Transform>);
@@ -36,12 +37,14 @@ namespace engine
         components::Material mat;
         intersection.reset();
 
-        spheres.each([&intersection, &ray, &mat](auto const, auto &transform, auto &material)
+        spheres.each([&intersection, &ray, &mat](auto const, auto const &transform, auto const &material)
                      { if(components::Sphere::CheckIntersection(transform, intersection, ray)) { mat = material; } });
-        planes.each([&intersection, &ray, &mat](auto const, auto const &plane, auto const &transform, auto &material)
+        planes.each([&intersection, &ray, &mat](auto const, auto const &plane, auto const &transform, auto const &material)
                     { if(plane.CheckIntersection(transform, intersection, ray)) { mat = material; } });
-        cubes.each([&intersection, &ray, &mat](auto const, auto &transform, auto &material)
+        cubes.each([&intersection, &ray, &mat](auto const, auto const &transform, auto const &material)
                    { if(components::Cube::CheckIntersection(transform, intersection, ray)) { mat = material; } });
+        meshes.each([&intersection, &ray, &mat](auto const, auto const &mesh, auto const &transform, auto const &material)
+                   { if(mesh.CheckIntersection(transform, intersection, ray)) { mat = material; } });
 
         if (!intersection.exists())
         {

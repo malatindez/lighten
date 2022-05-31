@@ -5,6 +5,7 @@
 #include "misc/camera-controller.hpp"
 #include "components/plane.hpp"
 #include "components/material.hpp"
+#include "components/mesh.hpp"
 using namespace engine;
 using namespace components;
 
@@ -77,7 +78,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
 
     entt::entity point_light_entity = registry.create();
     AddBasicSphere(registry, point_light_entity);
-    registry.get<Transform>(point_light_entity).position = math::vec3{ 0, -1.95f, -4 };
+    registry.get<Transform>(point_light_entity).position = math::vec3{ 2, 2, -1 };
     registry.get<Transform>(point_light_entity).scale = math::vec3{0.01f};
     registry.get<Transform>(point_light_entity).UpdateMatrices();
 
@@ -93,16 +94,16 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
         .quadratic = 1.44f
     };
     
+    entt::entity directional_light = registry.create();
 
-    DirectionalLight directional_light;
-    directional_light.direction = math::normalize(math::vec3{ 0,-1, 0 });
-    directional_light.color = math::vec3{ 1,1,0.7f };
-    directional_light.ambient_intensity = 0.2f;
-    directional_light.diffuse_intensity = 0.3f;
-    directional_light.specular_intensity = 0.1f;
+    DirectionalLight& directional_light_v = registry.emplace<DirectionalLight>(directional_light);
+    directional_light_v.direction = math::normalize(math::vec3{ 0,-1, 0 });
+    directional_light_v.color = math::vec3{ 1,1,0.7f };
+    directional_light_v.ambient_intensity = 0.5f;
+    directional_light_v.diffuse_intensity = 0.5f;
+    directional_light_v.specular_intensity = 0.5f;
 
-
-    registry.emplace<DirectionalLight>(registry.create(), directional_light);
+    
 
     entt::entity camera = registry.create();
     Transform &camera_transform = registry.emplace<Transform>(camera);
@@ -118,6 +119,13 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     cube_transform.UpdateMatrices();
     registry.emplace<Cube>(cube);
     registry.emplace<Material>(cube, math::vec3{1.0f, 1.0f, 0.0f});
+    
+    entt::entity mesh = registry.create();
+    Transform &mesh_transform = registry.emplace<Transform>(mesh);
+    mesh_transform.position = math::vec3{2,4,0};
+    mesh_transform.UpdateMatrices();
+    registry.emplace<Mesh>(mesh, render::LoadMeshFromObj(std::filesystem::current_path() / "objects/cube.obj"));
+    registry.emplace<Material>(mesh, math::vec3{1.0f, 1.0f, 0.0f});
 
     Application::Init();
 
@@ -125,8 +133,35 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     
 
     auto controller = std::make_shared<Controller>(*bmwindow, scene, camera_controller);
+
+    class LightUpdater : public engine::Layer
+    {
+    public:
+        LightUpdater(DirectionalLight &dir_light) : dir_light(dir_light) {}
+
+        void OnEvent(engine::Event& event) override
+        {
+            if (event.type() == EventType::AppTick)
+            {
+                AppTickEvent const&ate = dynamic_cast<AppTickEvent&>(event);
+                t += ate.delta_time();
+                dir_light.direction = math::vec3
+                {
+                    math::sin(t),
+                    math::cos(t),
+                    0
+                };
+            }
+        }
+        float t = 0;
+        DirectionalLight& dir_light;
+    };
+
+    auto lupdater = std::make_shared<LightUpdater>(directional_light_v);
+
     Application &application = Application::Get();
     application.AddLayer(controller);
+    application.AddLayer(lupdater);
     application.Run();
     PostQuitMessage(0);
     return 0;
