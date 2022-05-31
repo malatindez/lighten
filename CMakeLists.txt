@@ -48,6 +48,9 @@ target_include_directories(project PRIVATE ${ENGINE_SOURCES_DIR})
 target_link_libraries(project PUBLIC EnTT::EnTT)
 
 set_target_properties(project PROPERTIES LINKER_LANGUAGE CXX)
+file(GLOB RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/resources/*")
+file(COPY ${RESOURCES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 
 set(TEST_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test")
 file(GLOB_RECURSE TEST_SOURCES ${SRC_DIR} *.*)
