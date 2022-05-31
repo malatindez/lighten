@@ -95,4 +95,6 @@ void Controller::Tick(float delta_time)
         camera_controller_.AddRelativeOffset(kMoveSpeed * offset * delta_time);
     }
     camera_controller_.UpdateMatrices();
+
+    
 }
