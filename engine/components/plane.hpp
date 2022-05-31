@@ -34,7 +34,7 @@ namespace engine::components
     }
     void update_plane(math::vec3 const &first, math::vec3 const &second)
     {
-      math::vec3 temp = math::cross(first, second);
+      math::vec3 temp = -math::cross(first, second);
       if (math::length(temp) == 0)
       {
         throw std::invalid_argument("Input vectors can't be collinear!");
