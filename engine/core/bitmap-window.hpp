@@ -52,7 +52,7 @@ namespace engine
 #ifdef _DEBUG
     int resolution_scale_ = 8;
 #else
-    int resolution_scale_ = 2;
+    int resolution_scale_ = 4;
 #endif
     math::ivec2 bitmap_size_;
   };

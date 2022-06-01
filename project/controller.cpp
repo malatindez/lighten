@@ -5,7 +5,8 @@ using namespace engine::math;
 
 Controller::Controller(BitmapWindow &window,
                        std::shared_ptr<Scene> scene,
-                       CameraController cam) : scene_(scene), window_(window), camera_controller_(cam) {}
+                       CameraController cam) : scene_(scene), window_(window), camera_controller_(cam),
+                                               executor{std::max(1u, std::max(ParallelExecutor::kMaxThreads - 4u, ParallelExecutor::kHalfThreads))} {}
 void Controller::OnEvent(engine::Event &event)
 {
     if (event.in_category(EventCategoryApplication))
@@ -21,7 +22,7 @@ void Controller::OnEvent(engine::Event &event)
         }
         else if (event.type() == EventType::AppRender)
         {
-            scene_->Draw(camera_controller_.camera(), window_);
+            scene_->Draw(camera_controller_.camera(), window_, executor);
         }
         else if (event.type() == EventType::WindowClose)
         {
@@ -37,7 +38,7 @@ void Controller::OnEvent(engine::Event &event)
         }
         if (event.type() == EventType::MouseButtonPressed)
         {
-            auto const& mbpe = dynamic_cast<MouseButtonPressedEvent&>(event);
+            auto const &mbpe = dynamic_cast<MouseButtonPressedEvent &>(event);
             if (mbpe.mouse_button() != 0)
             {
                 return;
@@ -46,7 +47,7 @@ void Controller::OnEvent(engine::Event &event)
         }
         else if (event.type() == EventType::MouseButtonReleased)
         {
-            auto const& mbre = dynamic_cast<MouseButtonReleasedEvent&>(event);
+            auto const &mbre = dynamic_cast<MouseButtonReleasedEvent &>(event);
             if (mbre.mouse_button() != 0)
             {
                 return;
@@ -67,34 +68,57 @@ const float kMoveSpeed = 2.0f;
 #include <numbers>
 void Controller::Tick(float delta_time)
 {
-    math::vec3 offset{0,0,0};
+    math::vec3 offset{0, 0, 0};
     float roll = 0;
     float pitch = 0;
     float yaw = 0;
 
-    if (input_.key_state('W')) { 
+    if (input_.key_state('W'))
+    {
         offset += kForward;
     }
-    if(input_.key_state('S')) { offset += kBackwards; }
-    if(input_.key_state('A')) { offset += kLeft; }
-    if(input_.key_state('D')) { offset += kRight; }
-    if(input_.key_state(VK_CONTROL)) { offset += kDown; }
-    if(input_.key_state(VK_SPACE)) { offset += kUp; }
+    if (input_.key_state('S'))
+    {
+        offset += kBackwards;
+    }
+    if (input_.key_state('A'))
+    {
+        offset += kLeft;
+    }
+    if (input_.key_state('D'))
+    {
+        offset += kRight;
+    }
+    if (input_.key_state(VK_CONTROL))
+    {
+        offset += kDown;
+    }
+    if (input_.key_state(VK_SPACE))
+    {
+        offset += kUp;
+    }
 
     // 180 degrees per second
-    if (input_.key_state('Q')) { roll -= delta_time * kRollSpeed; } 
-    if (input_.key_state('E')) { roll += delta_time * kRollSpeed; }
-    if (input_.lbutton_down()) {
-        yaw = delta_time *  float( saved_mouse_position_.x - input_.mouse_position().x) / window_.window_size().x * engine::math::radians(90.0f);
-        pitch = delta_time *  float(saved_mouse_position_.y - input_.mouse_position().y) / window_.window_size().y * engine::math::radians(90.0f);
+    if (input_.key_state('Q'))
+    {
+        roll -= delta_time * kRollSpeed;
     }
-    if (!(roll == 0 && pitch == 0 && yaw == 0)) {
+    if (input_.key_state('E'))
+    {
+        roll += delta_time * kRollSpeed;
+    }
+    if (input_.lbutton_down())
+    {
+        yaw = delta_time * float(saved_mouse_position_.x - input_.mouse_position().x) / window_.window_size().x * engine::math::radians(90.0f);
+        pitch = delta_time * float(saved_mouse_position_.y - input_.mouse_position().y) / window_.window_size().y * engine::math::radians(90.0f);
+    }
+    if (!(roll == 0 && pitch == 0 && yaw == 0))
+    {
         camera_controller_.AddRelativeAngles(roll, pitch, yaw);
     }
-    if (length(offset) != 0) {
+    if (length(offset) != 0)
+    {
         camera_controller_.AddRelativeOffset(kMoveSpeed * offset * delta_time);
     }
     camera_controller_.UpdateMatrices();
-
-    
 }

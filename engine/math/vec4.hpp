@@ -58,7 +58,7 @@ namespace engine::math
         template <size_t n, Primitive U = T>
         [[nodiscard]] constexpr vec<n, U> as_vec() requires(n >= 2 && n <= size)
         {
-            vec<n, U> rv;
+            vec<n, U> rv{};
             for (int i = 0; i < n; i++)
             {
                 rv.data[i] = static_cast<U>(data[i]);
