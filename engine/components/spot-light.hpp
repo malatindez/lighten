@@ -14,19 +14,9 @@ namespace engine::components
         inline void UpdateColor(Transform const &transform, LightData &light_data, Material const&mat,
                                 std::function<bool(math::Intersection &, math::Ray &)> const &find_intersection) const
         {
-            assert(math::almost_equal(length(direction), 1.0f));
-
-            math::vec3 const light_direction = light_data.point - transform.position;
-
-            auto k = dot(normalize(light_direction), direction);
-            if (k < cut_off)
+            math::vec3 const L = normalize(light_data.point - transform.position);
+            if(dot(L, direction) < cut_off)
             {
-                float const distance = math::length(light_direction);
-                float const attenuation = 1.0f /
-                    (this->attenuation.constant +
-                        this->attenuation.linear * distance +
-                        this->attenuation.quadratic * distance * distance);
-                light_data.color += this->color * attenuation * ambient_intensity;
                 return;
             }
             PointLight::UpdateColor(transform, light_data, mat, find_intersection);

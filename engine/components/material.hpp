@@ -9,6 +9,5 @@ namespace engine::components
     math::vec3 emission{0.0f};
     float specular;
     float glossiness;
-    bool processes_light = true;
   };
 } // namespace engine::components

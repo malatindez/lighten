@@ -8,27 +8,29 @@ namespace engine::components
     struct DirectionalLight
     {
         math::vec3 direction;
-
         math::vec3 color;
-        float ambient_intensity;
-        float diffuse_intensity;
+        float R = 5.0f; // if intersection was found then we multiply light color by 1 / std::pow(max(1, sqrt(R - nearest.t)), 2)
 
-        inline void UpdateColor(LightData &light_data, Material const&mat,
+        inline void UpdateColor(LightData &light_data, Material const& mat,
                                 std::function<bool(math::Intersection &, math::Ray &)> const &find_intersection)
         {
-            assert(math::almost_equal(length(direction), 1.0f));
-            float const ndotl = math::dot(light_data.normal, direction);
-            light_data.color += color * ambient_intensity;
-            if(ndotl < 0.0f)
+            float ndotl = dot(light_data.normal, -direction);
+            if(ndotl <= 0)
             {
                 return;
             }
-            
-            float const u = dot(light_data.normal, light_data.view_dir);
-            float const specular = mat.specular * static_cast<float>(math::pow(std::max(u, 0.0f), mat.glossiness));
-
-            light_data.color += color * (std::max(ndotl, 0.0f) * mat.albedo + specular);
-            assert(!std::_Is_nan(light_data.color.r));
+            math::Intersection nearest;
+            nearest.reset();
+            math::Ray ray(light_data.point - direction * 0.01f, -direction);
+            find_intersection(nearest, ray);
+            float specular = pow(dot(light_data.normal, light_data.view_dir), mat.glossiness) * mat.specular;
+            float t = 1;
+            if(nearest.exists())
+            {
+                t = std::max(1.0f, R - nearest.t);
+                t = std::sqrt(t);
+            }
+            light_data.color += color * ndotl * (ndotl * mat.albedo + specular) / t;
         }
     };
 } // namespace engine
