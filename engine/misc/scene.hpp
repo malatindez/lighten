@@ -16,6 +16,15 @@
 
 namespace engine
 {
+    namespace _sdet // scene_detail
+    {
+        template <class T>
+        using cref = std::reference_wrapper<const T>;
+        template <class... T>
+        using cref_tuple_vec = std::vector<std::tuple<cref<T>...>>;
+        template <class T>
+        using cref_vec = std::vector<cref<T>>;
+    }
     class Scene
     {
     public:
@@ -25,9 +34,21 @@ namespace engine
         void Draw(components::Camera const &cam, BitmapWindow &window, ParallelExecutor &executor);
 
         math::Intersection FindIntersection(math::Ray const &ray);
-
+        // heavy function.
+        // should be updated whenever any of the rendered objects are added or deleted
+        void OnRegistryUpdate();
+        bool FindIntersection(math::Intersection &intersection, math::Ray &ray);
+        bool FindIntersectionMaterial(math::Intersection &intersection, math::Ray &ray, components::Material &mat);
         bool update_scene{true};
 
         entt::registry registry;
+
+        _sdet::cref_tuple_vec<components::Plane, components::Transform, components::Material> planes;
+        _sdet::cref_tuple_vec<components::Transform, components::Material> spheres;
+        _sdet::cref_tuple_vec<components::Transform, components::Material> cubes;
+        _sdet::cref_tuple_vec<components::Mesh, components::Transform, components::Material> meshes;
+        _sdet::cref_vec<components::DirectionalLight> directional_lights;
+        _sdet::cref_tuple_vec<components::PointLight, components::Transform> point_lights;
+        _sdet::cref_tuple_vec<components::SpotLight, components::Transform> spot_lights;
     };
 } // namespace engine

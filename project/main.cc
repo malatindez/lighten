@@ -88,12 +88,12 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     entt::entity point_light_entity = registry.create();
     AddBasicSphere(registry, point_light_entity);
     registry.get<Transform>(point_light_entity).position = math::vec3{2, 2, -1};
-    registry.get<Transform>(point_light_entity).scale = math::vec3{0.01f};
+    registry.get<Transform>(point_light_entity).scale = math::vec3{0.001f};
     registry.get<Transform>(point_light_entity).UpdateMatrices();
 
     PointLight &point_light = registry.emplace<PointLight>(point_light_entity);
     point_light.color = math::vec3{0.9f, 0.5f, 0.5f};
-    point_light.R = 10.0f;
+    point_light.R = 5.00f;
     registry.get<Material>(point_light_entity).albedo = math::vec3{0};
     registry.get<Material>(point_light_entity).emission = point_light.color;
 
@@ -102,16 +102,16 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     DirectionalLight &directional_light_v = registry.emplace<DirectionalLight>(directional_light);
     directional_light_v.direction = math::normalize(math::vec3{0, -1, 0});
     directional_light_v.color = math::vec3{0.3f, 0.0f, 0.4f};
-/*     float dir_light_t = 0.0f;
+     float dir_light_t = 0.0f;
     tick_layer->funcs.push_back(
         [&dir_light_t, &directional_light_v](float delta_time)
         {
             dir_light_t += delta_time;
-            directional_light_v.direction = math::vec3{
+            directional_light_v.direction = math::normalize(math::vec3{
                 math::sin(dir_light_t),
                 math::cos(dir_light_t),
-                2 * math::sin(dir_light_t) * math::cos(dir_light_t)};
-        }); */
+                0 });
+        }); 
 
 
     entt::entity camera = registry.create();
@@ -135,12 +135,12 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     registry.emplace<Cube>(cube);
     registry.emplace<Material>(cube, math::vec3{1.0f, 1.0f, 0.0f});
 
-      entt::entity mesh = registry.create();
+     /*  entt::entity mesh = registry.create();
       Transform &mesh_transform = registry.emplace<Transform>(mesh);
       mesh_transform.position = math::vec3{2,4,0};
      mesh_transform.UpdateMatrices();
       registry.emplace<Mesh>(mesh, render::LoadMeshFromObj(std::filesystem::current_path() / "objects/cube.obj"));
-     registry.emplace<Material>(mesh, math::vec3{1.0f, 1.0f, 0.0f});
+     registry.emplace<Material>(mesh, math::vec3{1.0f, 1.0f, 0.0f}); */
 
     Application::Init();
 
@@ -153,7 +153,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
         {
             spot.direction = controller->camera_controller().forward();
         });
-
+    scene->OnRegistryUpdate();
     Application &application = Application::Get();
     application.AddLayer(controller);
     application.AddLayer(tick_layer);

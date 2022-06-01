@@ -47,7 +47,8 @@ namespace engine::components
                 return false;
             }
             i.point = P;
-            i.normal = normal_;
+            // reverse normal if the ray is on the opposite side of the triangle
+            i.normal = normal_ * (ndotdir > 0 ? -1 : 1); 
             i.t = t;
             return true;
         }

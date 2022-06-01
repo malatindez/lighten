@@ -14,7 +14,7 @@ namespace engine::components
                                 std::function<bool(math::Intersection &, math::Ray &)> const &find_intersection) const
         {
            math::vec3 L = transform.position - light_data.point;
-           math::vec3 H = math::normalize(light_data.view_dir + L);
+           math::vec3 const H = math::normalize(light_data.view_dir + L);
            float distance = length(L);
            L = normalize(L);
            float ndotl = dot(light_data.normal, L);
@@ -22,6 +22,14 @@ namespace engine::components
             {
                 return;
             }
+            math::Intersection nearest;
+            nearest.reset();
+            math::Ray ray(light_data.point + L * 0.001f, L);
+            find_intersection(nearest, ray);
+            if(nearest.exists() && math::almost_equal(math::length(transform.position - ray.PointAtParameter(nearest.t)), 0.0f)) {
+                return;
+            }
+
            float const specular = pow(dot(light_data.normal, H), mat.glossiness) * mat.specular;
            distance /= R;
            distance *= distance;

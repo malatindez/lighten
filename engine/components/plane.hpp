@@ -26,9 +26,10 @@ namespace engine::components
       if (t > i.t || t <= 0)
       {
         return false;
-      }
+      } 
       i.t = t;
-      i.normal = normal_;
+      // reverse normal if the ray is on the opposite side of the plane
+      i.normal = normal_ * (denom > 0 ? -1 : 1); 
       i.point = ray.PointAtParameter(t);
       return true;
     }
