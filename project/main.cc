@@ -60,15 +60,24 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
 
     entt::entity sphere = registry.create();
     AddBasicSphere(registry, sphere);
-    registry.get<Transform>(sphere).position = math::vec3{0, 3, -2};
+    registry.get<Transform>(sphere).position = math::vec3{0, 1, -2};
     registry.get<Transform>(sphere).UpdateMatrices();
     registry.get<Material>(sphere).albedo = Color{1.0f, 1.0f, 1.0f};
 
-    //  entt::entity sphere2 = registry.create();
-    //  AddBasicSphere(registry, sphere2);
-    //  registry.get<Transform>(sphere2).position = math::vec3{ 0, 1, -2 };
-    //  registry.get<Transform>(sphere2).UpdateMatrices();
-    // registry.get<Material>(sphere2).color = Color{1.0f, 0.0f, 1.0f};
+      entt::entity sphere2 = registry.create();
+      AddBasicSphere(registry, sphere2);
+      auto& s2t = registry.get<Transform>(sphere2);
+      s2t.position = math::vec3{ 0, 1, -2 };
+      s2t.UpdateMatrices();
+      float s2t_t = 0;
+      tick_layer->funcs.emplace_back(
+          [&s2t, &s2t_t](float dt)
+          {
+              s2t_t += dt;
+              s2t.position = math::vec3{ 0, 6 + math::sin(s2t_t) * 3, -2};
+              s2t.UpdateMatrices();
+          });
+     registry.get<Material>(sphere2).albedo = Color{1.0f, 0.0f, 1.0f};
 
     entt::entity plane = registry.create();
     AddBasicPlane(registry, plane);
@@ -76,7 +85,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     registry.get<Transform>(plane).position = math::vec3{ 0, -2, 0 };
     registry.get<Transform>(plane).UpdateMatrices();
 
-/*     entt::entity point_light_entity = registry.create();
+    entt::entity point_light_entity = registry.create();
     AddBasicSphere(registry, point_light_entity);
     registry.get<Transform>(point_light_entity).position = math::vec3{2, 2, -1};
     registry.get<Transform>(point_light_entity).scale = math::vec3{0.01f};
@@ -84,23 +93,16 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
 
     PointLight &point_light = registry.emplace<PointLight>(point_light_entity);
     point_light.color = math::vec3{0.9f, 0.5f, 0.5f};
-    point_light.ambient_intensity = 0.2f;
-    point_light.diffuse_intensity = 0.6f;
-    point_light.specular_intensity = 2.5f;
-    point_light.attenuation = PointLight::Attenuation{
-        .constant = 1.0f,
-        .linear = 0.5f,
-        .quadratic = 0.2f}; */
+    point_light.R = 10.0f;
+    registry.get<Material>(point_light_entity).albedo = math::vec3{0};
+    registry.get<Material>(point_light_entity).emission = point_light.color;
 
     entt::entity directional_light = registry.create();
 
- /*    DirectionalLight &directional_light_v = registry.emplace<DirectionalLight>(directional_light);
+    DirectionalLight &directional_light_v = registry.emplace<DirectionalLight>(directional_light);
     directional_light_v.direction = math::normalize(math::vec3{0, -1, 0});
     directional_light_v.color = math::vec3{0.3f, 0.0f, 0.4f};
-    directional_light_v.ambient_intensity = 0.1f;
-    directional_light_v.diffuse_intensity = 0.1f;
-    directional_light_v.specular_intensity = 0.3f;
-    float dir_light_t = 0.0f;
+/*     float dir_light_t = 0.0f;
     tick_layer->funcs.push_back(
         [&dir_light_t, &directional_light_v](float delta_time)
         {
@@ -109,8 +111,8 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
                 math::sin(dir_light_t),
                 math::cos(dir_light_t),
                 2 * math::sin(dir_light_t) * math::cos(dir_light_t)};
-        });
- */
+        }); */
+
 
     entt::entity camera = registry.create();
     Transform &camera_transform = registry.emplace<Transform>(camera);
@@ -119,16 +121,11 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     Camera &cam = registry.emplace<Camera>(camera);
     CameraController camera_controller(cam, camera_transform, bmwindow->window_size());
     SpotLight &spot = registry.emplace<SpotLight>(camera);
-    spot.attenuation = SpotLight::Attenuation{
-        .constant = 1.0f,
-        .linear = 0.0014f,
-        .quadratic = 0.00007f };
 
     spot.direction = math::normalize(math::vec3{0, -1, 0});
-    spot.color = math::vec3{1, 1, 1};
-    spot.ambient_intensity = 0.1f;
-    spot.diffuse_intensity = 0.24f;
+    spot.color = math::vec3{0.3f, 0.3f, 0.7f};
     spot.cut_off = math::radians(45.0F);
+    spot.R = 1.0f;
     float t_temp = 0;
 
     entt::entity cube = registry.create();
@@ -138,12 +135,12 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     registry.emplace<Cube>(cube);
     registry.emplace<Material>(cube, math::vec3{1.0f, 1.0f, 0.0f});
 
-    //  entt::entity mesh = registry.create();
-    //  Transform &mesh_transform = registry.emplace<Transform>(mesh);
-    //  mesh_transform.position = math::vec3{2,4,0};
-    // / mesh_transform.UpdateMatrices();
-    //  registry.emplace<Mesh>(mesh, render::LoadMeshFromObj(std::filesystem::current_path() / "objects/cube.obj"));
-    // registry.emplace<Material>(mesh, math::vec3{1.0f, 1.0f, 0.0f});
+      entt::entity mesh = registry.create();
+      Transform &mesh_transform = registry.emplace<Transform>(mesh);
+      mesh_transform.position = math::vec3{2,4,0};
+     mesh_transform.UpdateMatrices();
+      registry.emplace<Mesh>(mesh, render::LoadMeshFromObj(std::filesystem::current_path() / "objects/cube.obj"));
+     registry.emplace<Material>(mesh, math::vec3{1.0f, 1.0f, 0.0f});
 
     Application::Init();
 
