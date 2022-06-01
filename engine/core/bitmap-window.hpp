@@ -36,7 +36,7 @@ namespace engine
       return bitmap_size_;
     }
     [[nodiscard]] constexpr int resolution_scale() const { return resolution_scale_; }
-    [[nodiscard]] void SetResolutionScale(int resolution_scale)
+    void SetResolutionScale(int resolution_scale)
     {
       resolution_scale_ = resolution_scale;
       OnSizeChanged();
@@ -52,7 +52,7 @@ namespace engine
 #ifdef _DEBUG
     int resolution_scale_ = 8;
 #else
-    int resolution_scale_ = 4;
+    int resolution_scale_ = 1;
 #endif
     math::ivec2 bitmap_size_;
   };

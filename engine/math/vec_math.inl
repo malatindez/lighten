@@ -85,6 +85,21 @@ namespace engine::math
     return vec<size, T>(left) %= right;
   }
 
+  template <size_t size, Primitive T, Primitive U>
+  [[nodiscard]] constexpr bool operator==(vec<size, T> const &left, vec<size, U> const &right) noexcept
+  {
+    bool rv = true;
+    for (size_t i = 0; i < size; i++)
+    {
+      rv &= left.data[i] == right.data[i];
+    }
+    return rv;
+  }
+  template <size_t size, Primitive T, Primitive U>
+  [[nodiscard]] constexpr bool operator!=(vec<size, T> const &left, vec<size, U> const &right) noexcept
+  {
+    return !(left == right);
+  }
   template <size_t size, Primitive T>
   [[nodiscard]] constexpr float
   squared_length(vec<size, T> const &vector) noexcept

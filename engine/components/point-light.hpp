@@ -11,7 +11,7 @@ namespace engine::components
         float R;
 
         inline void UpdateColor(Transform const &transform, LightData &light_data, Material const&mat,
-                                std::function<bool(math::Intersection &, math::Ray &)> const &find_intersection) const
+                                std::function<bool(math::Intersection &, math::Ray &, Transform &)> const &find_intersection_transform) const
         {
            math::vec3 L = transform.position - light_data.point;
            math::vec3 const H = math::normalize(light_data.view_dir + L);
@@ -24,16 +24,19 @@ namespace engine::components
             }
             math::Intersection nearest;
             nearest.reset();
-            math::Ray ray(light_data.point + L * 0.001f, L);
-            find_intersection(nearest, ray);
-            if(nearest.exists() && math::almost_equal(math::length(transform.position - ray.PointAtParameter(nearest.t)), 0.0f)) {
-                return;
+            math::Ray ray(light_data.point + L * 0.001f, + L);
+            Transform t;
+            find_intersection_transform(nearest, ray, t);
+            float modifier = ndotl * 0.25f * ndotl;
+            if(!(nearest.exists() && transform.position != t.position) && distance >= nearest.t) {
+                float const specular = pow(dot(light_data.normal, H), mat.glossiness) * mat.specular;
+                modifier = ndotl;
+                light_data.color += modifier * color * specular;
             }
 
-           float const specular = pow(dot(light_data.normal, H), mat.glossiness) * mat.specular;
            distance /= R;
            distance *= distance;
-           light_data.color += color * ndotl * (ndotl * mat.albedo / distance + specular);
+           light_data.color += modifier * color * (ndotl * mat.albedo / distance);
         }
     };
 } // namespace engine

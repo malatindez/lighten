@@ -12,7 +12,7 @@ namespace engine::components
         float R = 5.0f; // if intersection was found then we multiply light color by 1 / std::pow(max(1, sqrt(R - nearest.t)), 2)
 
         inline void UpdateColor(LightData &light_data, Material const& mat,
-                                std::function<bool(math::Intersection &, math::Ray &)> const &find_intersection) const
+            std::function<bool(math::Intersection&, math::Ray&)> const& find_intersection) const
         {
             float ndotl = dot(light_data.normal, -direction);
             if(ndotl <= 0)

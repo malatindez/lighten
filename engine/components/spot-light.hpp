@@ -12,14 +12,14 @@ namespace engine::components
         float cut_off;
 
         inline void UpdateColor(Transform const &transform, LightData &light_data, Material const&mat,
-                                std::function<bool(math::Intersection &, math::Ray &)> const &find_intersection) const
+            std::function<bool(math::Intersection&, math::Ray&, Transform&)> const& find_intersection_transform) const
         {
             math::vec3 const L = normalize(light_data.point - transform.position);
             if(dot(L, direction) < cut_off)
             {
                 return;
             }
-            PointLight::UpdateColor(transform, light_data, mat, find_intersection);
+            PointLight::UpdateColor(transform, light_data, mat, find_intersection_transform);
         }
     };
 } // namespace engine

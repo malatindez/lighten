@@ -31,7 +31,7 @@ namespace engine
       Material mat;
       intersection.reset();
 
-      FindIntersectionMaterial(intersection, ray, mat);
+      GetIntersectedMaterial(intersection, ray, mat);
 
       if (!intersection.exists())
       {
@@ -45,20 +45,20 @@ namespace engine
           .point = intersection.point,
           .normal = intersection.normal,
           .view_dir = normalize(ray.origin() - intersection.point)};
-      for (auto const &dir_light : directional_lights)
+      for (auto const &[entity, dir_light] : directional_lights)
       {
         dir_light.get().UpdateColor(ld, mat, [this](math::Intersection &i, math::Ray &r)
                                     { return FindIntersection(i, r); });
       }
-      for (auto const &[point_light, transform] : point_lights)
+      for (auto const &[entity, point_light, transform] : point_lights)
       {
-        point_light.get().UpdateColor(transform, ld, mat, [this](math::Intersection &i, math::Ray &r)
-                                      { return FindIntersection(i, r); });
+        point_light.get().UpdateColor(transform, ld, mat, [this](math::Intersection &i, math::Ray &r, Transform &t)
+                                      { return GetIntersectedTransform(i, r, t); });
       }
-      for (auto const &[spot_light, transform] : spot_lights)
+      for (auto const &[entity, spot_light, transform] : spot_lights)
       {
-        spot_light.get().UpdateColor(transform, ld, mat, [this](math::Intersection &i, math::Ray &r)
-                                     { return FindIntersection(i, r); });
+        spot_light.get().UpdateColor(transform, ld, mat, [this](math::Intersection &i, math::Ray &r, Transform &t)
+                                     { return GetIntersectedTransform(i, r , t); });
       }
       ivec3 color{256 * (mat.emission + ld.color)};
       color = math::ivec3{
@@ -83,66 +83,100 @@ namespace engine
   void Scene::OnRegistryUpdate()
   {
     using namespace components;
-    registry.group<Plane>(entt::get<Transform, Material>).each([this](auto const, auto const &plane, auto const &transform, auto const &material)
-                                                               { planes.emplace_back(plane, transform, material); });
-    registry.group<Sphere>(entt::get<Transform, Material>).each([this](auto const, auto const &transform, auto const &material)
-                                                                { spheres.emplace_back(transform, material); });
-    registry.group<Cube>(entt::get<Transform, Material>).each([this](auto const, auto const &transform, auto const &material)
-                                                              { cubes.emplace_back(transform, material); });
-    registry.group<Mesh>(entt::get<Transform, Material>).each([this](auto const, auto const &mesh, auto const &transform, auto const &material)
-                                                              { meshes.emplace_back(mesh, transform, material); });
+    registry.group<Plane>(entt::get<Transform, Material>).each([this](auto const e, auto const &plane, auto const &transform, auto const &material)
+                                                               { planes.emplace_back(e, plane, transform, material); });
+    registry.group<Sphere>(entt::get<Transform, Material>).each([this](auto const e, auto const &transform, auto const &material)
+                                                                { spheres.emplace_back(e, transform, material); });
+    registry.group<Cube>(entt::get<Transform, Material>).each([this](auto const e, auto const &transform, auto const &material)
+                                                              { cubes.emplace_back(e, transform, material); });
+    registry.group<Mesh>(entt::get<Transform, Material>).each([this](auto const e, auto const &mesh, auto const &transform, auto const &material)
+                                                              { meshes.emplace_back(e, mesh, transform, material); });
 
-    registry.view<DirectionalLight>().each([this](const auto, auto const &dirlight)
-                                           { directional_lights.emplace_back(dirlight); });
-    registry.group<PointLight>(entt::get<Transform>).each([this](const auto, auto const &point_light, auto const &transform)
-                                                          { point_lights.emplace_back(point_light, transform); });
-    registry.group<SpotLight>(entt::get<Transform>).each([this](const auto, auto const &spot_light, auto const &transform)
-                                                         { spot_lights.emplace_back(spot_light, transform); });
+    registry.view<DirectionalLight>().each([this](const auto e, auto const &dirlight)
+                                           { directional_lights.emplace_back(e, dirlight); });
+    registry.group<PointLight>(entt::get<Transform>).each([this](const auto e, auto const &point_light, auto const &transform)
+                                                          { point_lights.emplace_back(e, point_light, transform); });
+    registry.group<SpotLight>(entt::get<Transform>).each([this](const auto e, auto const &spot_light, auto const &transform)
+                                                         { spot_lights.emplace_back(e, spot_light, transform); });
   }
   bool Scene::FindIntersection(math::Intersection &intersection, math::Ray &ray)
   {
-    for (auto const &[transform, material] : spheres)
+    for (auto const &[entity, transform, material] : spheres)
     {
       components::Sphere::CheckIntersection(transform.get(), intersection, ray);
     }
-    for (auto const &[plane, transform, material] : planes)
+    for (auto const &[entity, plane, transform, material] : planes)
     {
       plane.get().CheckIntersection(transform.get(), intersection, ray);
     }
-    for (auto const &[transform, material] : cubes)
+    for (auto const &[entity, transform, material] : cubes)
     {
       components::Cube::CheckIntersection(transform.get(), intersection, ray);
     }
-    for (auto const &[mesh, transform, material] : meshes)
+    for (auto const &[entity, mesh, transform, material] : meshes)
     {
       mesh.get().CheckIntersection(transform.get(), intersection, ray);
     }
     return intersection.exists();
   }
-  bool Scene::FindIntersectionMaterial(math::Intersection &intersection, math::Ray &ray, components::Material &mat)
+  std::optional<entt::entity> Scene::GetIntersectedEntity(math::Intersection &intersection, math::Ray &ray)
   {
-    for (auto const &[transform, material] : spheres)
+    std::optional<entt::entity> rv{};
+    for (auto const &[entity, transform, material] : spheres)
+    {
+      if (components::Sphere::CheckIntersection(transform.get(), intersection, ray))
+      {
+        rv = entity;
+      }
+    }
+    for (auto const &[entity, plane, transform, material] : planes)
+    {
+      if (plane.get().CheckIntersection(transform.get(), intersection, ray))
+      {
+        rv = entity;
+      }
+    }
+    for (auto const &[entity, transform, material] : cubes)
+    {
+      if (components::Cube::CheckIntersection(transform.get(), intersection, ray))
+      {
+        rv = entity;
+      }
+    }
+    for (auto const &[entity, mesh, transform, material] : meshes)
+    {
+      if (mesh.get().CheckIntersection(transform.get(), intersection, ray))
+      {
+        rv = entity;
+      }
+    }
+    return rv;
+  }
+
+  bool Scene::GetIntersectedMaterial(math::Intersection &intersection, math::Ray &ray, components::Material &mat)
+  {
+    for (auto const &[entity, transform, material] : spheres)
     {
       if (components::Sphere::CheckIntersection(transform.get(), intersection, ray))
       {
         mat = material;
       }
     }
-    for (auto const &[plane, transform, material] : planes)
+    for (auto const &[entity, plane, transform, material] : planes)
     {
       if (plane.get().CheckIntersection(transform.get(), intersection, ray))
       {
         mat = material;
       }
     }
-    for (auto const &[transform, material] : cubes)
+    for (auto const &[entity, transform, material] : cubes)
     {
       if (components::Cube::CheckIntersection(transform.get(), intersection, ray))
       {
         mat = material;
       }
     }
-    for (auto const &[mesh, transform, material] : meshes)
+    for (auto const &[entity, mesh, transform, material] : meshes)
     {
       if (mesh.get().CheckIntersection(transform.get(), intersection, ray))
       {
@@ -151,5 +185,38 @@ namespace engine
     }
     return intersection.exists();
   }
-
+  
+  bool Scene::GetIntersectedTransform(math::Intersection &intersection, math::Ray &ray, components::Transform &t)
+  {
+    for (auto const &[entity, transform, material] : spheres)
+    {
+      if (components::Sphere::CheckIntersection(transform.get(), intersection, ray))
+      {
+        t = transform;
+      }
+    }
+    for (auto const &[entity, plane, transform, material] : planes)
+    {
+      if (plane.get().CheckIntersection(transform.get(), intersection, ray))
+      {
+        t = transform;
+      }
+    }
+    for (auto const &[entity, transform, material] : cubes)
+    {
+      if (components::Cube::CheckIntersection(transform.get(), intersection, ray))
+      {
+        t = transform;
+      }
+    }
+    for (auto const &[entity, mesh, transform, material] : meshes)
+    {
+      if (mesh.get().CheckIntersection(transform.get(), intersection, ray))
+      {
+        t = transform;
+      }
+    }
+    return intersection.exists();
+  }
+  
 } // namespace engine
