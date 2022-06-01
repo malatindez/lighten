@@ -1,5 +1,6 @@
 #pragma once
 #include "light-data.hpp"
+#include "material.hpp"
 #include "math.hpp"
 #include <cmath>
 namespace engine::components
@@ -9,7 +10,6 @@ namespace engine::components
         math::vec3 color;
         float ambient_intensity;
         float diffuse_intensity;
-        float specular_intensity;
         struct Attenuation
         {
             float constant;
@@ -17,29 +17,40 @@ namespace engine::components
             float quadratic;
         } attenuation;
 
-        inline void UpdateColor(Transform const &transform, LightData &light_data) const
+        inline void UpdateColor(Transform const &transform, LightData &light_data, Material const&mat,
+                                std::function<bool(math::Intersection &, math::Ray &)> const &find_intersection) const
         {
-            math::vec3 const light_direction = -light_data.point + transform.position;
-            float const t = math::dot(light_data.normal, light_direction);
-            light_data.color += color * ambient_intensity;
-            if (t < 0)
+            math::vec3 const light_direction = transform.position - light_data.point;
+            float const ndotl = math::dot(light_data.normal, light_direction);
+            if(ndotl < 0)
             {
                 return;
             }
-            float distance = math::length(light_direction);
-            float attenuation_ = 1.0f /
+            math::Intersection nearest;
+            nearest.reset();
+            math::Ray ray(transform.position, light_direction);
+            find_intersection(nearest, ray);
+
+            float const distance = math::length(light_direction);
+            float const attenuation_ = 1.0f /
                                  (attenuation.constant +
                                   attenuation.linear * distance +
                                   attenuation.quadratic * distance * distance);
+            
+            
+            math::vec3 const ambient = mat.albedo * ambient_intensity;
+            if (nearest.t < distance)
+            {
+                light_data.color += color * ambient * attenuation_;
+                return;
+            }
+            
+            math::vec3 const diffuse = ndotl * diffuse_intensity * mat.albedo;
 
-            math::vec3 const reflect_dir = math::reflect_normal_safe(light_data.normal, light_direction);
-            assert(!std::_Is_nan(reflect_dir.x));
+            float const u = dot(light_data.normal, math::normalize(light_data.view_dir + light_direction));
+            float const specular = mat.specular * static_cast<float>(math::pow(std::max(u, 0.0f), mat.glossiness));
 
-            float diffuse = diffuse_intensity * t;
-            float u = dot(light_data.view_dir, reflect_dir);
-            float specular = specular_intensity * static_cast<float>(math::pow(std::max(u, 0.0f), 32));
-
-            light_data.color += color * attenuation_ * (ambient_intensity + diffuse + specular);
+            light_data.color += color * attenuation_ * (ambient + diffuse + specular);
             assert(!std::_Is_nan(light_data.color.r));
         }
     };

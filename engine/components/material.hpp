@@ -5,7 +5,10 @@ namespace engine::components
   class Material final
   {
   public:
-    math::vec3 color{0.6f};
-    bool processes_light = false;
+    math::vec3 albedo{0.6f};
+    math::vec3 emission{0.0f};
+    float specular;
+    float glossiness;
+    bool processes_light = true;
   };
 } // namespace engine::components

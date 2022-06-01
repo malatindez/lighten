@@ -13,7 +13,7 @@ namespace engine::components
         math::mat4 inv_view{1};
         math::mat4 inv_projection{1};
         math::mat4 inv_view_projection{1};
-        float fovy_ = math::radians(45.0f);
+        float fovy_ = math::radians(90.0f);
         float z_near_ = 0.02f;
         float z_far_ = 20.0f;
     };

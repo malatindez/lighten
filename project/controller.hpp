@@ -16,7 +16,7 @@ public:
     Controller(engine::BitmapWindow &window, std::shared_ptr<engine::Scene> scene, engine::CameraController cam);
    
     void OnEvent(engine::Event &event) override;
- 
+    [[nodiscard]] engine::CameraController const& camera_controller() const noexcept { return camera_controller_; }
 private:
     void Tick(float delta_time);
     engine::CameraController camera_controller_;
