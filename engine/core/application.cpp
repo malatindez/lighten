@@ -36,7 +36,7 @@ namespace engine
   }
 
   void Application::Exit() { application_->running_ = false; }
-
+  
   void Application::Run()
   {
     render.reset();
@@ -61,8 +61,11 @@ namespace engine
         render.reset();
         Application::OnEvent(render_event);
         assert(!render_event.handled);
-        OutputDebugStringA(
-            (std::to_string(1.0f / render.elapsed()) + "\n").c_str());
+        static float spent_time = 0.0f;
+        static int frame_num = 0;
+        spent_time += render.elapsed();
+        frame_num++;
+        OutputDebugStringA((std::to_string(frame_num / spent_time) + "\n").c_str());
       }
       std::this_thread::yield();
     }

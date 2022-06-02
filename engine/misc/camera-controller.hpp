@@ -31,10 +31,11 @@ namespace engine
     // returns a projected ray from camera
     [[nodiscard]] inline math::Ray Raycast(math::vec2 const &uv) const noexcept
     {
-      math::vec4 near_ = math::vec4{uv, 1, 1} * camera_.inv_view_projection;
-      return math::Ray{
-          camera_.position(),
-          math::normalize(near_.as_vec<3>() / near_.w - camera_.position())};
+      math::vec4 bl4 = math::vec4(-1, -1, 1, 1) * camera_.inv_view_projection;
+      math::vec4 br4 = math::vec4(1, -1, 1, 1) * camera_.inv_view_projection;
+      math::vec4 tl4 = math::vec4(-1, 1, 1, 1) * camera_.inv_view_projection;
+      math::vec4 t = (bl4 + (tl4 - bl4) * uv.v + (br4 - bl4) * uv.u);
+      return math::Ray(camera_.position(), math::normalize(t.as_vec<3>() / t.w - camera_.position()));
     }
 
     [[nodiscard]] constexpr components::Camera const &camera() const noexcept { return camera_; }

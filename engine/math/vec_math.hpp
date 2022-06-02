@@ -5,6 +5,8 @@ namespace engine::math
     template <size_t size, Primitive T>
     constexpr std::istream &operator>>(std::istream &is, vec<size, T> &vec);
     template <size_t size, Primitive T>
+    constexpr std::ostream &operator<<(std::ostream &os, vec<size, T> const &vec);
+    template <size_t size, Primitive T>
     constexpr std::ostream &operator<<(std::ostream &os, vec<size, T> &vec);
 
     template <size_t size, Primitive T, Primitive U>

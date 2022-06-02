@@ -9,7 +9,7 @@ namespace engine::math
     public:
         using type = T;
         static constexpr size_t size = 4;
-        constexpr explicit qua() = default;
+        constexpr qua() = default;
         constexpr explicit qua(T w, T x, T y, T z);
         constexpr void reset();
         constexpr explicit qua(T radians, vec<3, T> axis);

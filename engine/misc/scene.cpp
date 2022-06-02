@@ -11,29 +11,23 @@ namespace engine
                    ParallelExecutor &executor)
   {
     using namespace components;
-    if (!update_scene)
-    {
-      // return;
-    }
     update_scene = false;
     ivec2 bitmap_size = window.bitmap_size();
     uint32_t *bitmap = window.bitmap().data();
-
-    auto func = [&](uint32_t, uint32_t task_num)
+    math::vec4 bl4 = vec4(-1, -1, 1, 1) * cam.inv_view_projection;
+    math::vec4 br4 = vec4(1, -1, 1, 1) * cam.inv_view_projection;
+    math::vec4 tl4 = vec4(-1, 1, 1, 1) * cam.inv_view_projection;
+    math::vec4 right4 = br4 - bl4;
+    math::vec4 up4 = tl4 - bl4;
+    auto func = [this, &bitmap, &cam, &bitmap_size, &bl4, &right4, &up4](uint32_t, uint32_t task_num)
     {
       int j = task_num / bitmap_size.x;
       int i = task_num % bitmap_size.x;
-      float u =
-          ((static_cast<float>(i) + 0.5f) / static_cast<float>(bitmap_size.x)) *
-              2 -
-          1;
-      float v =
-          ((static_cast<float>(j) + 0.5f) / static_cast<float>(bitmap_size.y)) *
-              2 -
-          1;
-      math::vec4 near_ = vec4(u, v, 1, 1) * cam.inv_view_projection;
-      math::Ray ray(cam.position(),
-                    normalize(near_.as_vec<3>() / near_.w - cam.position()));
+      float u = ((static_cast<float>(i) + 0.5f) / static_cast<float>(bitmap_size.x)) * 2 - 1;
+      float v = ((static_cast<float>(j) + 0.5f) / static_cast<float>(bitmap_size.y)) * 2 - 1;
+
+      math::vec4 t = (bl4 + up4 * v + right4 * u);
+      math::Ray ray(cam.position(), t.as_vec<3>() / t.w - cam.position());
       math::Intersection intersection;
       intersection.reset();
 
@@ -54,29 +48,18 @@ namespace engine
                    .view_dir = normalize(ray.origin() - intersection.point)};
       for (auto const &[entity, dir_light] : directional_lights)
       {
-        dir_light.get().UpdateColor(ld, mat,
-                                    [this](math::Intersection &i, math::Ray &r)
-                                    {
-                                      return FindIntersection(i, r);
-                                    });
+        dir_light.get().UpdateColor(ld, mat, [this](math::Intersection &i, math::Ray &r)
+                                    { return FindIntersection(i, r); });
       }
       for (auto const &[entity, point_light, transform] : point_lights)
       {
-        point_light.get().UpdateColor(
-            transform, ld, mat,
-            [this](math::Intersection &i, math::Ray &r, Transform &t)
-            {
-              return GetIntersectedTransform(i, r, t);
-            });
+        point_light.get().UpdateColor(transform, ld, mat, [this](math::Intersection &i, math::Ray &r, Transform &t)
+                                      { return GetIntersectedTransform(i, r, t); });
       }
       for (auto const &[entity, spot_light, transform] : spot_lights)
       {
-        spot_light.get().UpdateColor(
-            transform, ld, mat,
-            [this](math::Intersection &i, math::Ray &r, Transform &t)
-            {
-              return GetIntersectedTransform(i, r, t);
-            });
+        spot_light.get().UpdateColor(transform, ld, mat, [this](math::Intersection &i, math::Ray &r, Transform &t)
+                                     { return GetIntersectedTransform(i, r, t); });
       }
       ivec3 color{256 * (mat.emission + ld.color)};
       color = math::ivec3{color.r > 255 ? 255 : color.r,
@@ -101,8 +84,7 @@ namespace engine
   {
     using namespace components;
     registry.group<Plane>(entt::get<Transform, Material>)
-        .each([this](auto const e, auto const &plane, auto const &transform,
-                     auto const &material)
+        .each([this](auto const e, auto const &plane, auto const &transform, auto const &material)
               { planes.emplace_back(e, plane, transform, material); });
 
     registry.group<Sphere>(entt::get<Transform, Material>)
@@ -118,25 +100,17 @@ namespace engine
                      auto const &material)
               { meshes.emplace_back(e, mesh, transform, material); });
 
-    registry.view<DirectionalLight>().each(
-        [this](const auto e, auto const &dirlight)
-        {
-          directional_lights.emplace_back(e, dirlight);
-        });
+    registry.view<DirectionalLight>()
+        .each([this](const auto e, auto const &dirlight)
+              { directional_lights.emplace_back(e, dirlight); });
 
     registry.group<PointLight>(entt::get<Transform>)
-        .each(
-            [this](const auto e, auto const &point_light, auto const &transform)
-            {
-              point_lights.emplace_back(e, point_light, transform);
-            });
+        .each([this](const auto e, auto const &point_light, auto const &transform)
+              { point_lights.emplace_back(e, point_light, transform); });
 
     registry.group<SpotLight>(entt::get<Transform>)
-        .each(
-            [this](const auto e, auto const &spot_light, auto const &transform)
-            {
-              spot_lights.emplace_back(e, spot_light, transform);
-            });
+        .each([this](const auto e, auto const &spot_light, auto const &transform)
+              { spot_lights.emplace_back(e, spot_light, transform); });
   }
   bool Scene::FindIntersection(math::Intersection &intersection, math::Ray &ray)
   {

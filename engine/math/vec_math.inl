@@ -1,3 +1,5 @@
+#pragma once
+#include "vec_math.hpp"
 namespace engine::math
 {
   template <size_t size, Primitive T>
@@ -10,6 +12,15 @@ namespace engine::math
     return is;
   }
   template <size_t size, Primitive T>
+  constexpr std::ostream &operator<<(std::ostream &os, vec<size, T> const &vec)
+  {
+    for (int i = 0; i < size; i++)
+    {
+      os << vec[i] << " ";
+    }
+    return os;
+  }
+  template <size_t size, Primitive T>
   constexpr std::ostream &operator<<(std::ostream &os, vec<size, T> &vec)
   {
     for (int i = 0; i < size; i++)
@@ -20,8 +31,7 @@ namespace engine::math
   }
 
   template <size_t size, Primitive T, Primitive U>
-  [[nodiscard]] constexpr vec<size, T> operator*(U const value,
-                                                 vec<size, T> const &vector)
+  [[nodiscard]] constexpr vec<size, T> operator*(U const value, vec<size, T> const &vector)
   {
     return vec<size, T>(vector) *= value;
   }
