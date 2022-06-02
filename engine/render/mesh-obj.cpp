@@ -16,11 +16,13 @@ namespace engine::render
         std::vector<math::vec3> temp_normals;
     };
 
-    [[nodiscard]] inline bool ParsePrimitiveNoexcept(std::string_view &view, float &rv) noexcept
+    [[nodiscard]] inline bool ParsePrimitiveNoexcept(std::string_view &view,
+                                                     float &rv) noexcept
     {
         char *end = nullptr;
         float f = std::strtof(view.data(), &end);
-        if(errno != 0) {
+        if (errno != 0)
+        {
             errno = 0;
             return false;
         }
@@ -28,11 +30,13 @@ namespace engine::render
         view = view.substr(end - view.data());
         return true;
     }
-    [[nodiscard]] inline bool ParsePrimitiveNoexcept(std::string_view &view, int &rv) noexcept
+    [[nodiscard]] inline bool ParsePrimitiveNoexcept(std::string_view &view,
+                                                     int &rv) noexcept
     {
         char *end = nullptr;
         int i = std::strtol(view.data(), &end, 10);
-        if(errno != 0) {
+        if (errno != 0)
+        {
             errno = 0;
             return false;
         }
@@ -79,14 +83,22 @@ namespace engine::render
     {
         view = utils::ltrimview(view);
         math::ivec3 vertex_index, uv_index, normal_index;
-        ParsePrimitive(view, vertex_index.x);   view = view.substr(1);
-        ParsePrimitive(view, uv_index.x);       view = view.substr(1);
-        ParsePrimitive(view, normal_index.x);   view = view.substr(1);
-        ParsePrimitive(view, vertex_index.y);   view = view.substr(1);
-        ParsePrimitive(view, uv_index.y);       view = view.substr(1);
-        ParsePrimitive(view, normal_index.y);   view = view.substr(1);
-        ParsePrimitive(view, vertex_index.z);   view = view.substr(1);
-        ParsePrimitive(view, uv_index.z);       view = view.substr(1);
+        ParsePrimitive(view, vertex_index.x);
+        view = view.substr(1);
+        ParsePrimitive(view, uv_index.x);
+        view = view.substr(1);
+        ParsePrimitive(view, normal_index.x);
+        view = view.substr(1);
+        ParsePrimitive(view, vertex_index.y);
+        view = view.substr(1);
+        ParsePrimitive(view, uv_index.y);
+        view = view.substr(1);
+        ParsePrimitive(view, normal_index.y);
+        view = view.substr(1);
+        ParsePrimitive(view, vertex_index.z);
+        view = view.substr(1);
+        ParsePrimitive(view, uv_index.z);
+        view = view.substr(1);
         ParsePrimitive(view, normal_index.z);
         context.vertex_indices.push_back(vertex_index.x);
         context.vertex_indices.push_back(vertex_index.y);
@@ -122,7 +134,8 @@ namespace engine::render
             ParseFace(view.substr(2), context);
         }
     }
-    std::shared_ptr<const MeshObj> LoadMeshFromObj(std::filesystem::path const &path)
+    std::shared_ptr<const MeshObj>
+    LoadMeshFromObj(std::filesystem::path const &path)
     {
 
         ParserContext context;
@@ -135,11 +148,11 @@ namespace engine::render
 
             file.close();
             size_t begin = 0;
-            std::string_view view{ data.begin(), data.begin() + data.size()};
+            std::string_view view{data.begin(), data.begin() + data.size()};
             do
             {
                 size_t found = data.find_first_of('\n', begin + 1);
-                ParseLine(view.substr(begin + 1, found-begin - 1), context);
+                ParseLine(view.substr(begin + 1, found - begin - 1), context);
                 begin = found;
             } while (begin != std::string::npos);
         }
@@ -149,14 +162,13 @@ namespace engine::render
         {
             for (size_t i = 0; i < context.vertex_indices.size(); ++i)
             {
-                return_value->vertices.emplace_back(
-                    Vertex{
-                        .position = context.temp_vertices[context.vertex_indices[i] - 1],
-                        .normal = context.temp_normals[context.normal_indices[i] - 1],
-                        .tex_coords = context.temp_uvs[context.uv_indices[i] - 1]});
+                return_value->vertices.emplace_back(Vertex{
+                    .position = context.temp_vertices[context.vertex_indices[i] - 1],
+                    .normal = context.temp_normals[context.normal_indices[i] - 1],
+                    .tex_coords = context.temp_uvs[context.uv_indices[i] - 1]});
             }
         }
 
         return std::const_pointer_cast<const MeshObj>(return_value);
     }
-}
+} // namespace engine::render

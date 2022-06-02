@@ -14,7 +14,8 @@ namespace engine::components
       return -1;
     }
 
-    bool CheckIntersection(Transform const &transform, math::Intersection &i, math::Ray const &ray) const
+    bool CheckIntersection(Transform const &transform, math::Intersection &i,
+                           math::Ray const &ray) const
     {
       float denom = math::dot(normal_, ray.direction());
       if (abs(denom) <= 1e-6f)
@@ -26,10 +27,10 @@ namespace engine::components
       if (t > i.t || t <= 0)
       {
         return false;
-      } 
+      }
       i.t = t;
       // reverse normal if the ray is on the opposite side of the plane
-      i.normal = normal_ * (denom > 0 ? -1 : 1); 
+      i.normal = normal_ * (denom > 0 ? -1 : 1);
       i.point = ray.PointAtParameter(t);
       return true;
     }
@@ -53,4 +54,4 @@ namespace engine::components
     math::vec3 w_;
     math::vec3 normal_;
   };
-}
+} // namespace engine::components

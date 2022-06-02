@@ -9,10 +9,12 @@ namespace engine::components
     struct Sphere
     {
     public:
-        static constexpr float Hit(math::Ray const &r, math::vec3 center, float radius) noexcept
+        static constexpr float Hit(math::Ray const &r, math::vec3 center,
+                                   float radius) noexcept
         {
             // TODO
-            // figure out how can we adjust this formula to the sphere scaled by different factors
+            // figure out how can we adjust this formula to the sphere scaled by
+            // different factors
             const math::vec3 oc = r.origin() - center;
             const float a = math::dot(r.direction(), r.direction());
             const float b = math::dot(oc, r.direction());
@@ -36,7 +38,8 @@ namespace engine::components
             return rv0;
         }
 
-        static bool CheckIntersection(Transform const &transform, math::Intersection &i, math::Ray const &ray)
+        static bool CheckIntersection(Transform const &transform,
+                                      math::Intersection &i, math::Ray const &ray)
         {
             float t = Hit(ray, transform.position, transform.scale.x);
 
@@ -50,4 +53,4 @@ namespace engine::components
             return true;
         }
     };
-}
+} // namespace engine::components

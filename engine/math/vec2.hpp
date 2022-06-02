@@ -12,21 +12,11 @@ namespace engine::math
     static constexpr size_t size = 2;
     constexpr vec() = default;
     template <Primitive U>
-    explicit constexpr vec(U value) { x = y = static_cast<T>(value); }
+    explicit constexpr vec(U value);
     template <Primitive A, Primitive B>
-    explicit constexpr vec(A a, B b)
-    {
-      x = a;
-      y = b;
-    }
+    explicit constexpr vec(A a, B b);
     template <typename... U>
-    explicit constexpr vec(U... data)
-    {
-      static_assert(get_parameter_pack_size<U...>() == size,
-                    "You have provided wrong amount of data");
-      unpack_data(0, data...);
-    }
-
+    explicit constexpr vec(U... data);
     constexpr void reset() noexcept;
 
     [[nodiscard]] constexpr vec<2, T> const &operator+() const noexcept;

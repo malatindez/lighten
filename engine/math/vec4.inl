@@ -3,6 +3,26 @@
 namespace engine::math
 {
   template <Primitive T>
+  template <Primitive U>
+  constexpr vec<4, T>::vec(U value) { x = y = z = w = static_cast<T>(value); }
+  template <Primitive T>
+  template <Primitive A, Primitive B, Primitive C, Primitive D>
+  constexpr vec<4, T>::vec(A a, B b, C c, D d)
+  {
+    x = a;
+    y = b;
+    z = c;
+    w = d;
+  }
+  template <Primitive T>
+  template <typename... U>
+  constexpr vec<4, T>::vec(U... data)
+  {
+    static_assert(get_parameter_pack_size<U...>() == size,
+                  "You have provided wrong amount of data");
+    unpack_data(0, data...);
+  }
+  template <Primitive T>
   constexpr void vec<4, T>::reset() noexcept
   {
     x = y = z = w = 0;
@@ -130,6 +150,18 @@ namespace engine::math
   {
     assert(i < size);
     return data[i];
+  }
+
+  template <Primitive T>
+  template <size_t n, Primitive U>
+  [[nodiscard]] constexpr vec<n, U> vec<4, T>::as_vec() requires(n >= 2 && n <= size)
+  {
+    vec<n, U> rv{};
+    for (int i = 0; i < n; i++)
+    {
+      rv.data[i] = static_cast<U>(data[i]);
+    }
+    return rv;
   }
 
   template <Primitive T>

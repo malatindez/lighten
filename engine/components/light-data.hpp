@@ -11,4 +11,4 @@ namespace engine::components
         math::vec3 const normal;
         math::vec3 const view_dir; // normalize(point - ray.origin())
     };
-} // namespace engine
+} // namespace engine::components

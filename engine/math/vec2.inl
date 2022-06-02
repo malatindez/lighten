@@ -3,6 +3,24 @@
 namespace engine::math
 {
   template <Primitive T>
+  template <Primitive U>
+  constexpr vec<2, T>::vec(U value) { x = y = static_cast<T>(value); }
+  template <Primitive T>
+  template <Primitive A, Primitive B>
+  constexpr vec<2, T>::vec(A a, B b)
+  {
+    x = a;
+    y = b;
+  }
+  template <Primitive T>
+  template <typename... U>
+  constexpr vec<2, T>::vec(U... data)
+  {
+    static_assert(get_parameter_pack_size<U...>() == size,
+                  "You have provided wrong amount of data");
+    unpack_data(0, data...);
+  }
+  template <Primitive T>
   constexpr void vec<2, T>::reset() noexcept { x = y = 0; }
 
   template <Primitive T>

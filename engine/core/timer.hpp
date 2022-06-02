@@ -10,7 +10,9 @@ namespace engine
     void reset() { start_ = clock::now(); }
     float elapsed()
     {
-      return std::chrono::duration_cast<std::chrono::duration<float>>(clock::now() - start_).count();
+      return std::chrono::duration_cast<std::chrono::duration<float>>(
+                 clock::now() - start_)
+          .count();
     }
 
   private:

@@ -6,8 +6,7 @@ using namespace engine::math;
 
 Controller::Controller(BitmapWindow &window,
                        std::shared_ptr<Scene> scene,
-                       CameraController cam) : scene_(scene), window_(window), camera_controller_(cam),
-                                               executor{std::max(1u, std::max(ParallelExecutor::kMaxThreads - 4u, ParallelExecutor::kHalfThreads))} {}
+                       CameraController const &cam) : camera_controller_(cam), scene_(scene), window_(window) {}
 void Controller::OnEvent(engine::Event &event)
 {
     if (event.in_category(EventCategoryApplication))
@@ -77,7 +76,6 @@ const vec3 kBackwards{0, 0, -1};
 const float kRollSpeed = engine::math::radians(180.0f);
 const float kMoveSpeed = 2.0f;
 
-#include <numbers>
 void Controller::Tick(float delta_time)
 {
     math::vec3 offset{0, 0, 0};
@@ -121,13 +119,14 @@ void Controller::Tick(float delta_time)
     }
     if (input_.lbutton_down())
     {
-        yaw = delta_time * float(lb_saved_mouse_position_.x - input_.mouse_position().x) / window_.window_size().x * engine::math::radians(90.0f);
-        pitch = delta_time * float(lb_saved_mouse_position_.y - input_.mouse_position().y) / window_.window_size().y * engine::math::radians(90.0f);
+        vec2 t{ lb_saved_mouse_position_ - input_.mouse_position() };
+        t = t / window_.window_size();
+        t *= engine::math::radians(90.0f);
+        yaw = delta_time * t.x;
+        pitch = delta_time * t.y;
     }
     if (input_.rbutton_down() && selected_object)
     {
-        // find a new location for the object by casting ray
-        Ray const a = PixelRaycast(math::vec2{input_.mouse_position()});
         Ray const b = PixelRaycast(math::vec2{rb_saved_mouse_position_});
         rb_saved_mouse_position_ = input_.mouse_position();
 

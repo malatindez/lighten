@@ -28,10 +28,13 @@ namespace engine
         // we need it so the entt::entity is not wrapped
         template <class A, class... T>
         using cref_tuple_vec_sf = std::vector<std::tuple<A, cref<T>...>>;
-        // _sdet::cref_tuple_vec_sf<entt::entity, components::Plane, components::Transform, components::Material> planes;
-        // vs
-        // std::vector<std::tuple<entt::entity, std::reference_wrapper<components::Plane>, std::reference_wrapper<components::Transform>, std::reference_wrapper<components::Material>>> planes;
-    }
+        // _sdet::cref_tuple_vec_sf<entt::entity, components::Plane,
+        // components::Transform, components::Material> planes; vs
+        // std::vector<std::tuple<entt::entity,
+        // std::reference_wrapper<components::Plane>,
+        // std::reference_wrapper<components::Transform>,
+        // std::reference_wrapper<components::Material>>> planes;
+    } // namespace _sdet
     class Scene
     {
     public:

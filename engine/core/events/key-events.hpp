@@ -6,7 +6,8 @@ namespace engine
     class KeyPressedEvent final : public Event
     {
     public:
-        explicit KeyPressedEvent(uint32_t const code, uint16_t const count) : key_code_(code), count_(count) {}
+        explicit KeyPressedEvent(uint32_t const code, uint16_t const count)
+            : key_code_(code), count_(count) {}
         [[nodiscard]] std::string to_string() const noexcept override
         {
             return std::string(name()) + std::to_string(key_code_);

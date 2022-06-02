@@ -12,21 +12,11 @@ namespace engine::math
     static constexpr size_t size = 3;
     constexpr vec() = default;
     template <Primitive U>
-    explicit constexpr vec(U value) { x = y = z = static_cast<T>(value); }
+    explicit constexpr vec(U value);
     template <Primitive A, Primitive B, Primitive C>
-    explicit constexpr vec(A a, B b, C c)
-    {
-      x = a;
-      y = b;
-      z = c;
-    }
+    explicit constexpr vec(A a, B b, C c);
     template <typename... U>
-    explicit constexpr vec(U... data)
-    {
-      static_assert(get_parameter_pack_size<U...>() == size,
-                    "You have provided wrong amount of data");
-      unpack_data(0, data...);
-    }
+    explicit constexpr vec(U... data);
 
     constexpr void reset() noexcept;
 
@@ -53,19 +43,12 @@ namespace engine::math
     constexpr vec<3, T> &operator/=(vec<3, U> const &other) noexcept;
     template <Primitive U>
     constexpr vec<3, T> &operator%=(vec<3, U> const &other) noexcept;
-    template <size_t n, Primitive U = T>
-    [[nodiscard]] constexpr vec<n, U> as_vec() requires(n >= 2 && n <= size)
-    {
-      vec<n, U> rv;
-      for (int i = 0; i < n; i++)
-      {
-        rv.data[i] = static_cast<U>(data[i]);
-      }
-      return rv;
-    }
 
     [[nodiscard]] constexpr T &operator[](size_t i);
     [[nodiscard]] constexpr T const &operator[](size_t i) const;
+
+    template <size_t n, Primitive U = T>
+    [[nodiscard]] constexpr vec<n, U> as_vec() requires(n >= 2 && n <= size);
     union
     {
       struct

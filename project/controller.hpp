@@ -14,9 +14,10 @@
 class Controller : public engine::Layer
 {
 public:
-    Controller(engine::BitmapWindow &window, std::shared_ptr<engine::Scene> scene, engine::CameraController cam);
+    Controller(engine::BitmapWindow &window, std::shared_ptr<engine::Scene> scene, engine::CameraController const &cam);
 
     void OnEvent(engine::Event &event) override;
+
     [[nodiscard]] engine::CameraController const &camera_controller() const noexcept { return camera_controller_; }
 
 private:
@@ -34,8 +35,8 @@ private:
     Input input_;
     std::shared_ptr<engine::Scene> scene_;
     engine::BitmapWindow &window_;
-    engine::math::ivec2 lb_saved_mouse_position_;
-    engine::math::ivec2 rb_saved_mouse_position_;
+    engine::math::ivec2 lb_saved_mouse_position_{0};
+    engine::math::ivec2 rb_saved_mouse_position_{0};
     engine::components::Transform *selected_object = nullptr;
-    engine::ParallelExecutor executor;
+    engine::ParallelExecutor executor{ std::max(1u, std::max(engine::ParallelExecutor::kMaxThreads - 4u, engine::ParallelExecutor::kHalfThreads)) };
 };

@@ -18,4 +18,4 @@ namespace engine::math
             return inf;
         }
     };
-}
+} // namespace engine::math

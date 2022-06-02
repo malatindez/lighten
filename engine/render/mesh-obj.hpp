@@ -1,8 +1,8 @@
 #pragma once
-#include <vector>
+#include "math.hpp"
 #include <filesystem>
 #include <fstream>
-#include "math.hpp"
+#include <vector>
 
 namespace engine::render
 {
@@ -18,5 +18,6 @@ namespace engine::render
         std::vector<Vertex> vertices;
         MeshObj() = default;
     };
-    std::shared_ptr<const MeshObj> LoadMeshFromObj(std::filesystem::path const &path);
-}
+    std::shared_ptr<const MeshObj>
+    LoadMeshFromObj(std::filesystem::path const &path);
+} // namespace engine::render

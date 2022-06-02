@@ -31,11 +31,17 @@ namespace engine
     bitmap_.resize(size_t(bitmap_size_.x) * bitmap_size_.y);
   }
 
+  void BitmapWindow::SetResolutionScale(int resolution_scale)
+  {
+    resolution_scale_ = resolution_scale;
+    OnSizeChanged();
+  }
   bool BitmapWindow::PeekOSMessages()
   {
     bool rv = Window::PeekOSMessages();
-    StretchDIBits(hdc_, 0, 0, window_size().x, window_size().y, 0, 0, bitmap_size_.x, bitmap_size_.y,
-                  bitmap_.data(), &bitmap_info_, DIB_RGB_COLORS, SRCCOPY);
+    StretchDIBits(hdc_, 0, 0, window_size().x, window_size().y, 0, 0,
+                  bitmap_size_.x, bitmap_size_.y, bitmap_.data(), &bitmap_info_,
+                  DIB_RGB_COLORS, SRCCOPY);
     return rv;
   }
 } // namespace engine

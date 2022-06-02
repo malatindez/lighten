@@ -25,23 +25,14 @@ namespace engine
   class Application final
   {
   public:
-    [[nodiscard]] static inline Application &Get() noexcept
-    {
-      return *application_;
-    }
-    [[nodiscard]] static inline EventCallbackFn const &event_function()
-    {
-      return application_->event_function_;
-    }
+    [[nodiscard]] static inline Application &Get() noexcept { return *application_; }
+    [[nodiscard]] static inline EventCallbackFn const &event_function() { return application_->event_function_; }
     static void Exit();
 
     static void OnEvent(Event &e);
 
     template <class T>
-    inline void AddLayer(std::shared_ptr<T> t)
-    {
-      layers_.push_back(std::static_pointer_cast<Layer>(t));
-    }
+    inline void AddLayer(std::shared_ptr<T> t) { layers_.push_back(std::static_pointer_cast<Layer>(t)); }
 
   private:
     static void Init();

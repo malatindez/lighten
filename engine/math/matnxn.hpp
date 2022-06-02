@@ -11,41 +11,13 @@ namespace engine::math
 
     constexpr mat() = default;
     template <Primitive P>
-    explicit constexpr mat(P p) requires(a == b)
-    {
-      reset();
-      for (int i = 0; i < a; i++)
-      {
-        data[i][i] = static_cast<T>(p);
-      }
-    }
+    explicit constexpr mat(P p) requires(a == b);
     template <size_t c, size_t d, Primitive P>
-    explicit constexpr mat(mat<c, d, P> p) requires(a > c && b > d)
-    {
-      reset();
-      for (int i = 0; i < c; i++)
-      {
-        for (int j = 0; j < d; j++)
-        {
-          data[i][j] = static_cast<T>(p.data[i][j]);
-        }
-      }
-    }
+    explicit constexpr mat(mat<c, d, P> p) requires(a > c && b > d);
     template <Primitive P>
-    explicit constexpr mat(mat<a, b, P> p)
-    {
-      for (int i = 0; i < a * b; i++)
-      {
-        arr[i] = static_cast<T>(p.arr[i]);
-      }
-    }
+    explicit constexpr mat(mat<a, b, P> p);
     template <typename... U>
-    explicit constexpr mat(U... data)
-    {
-      static_assert(get_parameter_pack_size<U...>() == a * b,
-                    "You have provided wrong amount of data");
-      unpack_data(0, data...);
-    }
+    explicit constexpr mat(U... data);
 
     // sets all values to zero
     constexpr void reset() noexcept;

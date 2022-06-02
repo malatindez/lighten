@@ -9,8 +9,10 @@ namespace engine::components
     class Triangle
     {
     public:
-        Triangle(math::vec3 a, math::vec3 b, math::vec3 c, math::vec3 normal) : points_{a, b, c}, normal_(normal) { }
-        bool CheckIntersection(Transform const &, math::Intersection &i, math::Ray const &ray) const noexcept
+        Triangle(math::vec3 a, math::vec3 b, math::vec3 c, math::vec3 normal)
+            : points_{a, b, c}, normal_(normal) {}
+        bool CheckIntersection(Transform const &, math::Intersection &i,
+                               math::Ray const &ray) const noexcept
         {
             assert(!std::_Is_nan(normal_.x));
             float ndotdir = math::dot(normal_, ray.direction());
@@ -48,10 +50,11 @@ namespace engine::components
             }
             i.point = P;
             // reverse normal if the ray is on the opposite side of the triangle
-            i.normal = normal_ * (ndotdir > 0 ? -1 : 1); 
+            i.normal = normal_ * (ndotdir > 0 ? -1 : 1);
             i.t = t;
             return true;
         }
+
     private:
         std::array<math::vec3, 3> points_;
         math::vec3 normal_;
@@ -59,4 +62,4 @@ namespace engine::components
         // create vector class which uses reference wrappers to wrap vec<n, T>
         // use it here so we can use less memory and apply this class to a mesh
     };
-}
+} // namespace engine::components

@@ -3,6 +3,46 @@
 
 namespace engine::math
 {
+  template <size_t a, size_t b, Primitive T>
+  template <Primitive P>
+  constexpr mat<a, b, T>::mat(P p) requires(a == b)
+  {
+    reset();
+    for (int i = 0; i < a; i++)
+    {
+      data[i][i] = static_cast<T>(p);
+    }
+  }
+  template <size_t a, size_t b, Primitive T>
+  template <size_t c, size_t d, Primitive P>
+  constexpr mat<a, b, T>::mat(mat<c, d, P> p) requires(a > c && b > d)
+  {
+    reset();
+    for (int i = 0; i < c; i++)
+    {
+      for (int j = 0; j < d; j++)
+      {
+        data[i][j] = static_cast<T>(p.data[i][j]);
+      }
+    }
+  }
+  template <size_t a, size_t b, Primitive T>
+  template <Primitive P>
+  constexpr mat<a, b, T>::mat(mat<a, b, P> p)
+  {
+    for (int i = 0; i < a * b; i++)
+    {
+      arr[i] = static_cast<T>(p.arr[i]);
+    }
+  }
+  template <size_t a, size_t b, Primitive T>
+  template <typename... U>
+  constexpr mat<a, b, T>::mat(U... data)
+  {
+    static_assert(get_parameter_pack_size<U...>() == a * b,
+                  "You have provided wrong amount of data");
+    unpack_data(0, data...);
+  }
 
   // sets all values to zero
   template <size_t a, size_t b, Primitive T>
@@ -42,7 +82,7 @@ namespace engine::math
   template <size_t a, size_t b, Primitive T>
   [[nodiscard]] constexpr mat<a, b, T> mat<a, b, T>::operator-() const noexcept
   {
-    mat<a, b, T> return_value;
+    mat<a, b, T> return_value{};
     for (int i = 0; i < size.x; i++)
     {
       return_value.data[i] = -data[i];

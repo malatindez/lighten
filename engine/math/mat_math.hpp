@@ -33,13 +33,16 @@ namespace engine::math
     constexpr mat<a, a, T> inverse(mat<a, a, T> const &m);
 
     template <Primitive T>
-    constexpr mat<4, 4, T> translate(mat<4, 4, T> const &matrix, vec<3, T> const &vec);
+    constexpr mat<4, 4, T> translate(mat<4, 4, T> const &matrix,
+                                     vec<3, T> const &vec);
 
     template <Primitive T>
-    constexpr mat<4, 4, T> rotate(mat<4, 4, T> const &matrix, T angle, vec<3, T> const &axis);
+    constexpr mat<4, 4, T> rotate(mat<4, 4, T> const &matrix, T angle,
+                                  vec<3, T> const &axis);
 
     template <Primitive T>
-    constexpr mat<4, 4, T> scale(mat<4, 4, T> const &matrix, vec<3, T> const &scale);
+    constexpr mat<4, 4, T> scale(mat<4, 4, T> const &matrix,
+                                 vec<3, T> const &scale);
 
     template <Primitive T>
     constexpr mat<4, 4, T> lookAt(vec<3, T> const &eye, vec<3, T> const &center,

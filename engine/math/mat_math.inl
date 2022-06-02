@@ -162,7 +162,8 @@ namespace engine::math
   }
 
   template <Primitive T>
-  constexpr mat<4, 4, T> translate(mat<4, 4, T> const &matrix, vec<3, T> const &vec)
+  constexpr mat<4, 4, T> translate(mat<4, 4, T> const &matrix,
+                                   vec<3, T> const &vec)
   {
     mat<4, 4, T> return_value;
     return_value[0] = matrix[0];
@@ -207,7 +208,8 @@ namespace engine::math
   }
 
   template <Primitive T>
-  constexpr mat<4, 4, T> scale(mat<4, 4, T> const &matrix, vec<3, T> const &scale)
+  constexpr mat<4, 4, T> scale(mat<4, 4, T> const &matrix,
+                               vec<3, T> const &scale)
   {
     mat<4, 4, T> return_value;
     return_value[0] = matrix[0] * scale[0];
@@ -240,7 +242,9 @@ namespace engine::math
     return return_value;
   }
   template <Primitive T>
-  constexpr mat<4, 4, T> perspective(T fov_y, T aspect_ratio, T z_near, T z_far) requires(!std::numeric_limits<T>::is_integer)
+  constexpr mat<4, 4, T>
+  perspective(T fov_y, T aspect_ratio, T z_near,
+              T z_far) requires(!std::numeric_limits<T>::is_integer)
   {
     assert(std::abs(aspect_ratio - std::numeric_limits<T>::epsilon()) >
            static_cast<T>(0));
@@ -268,9 +272,12 @@ namespace engine::math
     dst[2][0] = src[0][2];
     dst[1][2] = src[2][1];
     dst[2][1] = src[1][2];
-    dst[3][0] = -src[3].x * dst.data[0][0] - src[3].x * dst.data[0][1] - src[3].x * dst.data[0][2];
-    dst[3][1] = -src[3].y * dst.data[1][0] - src[3].y * dst.data[1][1] - src[3].y * dst.data[1][2];
-    dst[3][2] = -src[3].z * dst.data[2][0] - src[3].z * dst.data[2][1] - src[3].z * dst.data[2][2];
+    dst[3][0] = -src[3].x * dst.data[0][0] - src[3].x * dst.data[0][1] -
+                src[3].x * dst.data[0][2];
+    dst[3][1] = -src[3].y * dst.data[1][0] - src[3].y * dst.data[1][1] -
+                src[3].y * dst.data[1][2];
+    dst[3][2] = -src[3].z * dst.data[2][0] - src[3].z * dst.data[2][1] -
+                src[3].z * dst.data[2][2];
     dst[0][3] = 0;
     dst[1][3] = 0;
     dst[2][3] = 0;
@@ -290,9 +297,12 @@ namespace engine::math
     dst[2][1] = src[1][2];
 
     vec3 lengths{
-        std::sqrt(dst[0][0] * dst[0][0] + dst[0][1] * dst[0][1] + dst[0][2] * dst[0][2]),
-        std::sqrt(dst[1][0] * dst[1][0] + dst[1][1] * dst[1][1] + dst[1][2] * dst[1][2]),
-        std::sqrt(dst[2][0] * dst[2][0] + dst[2][1] * dst[2][1] + dst[2][2] * dst[2][2]),
+        std::sqrt(dst[0][0] * dst[0][0] + dst[0][1] * dst[0][1] +
+                  dst[0][2] * dst[0][2]),
+        std::sqrt(dst[1][0] * dst[1][0] + dst[1][1] * dst[1][1] +
+                  dst[1][2] * dst[1][2]),
+        std::sqrt(dst[2][0] * dst[2][0] + dst[2][1] * dst[2][1] +
+                  dst[2][2] * dst[2][2]),
     };
 
     dst[0][0] = 1.0f / (dst[0][0] * lengths[0]);
@@ -305,12 +315,15 @@ namespace engine::math
     dst[2][1] = 1.0f / (dst[2][1] * lengths[2]);
     dst[2][2] = 1.0f / (dst[2][2] * lengths[2]);
 
-    dst[3][0] =
-        -src[3].x * dst.data[0][0] / lengths[0] - src[3].x * dst.data[0][1] / lengths[0] - src[3].x * dst.data[0][2] / lengths[0];
-    dst[3][1] =
-        -src[3].y * dst.data[1][0] / lengths[1] - src[3].y * dst.data[1][1] / lengths[1] - src[3].y * dst.data[1][2] / lengths[1];
-    dst[3][2] =
-        -src[3].z * dst.data[2][0] / lengths[2] - src[3].z * dst.data[2][1] / lengths[2] - src[3].z * dst.data[2][2] / lengths[2];
+    dst[3][0] = -src[3].x * dst.data[0][0] / lengths[0] -
+                src[3].x * dst.data[0][1] / lengths[0] -
+                src[3].x * dst.data[0][2] / lengths[0];
+    dst[3][1] = -src[3].y * dst.data[1][0] / lengths[1] -
+                src[3].y * dst.data[1][1] / lengths[1] -
+                src[3].y * dst.data[1][2] / lengths[1];
+    dst[3][2] = -src[3].z * dst.data[2][0] / lengths[2] -
+                src[3].z * dst.data[2][1] / lengths[2] -
+                src[3].z * dst.data[2][2] / lengths[2];
     dst[0][3] = 0;
     dst[1][3] = 0;
     dst[2][3] = 0;

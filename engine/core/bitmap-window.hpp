@@ -18,29 +18,13 @@ namespace engine
     BitmapWindow(BitmapWindow const &BitmapWindow) = delete;
     BitmapWindow &operator=(BitmapWindow const &BitmapWindow) = delete;
 
-    [[nodiscard]] inline BITMAPINFO bitmap_info() const noexcept
-    {
-      return bitmap_info_;
-    }
+    [[nodiscard]] inline BITMAPINFO bitmap_info() const noexcept { return bitmap_info_; }
 
-    [[nodiscard]] constexpr std::vector<uint32_t> &bitmap() noexcept
-    {
-      return bitmap_;
-    }
-    [[nodiscard]] constexpr std::vector<uint32_t> const &bitmap() const noexcept
-    {
-      return bitmap_;
-    }
-    [[nodiscard]] constexpr math::ivec2 const &bitmap_size() const noexcept
-    {
-      return bitmap_size_;
-    }
+    [[nodiscard]] constexpr std::vector<uint32_t> &bitmap() noexcept { return bitmap_; }
+    [[nodiscard]] constexpr std::vector<uint32_t> const &bitmap() const noexcept { return bitmap_; }
+    [[nodiscard]] constexpr math::ivec2 const &bitmap_size() const noexcept { return bitmap_size_; }
     [[nodiscard]] constexpr int resolution_scale() const { return resolution_scale_; }
-    void SetResolutionScale(int resolution_scale)
-    {
-      resolution_scale_ = resolution_scale;
-      OnSizeChanged();
-    }
+    void SetResolutionScale(int resolution_scale);
 
     bool PeekOSMessages() override;
 
@@ -52,7 +36,7 @@ namespace engine
 #ifdef _DEBUG
     int resolution_scale_ = 8;
 #else
-    int resolution_scale_ = 2;
+    int resolution_scale_ = 3;
 #endif
     math::ivec2 bitmap_size_;
   };

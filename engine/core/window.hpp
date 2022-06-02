@@ -31,20 +31,11 @@ namespace engine
 
     virtual ~Window() { DestroyWindow(handle_); }
 
-    void SetEventCallback(EventCallbackFn const &callback) noexcept
-    {
-      event_callback_ = callback;
-    }
+    void SetEventCallback(EventCallbackFn const &callback) noexcept { event_callback_ = callback; }
 
     [[nodiscard]] constexpr HWND handle() const noexcept { return handle_; }
-    [[nodiscard]] constexpr math::ivec2 const &window_size() const noexcept
-    {
-      return window_size_;
-    }
-    [[nodiscard]] constexpr math::ivec2 const &position() const noexcept
-    {
-      return position_;
-    }
+    [[nodiscard]] constexpr math::ivec2 const &window_size() const noexcept { return window_size_; }
+    [[nodiscard]] constexpr math::ivec2 const &position() const noexcept { return position_; }
     [[nodiscard]] constexpr bool running() const noexcept { return running_; }
 
     virtual bool PeekOSMessages();

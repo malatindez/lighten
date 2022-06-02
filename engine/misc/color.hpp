@@ -6,4 +6,4 @@ namespace engine
     {
         using math::vec<3, float>::vec;
     };
-}
+} // namespace engine
