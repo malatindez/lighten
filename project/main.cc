@@ -90,7 +90,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     s2t.UpdateMatrices();
     float s2t_t = 0;
     tick_layer->funcs.emplace_back(
-        [&s2t, &s2t_t, plet](float dt)
+        [&s2t, &s2t_t, &plet](float dt)
         {
             s2t_t += dt;
             s2t.position = plet.position + math::vec3{sin(s2t_t), -1.0f, math::cos(s2t_t)};
@@ -130,11 +130,18 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
     float t_temp = 0;
 
     entt::entity cube = registry.create();
-    Transform &cube_transform = registry.emplace<Transform>(cube);
-    cube_transform.position = math::vec3{0, 0, 0};
+    Transform& cube_transform = registry.emplace<Transform>(cube);
+    cube_transform.position = math::vec3{ 0, 0, 0 };
     cube_transform.UpdateMatrices();
     registry.emplace<Cube>(cube);
-    registry.emplace<Material>(cube, math::vec3{1.0f, 1.0f, 0.0f});
+    registry.emplace<Material>(cube, math::vec3{ 1.0f, 1.0f, 0.0f });
+
+    entt::entity cube2 = registry.create();
+    Transform& cube2_transform = registry.emplace<Transform>(cube2);
+    cube2_transform.position = math::vec3{ 0, 2, 2 };
+    cube2_transform.UpdateMatrices();
+    registry.emplace<Cube>(cube2);
+    registry.emplace<Material>(cube2, math::vec3{ 1.0f, 1.0f, 0.0f });
 
     /*  entt::entity mesh = registry.create();
      Transform &mesh_transform = registry.emplace<Transform>(mesh);

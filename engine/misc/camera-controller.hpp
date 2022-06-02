@@ -2,6 +2,7 @@
 #include "components/camera.hpp"
 #include "components/transform.hpp"
 #include "entt/entt.hpp"
+#include "math/ray.hpp"
 #include <iostream>
 namespace engine
 {
@@ -40,6 +41,15 @@ namespace engine
         void UpdateBasis();
 
         void UpdateMatrices();
+
+        // uv in range from -1 to 1
+        // returns a projected ray from camera
+        [[nodiscard]] inline math::Ray Raycast(math::vec2 const &uv) const noexcept
+        {
+            math::vec4 near_ = math::vec4{ uv, 1, 1 } *camera_.inv_view_projection;
+            return math::Ray{ camera_.position(),
+                math::normalize(near_.as_vec<3>() / near_.w - camera_.position()) };
+        }
 
         [[nodiscard]] constexpr components::Camera const &camera() const noexcept { return camera_; }
         [[nodiscard]] constexpr components::Transform const &transform() const noexcept { return transform_; }

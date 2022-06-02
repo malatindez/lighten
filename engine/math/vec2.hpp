@@ -59,8 +59,8 @@ namespace engine::math
     {
       struct
       {
-        union { T x, r, s; };
-        union { T y, g, t; };
+        union { T x, r, s, u; };
+        union { T y, g, t, v; };
       };
       std::array<T, 2> data;
     };

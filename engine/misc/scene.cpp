@@ -27,9 +27,9 @@ namespace engine
       math::vec4 near_ = vec4(u, v, 1, 1) * cam.inv_view_projection;
       math::Ray ray(cam.position(), normalize(near_.as_vec<3>() / near_.w - cam.position()));
       math::Intersection intersection;
+      intersection.reset();
 
       Material mat;
-      intersection.reset();
 
       GetIntersectedMaterial(intersection, ray, mat);
 
@@ -121,7 +121,7 @@ namespace engine
   }
   std::optional<entt::entity> Scene::GetIntersectedEntity(math::Intersection &intersection, math::Ray &ray)
   {
-    std::optional<entt::entity> rv{};
+    std::optional<entt::entity> rv = std::nullopt;
     for (auto const &[entity, transform, material] : spheres)
     {
       if (components::Sphere::CheckIntersection(transform.get(), intersection, ray))

@@ -21,10 +21,21 @@ public:
 
 private:
     void Tick(float delta_time);
+
+    [[nodiscard]] inline engine::math::Ray PixelRaycast(engine::math::vec2 uv) const noexcept
+    {
+        uv /= window_.window_size();
+        uv = uv * 2 - 1;
+        uv.v = -uv.v;
+        return camera_controller_.Raycast(uv);
+    }
+
     engine::CameraController camera_controller_;
     Input input_;
     std::shared_ptr<engine::Scene> scene_;
     engine::BitmapWindow &window_;
-    engine::math::ivec2 saved_mouse_position_{0};
+    engine::math::ivec2 lb_saved_mouse_position_;
+    engine::math::ivec2 rb_saved_mouse_position_;
+    engine::components::Transform *selected_object = nullptr;
     engine::ParallelExecutor executor;
 };
