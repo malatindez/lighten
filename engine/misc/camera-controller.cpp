@@ -14,7 +14,7 @@ namespace engine
     {
         SetProjectionMatrix(math::perspective(
             camera_.fovy_,
-            static_cast<float>(window_size_.x) / static_cast<float>(window_size_.y),
+            float(window_size_.x) / float(window_size_.y),
             camera_.z_far_, camera_.z_near_));
     }
 
@@ -40,8 +40,7 @@ namespace engine
     void CameraController::AddRelativeOffset(math::vec3 const &offset)
     {
         UpdateBasis();
-        transform_.position +=
-            offset[0] * right_ + offset[1] * up_ + offset[2] * forward_;
+        transform_.position += offset[0] * right() + offset[1] * up() + offset[2] * forward();
         transform_.UpdateMatrices();
         update_matrices_ = true;
     }
@@ -69,9 +68,9 @@ namespace engine
     {
         update_basis_ = true;
         update_matrices_ = true;
-        transform_.rotation *= math::quat(roll, forward_);
-        transform_.rotation *= math::quat(pitch, right_);
-        transform_.rotation *= math::quat(yaw, up_);
+        transform_.rotation *= math::quat(roll, forward().as_vec());
+        transform_.rotation *= math::quat(pitch, right().as_vec());
+        transform_.rotation *= math::quat(yaw, up().as_vec());
         transform_.rotation = normalize(transform_.rotation);
     }
 
@@ -83,16 +82,7 @@ namespace engine
         }
         update_basis_ = false;
 
-        math::mat3 rotation = transform_.rotation.as_mat3();
-        right_.x = camera_.inv_view[0].x = rotation[0].x;
-        right_.y = camera_.inv_view[0].y = rotation[0].y;
-        right_.z = camera_.inv_view[0].z = rotation[0].z;
-        up_.x = camera_.inv_view[1].x = rotation[1].x;
-        up_.y = camera_.inv_view[1].y = rotation[1].y;
-        up_.z = camera_.inv_view[1].z = rotation[1].z;
-        forward_.x = camera_.inv_view[2].x = rotation[2].x;
-        forward_.y = camera_.inv_view[2].y = rotation[2].y;
-        forward_.z = camera_.inv_view[2].z = rotation[2].z;
+        camera_.inv_view.as_rmat<3, 3>() = transform_.rotation.as_mat3();
     }
 
     void CameraController::UpdateMatrices()

@@ -8,15 +8,15 @@ namespace engine
     {
     public:
         explicit MouseMovedEvent(math::ivec2 &&coordinates)
-            : coordinates_{std::move(coordinates)} {}
+            : Event(EventType::MouseMoved, EventCategoryMouse | EventCategoryInput), coordinates_{std::move(coordinates)} {}
         explicit MouseMovedEvent(math::ivec2 const &coordinates)
-            : coordinates_{coordinates} {}
-        MouseMovedEvent(int x, int y) : coordinates_{x, y} {}
+            : Event(EventType::MouseMoved, EventCategoryMouse | EventCategoryInput), coordinates_{coordinates} {}
+        MouseMovedEvent(int x, int y) 
+            : Event(EventType::MouseMoved, EventCategoryMouse | EventCategoryInput), coordinates_{x, y} {}
         [[nodiscard]] inline math::ivec2 const &coordinates() const noexcept
         {
             return coordinates_;
         }
-        EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
         EVENT_CLASS_TYPE(MouseMoved)
     private:
         math::ivec2 coordinates_;
@@ -25,12 +25,12 @@ namespace engine
     class MouseButtonPressedEvent final : public Event
     {
     public:
-        explicit MouseButtonPressedEvent(uint16_t const code,
-                                         math::ivec2 &&coordinates)
-            : mouse_button_(code), coordinates_(std::move(coordinates)) {}
-        explicit MouseButtonPressedEvent(uint16_t const code,
-                                         math::ivec2 const &coordinates)
-            : mouse_button_(code), coordinates_(coordinates) {}
+        explicit MouseButtonPressedEvent(uint16_t const code, math::ivec2 &&coordinates)
+            : Event(EventType::MouseButtonPressed, EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput), 
+                mouse_button_(code), coordinates_(std::move(coordinates)) {}
+        explicit MouseButtonPressedEvent(uint16_t const code, math::ivec2 const &coordinates)
+            : Event(EventType::MouseButtonPressed, EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput), 
+                mouse_button_(code), coordinates_(coordinates) {}
         [[nodiscard]] std::string to_string() const noexcept override
         {
             return std::string(name()) + std::to_string(mouse_button_);
@@ -43,8 +43,6 @@ namespace engine
         {
             return coordinates_;
         };
-        EVENT_CLASS_CATEGORY(EventCategoryMouseButton | EventCategoryMouse |
-                             EventCategoryInput)
         EVENT_CLASS_TYPE(MouseButtonPressed)
     private:
         uint16_t const mouse_button_;
@@ -56,10 +54,10 @@ namespace engine
     public:
         explicit MouseButtonReleasedEvent(uint16_t const code,
                                           math::ivec2 &&coordinates)
-            : mouse_button_(code), coordinates_(std::move(coordinates)) {}
+            : Event(EventType::MouseButtonReleased, EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput), mouse_button_(code), coordinates_(std::move(coordinates)) {}
         explicit MouseButtonReleasedEvent(uint16_t const code,
                                           math::ivec2 const &coordinates)
-            : mouse_button_(code), coordinates_(coordinates) {}
+            : Event(EventType::MouseButtonReleased, EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput), mouse_button_(code), coordinates_(coordinates) {}
         [[nodiscard]] std::string to_string() const noexcept override
         {
             return std::string(name()) + std::to_string(mouse_button_);
@@ -72,8 +70,6 @@ namespace engine
         {
             return coordinates_;
         };
-        EVENT_CLASS_CATEGORY(EventCategoryMouseButton | EventCategoryMouse |
-                             EventCategoryInput)
         EVENT_CLASS_TYPE(MouseButtonReleased)
     private:
         uint16_t const mouse_button_;

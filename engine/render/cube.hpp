@@ -1,0 +1,42 @@
+#pragma once
+#include "mesh.hpp"
+namespace engine::render
+{
+static inline const std::shared_ptr<Mesh> kCubeMesh = std::make_shared<Mesh>(Mesh{
+    {Vertex{math::vec3{0.5f, -0.5f, 0.5f}, math::vec3{0, -1, 0}, math::vec2{0}},
+     Vertex{math::vec3{-0.5f, -0.5f, -0.5f}, math::vec3{0, -1, 0}, math::vec2{0}},
+     Vertex{math::vec3{-0.5f, -0.5f, 0.5f}, math::vec3{0, -1, 0}, math::vec2{0}},
+     Vertex{math::vec3{-0.5f, -0.5f, -0.5f}, math::vec3{0, 0, 1}, math::vec2{0}},
+     Vertex{math::vec3{0.5f, 0.5f, -0.5f}, math::vec3{0, 0, 1}, math::vec2{0}},
+     Vertex{math::vec3{-0.5f, 0.5f, -0.5f}, math::vec3{0, 0, 1}, math::vec2{0}},
+     Vertex{math::vec3{0.5f, -0.5f, -0.5f}, math::vec3{-1, 0, 0}, math::vec2{0}},
+     Vertex{math::vec3{0.5f, 0.5f, 0.5f}, math::vec3{-1, 0, 0}, math::vec2{0}},
+     Vertex{math::vec3{0.5f, 0.5f, -0.5f}, math::vec3{-1, 0, 0}, math::vec2{0}},
+     Vertex{math::vec3{-0.5f, 0.5f, 0.5f}, math::vec3{0, 1, 0}, math::vec2{0}},
+     Vertex{math::vec3{0.5f, 0.5f, -0.5f}, math::vec3{0, 1, 0}, math::vec2{0}},
+     Vertex{math::vec3{0.5f, 0.5f, 0.5f}, math::vec3{0, 1, 0}, math::vec2{0}},
+     Vertex{math::vec3{-0.5f, -0.5f, 0.5f}, math::vec3{1, 0, 0}, math::vec2{0}},
+     Vertex{math::vec3{-0.5f, 0.5f, -0.5f}, math::vec3{1, 0, 0}, math::vec2{0}},
+     Vertex{math::vec3{-0.5f, 0.5f, 0.5f}, math::vec3{1, 0, 0}, math::vec2{0}},
+     Vertex{math::vec3{0.5f, -0.5f, 0.5f}, math::vec3{0, 0, -1}, math::vec2{0}},
+     Vertex{math::vec3{-0.5f, 0.5f, 0.5f}, math::vec3{0, 0, -1}, math::vec2{0}},
+     Vertex{math::vec3{0.5f, 0.5f, 0.5f}, math::vec3{0, 0, -1}, math::vec2{0}},
+     Vertex{math::vec3{0.5f, -0.5f, 0.5f}, math::vec3{0, -1, 0}, math::vec2{0}},
+     Vertex{math::vec3{0.5f, -0.5f, -0.5f}, math::vec3{0, -1, 0}, math::vec2{0}},
+     Vertex{math::vec3{-0.5f, -0.5f, -0.5f}, math::vec3{0, -1, 0}, math::vec2{0}},
+     Vertex{math::vec3{-0.5f, -0.5f, -0.5f}, math::vec3{0, 0, 1}, math::vec2{0}},
+     Vertex{math::vec3{0.5f, -0.5f, -0.5f}, math::vec3{0, 0, 1}, math::vec2{0}},
+     Vertex{math::vec3{0.5f, 0.5f, -0.5f}, math::vec3{0, 0, 1}, math::vec2{0}},
+     Vertex{math::vec3{0.5f, -0.5f, -0.5f}, math::vec3{-1, 0, 0}, math::vec2{0}},
+     Vertex{math::vec3{0.5f, -0.5f, 0.5f}, math::vec3{-1, 0, 0}, math::vec2{0}},
+     Vertex{math::vec3{0.5f, 0.5f, 0.5f}, math::vec3{-1, 0, 0}, math::vec2{0}},
+     Vertex{math::vec3{-0.5f, 0.5f, 0.5f}, math::vec3{0, 1, 0}, math::vec2{0}},
+     Vertex{math::vec3{-0.5f, 0.5f, -0.5f}, math::vec3{0, 1, 0}, math::vec2{0}},
+     Vertex{math::vec3{0.5f, 0.5f, -0.5f}, math::vec3{0, 1, 0}, math::vec2{0}},
+     Vertex{math::vec3{-0.5f, -0.5f, 0.5f}, math::vec3{1, 0, 0}, math::vec2{0}},
+     Vertex{math::vec3{-0.5f, -0.5f, -0.5f}, math::vec3{1, 0, 0}, math::vec2{0}},
+     Vertex{math::vec3{-0.5f, 0.5f, -0.5f}, math::vec3{1, 0, 0}, math::vec2{0}},
+     Vertex{math::vec3{0.5f, -0.5f, 0.5f}, math::vec3{0, 0, -1}, math::vec2{0}},
+     Vertex{math::vec3{-0.5f, -0.5f, 0.5f}, math::vec3{0, 0, -1}, math::vec2{0}},
+     Vertex{math::vec3{-0.5f, 0.5f, 0.5f}, math::vec3{0, 0, -1}, math::vec2{0}}}});
+}

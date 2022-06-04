@@ -20,10 +20,12 @@ namespace engine::components
       model = math::translate(model, position);
       inv_model = math::inverse(model);
     }
-    math::vec3 position{0};
+    math::vec3 position;
+    float padding0;
     math::vec3 scale{1};
-    math::quat rotation{1, 0, 0, 0};
-    math::mat4 model{1};
-    math::mat4 inv_model{1};
+    float padding1;
+    math::quat rotation;
+    math::mat4 model;
+    math::mat4 inv_model;
   };
 } // namespace engine::components

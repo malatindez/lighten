@@ -2,6 +2,8 @@
 #include <unordered_map>
 
 #include "pch.hpp"
+#define NOMINMAX
+#include <Windows.h>
 
 #include "core/events/mouse-events.hpp"
 #include "events.hpp"

@@ -27,50 +27,33 @@ namespace engine
 
     void UpdateMatrices();
 
-    // uv in range from -1 to 1
+    // nfc in range from -1 to 1
     // returns a projected ray from camera
-    [[nodiscard]] inline math::Ray Raycast(math::vec2 const &uv) const noexcept
+    [[nodiscard]] inline math::Ray Raycast(math::vec2 const &ndc) const noexcept
     {
-      math::vec4 bl4 = math::vec4(-1, -1, 1, 1) * camera_.inv_view_projection;
-      math::vec4 br4 = math::vec4(1, -1, 1, 1) * camera_.inv_view_projection;
-      math::vec4 tl4 = math::vec4(-1, 1, 1, 1) * camera_.inv_view_projection;
-      math::vec4 t = (bl4 + (tl4 - bl4) * uv.v + (br4 - bl4) * uv.u);
-      return math::Ray(camera_.position(), math::normalize(t.as_vec<3>() / t.w - camera_.position()));
+      math::vec4 direction = math::vec4(ndc.x, ndc.y, 1, 1) * camera_.inv_view_projection;
+      return math::Ray(camera_.position(), math::normalize(direction.as_vec<3>() / direction.w - camera_.position()));
     }
 
     [[nodiscard]] constexpr components::Camera const &camera() const noexcept { return camera_; }
     [[nodiscard]] constexpr components::Transform const &transform() const noexcept { return transform_; }
-    [[nodiscard]] constexpr math::ivec2 const &size() const noexcept { return window_size_; }
+    [[nodiscard]] constexpr math::ivec2 const &window_size() const noexcept { return window_size_; }
 
     [[nodiscard]] constexpr math::vec3 const &position() const noexcept { return transform_.position; }
-    [[nodiscard]] constexpr math::vec3 const &scale() const noexcept { return transform_.scale; }
     [[nodiscard]] constexpr math::quat const &rotation() const noexcept { return transform_.rotation; }
 
-    [[nodiscard]] constexpr math::vec3 right() const noexcept { return right_; }
-    [[nodiscard]] constexpr math::vec3 up() const noexcept { return up_; }
-    [[nodiscard]] constexpr math::vec3 forward() const noexcept
-    {
-      return forward_;
-    }
+    [[nodiscard]] constexpr math::crvec3 right() const noexcept { return math::crvec3{camera_.inv_view[0][0], camera_.inv_view[0][1], camera_.inv_view[0][2]}; }
+    [[nodiscard]] constexpr math::crvec3 up() const noexcept { return math::crvec3{camera_.inv_view[1][0], camera_.inv_view[1][1], camera_.inv_view[1][2]}; }
+    [[nodiscard]] constexpr math::crvec3 forward() const noexcept { return math::crvec3{camera_.inv_view[2][0], camera_.inv_view[2][1], camera_.inv_view[2][2]}; }
 
     [[nodiscard]] constexpr float fovy() const noexcept { return camera_.fovy_; }
-    [[nodiscard]] constexpr float z_near() const noexcept
-    {
-      return camera_.z_near_;
-    }
-    [[nodiscard]] constexpr float z_far() const noexcept
-    {
-      return camera_.z_far_;
-    }
+    [[nodiscard]] constexpr float z_near() const noexcept { return camera_.z_near_; }
+    [[nodiscard]] constexpr float z_far() const noexcept { return camera_.z_far_; }
 
   private:
     components::Camera &camera_;
     components::Transform &transform_;
     math::ivec2 const &window_size_;
-
-    math::vec3 right_{1, 0, 0};
-    math::vec3 up_{0, 1, 0};
-    math::vec3 forward_{0, 0, 1};
 
     bool update_matrices_ = true;
     bool update_basis_ = true;

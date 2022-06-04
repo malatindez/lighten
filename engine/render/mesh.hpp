@@ -12,12 +12,12 @@ namespace engine::render
         math::vec3 normal;
         math::vec2 tex_coords;
     };
-    class MeshObj
+    class Mesh
     {
     public:
         std::vector<Vertex> vertices;
-        MeshObj() = default;
+        constexpr Mesh() = default;
+        explicit constexpr Mesh(std::vector<Vertex> const &v) : vertices{v} {}
     };
-    std::shared_ptr<const MeshObj>
-    LoadMeshFromObj(std::filesystem::path const &path);
+    std::shared_ptr<const Mesh> LoadMeshFromObj(std::filesystem::path const &path);
 } // namespace engine::render

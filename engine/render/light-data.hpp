@@ -1,7 +1,8 @@
 #pragma once
 #include "math.hpp"
 #include "misc/color.hpp"
-namespace engine::components
+#include "math/ray.hpp"
+namespace engine::render
 {
     struct LightData
     {
@@ -9,6 +10,6 @@ namespace engine::components
         math::Ray const ray;
         math::vec3 const point;
         math::vec3 const normal;
-        math::vec3 const view_dir; // normalize(point - ray.origin())
+        math::vec3 const view_dir; // normalize(point - ray.origin()))
     };
 } // namespace engine::components

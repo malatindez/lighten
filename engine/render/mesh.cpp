@@ -1,4 +1,4 @@
-#include "mesh-obj.hpp"
+#include "mesh.hpp"
 #include "core/utils.hpp"
 #include <cstdlib>
 #include <string_view>
@@ -134,7 +134,7 @@ namespace engine::render
             ParseFace(view.substr(2), context);
         }
     }
-    std::shared_ptr<const MeshObj>
+    std::shared_ptr<const Mesh>
     LoadMeshFromObj(std::filesystem::path const &path)
     {
 
@@ -157,7 +157,7 @@ namespace engine::render
             } while (begin != std::string::npos);
         }
 
-        auto return_value = std::make_shared<MeshObj>();
+        auto return_value = std::make_shared<Mesh>();
 
         {
             for (size_t i = 0; i < context.vertex_indices.size(); ++i)
@@ -169,6 +169,6 @@ namespace engine::render
             }
         }
 
-        return std::const_pointer_cast<const MeshObj>(return_value);
+        return std::const_pointer_cast<const Mesh>(return_value);
     }
 } // namespace engine::render

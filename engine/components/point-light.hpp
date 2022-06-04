@@ -1,6 +1,6 @@
 #pragma once
-#include "light-data.hpp"
-#include "material.hpp"
+#include "render/light-data.hpp"
+#include "render/material.hpp"
 #include "math.hpp"
 #include <cmath>
 namespace engine::components
@@ -9,39 +9,30 @@ namespace engine::components
     {
         math::vec3 color;
         float R;
-
-        inline void UpdateColor(
-            Transform const &transform, LightData &light_data, Material const &mat,
-            std::function<bool(math::Intersection &, math::Ray &, Transform &)> const
-                &find_intersection_transform) const
+        
+        inline bool Illuminable(Transform const &transform, render::LightData const&light_data) const noexcept
         {
             math::vec3 L = transform.position - light_data.point;
-            math::vec3 const H = math::normalize(light_data.view_dir + L);
+            math::vec3 const H = math::normalize(light_data.ray.origin() - light_data.point);
             float distance = length(L);
             L = normalize(L);
             float ndotl = dot(light_data.normal, L);
             if (ndotl < 0)
             {
-                return;
+                return false;
             }
-            math::Intersection nearest;
-            nearest.reset();
-            math::Ray ray(light_data.point + L * 0.001f, +L);
-            Transform t;
-            find_intersection_transform(nearest, ray, t);
-            float modifier = ndotl * 0.25f * ndotl;
-            if (!(nearest.exists() && transform.position != t.position) &&
-                distance >= nearest.t)
-            {
-                float const specular =
-                    pow(dot(light_data.normal, H), mat.glossiness) * mat.specular;
-                modifier = ndotl;
-                light_data.color += modifier * color * specular;
-            }
-
+            return true;
+        }
+        inline void Illuminate(Transform const &transform, render::LightData &light_data, render::Material const &mat) const
+        {
+            math::vec3 L = transform.position - light_data.point;
+            math::vec3 const H = math::normalize(light_data.ray.origin() - light_data.point);
+            float distance = length(L);
+            L = normalize(L);
+            float ndotl = dot(light_data.normal, L);
             distance /= R;
             distance *= distance;
-            light_data.color += modifier * color * (ndotl * mat.albedo / distance);
+            light_data.color += ndotl * color * (ndotl * mat.albedo / distance + pow(dot(light_data.normal, H), mat.glossiness) * mat.specular);
         }
     };
 } // namespace engine::components

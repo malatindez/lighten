@@ -52,5 +52,7 @@ namespace engine::components
             i.normal = normalize(i.point - transform.position);
             return true;
         }
+        
+        render::Material material;
     };
 } // namespace engine::components

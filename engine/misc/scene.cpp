@@ -1,4 +1,7 @@
 #include "misc/scene.hpp"
+#include "render/light-data.hpp"
+#include "render/material.hpp"
+#include <functional>
 #include <sstream>
 #include <tuple>
 #include <vector>
@@ -6,239 +9,178 @@ using namespace engine::math;
 
 namespace engine
 {
-  void Scene::UpdateScene() noexcept { update_scene = true; }
-  void Scene::Draw(components::Camera const &cam, BitmapWindow &window,
-                   ParallelExecutor &executor)
-  {
-    using namespace components;
-    update_scene = false;
-    ivec2 bitmap_size = window.bitmap_size();
-    uint32_t *bitmap = window.bitmap().data();
-    math::vec4 bl4 = vec4(-1, -1, 1, 1) * cam.inv_view_projection;
-    math::vec4 br4 = vec4(1, -1, 1, 1) * cam.inv_view_projection;
-    math::vec4 tl4 = vec4(-1, 1, 1, 1) * cam.inv_view_projection;
-    math::vec4 right4 = br4 - bl4;
-    math::vec4 up4 = tl4 - bl4;
-    auto func = [this, &bitmap, &cam, &bitmap_size, &bl4, &right4, &up4](uint32_t, uint32_t task_num)
+    void Scene::UpdateScene() noexcept { update_scene = true; }
+    void Scene::Draw(components::Camera const &cam, BitmapWindow &window,
+                     ParallelExecutor &executor)
     {
-      int j = task_num / bitmap_size.x;
-      int i = task_num % bitmap_size.x;
-      float u = ((static_cast<float>(i) + 0.5f) / static_cast<float>(bitmap_size.x)) * 2 - 1;
-      float v = ((static_cast<float>(j) + 0.5f) / static_cast<float>(bitmap_size.y)) * 2 - 1;
+        using namespace components;
 
-      math::vec4 t = (bl4 + up4 * v + right4 * u);
-      math::Ray ray(cam.position(), t.as_vec<3>() / t.w - cam.position());
-      math::Intersection intersection;
-      intersection.reset();
+        auto spheres = registry.group<components::Sphere>(entt::get<components::Transform>);
+        auto meshes = registry.group<components::MeshComponent>(entt::get<components::Transform>);
 
-      Material mat;
+        auto directional_lights = registry.view<components::DirectionalLight>();
+        auto point_lights = registry.group<components::PointLight>(entt::get<components::Transform>);
+        auto spot_lights = registry.group<components::SpotLight>(entt::get<components::Transform>);
+        auto find_intersection = [this, &spheres, &meshes](math::Intersection &intersection, math::Ray &ray)
+        {
+            floor.CheckIntersection(intersection, ray);
+            spheres.each([&intersection, &ray](auto const, auto const &, auto const &transform) __lambda_force_inline
+                         { components::Sphere::CheckIntersection(transform, intersection, ray); });
+            meshes.each([&intersection, &ray](auto const, auto const &mesh, auto const &transform) __lambda_force_inline
+                        { mesh.CheckIntersection(transform, intersection, ray); });
+            return intersection.exists();
+        };
 
-      GetIntersectedMaterial(intersection, ray, mat);
+        auto find_intersection_if = [this, &spheres, &meshes](
+                                        math::Intersection &intersection,
+                                        math::Ray &ray,
+                                        std::function<bool(entt::entity, Transform const &, render::Material const &)> const &func)
+        {
+            floor.CheckIntersection(intersection, ray);
+            spheres.each([&intersection, &ray, &func](auto const entity, auto const &sphere, auto const &transform) __lambda_force_inline
+                         {
+                             if(func(entity, transform, sphere.material)) { components::Sphere::CheckIntersection(transform, intersection, ray); } });
+            meshes.each([&intersection, &ray, &func](auto const entity, auto const &mesh, auto const &transform) __lambda_force_inline
+                        { 
+                             if(func(entity, transform, mesh.material())) { mesh.CheckIntersection(transform, intersection, ray); } });
+            return intersection.exists();
+        };
 
-      if (!intersection.exists())
-      {
-        bitmap[task_num] = 0;
-        return;
-      }
+        auto find_intersection_material = [this, &spheres, &meshes](math::Intersection &intersection, math::Ray &ray, render::Material &mat)
+        {
+            if (floor.CheckIntersection(intersection, ray))
+            {
+                mat = floor.material;
+            }
+            spheres.each([&intersection, &ray, &mat](auto const, auto const &sphere, auto const &transform) __lambda_force_inline
+                         { if(components::Sphere::CheckIntersection(transform, intersection, ray)) { mat = sphere.material; } });
+            meshes.each([&intersection, &ray, &mat](auto const, auto const &mesh, auto const &transform) __lambda_force_inline
+                        { if(mesh.CheckIntersection(transform, intersection, ray)) { mat = mesh.material(); } });
+            return intersection.exists();
+        };
 
-      LightData ld{.color = math::vec3{0, 0, 0},
-                   .ray = ray,
-                   .point = intersection.point,
-                   .normal = intersection.normal,
-                   .view_dir = normalize(ray.origin() - intersection.point)};
-      for (auto const &[entity, dir_light] : directional_lights)
-      {
-        dir_light.get().UpdateColor(ld, mat, [this](math::Intersection &i, math::Ray &r)
-                                    { return FindIntersection(i, r); });
-      }
-      for (auto const &[entity, point_light, transform] : point_lights)
-      {
-        point_light.get().UpdateColor(transform, ld, mat, [this](math::Intersection &i, math::Ray &r, Transform &t)
-                                      { return GetIntersectedTransform(i, r, t); });
-      }
-      for (auto const &[entity, spot_light, transform] : spot_lights)
-      {
-        spot_light.get().UpdateColor(transform, ld, mat, [this](math::Intersection &i, math::Ray &r, Transform &t)
-                                     { return GetIntersectedTransform(i, r, t); });
-      }
-      ivec3 color{256 * (mat.emission + ld.color)};
-      color = math::ivec3{color.r > 255 ? 255 : color.r,
-                          color.g > 255 ? 255 : color.g,
-                          color.b > 255 ? 255 : color.b};
-      color.r <<= 16;
-      color.g <<= 8;
+        update_scene = false;
+        ivec2 bitmap_size = window.bitmap_size();
+        uint32_t *bitmap = window.bitmap().data();
+        math::vec4 bl4 = vec4(-1, -1, 1, 1) * cam.inv_view_projection;
+        math::vec4 br4 = vec4(1, -1, 1, 1) * cam.inv_view_projection;
+        math::vec4 tl4 = vec4(-1, 1, 1, 1) * cam.inv_view_projection;
+        math::vec4 right4 = br4 - bl4;
+        math::vec4 up4 = tl4 - bl4;
+        auto func = [&](uint32_t, uint32_t task_num)
+        {
+            int j = task_num / bitmap_size.x;
+            int i = task_num % bitmap_size.x;
+            float u = ((float(i) + 0.5f) / float(bitmap_size.x));
+            float v = ((float(j) + 0.5f) / float(bitmap_size.y));
 
-      bitmap[task_num] = color.r | color.g | color.b;
-    };
+            math::vec4 t = (bl4 + up4 * v + right4 * u);
+            math::Ray ray(cam.position(), t.as_vec<3>() / t.w - cam.position());
+            math::Intersection intersection;
+            intersection.reset();
+
+            render::Material mat;
+
+            find_intersection_material(intersection, ray, mat);
+
+            if (!intersection.exists())
+            {
+                bitmap[task_num] = 0;
+                return;
+            }
+
+            render::LightData ld{.color = math::vec3{0, 0, 0},
+                                 .ray = ray,
+                                 .point = intersection.point,
+                                 .normal = intersection.normal,
+                                 .view_dir = normalize(ray.origin() - intersection.point)};
+            directional_lights.each([&ld, &mat, &find_intersection](const auto, auto &dirlight)
+                                    {
+                                math::Intersection nearest;
+                                nearest.reset();
+                                math::Ray ray(ld.point - dirlight.direction * 0.01f, -dirlight.direction);
+                                find_intersection(nearest, ray);
+                                if(!nearest.exists())
+                                {
+                                  dirlight.Illuminate(ld, mat);
+                                } });
+            point_lights.each([&ld, &mat, &find_intersection](const auto, auto const &point_light, auto const &transform)
+                              { 
+                                if(!point_light.Illuminable(transform, ld)) { return; }
+                                math::vec3 const L = math::normalize(ld.point - transform.position);
+                                math::Intersection nearest;
+                                nearest.reset();
+                                math::Ray ray(transform.position + L * 0.01f, +L);
+                                find_intersection(nearest, ray);
+                                if(nearest.exists() && nearest.point == ld.point)
+                                {
+                                    return;
+                                } 
+                                point_light.Illuminate(transform, ld, mat); });
+            spot_lights.each([&ld, &mat, &find_intersection_if](const auto, auto const &spot_light, auto const &transform)
+                             { 
+                                if(!spot_light.Illuminable(transform, ld)) { return; }
+                                math::vec3 const L = math::normalize(ld.point - transform.position);
+                                math::Intersection nearest;
+                                nearest.reset();
+                                math::Ray ray(transform.position + L * 0.01f, +L);
+                                find_intersection_if(
+                                    nearest, ray, 
+                                    [](entt::entity, Transform const&, render::Material const& mat) __lambda_force_inline
+                                    {
+                                        return mat.casts_shadow;
+                                    }
+                                );
+                                if(nearest.exists() && nearest.point == ld.point)
+                                {
+                                    return;
+                                } 
+                                spot_light.Illuminate(transform, ld, mat); });
+            ivec3 color{256 * (mat.emission + ld.color)};
+            color = math::ivec3{color.r > 255 ? 255 : color.r,
+                                color.g > 255 ? 255 : color.g,
+                                color.b > 255 ? 255 : color.b};
+            color.r <<= 16;
+            color.g <<= 8;
+
+            bitmap[task_num] = color.r | color.g | color.b;
+        };
 #ifdef _DEBUG // parallel mode is worse in debug
-    for (int i = 0; i < bitmap_size.x * bitmap_size.y; i++)
-    {
-      func(0, i);
-    }
+        for (int i = 0; i < bitmap_size.x * bitmap_size.y; i++)
+        {
+            func(0, i);
+        }
 #else
-    executor.execute(func, bitmap_size.x * bitmap_size.y, 10);
+        executor.execute(func, bitmap_size.x * bitmap_size.y, 25);
 #endif
-  }
+    }
 
-  void Scene::OnRegistryUpdate()
-  {
-    using namespace components;
-    registry.group<Plane>(entt::get<Transform, Material>)
-        .each([this](auto const e, auto const &plane, auto const &transform, auto const &material)
-              { planes.emplace_back(e, plane, transform, material); });
+    std::optional<entt::entity> Scene::GetIntersectedEntity(math::Intersection &intersection, math::Ray &ray)
+    {
+        auto spheres = registry.group<components::Sphere>(entt::get<components::Transform>);
+        auto meshes = registry.group<components::MeshComponent>(entt::get<components::Transform>);
+        std::optional<entt::entity> rv = std::nullopt;
 
-    registry.group<Sphere>(entt::get<Transform, Material>)
-        .each([this](auto const e, auto const &transform, auto const &material)
-              { spheres.emplace_back(e, transform, material); });
+        spheres.each([&rv, &intersection, &ray](auto const e, auto const &, auto const &transform) __lambda_force_inline
+                     { if(components::Sphere::CheckIntersection(transform, intersection, ray)) {rv = e;} });
+        meshes.each([&rv, &intersection, &ray](auto const e, auto const &mesh, auto const &transform) __lambda_force_inline
+                    { if(mesh.CheckIntersection(transform, intersection, ray)) {rv = e;} });
+        return rv;
+    }
 
-    registry.group<Cube>(entt::get<Transform, Material>)
-        .each([this](auto const e, auto const &transform, auto const &material)
-              { cubes.emplace_back(e, transform, material); });
+    std::optional<entt::entity> Scene::GetIntersectedEntityIf(
+        math::Intersection &intersection, math::Ray &ray,
+        std::function<bool(entt::entity, components::Transform const &, render::Material const &)> const &func)
+    {
+        auto spheres = registry.group<components::Sphere>(entt::get<components::Transform>);
+        auto meshes = registry.group<components::MeshComponent>(entt::get<components::Transform>);
+        std::optional<entt::entity> rv = std::nullopt;
 
-    registry.group<Mesh>(entt::get<Transform, Material>)
-        .each([this](auto const e, auto const &mesh, auto const &transform,
-                     auto const &material)
-              { meshes.emplace_back(e, mesh, transform, material); });
-
-    registry.view<DirectionalLight>()
-        .each([this](const auto e, auto const &dirlight)
-              { directional_lights.emplace_back(e, dirlight); });
-
-    registry.group<PointLight>(entt::get<Transform>)
-        .each([this](const auto e, auto const &point_light, auto const &transform)
-              { point_lights.emplace_back(e, point_light, transform); });
-
-    registry.group<SpotLight>(entt::get<Transform>)
-        .each([this](const auto e, auto const &spot_light, auto const &transform)
-              { spot_lights.emplace_back(e, spot_light, transform); });
-  }
-  bool Scene::FindIntersection(math::Intersection &intersection, math::Ray &ray)
-  {
-    for (auto const &[entity, transform, material] : spheres)
-    {
-      components::Sphere::CheckIntersection(transform.get(), intersection, ray);
+        spheres.each([&func, &rv, &intersection, &ray](auto const e, auto const &sphere, auto const &transform) __lambda_force_inline
+                     { if(func(e, transform, sphere.material) && components::Sphere::CheckIntersection(transform, intersection, ray)) {rv = e;} });
+        meshes.each([&func, &rv, &intersection, &ray](auto const e, auto const &mesh, auto const &transform) __lambda_force_inline
+                    { if(func(e, transform, mesh.material()) && mesh.CheckIntersection(transform, intersection, ray)) {rv = e;} });
+        return rv;
     }
-    for (auto const &[entity, plane, transform, material] : planes)
-    {
-      plane.get().CheckIntersection(transform.get(), intersection, ray);
-    }
-    for (auto const &[entity, transform, material] : cubes)
-    {
-      components::Cube::CheckIntersection(transform.get(), intersection, ray);
-    }
-    for (auto const &[entity, mesh, transform, material] : meshes)
-    {
-      mesh.get().CheckIntersection(transform.get(), intersection, ray);
-    }
-    return intersection.exists();
-  }
-  std::optional<entt::entity>
-  Scene::GetIntersectedEntity(math::Intersection &intersection, math::Ray &ray)
-  {
-    std::optional<entt::entity> rv = std::nullopt;
-    for (auto const &[entity, transform, material] : spheres)
-    {
-      if (components::Sphere::CheckIntersection(transform.get(), intersection,
-                                                ray))
-      {
-        rv = entity;
-      }
-    }
-    for (auto const &[entity, plane, transform, material] : planes)
-    {
-      if (plane.get().CheckIntersection(transform.get(), intersection, ray))
-      {
-        rv = entity;
-      }
-    }
-    for (auto const &[entity, transform, material] : cubes)
-    {
-      if (components::Cube::CheckIntersection(transform.get(), intersection,
-                                              ray))
-      {
-        rv = entity;
-      }
-    }
-    for (auto const &[entity, mesh, transform, material] : meshes)
-    {
-      if (mesh.get().CheckIntersection(transform.get(), intersection, ray))
-      {
-        rv = entity;
-      }
-    }
-    return rv;
-  }
-
-  bool Scene::GetIntersectedMaterial(math::Intersection &intersection,
-                                     math::Ray &ray, components::Material &mat)
-  {
-    for (auto const &[entity, transform, material] : spheres)
-    {
-      if (components::Sphere::CheckIntersection(transform.get(), intersection,
-                                                ray))
-      {
-        mat = material;
-      }
-    }
-    for (auto const &[entity, plane, transform, material] : planes)
-    {
-      if (plane.get().CheckIntersection(transform.get(), intersection, ray))
-      {
-        mat = material;
-      }
-    }
-    for (auto const &[entity, transform, material] : cubes)
-    {
-      if (components::Cube::CheckIntersection(transform.get(), intersection,
-                                              ray))
-      {
-        mat = material;
-      }
-    }
-    for (auto const &[entity, mesh, transform, material] : meshes)
-    {
-      if (mesh.get().CheckIntersection(transform.get(), intersection, ray))
-      {
-        mat = material;
-      }
-    }
-    return intersection.exists();
-  }
-
-  bool Scene::GetIntersectedTransform(math::Intersection &intersection,
-                                      math::Ray &ray, components::Transform &t)
-  {
-    for (auto const &[entity, transform, material] : spheres)
-    {
-      if (components::Sphere::CheckIntersection(transform.get(), intersection,
-                                                ray))
-      {
-        t = transform;
-      }
-    }
-    for (auto const &[entity, plane, transform, material] : planes)
-    {
-      if (plane.get().CheckIntersection(transform.get(), intersection, ray))
-      {
-        t = transform;
-      }
-    }
-    for (auto const &[entity, transform, material] : cubes)
-    {
-      if (components::Cube::CheckIntersection(transform.get(), intersection,
-                                              ray))
-      {
-        t = transform;
-      }
-    }
-    for (auto const &[entity, mesh, transform, material] : meshes)
-    {
-      if (mesh.get().CheckIntersection(transform.get(), intersection, ray))
-      {
-        t = transform;
-      }
-    }
-    return intersection.exists();
-  }
 
 } // namespace engine

@@ -1,8 +1,8 @@
 #pragma once
-#include "mesh.hpp"
+#include "mesh-component.hpp"
 namespace engine::components
 {
-    inline bool Mesh::CheckTriangleIntersection(std::vector<render::Vertex>::const_iterator &it,
+    inline bool MeshComponent::CheckTriangleIntersection(std::vector<render::Vertex>::const_iterator &it,
                                                 math::Intersection &i,
                                                 math::Ray const &ray) noexcept
     {

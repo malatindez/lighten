@@ -7,16 +7,16 @@ namespace engine
   {
   public:
     Timer() { reset(); }
-    void reset() { start_ = clock::now(); }
+    void reset() { start_ = current_; }
     float elapsed()
     {
-      return std::chrono::duration_cast<std::chrono::duration<float>>(
-                 clock::now() - start_)
-          .count();
+      current_ = clock::now();
+      return std::chrono::duration_cast<std::chrono::duration<float>>(current_ - start_).count();
     }
 
   private:
     std::chrono::time_point<clock> start_;
+    std::chrono::time_point<clock> current_;
   };
 
   using SteadyTimer = Timer<std::chrono::steady_clock>;

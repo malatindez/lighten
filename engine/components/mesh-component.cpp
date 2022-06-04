@@ -1,12 +1,12 @@
-#include "mesh.hpp"
-#include "mesh.inl"
+#include "mesh-component.hpp"
+#include "mesh-component.inl"
 namespace engine::components
 {
-    Mesh::Mesh(std::shared_ptr<const render::MeshObj> value) : mesh_(value)
+    MeshComponent::MeshComponent(std::shared_ptr<const render::Mesh> value) : mesh_(value)
     {
         assert(value != nullptr);
     }
-    bool Mesh::CheckIntersection(Transform const &transform, math::Intersection &i,
+    bool MeshComponent::CheckIntersection(Transform const &transform, math::Intersection &i,
                                  math::Ray const &ray) const
     {
         math::Ray local = ray;
@@ -31,7 +31,7 @@ namespace engine::components
         }
         return rv;
     }
-    void Mesh::SetMesh(std::shared_ptr<const render::MeshObj> mesh)
+    void MeshComponent::SetMesh(std::shared_ptr<const render::Mesh> mesh)
     {
         assert(mesh != nullptr);
         mesh_ = mesh;
