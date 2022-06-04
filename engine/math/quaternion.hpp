@@ -15,7 +15,7 @@ namespace engine::math
         constexpr explicit qua(T radians, vec<3, T> axis);
         [[nodiscard]] constexpr mat<3, 3, T> as_mat3() const noexcept;
         [[nodiscard]] constexpr mat<4, 4, T> as_mat4() const noexcept;
-        [[nodiscard]] constexpr vec<3, T> axis() const noexcept;
+        [[nodiscard]] constexpr rvec<3, const T> axis() const noexcept;
         [[nodiscard]] constexpr T radians() const noexcept;
 
         [[nodiscard]] constexpr qua<T> const &operator+() const noexcept;
@@ -61,64 +61,48 @@ namespace engine::math
     constexpr std::ostream &operator<<(std::ostream &os, vec<size, T> &vec);
 
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T> operator*(U const value,
-                                                   vec<size, T> const &vector);
+    [[nodiscard]] constexpr vec<size, T> operator*(U const value, vec<size, T> const &vector);
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T> operator+(vec<size, T> const &vector,
-                                                   U const value) noexcept;
+    [[nodiscard]] constexpr vec<size, T> operator+(vec<size, T> const &vector, U const value) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T> operator-(vec<size, T> const &vector,
-                                                   U const value) noexcept;
+    [[nodiscard]] constexpr vec<size, T> operator-(vec<size, T> const &vector, U const value) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T> operator*(vec<size, T> const &vector,
-                                                   U const value) noexcept;
+    [[nodiscard]] constexpr vec<size, T> operator*(vec<size, T> const &vector, U const value) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T> operator/(vec<size, T> const &vector,
-                                                   U const value) noexcept;
+    [[nodiscard]] constexpr vec<size, T> operator/(vec<size, T> const &vector, U const value) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T>
-    operator+(vec<size, T> const &left, vec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, T> operator+(vec<size, T> const &left, vec<size, U> const &right) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T>
-    operator-(vec<size, T> const &left, vec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, T> operator-(vec<size, T> const &left, vec<size, U> const &right) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T>
-    operator*(vec<size, T> const &left, vec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, T> operator*(vec<size, T> const &left, vec<size, U> const &right) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T>
-    operator/(vec<size, T> const &left, vec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, T> operator/(vec<size, T> const &left, vec<size, U> const &right) noexcept;
 
     template <Primitive T, Primitive U>
     [[nodiscard]] constexpr T dot(qua<T> const &left, qua<U> const &right);
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> QuaternionFromEuler(vec<3, T> angles);
     template <Primitive T>
-    [[nodiscard]] constexpr qua<T>
-    QuaternionFromEuler(T roll, T pitch,
-                        T yaw) requires(std::is_floating_point_v<T>);
+    [[nodiscard]] constexpr qua<T> QuaternionFromEuler(T roll, T pitch, T yaw) requires(std::is_floating_point_v<T>);
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> operator*(qua<T> const &q, qua<T> const &p);
     template <Primitive T>
-    [[nodiscard]] constexpr vec<3, T> operator*(qua<T> const &q,
-                                                vec<3, T> const &v);
+    [[nodiscard]] constexpr vec<3, T> operator*(qua<T> const &q, vec<3, T> const &v);
 
     template <Primitive T>
-    [[nodiscard]] constexpr vec<3, T> operator*(vec<3, T> const &v,
-                                                qua<T> const &q);
+    [[nodiscard]] constexpr vec<3, T> operator*(vec<3, T> const &v, qua<T> const &q);
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> conjugate(qua<T> const &q);
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> inverse(qua<T> const &q);
     template <Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<3, T> cross(vec<3, T> const &left,
-                                            vec<3, U> const &right);
+    [[nodiscard]] constexpr vec<3, T> cross(vec<3, T> const &left, vec<3, U> const &right);
     template <Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<3, T> cross(vec<3, U> const &left,
-                                            qua<T> const &right);
+    [[nodiscard]] constexpr vec<3, T> cross(vec<3, U> const &left, qua<T> const &right);
 
     template <Primitive T>
-    [[nodiscard]] constexpr mat<4, 4, T> rotate(mat<4, 4, T> const &matrix,
-                                                qua<T> const &q);
+    [[nodiscard]] constexpr mat<4, 4, T> rotate(mat<4, 4, T> const &matrix, qua<T> const &q);
     template <Primitive T>
     [[nodiscard]] constexpr T length(qua<T> const &q);
     template <Primitive T>

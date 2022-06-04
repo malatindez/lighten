@@ -15,7 +15,20 @@ namespace engine::math
   }
   template <size_t a, size_t b, Primitive T>
   template <size_t c, size_t d, Primitive P>
-  constexpr mat<a, b, T>::mat(mat<c, d, P> p) requires(a > c && b > d)
+  constexpr mat<a, b, T>::mat(mat<c, d, P> p) requires(a >= c && b >= d)
+  {
+    reset();
+    for (int i = 0; i < c; i++)
+    {
+      for (int j = 0; j < d; j++)
+      {
+        data[i][j] = static_cast<T>(p.data[i][j]);
+      }
+    }
+  }
+  template <size_t a, size_t b, Primitive T>
+  template <size_t c, size_t d, Primitive P>
+  constexpr mat<a, b, T>::mat(rmat<c, d, P> p) requires(a >= c && b >= d)
   {
     reset();
     for (int i = 0; i < c; i++)
@@ -36,6 +49,15 @@ namespace engine::math
     }
   }
   template <size_t a, size_t b, Primitive T>
+  template <Primitive P>
+  constexpr mat<a, b, T>::mat(rmat<a, b, P> p)
+  {
+    for (int i = 0; i < a * b; i++)
+    {
+      arr[i] = static_cast<T>(p.arr[i]);
+    }
+  }
+  template <size_t a, size_t b, Primitive T>
   template <typename... U>
   constexpr mat<a, b, T>::mat(U... data)
   {
@@ -44,7 +66,6 @@ namespace engine::math
     unpack_data(0, data...);
   }
 
-  // sets all values to zero
   template <size_t a, size_t b, Primitive T>
   constexpr void mat<a, b, T>::reset() noexcept
   {
@@ -52,9 +73,9 @@ namespace engine::math
     {
       data[i].reset();
     }
-    for (int i = 0, j = 0; i < a && j < b; i++, j++)
+    for (int i = 0; i < a && i < b; i++)
     {
-      data[i][j] = 1;
+      data[i][i] = 1;
     }
   }
 
@@ -65,16 +86,14 @@ namespace engine::math
     return data[i];
   }
   template <size_t a, size_t b, Primitive T>
-  [[nodiscard]] constexpr vec<b, T> const &
-  mat<a, b, T>::operator[](size_t i) const
+  [[nodiscard]] constexpr vec<b, T> const & mat<a, b, T>::operator[](size_t i) const
   {
     assert(i < size.x);
     return data[i];
   }
 
   template <size_t a, size_t b, Primitive T>
-  [[nodiscard]] constexpr mat<a, b, T> const &
-  mat<a, b, T>::operator+() const noexcept
+  [[nodiscard]] constexpr mat<a, b, T> const & mat<a, b, T>::operator+() const noexcept
   {
     return *this;
   }
@@ -114,6 +133,35 @@ namespace engine::math
   template <size_t a, size_t b, Primitive T>
   template <size_t c, Primitive U>
   constexpr mat<a, c, T> &mat<a, b, T>::operator*=(mat<b, c, U> const &other)
+  {
+    return (*this = *this * other);
+  }
+  
+
+  template <size_t a, size_t b, Primitive T>
+  template <Primitive U>
+  constexpr mat<a, b, T> &mat<a, b, T>::operator+=(rmat<a, b, U> const &other)
+  {
+    for (int i = 0; i < size.x; i++)
+    {
+      data[i] += other.data[i];
+    }
+    return *this;
+  }
+  template <size_t a, size_t b, Primitive T>
+  template <Primitive U>
+  constexpr mat<a, b, T> &mat<a, b, T>::operator-=(rmat<a, b, U> const &other)
+  {
+    for (int i = 0; i < size.x; i++)
+    {
+      data[i] -= other.data[i];
+    }
+    return *this;
+  }
+
+  template <size_t a, size_t b, Primitive T>
+  template <size_t c, Primitive U>
+  constexpr mat<a, c, T> &mat<a, b, T>::operator*=(rmat<b, c, U> const &other)
   {
     return (*this = *this * other);
   }

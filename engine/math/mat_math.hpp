@@ -2,23 +2,21 @@
 #include "mat.hpp"
 namespace engine::math
 {
+    // todo 
+    // rmat
     template <size_t a, size_t b, Primitive T>
     constexpr std::istream &operator>>(std::istream &is, mat<a, b, T> matrix);
     template <size_t a, size_t b, Primitive T>
     constexpr std::ostream &operator<<(std::ostream &os, mat<a, b, T> matrix);
 
     template <size_t a, size_t b, size_t c, Primitive T, Primitive U>
-    [[nodiscard]] constexpr mat<a, c, T> operator*(mat<a, b, T> const &left,
-                                                   mat<b, c, U> const &right);
+    [[nodiscard]] constexpr mat<a, c, T> operator*(mat<a, b, T> const &left, mat<b, c, U> const &right);
     template <size_t b, size_t c, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<b, T> operator*(vec<b, T> const &left,
-                                                mat<b, c, U> const &right);
+    [[nodiscard]] constexpr vec<b, T> operator*(vec<b, T> const &left, mat<b, c, U> const &right);
     template <size_t a, size_t b, Primitive T, Primitive U>
-    [[nodiscard]] constexpr mat<a, b, T> operator*(mat<a, b, T> const &left,
-                                                   U const right);
+    [[nodiscard]] constexpr mat<a, b, T> operator*(mat<a, b, T> const &left, U const right);
     template <size_t a, size_t b, Primitive T, Primitive U>
-    [[nodiscard]] constexpr mat<a, b, T> operator*(U const left,
-                                                   mat<a, b, T> const &right);
+    [[nodiscard]] constexpr mat<a, b, T> operator*(U const left, mat<a, b, T> const &right);
 
     template <size_t a, size_t b, Primitive T>
     constexpr mat<b, a, T> transpose(mat<a, b, T> const &matrix);

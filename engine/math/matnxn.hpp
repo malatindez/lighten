@@ -1,5 +1,6 @@
 #pragma once
 #include "mat.hpp"
+#include "vec_math.hpp"
 namespace engine::math
 {
 
@@ -13,9 +14,13 @@ namespace engine::math
     template <Primitive P>
     explicit constexpr mat(P p) requires(a == b);
     template <size_t c, size_t d, Primitive P>
-    explicit constexpr mat(mat<c, d, P> p) requires(a > c && b > d);
+    explicit constexpr mat(mat<c, d, P> p) requires(a >= c && b >= d);
+    template <size_t c, size_t d, Primitive P>
+    explicit constexpr mat(rmat<c, d, P> p) requires(a >= c && b >= d);
     template <Primitive P>
     explicit constexpr mat(mat<a, b, P> p);
+    template <Primitive P>
+    explicit constexpr mat(rmat<a, b, P> p);
     template <typename... U>
     explicit constexpr mat(U... data);
 
@@ -24,9 +29,7 @@ namespace engine::math
 
     [[nodiscard]] constexpr vec<b, T> &operator[](size_t i);
     [[nodiscard]] constexpr vec<b, T> const &operator[](size_t i) const;
-
     [[nodiscard]] constexpr mat<a, b, T> const &operator+() const noexcept;
-
     [[nodiscard]] constexpr mat<a, b, T> operator-() const noexcept;
 
     template <Primitive U>
@@ -37,11 +40,21 @@ namespace engine::math
     constexpr mat<a, c, T> &operator*=(mat<b, c, U> const &other);
 
     template <Primitive U>
+    constexpr mat<a, b, T> &operator+=(rmat<a, b, U> const &other);
+    template <Primitive U>
+    constexpr mat<a, b, T> &operator-=(rmat<a, b, U> const &other);
+    template <size_t c, Primitive U>
+    constexpr mat<a, c, T> &operator*=(rmat<b, c, U> const &other);
+
+    template <Primitive U>
     constexpr mat<a, b, T> &operator+=(U const value);
     template <Primitive U>
     constexpr mat<a, b, T> &operator-=(U const value);
     template <Primitive U>
     constexpr mat<a, b, T> &operator*=(U const value);
+
+    template<size_t c = a, size_t d = b> 
+    constexpr rmat<c, d, T> as_rmat() noexcept { return rmat<c, d, T>{*this}; }
 
     union
     {

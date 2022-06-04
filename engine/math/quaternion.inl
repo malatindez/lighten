@@ -67,9 +67,9 @@ namespace engine::math
         return mat<4, 4, T>(as_mat3());
     }
     template <Primitive T>
-    [[nodiscard]] constexpr vec<3, T> qua<T>::axis() const noexcept
+    [[nodiscard]] constexpr rvec<3, const T> qua<T>::axis() const noexcept
     {
-        return vec<3, T>{x, y, z};
+        return rvec<3, const T>{x, y, z};
     }
     template <Primitive T>
     [[nodiscard]] constexpr T qua<T>::radians() const noexcept

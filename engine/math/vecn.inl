@@ -1,6 +1,5 @@
 #pragma once
-#include "vec4.hpp"
-
+#include "vecn.hpp"
 namespace engine::math
 {
   template <size_t L, Primitive T>
@@ -80,8 +79,8 @@ namespace engine::math
     return *this;
   }
   template <size_t L, Primitive T>
-  template <Primitive U>
-  constexpr vec<L, T> &vec<L, T>::operator+=(vec<L, U> const &other) noexcept
+  template <AnyVec U>
+  constexpr vec<L, T> &vec<L, T>::operator+=(U const &other) noexcept requires (size == U::size)
   {
     for (int i = 0; i < size; i++)
     {
@@ -90,8 +89,8 @@ namespace engine::math
     return *this;
   }
   template <size_t L, Primitive T>
-  template <Primitive U>
-  constexpr vec<L, T> &vec<L, T>::operator-=(vec<L, U> const &other) noexcept
+  template <AnyVec U>
+  constexpr vec<L, T> &vec<L, T>::operator-=(U const &other) noexcept requires (size == U::size)
   {
     for (int i = 0; i < size; i++)
     {
@@ -100,8 +99,8 @@ namespace engine::math
     return *this;
   }
   template <size_t L, Primitive T>
-  template <Primitive U>
-  constexpr vec<L, T> &vec<L, T>::operator*=(vec<L, U> const &other) noexcept
+  template <AnyVec U>
+  constexpr vec<L, T> &vec<L, T>::operator*=(U const &other) noexcept requires (size == U::size)
   {
     for (int i = 0; i < size; i++)
     {
@@ -110,8 +109,8 @@ namespace engine::math
     return *this;
   }
   template <size_t L, Primitive T>
-  template <Primitive U>
-  constexpr vec<L, T> &vec<L, T>::operator/=(vec<L, U> const &other) noexcept
+  template <AnyVec U>
+  constexpr vec<L, T> &vec<L, T>::operator/=(U const &other) noexcept requires (size == U::size)
   {
     for (int i = 0; i < size; i++)
     {
@@ -120,8 +119,8 @@ namespace engine::math
     return *this;
   }
   template <size_t L, Primitive T>
-  template <Primitive U>
-  constexpr vec<L, T> &vec<L, T>::operator%=(vec<L, U> const &other) noexcept
+  template <AnyVec U>
+  constexpr vec<L, T> &vec<L, T>::operator%=(U const &other) noexcept requires (size == U::size)
   {
     for (int i = 0; i < size; i++)
     {
@@ -143,8 +142,8 @@ namespace engine::math
     return data[i];
   }
   template <size_t L, Primitive T>
-  template <size_t n, Primitive U>
-  [[nodiscard]] constexpr vec<n, U> vec<L, T>::as_vec() requires(n >= 2 && n <= size)
+        template <size_t n, Primitive U>
+        [[nodiscard]] constexpr vec<n, U> vec<L, T>::as_vec() const noexcept requires(n >= 2 && n <= size)
   {
     vec<n, U> rv;
     for (int i = 0; i < n; i++)
@@ -153,7 +152,18 @@ namespace engine::math
     }
     return rv;
   }
-
+  template <size_t L, Primitive T>
+  template <size_t n, Primitive U>
+  [[nodiscard]] constexpr rvec<n, U> vec<L, T>::as_rvec() noexcept requires(n >= 2 && n <= size)
+  {
+      return rvec<n, U>{*this};
+  }
+  template <size_t L, Primitive T>
+  template <size_t n, Primitive U>
+  [[nodiscard]] constexpr rvec<n, const U> vec<L, T>::as_crvec() const noexcept requires(n >= 2 && n <= size)
+  {
+      return rvec<n, U>{*this};
+  }
   template <size_t L, Primitive T>
   template <Primitive _> // primitives
   constexpr size_t vec<L, T>::get_parameter_pack_size()
