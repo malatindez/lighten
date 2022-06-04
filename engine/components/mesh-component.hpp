@@ -13,7 +13,7 @@ namespace engine::components
     {
     public:
         MeshComponent(std::shared_ptr<const render::Mesh> value);
-        bool CheckIntersection(Transform const &transform, math::Intersection &i, math::Ray const &ray) const;
+        bool CheckIntersection(Transform const &transform, core::math::Intersection &i, core::math::Ray const &ray) const;
         void SetMesh(std::shared_ptr<const render::Mesh> mesh);
         [[nodiscard]] std::shared_ptr<const render::Mesh> mesh_data() const noexcept { return mesh_; }
         [[nodiscard]] render::Material &material() noexcept { return material_; }
@@ -21,8 +21,8 @@ namespace engine::components
 
     private:
         static inline bool CheckTriangleIntersection(std::vector<render::Vertex>::const_iterator &it,
-                                                     math::Intersection &i,
-                                                     math::Ray const &ray) noexcept;
+                                                     core::math::Intersection &i,
+                                                     core::math::Ray const &ray) noexcept;
         std::shared_ptr<const render::Mesh> mesh_;
         render::Material material_;
     };

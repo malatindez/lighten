@@ -1,25 +1,25 @@
 #pragma once
 #include "mat_math.hpp"
-namespace engine::math
+namespace engine::core::math
 {
-  template <size_t a, size_t b, Primitive T>
-  constexpr std::istream &operator>>(std::istream &is, mat<a, b, T> matrix)
+  template <AnyMat U>
+  constexpr std::istream &operator>>(std::istream &is, U &matrix)
   {
-    for (int i = 0; i < a; i++)
+    for (int i = 0; i < U::size.x; i++)
     {
-      for (int j = 0; j < b; j++)
+      for (int j = 0; j < U::size.y; j++)
       {
         is >> matrix[i][j];
       }
     }
     return is;
   }
-  template <size_t a, size_t b, Primitive T>
-  constexpr std::ostream &operator<<(std::ostream &os, mat<a, b, T> matrix)
+  template <AnyMat U>
+  constexpr std::ostream &operator<<(std::ostream &os, U const &matrix)
   {
-    for (int i = 0; i < a; i++)
+    for (int i = 0; i < U::size.x; i++)
     {
-      for (int j = 0; j < b; j++)
+      for (int j = 0; j < U::size.y; j++)
       {
         os << matrix[i][j] << " ";
       }
@@ -28,17 +28,16 @@ namespace engine::math
     return os;
   }
 
-  template <size_t a, size_t b, size_t c, Primitive T, Primitive U>
-  constexpr mat<a, c, T> operator*(mat<a, b, T> const &left,
-                                   mat<b, c, U> const &right)
+  template <AnyMat T, AnyMat U>
+  [[nodiscard]] constexpr mat<T::size.x, T::size.y, typename T::type> operator*(T const left, U const &right) requires(T::size.y == U::size.x)
   {
-    mat<a, c, T> return_value;
-    for (size_t i = 0; i < a; i++)
+    mat<T::size.x, T::size.y, typename T::type> return_value;
+    for (size_t i = 0; i < T::size.x; i++)
     {
-      for (size_t j = 0; j < c; j++)
+      for (size_t j = 0; j < U::size.y; j++)
       {
         return_value[i][j] = 0;
-        for (size_t k = 0; k < b; k++)
+        for (size_t k = 0; k < U::size.x; k++)
         {
           return_value[i][j] += left[i][k] * right[k][j];
         }
@@ -46,68 +45,94 @@ namespace engine::math
     }
     return return_value;
   }
-  template <size_t b, size_t c, Primitive T, Primitive U>
-  constexpr vec<b, T> operator*(vec<b, T> const &left,
-                                mat<b, c, U> const &right)
+  template <AnyVec T, AnyMat U>
+  [[nodiscard]] constexpr vec<T::size, typename T::type> operator*(T const &left, U const &right) requires(U::size.x == T::size)
   {
-    vec<b, T> return_value;
-    for (size_t j = 0; j < c; j++)
+    vec<T::size, typename T::type> return_value;
+    for (size_t j = 0; j < U::size.y; j++)
     {
       return_value[j] = 0;
-      for (size_t k = 0; k < b; k++)
+      for (size_t k = 0; k < U::size.x; k++)
       {
         return_value[j] += left[k] * right[k][j];
       }
     }
     return return_value;
   }
-  template <size_t a, size_t b, Primitive T, Primitive U>
-  constexpr mat<a, b, T> operator*(mat<a, b, T> const &left, U const right)
+  template <AnyMat T, Primitive U>
+  [[nodiscard]] constexpr mat<T::size.x, T::size.y, typename T::type> operator*(T const &left, U const right)
   {
-    return mat<a, b, T>(left) *= right;
+    return mat<T::size.x, T::size.y, typename T::type>(left) *= right;
   }
-  template <size_t a, size_t b, Primitive T, Primitive U>
-  constexpr mat<a, b, T> operator*(U const left, mat<a, b, T> const &right)
+  template <AnyMat T, Primitive U>
+  [[nodiscard]] constexpr mat<T::size.x, T::size.y, typename T::type> operator*(U const left, T const &right)
   {
-    return mat<a, b, T>(right) *= left;
+    return mat<T::size.x, T::size.y, typename T::type>(right) *= left;
   }
 
-  template <size_t a, size_t b, Primitive T>
-  constexpr mat<b, a, T> transpose(mat<a, b, T> const &matrix)
+  template <AnyMat T>
+  constexpr mat<T::size.y, T::size.x, typename T::type> transpose(T const &matrix)
   {
-    mat<b, a, T> return_value;
-    for (int i = 0; i < a; i++)
+    rmat<T::size.x, T::size.y, typename T::type> return_value;
+    for (int i = 0; i < T::size.x; i++)
     {
-      for (int j = 0; j < b; j++)
+      for (int j = 0; j < T::size.y; j++)
       {
         return_value[j][i] = matrix[i][j];
       }
     }
     return return_value;
   }
-  template <Primitive T>
-  constexpr T det(mat<2, 2, T> const &m)
+  template <AnyMat T>
+  constexpr rmat<T::size.y, T::size.x, typename T::type> rtranspose(T &matrix)
+  {
+    rmat<T::size.x, T::size.y, typename T::type> return_value;
+    for (int i = 0; i < T::size.x; i++)
+    {
+      for (int j = 0; j < T::size.y; j++)
+      {
+        return_value[j][i].set_ptr(matrix[i][j]);
+      }
+    }
+    return return_value;
+  }
+  template <AnyMat T>
+  constexpr rmat<T::size.y, T::size.x, const typename T::type> rctranspose(T const &matrix)
+  {
+    rmat<T::size.x, T::size.y, const typename T::type> return_value;
+    for (int i = 0; i < T::size.x; i++)
+    {
+      for (int j = 0; j < T::size.y; j++)
+      {
+        return_value[j][i].set_ptr(matrix[i][j]);
+      }
+    }
+    return return_value;
+  }
+
+  template <AnyMat T>
+  constexpr typename T::type det_2(T const &m) requires(T::size.x == T::size.y && T::size.x == 2)
   {
     return m[0][0] * m[1][1] - m[1][0] * m[0][1];
   }
-  template <Primitive T>
-  constexpr T det(mat<3, 3, T> const &m)
+  template <AnyMat T>
+  constexpr typename T::type det_3(T const &m) requires(T::size.x == T::size.y && T::size.x == 3)
   {
     return +m[0][0] * (m[1][1] * m[2][2] - m[2][1] * m[1][2]) -
            m[1][0] * (m[0][1] * m[2][2] - m[2][1] * m[0][2]) +
            m[2][0] * (m[0][1] * m[1][2] - m[1][1] * m[0][2]);
   }
-  template <Primitive T>
-  constexpr T det(mat<4, 4, T> const &m)
+  template <AnyMat T>
+  constexpr typename T::type det_4(T const &m) requires(T::size.x == T::size.y && T::size.x == 4)
   {
-    T const sub_det_00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
-    T const sub_det_01 = m[2][1] * m[3][3] - m[3][1] * m[2][3];
-    T const sub_det_02 = m[2][1] * m[3][2] - m[3][1] * m[2][2];
-    T const sub_det_03 = m[2][0] * m[3][3] - m[3][0] * m[2][3];
-    T const sub_det_04 = m[2][0] * m[3][2] - m[3][0] * m[2][2];
-    T const sub_det_05 = m[2][0] * m[3][1] - m[3][0] * m[2][1];
+    typename T::type const sub_det_00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
+    typename T::type const sub_det_01 = m[2][1] * m[3][3] - m[3][1] * m[2][3];
+    typename T::type const sub_det_02 = m[2][1] * m[3][2] - m[3][1] * m[2][2];
+    typename T::type const sub_det_03 = m[2][0] * m[3][3] - m[3][0] * m[2][3];
+    typename T::type const sub_det_04 = m[2][0] * m[3][2] - m[3][0] * m[2][2];
+    typename T::type const sub_det_05 = m[2][0] * m[3][1] - m[3][0] * m[2][1];
 
-    vec<4, T> sub_det(
+    vec<4, typename T::type> sub_det(
         +(m[1][1] * sub_det_00 - m[1][2] * sub_det_01 + m[1][3] * sub_det_02),
         -(m[1][0] * sub_det_00 - m[1][2] * sub_det_03 + m[1][3] * sub_det_04),
         +(m[1][0] * sub_det_01 - m[1][1] * sub_det_03 + m[1][3] * sub_det_05),
@@ -117,28 +142,33 @@ namespace engine::math
            m[0][3] * sub_det[3];
   }
 
-  template <Primitive T>
-  constexpr mat<2, 2, T> adj(mat<2, 2, T> const &m)
+  template <AnyMat T>
+  constexpr typename T::type det(T const &m) requires(T::size.x == T::size.y)
   {
-    return mat<2, 2, T>(+m[1][1], -m[0][1], -m[1][0], +m[0][0]);
+    if constexpr (T::size.x == 2)
+      return det_2(m);
+    if constexpr (T::size.x == 3)
+      return det_3(m);
+    if constexpr (T::size.x == 4)
+      return det_4(m);
   }
 
-  template <size_t m_size, Primitive T>
-  constexpr mat<m_size, m_size, T> adjugate(mat<m_size, m_size, T> const &m)
+  template <AnyMat T>
+  constexpr mat<T::size.x, T::size.y, typename T::type> adjugate(T const &m) requires(T::size.x == T::size.y)
   {
-    mat<m_size, m_size, T> return_value;
-    mat<m_size - 1, m_size - 1, T> temp;
+    mat<T::size.x, T::size.y, typename T::type> return_value;
+    mat<T::size.x - 1, T::size.y - 1, typename T::type> temp;
     int sign = 1;
-    for (int i = 0; i < m_size; i++)
+    for (int i = 0; i < T::size.x; i++)
     {
-      for (int j = 0; j < m_size; j++)
+      for (int j = 0; j < T::size.x; j++)
       {
         // create 3x3 matrix using m without column i and row j
-        for (int k = 0, s = 0; k < m_size; k++)
+        for (int k = 0, s = 0; k < T::size.x; k++)
         {
           if (k == j)
             continue;
-          for (int l = 0, t = 0; l < m_size; l++)
+          for (int l = 0, t = 0; l < T::size.x; l++)
           {
             if (l == i)
               continue;
@@ -155,17 +185,16 @@ namespace engine::math
     return return_value;
   }
 
-  template <size_t a, Primitive T>
-  constexpr mat<a, a, T> inverse(mat<a, a, T> const &m)
+  template <AnyMat T>
+  constexpr mat<T::size.x, T::size.y, typename T::type> inverse(T const &m) requires(T::size.x == T::size.y)
   {
-    return adjugate(m) * (static_cast<T>(1) / det(m));
+    return adjugate(m) * (static_cast<typename T::type>(1) / det(m));
   }
 
-  template <Primitive T>
-  constexpr mat<4, 4, T> translate(mat<4, 4, T> const &matrix,
-                                   vec<3, T> const &vec)
+  template <AnyMat T, AnyVec V>
+  constexpr mat<4, 4, typename T::type> translate(T const &matrix, V const &vec) requires(T::size.x == T::size.y && T::size.x == 4 && V::size == 3)
   {
-    mat<4, 4, T> return_value;
+    mat<4, 4, typename T::type> return_value;
     return_value[0] = matrix[0];
     return_value[1] = matrix[1];
     return_value[2] = matrix[2];
@@ -173,16 +202,14 @@ namespace engine::math
         matrix[0] * vec[0] + matrix[1] * vec[1] + matrix[2] * vec[2] + matrix[3];
     return return_value;
   }
-
-  template <Primitive T>
-  constexpr mat<4, 4, T> rotate(mat<4, 4, T> const &matrix, T angle,
-                                vec<3, T> const &vector)
+  template <AnyMat T, Primitive U, AnyVec V>
+  constexpr mat<4, 4, typename T::type> rotate(T const &matrix, U angle, V const &vector) requires(T::size.x == T::size.y && T::size.x == 4 && V::size == 3)
   {
-    T const c = math::cos(angle);
-    T const s = math::sin(angle);
-    vec<3, T> axis = normalize(vector);
-    vec<3, T> temp = (T(1) - c) * axis;
-    mat<4, 4, T> rotate;
+    typename T::type const c = core::math::cos(angle);
+    typename T::type const s = core::math::sin(angle);
+    vec<3, typename T::type> axis = normalize(vector);
+    vec<3, typename T::type> temp = (T(1) - c) * axis;
+    mat<4, 4, typename T::type> rotate;
 
     rotate[0][0] = c + temp[0] * axis[0];
     rotate[0][1] = temp[0] * axis[1] + s * axis[2];
@@ -196,7 +223,7 @@ namespace engine::math
     rotate[2][1] = temp[2] * axis[1] - s * axis[0];
     rotate[2][2] = c + temp[2] * axis[2];
 
-    mat<4, 4, T> result(1);
+    mat<4, 4, typename T::type> result(1);
     result[0] = matrix[0] * rotate[0][0] + matrix[1] * rotate[0][1] +
                 matrix[2] * rotate[0][2];
     result[1] = matrix[0] * rotate[1][0] + matrix[1] * rotate[1][1] +
@@ -206,12 +233,10 @@ namespace engine::math
     result[3] = matrix[3];
     return result;
   }
-
-  template <Primitive T>
-  constexpr mat<4, 4, T> scale(mat<4, 4, T> const &matrix,
-                               vec<3, T> const &scale)
+  template <AnyMat T, AnyVec V>
+  constexpr mat<4, 4, typename T::type> scale(T const& matrix, V const &scale) requires (T::size.x == T::size.y && T::size.x == 4 && V::size == 3)
   {
-    mat<4, 4, T> return_value;
+    mat<4, 4, typename T::type> return_value;
     return_value[0] = matrix[0] * scale[0];
     return_value[1] = matrix[1] * scale[1];
     return_value[2] = matrix[2] * scale[2];
@@ -219,14 +244,13 @@ namespace engine::math
     return return_value;
   }
 
-  template <Primitive T>
-  constexpr mat<4, 4, T> lookAt(vec<3, T> const &eye, vec<3, T> const &center,
-                                vec<3, T> const &world_up)
+    template <AnyVec Position>
+    constexpr mat<4, 4, typename Position::type> lookAt(Position const &eye, Position const &center, Position const &world_up) requires (Position::size == 3)
   {
-    vec<3, T> const forward = normalize(center - eye);
-    vec<3, T> const right = normalize(cross(forward, world_up));
-    vec<3, T> const up = cross(forward, right);
-    mat<4, 4, T> return_value(1);
+    vec<3, typename Position::type> const forward = normalize(center - eye);
+    vec<3, typename Position::type> const right = normalize(cross(forward, world_up));
+    vec<3, typename Position::type> const up = cross(forward, right);
+    mat<4, 4, typename Position::type> return_value(1);
     return_value[0][0] = right.x;
     return_value[1][0] = right.y;
     return_value[2][0] = right.z;
@@ -242,9 +266,7 @@ namespace engine::math
     return return_value;
   }
   template <Primitive T>
-  constexpr mat<4, 4, T>
-  perspective(T fov_y, T aspect_ratio, T z_near,
-              T z_far) requires(!std::numeric_limits<T>::is_integer)
+  constexpr mat<4, 4, T> perspective(T fov_y, T aspect_ratio, T z_near, T z_far) requires(!std::numeric_limits<T>::is_integer)
   {
     assert(std::abs(aspect_ratio - std::numeric_limits<T>::epsilon()) >
            static_cast<T>(0));
@@ -263,6 +285,7 @@ namespace engine::math
   template <Primitive T>
   constexpr void invert_orthonormal(mat<4, 4, T> const &src, mat<4, 4, T> &dst)
   {
+    assert(&src != &dst);
     dst[0][0] = src[2][2];
     dst[1][1] = src[1][1];
     dst[2][2] = src[0][0];
@@ -286,6 +309,7 @@ namespace engine::math
   template <Primitive T>
   constexpr void invert_orthogonal(mat<4, 4, T> const &src, mat<4, 4, T> &dst)
   {
+    assert(&src != &dst);
     dst[0][0] = src[2][2];
     dst[1][1] = src[1][1];
     dst[2][2] = src[0][0];
@@ -333,7 +357,6 @@ namespace engine::math
   constexpr mat<4, 4, T> invert_orthonormal(mat<4, 4, T> const &src)
   {
     mat<4, 4, T> return_value;
-    return_value.reset();
     invert_orthonormal(src, return_value);
     return return_value;
   }
@@ -341,8 +364,7 @@ namespace engine::math
   constexpr mat<4, 4, T> invert_orthogonal(mat<4, 4, T> const &src)
   {
     mat<4, 4, T> return_value;
-    return_value.reset();
     invert_orthogonal(src, return_value);
     return return_value;
   }
-} // namespace engine::math
+} // namespace engine::core::math

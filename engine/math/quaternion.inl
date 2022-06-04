@@ -1,7 +1,7 @@
 #pragma once
 #include "quaternion.hpp"
 
-namespace engine::math
+namespace engine::core::math
 {
 
     template <Primitive T>
@@ -22,12 +22,12 @@ namespace engine::math
     template <Primitive T>
     constexpr qua<T>::qua(T radians, vec<3, T> axis)
     {
-        if (math::length(axis) != 0)
+        if (core::math::length(axis) != 0)
         {
             axis = normalize(axis);
         }
-        w = math::cos(radians / 2);
-        float const s = math::sin(radians / 2);
+        w = core::math::cos(radians / 2);
+        float const s = core::math::sin(radians / 2);
         x = axis.x * s;
         y = axis.y * s;
         z = axis.z * s;
@@ -363,4 +363,4 @@ namespace engine::math
         return qua<T>(q.w * one_over_len, q.x * one_over_len, q.y * one_over_len,
                       q.z * one_over_len);
     }
-} // namespace engine::math
+} // namespace engine::core::math

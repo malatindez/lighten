@@ -1,6 +1,6 @@
 #pragma once
 #include <chrono>
-namespace engine
+namespace engine::core
 {
   template <class clock>
   class Timer
@@ -21,4 +21,4 @@ namespace engine
 
   using SteadyTimer = Timer<std::chrono::steady_clock>;
   using HighResolutionTimer = Timer<std::chrono::high_resolution_clock>;
-} // namespace engine
+} // namespace engine::core

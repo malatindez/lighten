@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace engine
+namespace engine::core
 {
   class Layer
   {
@@ -14,11 +14,11 @@ namespace engine
 
     virtual void OnAttach() {}
     virtual void OnDetach() {}
-    virtual void OnEvent(Event &event) {}
+    virtual void OnEvent(events::Event &event) {}
 
     [[nodiscard]] std::string_view name() const { return debug_name_; }
 
   private:
     std::string debug_name_;
   };
-} // namespace engine
+} // namespace engine::core

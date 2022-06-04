@@ -7,11 +7,11 @@
 #include "pch.hpp"
 #include <chrono>
 
-namespace engine
+namespace engine::core
 {
 
-  const math::ivec2 kWindowPosition{0};
-  const math::ivec2 kWindowResolution{1280, 720};
+  const core::math::ivec2 kWindowPosition{0};
+  const core::math::ivec2 kWindowResolution{1280, 720};
 
   const float kFpsLimit = 60.0f;
   const float kFrameDuration = 1.0f / kFpsLimit;
@@ -19,7 +19,7 @@ namespace engine
   const float kTickrate = 120.0f;
   const float kTickDuration = 1.0f / kTickrate;
 
-  const math::vec3 kSphereCoords{0, 0, -1};
+  const core::math::vec3 kSphereCoords{0, 0, -1};
   const float kSphereRadius{0.5f};
 
   class Application final
@@ -29,7 +29,7 @@ namespace engine
     [[nodiscard]] static inline EventCallbackFn const &event_function() { return application_->event_function_; }
     static void Exit();
 
-    static void OnEvent(Event &e);
+    static void OnEvent(events::Event &e);
 
     template <class T>
     inline void AddLayer(std::shared_ptr<T> t) { layers_.push_back(std::static_pointer_cast<Layer>(t)); }
@@ -58,4 +58,4 @@ namespace engine
     static std::unique_ptr<Application> application_;
     friend INT WINAPI ::wWinMain(HINSTANCE, HINSTANCE, PWSTR, int cmd_show);
   };
-} // namespace engine
+} // namespace engine::core

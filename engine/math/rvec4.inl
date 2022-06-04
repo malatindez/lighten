@@ -1,6 +1,6 @@
 #pragma once
 #include "rvec4.hpp"
-namespace engine::math
+namespace engine::core::math
 {
     template <Primitive T>
     constexpr void rvec<4, T>::reset() noexcept
@@ -157,4 +157,4 @@ namespace engine::math
     {
         return rvec<n, const U>{*this};
     }
-}; // namespace engine::math
+}; // namespace engine::core::math

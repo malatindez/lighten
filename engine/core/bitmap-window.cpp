@@ -1,10 +1,10 @@
 #include "core/bitmap-window.hpp"
-namespace engine
+namespace engine::core
 {
   BitmapWindow::BitmapWindow(WNDCLASSEXW const &window_class,
                              DWORD extended_style, std::wstring const &class_name,
                              std::wstring const &window_name, DWORD style,
-                             math::ivec2 position, math::ivec2 size,
+                             core::math::ivec2 position, core::math::ivec2 size,
                              HWND parent_window, HMENU menu, HINSTANCE instance,
                              LPVOID lp_param)
       : Window(window_class, extended_style, class_name, window_name, style,
@@ -24,7 +24,7 @@ namespace engine
   }
   void BitmapWindow::OnSizeChanged()
   {
-    const math::ivec2 size = this->window_size();
+    const core::math::ivec2 size = this->window_size();
     bitmap_size_ = size / resolution_scale_;
     bitmap_info_.bmiHeader.biWidth = bitmap_size_.x;
     bitmap_info_.bmiHeader.biHeight = bitmap_size_.y;
@@ -44,4 +44,4 @@ namespace engine
                   DIB_RGB_COLORS, SRCCOPY);
     return rv;
   }
-} // namespace engine
+} // namespace engine::core

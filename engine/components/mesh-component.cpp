@@ -6,15 +6,15 @@ namespace engine::components
     {
         assert(value != nullptr);
     }
-    bool MeshComponent::CheckIntersection(Transform const &transform, math::Intersection &i,
-                                 math::Ray const &ray) const
+    bool MeshComponent::CheckIntersection(Transform const &transform, core::math::Intersection &i,
+                                 core::math::Ray const &ray) const
     {
-        math::Ray local = ray;
+        core::math::Ray local = ray;
 
         local.direction() =
-            (math::vec4{local.direction(), 0} * transform.inv_model).as_vec<3>();
+            (core::math::vec4{local.direction(), 0} * transform.inv_model).as_vec<3>();
         local.origin() =
-            (math::vec4{local.origin(), 1} * transform.inv_model).as_vec<3>();
+            (core::math::vec4{local.origin(), 1} * transform.inv_model).as_vec<3>();
 
         bool rv = false;
         auto it = mesh_->vertices.begin();
@@ -26,8 +26,8 @@ namespace engine::components
         if (rv)
         {
             i.normal =
-                normalize((math::vec4{i.normal, 0} * transform.model).as_vec<3>());
-            i.point = (math::vec4{i.point, 1} * transform.model).as_vec<3>();
+                normalize((core::math::vec4{i.normal, 0} * transform.model).as_vec<3>());
+            i.point = (core::math::vec4{i.point, 1} * transform.model).as_vec<3>();
         }
         return rv;
     }

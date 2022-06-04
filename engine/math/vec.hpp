@@ -1,7 +1,7 @@
 #pragma once
 #include "mathpch.h"
 
-namespace engine::math
+namespace engine::core::math
 {
     template <size_t L, Primitive T>
     struct vec;
@@ -27,7 +27,7 @@ namespace engine::math
 
     template <class T>
     concept AnyVec = _detail::is_vec_v<T>;
-} // namespace engine::math
+} // namespace engine::core::math
 #include "math/rvec2.hpp"
 #include "math/rvec3.hpp"
 #include "math/rvec4.hpp"
@@ -36,7 +36,7 @@ namespace engine::math
 #include "math/vec4.hpp"
 #include "math/vecn.hpp"
 
-namespace engine::math
+namespace engine::core::math
 {
     using vec2 = vec<2, float>;
     using dvec2 = vec<2, double>;
@@ -87,4 +87,4 @@ namespace engine::math
     static_assert(_detail::is_vec_v<rvec2>);
     static_assert(_detail::is_vec_v<vec<32, uint64_t>>);
     static_assert(_detail::is_vec_v<rvec<32, uint64_t>>);
-}; // namespace engine::math
+}; // namespace engine::core::math

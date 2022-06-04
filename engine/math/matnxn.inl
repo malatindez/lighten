@@ -1,7 +1,7 @@
 #pragma once
 #include "matnxn.hpp"
 
-namespace engine::math
+namespace engine::core::math
 {
   template <size_t a, size_t b, Primitive T>
   template <Primitive P>
@@ -240,4 +240,4 @@ namespace engine::math
     offset += get_parameter_pack_size<A>();
     unpack_data(offset, second, rest...);
   }
-} // namespace engine::math
+} // namespace engine::core::math

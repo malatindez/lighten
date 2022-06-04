@@ -1,6 +1,6 @@
 #pragma once
 #include "vec2.hpp"
-namespace engine::math
+namespace engine::core::math
 {
     template <Primitive T>
     template <Primitive U>
@@ -171,4 +171,4 @@ namespace engine::math
         unpack_data(offset, b, c...);
     }
 
-} // namespace engine::math
+} // namespace engine::core::math

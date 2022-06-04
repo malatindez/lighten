@@ -1,5 +1,5 @@
 #include "vec.hpp"
-namespace engine::math
+namespace engine::core::math
 {
     template struct vec<2, float>;
     template struct vec<2, double>;
@@ -20,4 +20,4 @@ namespace engine::math
     template struct rvec<4, float>;
     template struct rvec<4, double>;
     template struct rvec<4, int>;
-} // namespace engine::math
+} // namespace engine::core::math

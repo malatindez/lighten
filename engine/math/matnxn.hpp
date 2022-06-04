@@ -1,7 +1,7 @@
 #pragma once
 #include "mat.hpp"
 #include "vec_math.hpp"
-namespace engine::math
+namespace engine::core::math
 {
 
   template <size_t a, size_t b, Primitive T>
@@ -78,5 +78,5 @@ namespace engine::math
     template <typename A, typename B, typename... C>
     constexpr void unpack_data(int offset, A, B, C...);
   };
-} // namespace engine::math
+} // namespace engine::core::math
 #include "matnxn.inl"

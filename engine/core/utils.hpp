@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace engine::utils
+namespace engine::core::utils
 {
     // trim from start (in place)
     constexpr std::string_view ltrimview(std::string_view const &s)
@@ -49,4 +49,4 @@ namespace engine::utils
 
     // trim from both ends (in place)
     inline std::string trim(std::string const &s) { return ltrim(rtrim(s)); }
-} // namespace engine::utils
+} // namespace engine::core::utils

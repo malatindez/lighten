@@ -1,9 +1,10 @@
 #include "core/window.hpp"
-namespace engine
+namespace engine::core
 {
+  using namespace events;
   Window::Window(WNDCLASSEXW const &window_class_template, DWORD extended_style,
                  std::wstring const &class_name, std::wstring const &window_name,
-                 DWORD style, math::ivec2 position, math::ivec2 size,
+                 DWORD style, core::math::ivec2 position, core::math::ivec2 size,
                  HWND parent_window, HMENU menu, HINSTANCE instance,
                  LPVOID lp_param)
       : position_(position), window_size_(size)
@@ -58,13 +59,13 @@ namespace engine
     // update the window size if it has changed
     if (message == WM_SIZE)
     {
-      window_size_ = math::ivec2{LOWORD(l_param), HIWORD(l_param)};
+      window_size_ = core::math::ivec2{LOWORD(l_param), HIWORD(l_param)};
       OnSizeChanged();
     } // update window position if it has changed
     else if (message == WM_WINDOWPOSCHANGED)
     {
       auto window_pos = reinterpret_cast<LPWINDOWPOS>(l_param);
-      position_ = math::ivec2{window_pos->x, window_pos->y};
+      position_ = core::math::ivec2{window_pos->x, window_pos->y};
     }
 
     if (message == WM_KEYDOWN)
@@ -79,31 +80,31 @@ namespace engine
     }
     else if (message == WM_MOUSEMOVE)
     {
-      MouseMovedEvent event{math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
+      MouseMovedEvent event{core::math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
       event_callback_(event);
     }
     else if (message == WM_LBUTTONDOWN)
     {
       MouseButtonPressedEvent event{
-          0, math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
+          0, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
       event_callback_(event);
     }
     else if (message == WM_LBUTTONUP)
     {
       MouseButtonReleasedEvent event{
-          0, math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
+          0, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
       event_callback_(event);
     }
     else if (message == WM_RBUTTONDOWN)
     {
       MouseButtonPressedEvent event{
-          1, math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
+          1, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
       event_callback_(event);
     }
     else if (message == WM_RBUTTONUP)
     {
       MouseButtonReleasedEvent event{
-          1, math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
+          1, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
       event_callback_(event);
     }
     else if (message == WM_DESTROY)
@@ -126,4 +127,4 @@ namespace engine
     return DefWindowProcW(handle, message, w_param, l_param);
   }
 
-} // namespace engine
+} // namespace engine::core

@@ -1,6 +1,6 @@
 #pragma once
 #include "vec_math.hpp"
-namespace engine::math
+namespace engine::core::math
 {
   template <AnyVec U>
   constexpr std::istream &operator>>(std::istream &is, U &vec)
@@ -259,7 +259,7 @@ namespace engine::math
     vec<T::size, typename T::type> return_value;
     for (int i = 0; i < return_value.size; i++)
     {
-      return_value[i] = math::cos(vector[i]);
+      return_value[i] = core::math::cos(vector[i]);
     }
     return return_value;
   }
@@ -270,7 +270,7 @@ namespace engine::math
     vec<T::size, typename T::type> return_value;
     for (int i = 0; i < return_value.size; i++)
     {
-      return_value[i] = math::sin(vector[i]);
+      return_value[i] = core::math::sin(vector[i]);
     }
     return return_value;
   }
@@ -282,4 +282,4 @@ namespace engine::math
                      left.x * right.z - left.z * right.x,
                      left.x * right.y - left.y * right.x};
   }
-} // namespace engine::math
+} // namespace engine::core::math

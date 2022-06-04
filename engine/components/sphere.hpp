@@ -8,16 +8,13 @@ namespace engine::components
     struct Sphere
     {
     public:
-        static constexpr float Hit(math::Ray const &r, math::vec3 center,
+        static constexpr float Hit(core::math::Ray const &r, core::math::vec3 center,
                                    float radius) noexcept
         {
-            // TODO
-            // figure out how can we adjust this formula to the sphere scaled by
-            // different factors
-            const math::vec3 oc = r.origin() - center;
-            const float a = math::dot(r.direction(), r.direction());
-            const float b = math::dot(oc, r.direction());
-            const float c = math::dot(oc, oc) - radius;
+            const core::math::vec3 oc = r.origin() - center;
+            const float a = core::math::dot(r.direction(), r.direction());
+            const float b = core::math::dot(oc, r.direction());
+            const float c = core::math::dot(oc, oc) - radius;
             const float discriminant = b * b - a * c;
             if (discriminant < 0)
             {
@@ -38,7 +35,7 @@ namespace engine::components
         }
 
         static bool CheckIntersection(Transform const &transform,
-                                      math::Intersection &i, math::Ray const &ray)
+                                      core::math::Intersection &i, core::math::Ray const &ray)
         {
             float t = Hit(ray, transform.position, transform.scale.x);
 

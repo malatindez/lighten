@@ -6,7 +6,7 @@
     static constexpr std::string_view event_name = #event_type;    \
     [[nodiscard]] std::string_view name() const override { return event_name; } \
 
-namespace engine
+namespace engine::core::events
 {
     enum class EventType : uint32_t
     {
@@ -58,4 +58,4 @@ namespace engine
         const EventType kType;
         const uint8_t kCategoryFlags;
     };
-} // namespace engine
+} // namespace engine::core

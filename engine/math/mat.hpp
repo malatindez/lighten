@@ -1,6 +1,6 @@
 #pragma once
 #include "vec.hpp"
-namespace engine::math
+namespace engine::core::math
 {
     template <size_t rows, size_t columns, Primitive T>
     struct mat;
@@ -25,10 +25,11 @@ namespace engine::math
     } // namespace _detail
     template <class T>
     concept AnyMat = _detail::is_mat_v<T>;
+    
 }
 #include "matnxn.hpp"
 #include "rmatnxn.hpp"
-namespace engine::math
+namespace engine::core::math
 {
     using mat4 = mat<4, 4, float>;
     using dmat4 = mat<4, 4, double>;
@@ -120,5 +121,5 @@ namespace engine::math
     using rmat4x3 = rmat<4, 3, float>;
     using drmat4x3 = rmat<4, 3, double>;
     using irmat4x3 = rmat<4, 3, int>;
-} // namespace engine::math
+} // namespace engine::core::math
 #include "mat_math.hpp"

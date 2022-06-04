@@ -1,23 +1,23 @@
 #pragma once
 #include "render/material.hpp"
-namespace engine
+namespace engine::render
 {
     struct Floor
     {
-        float Hit(math::Ray const &r, math::vec3 center, float radius) noexcept
+        float Hit(core::math::Ray const &r, core::math::vec3 center, float radius) noexcept
         {
             return -1;
         }
 
-        bool CheckIntersection(math::Intersection &i, math::Ray const &ray) const
+        bool CheckIntersection(core::math::Intersection &i, core::math::Ray const &ray) const
         {
-            float denom = math::dot(normal, ray.direction());
+            float denom = core::math::dot(normal, ray.direction());
             if (abs(denom) <= 1e-6f)
             {
                 return false;
             }
-            math::vec3 a = transform.position - ray.origin();
-            float t = math::dot(a, normal) / denom;
+            core::math::vec3 a = transform.position - ray.origin();
+            float t = core::math::dot(a, normal) / denom;
             if (t > i.t || t <= 0)
             {
                 return false;
@@ -29,22 +29,22 @@ namespace engine
             return true;
         }
 
-        void update_plane(math::vec3 const &first, math::vec3 const &second)
+        void update_plane(core::math::vec3 const &first, core::math::vec3 const &second)
         {
-            math::vec3 temp = -math::cross(first, second);
-            if (math::length(temp) == 0)
+            core::math::vec3 temp = -core::math::cross(first, second);
+            if (core::math::length(temp) == 0)
             {
                 throw std::invalid_argument("Input vectors can't be collinear!");
             }
             v = first;
             w = second;
-            normal = math::normalize(temp);
+            normal = core::math::normalize(temp);
         }
 
         render::Material material;
         components::Transform transform;
-        math::vec3 v;
-        math::vec3 w;
-        math::vec3 normal;
+        core::math::vec3 v;
+        core::math::vec3 w;
+        core::math::vec3 normal;
     };
 }

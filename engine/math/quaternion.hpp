@@ -1,7 +1,7 @@
 #pragma once
 #include "matnxn.hpp"
 #include "vec_math.hpp"
-namespace engine::math
+namespace engine::core::math
 {
     template <Primitive T>
     class qua
@@ -107,11 +107,11 @@ namespace engine::math
     [[nodiscard]] constexpr T length(qua<T> const &q);
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> normalize(qua<T> const &q);
-} // namespace engine::math
+} // namespace engine::core::math
 
-namespace engine::math
+namespace engine::core::math
 {
     using quat = qua<float>;
     using dquat = qua<double>;
-}; // namespace engine::math
+}; // namespace engine::core::math
 #include "quaternion.inl"

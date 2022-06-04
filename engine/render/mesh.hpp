@@ -8,9 +8,9 @@ namespace engine::render
 {
     struct Vertex
     {
-        math::vec3 position;
-        math::vec3 normal;
-        math::vec2 tex_coords;
+        core::math::vec3 position;
+        core::math::vec3 normal;
+        core::math::vec2 tex_coords;
     };
     class Mesh
     {

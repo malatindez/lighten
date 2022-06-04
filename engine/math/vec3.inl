@@ -1,6 +1,6 @@
 #pragma once
 #include "vec3.hpp"
-namespace engine::math
+namespace engine::core::math
 {
     template <Primitive T>
     template <Primitive U>
@@ -221,4 +221,4 @@ namespace engine::math
                                          left.x * right.z - left.z * right.x,
                                          left.x * right.y - left.y * right.x};
     }
-} // namespace engine::math
+} // namespace engine::core::math

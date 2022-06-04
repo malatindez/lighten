@@ -7,25 +7,25 @@ namespace engine::components
   public:
     void reset()
     {
-      position = math::vec3{0};
-      scale = math::vec3{1};
-      rotation = math::quat{1, 0, 0, 0};
+      position = core::math::vec3{0};
+      scale = core::math::vec3{1};
+      rotation = core::math::quat{1, 0, 0, 0};
       UpdateMatrices();
     }
     void UpdateMatrices() noexcept
     {
-      model = math::mat4{1};
-      model = math::translate(model, position);
+      model = core::math::mat4{1};
+      model = core::math::translate(model, position);
       model = model * rotation.as_mat4();
-      model = math::scale(model, scale);
-      inv_model = math::inverse(model);
+      model = core::math::scale(model, scale);
+      inv_model = core::math::inverse(model);
     }
-    math::vec3 position;
+    core::math::vec3 position;
     float padding0;
-    math::vec3 scale{1};
+    core::math::vec3 scale{1};
     float padding1;
-    math::quat rotation;
-    math::mat4 model;
-    math::mat4 inv_model;
+    core::math::quat rotation;
+    core::math::mat4 model;
+    core::math::mat4 inv_model;
   };
 } // namespace engine::components

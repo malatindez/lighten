@@ -4,7 +4,7 @@
 #include "math.hpp"
 #include "pch.hpp"
 
-namespace math = engine::math;
+namespace math = engine::core::math;
 template <size_t a, size_t b, math::Primitive T>
 void random_fill(math::mat<a, b, T> &matrix)
 {

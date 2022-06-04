@@ -5,8 +5,9 @@
 #include <memory>
 #include <thread>
 
-namespace engine
+namespace engine::core
 {
+  using namespace events;
   std::unique_ptr<Application> Application::application_;
 
   void Application::OnEvent(Event &e)
@@ -75,4 +76,4 @@ namespace engine
     event_function_ = std::bind_front(&Application::OnEvent);
   }
 
-} // namespace engine
+} // namespace engine::core

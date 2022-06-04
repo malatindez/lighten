@@ -1,7 +1,7 @@
 #pragma once
 #include "mat.hpp"
 #include "vec_math.hpp"
-namespace engine::math
+namespace engine::core::math
 {
 
   template <size_t a, size_t b, Primitive T>
@@ -71,5 +71,5 @@ namespace engine::math
     };
     static_assert(sizeof(arr) == sizeof(data));
   };
-} // namespace engine::math
+} // namespace engine::core::math
 #include "rmatnxn.inl"

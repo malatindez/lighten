@@ -1,6 +1,6 @@
 #pragma once
 #include "math.hpp"
-namespace engine::math
+namespace engine::core::math
 {
     struct Intersection
     {
@@ -18,4 +18,4 @@ namespace engine::math
             return inf;
         }
     };
-} // namespace engine::math
+} // namespace engine::core::math

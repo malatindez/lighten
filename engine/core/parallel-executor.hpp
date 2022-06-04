@@ -6,7 +6,7 @@
 #include <shared_mutex>
 #include <stdint.h>
 #include <thread>
-namespace engine
+namespace engine::core
 {
     class ParallelExecutor
     {
@@ -45,4 +45,4 @@ namespace engine
 
         std::vector<std::jthread> threads_;
     };
-} // namespace engine
+} // namespace engine::core

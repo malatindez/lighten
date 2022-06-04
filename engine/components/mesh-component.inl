@@ -3,44 +3,44 @@
 namespace engine::components
 {
     inline bool MeshComponent::CheckTriangleIntersection(std::vector<render::Vertex>::const_iterator &it,
-                                                math::Intersection &i,
-                                                math::Ray const &ray) noexcept
+                                                core::math::Intersection &i,
+                                                core::math::Ray const &ray) noexcept
     {
-        math::vec3 const &p0 = (it++)->position;
-        math::vec3 const &p1 = (it++)->position;
-        math::vec3 const &p2 = (it)->position;
-        math::vec3 const &normal = (it++)->normal;
+        core::math::vec3 const &p0 = (it++)->position;
+        core::math::vec3 const &p1 = (it++)->position;
+        core::math::vec3 const &p2 = (it)->position;
+        core::math::vec3 const &normal = (it++)->normal;
 
-        float ndotdir = math::dot(normal, ray.direction());
+        float ndotdir = core::math::dot(normal, ray.direction());
         if (fabs(ndotdir) < 1e-6f)
         {
             return false;
         }
-        float t = math::dot(p0 - ray.origin(), normal) / ndotdir;
+        float t = core::math::dot(p0 - ray.origin(), normal) / ndotdir;
         if (t > i.t || t < 0)
         {
             return false;
         }
-        math::vec3 P = ray.PointAtParameter(t);
-        math::vec3 c;
-        math::vec3 edge0 = p1 - p0;
-        math::vec3 vp0 = P - p0;
-        c = math::cross(edge0, vp0);
-        if (math::dot(normal, c) < 0.0f)
+        core::math::vec3 P = ray.PointAtParameter(t);
+        core::math::vec3 c;
+        core::math::vec3 edge0 = p1 - p0;
+        core::math::vec3 vp0 = P - p0;
+        c = core::math::cross(edge0, vp0);
+        if (core::math::dot(normal, c) < 0.0f)
         {
             return false;
         }
-        math::vec3 edge1 = p2 - p1;
-        math::vec3 vp1 = P - p1;
-        c = math::cross(edge1, vp1);
-        if (math::dot(normal, c) < 0.0f)
+        core::math::vec3 edge1 = p2 - p1;
+        core::math::vec3 vp1 = P - p1;
+        c = core::math::cross(edge1, vp1);
+        if (core::math::dot(normal, c) < 0.0f)
         {
             return false;
         }
-        math::vec3 edge2 = p0 - p2;
-        math::vec3 vp2 = P - p2;
-        c = math::cross(edge2, vp2);
-        if (math::dot(normal, c) < 0.0f)
+        core::math::vec3 edge2 = p0 - p2;
+        core::math::vec3 vp2 = P - p2;
+        c = core::math::cross(edge2, vp2);
+        if (core::math::dot(normal, c) < 0.0f)
         {
             return false;
         }

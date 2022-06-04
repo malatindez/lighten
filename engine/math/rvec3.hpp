@@ -2,7 +2,7 @@
 
 #include "vec.hpp"
 
-namespace engine::math
+namespace engine::core::math
 {
 
     template <Primitive T>
@@ -87,5 +87,5 @@ namespace engine::math
     };
 
 
-}; // namespace engine::math
+}; // namespace engine::core::math
 #include "rvec3.inl"

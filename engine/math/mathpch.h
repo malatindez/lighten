@@ -11,7 +11,7 @@
 #include <ostream>
 #include <type_traits>
 
-namespace engine::math
+namespace engine::core::math
 {
 
     template <typename T>
@@ -98,4 +98,4 @@ namespace engine::math
     template <Primitive T>
     [[nodiscard]] inline T pow(T x, T y) noexcept { return std::powf(x, y); }
     [[nodiscard]] inline double pow(double x, double y) { return std::pow(x, y); }
-} // namespace engine::math
+} // namespace engine::core::math

@@ -1,50 +1,48 @@
 #pragma once
 #include "mat.hpp"
-namespace engine::math
+namespace engine::core::math
 {
-    // todo 
-    // rmat
-    template <size_t a, size_t b, Primitive T>
-    constexpr std::istream &operator>>(std::istream &is, mat<a, b, T> matrix);
-    template <size_t a, size_t b, Primitive T>
-    constexpr std::ostream &operator<<(std::ostream &os, mat<a, b, T> matrix);
+    template <AnyMat U>
+    constexpr std::istream &operator>>(std::istream &is, U &matrix);
+    template <AnyMat U>
+    constexpr std::ostream &operator<<(std::ostream &os, U const &matrix);
 
-    template <size_t a, size_t b, size_t c, Primitive T, Primitive U>
-    [[nodiscard]] constexpr mat<a, c, T> operator*(mat<a, b, T> const &left, mat<b, c, U> const &right);
-    template <size_t b, size_t c, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<b, T> operator*(vec<b, T> const &left, mat<b, c, U> const &right);
-    template <size_t a, size_t b, Primitive T, Primitive U>
-    [[nodiscard]] constexpr mat<a, b, T> operator*(mat<a, b, T> const &left, U const right);
-    template <size_t a, size_t b, Primitive T, Primitive U>
-    [[nodiscard]] constexpr mat<a, b, T> operator*(U const left, mat<a, b, T> const &right);
+    template <AnyMat T, AnyMat U>
+    [[nodiscard]] constexpr mat<T::size.x, T::size.y, typename T::type> operator*(T const left, U const &right) requires(T::size.y == U::size.x);
+    template <AnyVec T, AnyMat U>
+    [[nodiscard]] constexpr vec<T::size, typename T::type> operator*(T const &left, U const &right) requires(U::size.x == T::size);
+    template <AnyMat T, Primitive U>
+    [[nodiscard]] constexpr mat<T::size.x, T::size.y, typename T::type> operator*(T const &left, U const right) ;
+    template <AnyMat T, Primitive U>
+    [[nodiscard]] constexpr mat<T::size.x, T::size.y, typename T::type> operator*(U const left, T const &right);
+   
+    template <AnyMat T>
+    constexpr mat<T::size.y, T::size.x, typename T::type> transpose(T const &matrix);
+    template <AnyMat T>
+    constexpr rmat<T::size.y, T::size.x, typename T::type> rtranspose(T &matrix);
+    template <AnyMat T>
+    constexpr rmat<T::size.y, T::size.x, const typename T::type> rctranspose(T  const&matrix);
 
-    template <size_t a, size_t b, Primitive T>
-    constexpr mat<b, a, T> transpose(mat<a, b, T> const &matrix);
+    template <AnyMat T>
+    constexpr typename T::type det(T const &matrix) requires(T::size.x == T::size.y);
+ 
+    template <AnyMat T>
+    constexpr mat<T::size.x, T::size.y, typename T::type> adjugate(T const &matrix) requires(T::size.x == T::size.y);
 
-    template <size_t a, Primitive T>
-    constexpr T det(mat<a, a, T> const &matrix);
+    template <AnyMat T>
+    constexpr mat<T::size.x, T::size.y, typename T::type> inverse(T const &matrix) requires(T::size.x == T::size.y);
 
-    template <size_t a, Primitive T>
-    constexpr mat<a, a, T> adjugate(mat<a, a, T> const &m);
+    template <AnyMat T, AnyVec V>
+    constexpr mat<4, 4, typename T::type> translate(T const& matrix, V const &vec) requires (T::size.x == T::size.y && T::size.x == 4 && V::size == 3);
 
-    template <size_t a, Primitive T>
-    constexpr mat<a, a, T> inverse(mat<a, a, T> const &m);
+    template <AnyMat T, Primitive U, AnyVec V>
+    constexpr mat<4, 4, typename T::type> rotate(T const& matrix, U angle, V const &axis)  requires (T::size.x == T::size.y && T::size.x == 4 && V::size == 3);
 
-    template <Primitive T>
-    constexpr mat<4, 4, T> translate(mat<4, 4, T> const &matrix,
-                                     vec<3, T> const &vec);
+    template <AnyMat T, AnyVec V>
+    constexpr mat<4, 4, typename T::type> scale(T const& matrix, V const &scale) requires (T::size.x == T::size.y && T::size.x == 4 && V::size == 3);
 
-    template <Primitive T>
-    constexpr mat<4, 4, T> rotate(mat<4, 4, T> const &matrix, T angle,
-                                  vec<3, T> const &axis);
-
-    template <Primitive T>
-    constexpr mat<4, 4, T> scale(mat<4, 4, T> const &matrix,
-                                 vec<3, T> const &scale);
-
-    template <Primitive T>
-    constexpr mat<4, 4, T> lookAt(vec<3, T> const &eye, vec<3, T> const &center,
-                                  vec<3, T> const &up);
+    template <AnyVec Position>
+    constexpr mat<4, 4, typename Position::type> lookAt(Position const &eye, Position const &center, Position const &up) requires (Position::size == 3);
 
     template <Primitive T>
     constexpr mat<4, 4, T> perspective(T fov_y, T aspect_ratio, T z_near, T z_far);
@@ -58,5 +56,5 @@ namespace engine::math
     template <Primitive T>
     constexpr mat<4, 4, T> invert_orthogonal(mat<4, 4, T> const &src);
 
-} // namespace engine::math
+} // namespace engine::core::math
 #include "mat_math.inl"

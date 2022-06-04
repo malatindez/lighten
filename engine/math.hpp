@@ -6,29 +6,29 @@
 #include "math/vec.hpp"
 #include "math/vec_math.hpp"
 
-namespace engine::math
+namespace engine::core::math
 {
     template <class T>
-    [[nodiscard]] constexpr math::vec<3, T> reflect(math::vec<3, T> const &normal,
-                                                    math::vec<3, T> const &dir)
+    [[nodiscard]] constexpr vec<3, T> reflect(vec<3, T> const &normal,
+                                                    vec<3, T> const &dir)
     {
-        return 2.0f * math::dot(normal, dir) * (normal - dir);
+        return 2.0f * dot(normal, dir) * (normal - dir);
     }
     template <class T>
-    [[nodiscard]] constexpr math::vec<3, T>
-    reflect_normal(math::vec<3, T> const &normal, math::vec<3, T> const &dir)
+    [[nodiscard]] constexpr vec<3, T>
+    reflect_normal(vec<3, T> const &normal, vec<3, T> const &dir)
     {
-        return normalize(2.0f * math::dot(normal, dir) * (normal - dir));
+        return normalize(2.0f * dot(normal, dir) * (normal - dir));
     }
     template <class T>
-    [[nodiscard]] constexpr math::vec<3, T>
-    reflect_normal_safe(math::vec<3, T> const &normal, math::vec<3, T> const &dir)
+    [[nodiscard]] constexpr vec<3, T>
+    reflect_normal_safe(vec<3, T> const &normal, vec<3, T> const &dir)
     {
-        math::vec<3, T> t = 2.0f * math::dot(normal, dir) * (normal - dir);
-        if (math::length(t) <= 1e-6f)
+        vec<3, T> t = 2.0f * dot(normal, dir) * (normal - dir);
+        if (length(t) <= 1e-6f)
         {
             return t;
         }
         return normalize(t);
     }
-} // namespace engine::math
+} // namespace engine::core::math

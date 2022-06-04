@@ -1,6 +1,6 @@
 #pragma once
 #include "vec4.hpp"
-namespace engine::math
+namespace engine::core::math
 {
     template <Primitive T>
     template <Primitive U>
@@ -220,4 +220,4 @@ namespace engine::math
         offset += get_parameter_pack_size<A>();
         unpack_data(offset, b, c...);
     }
-}; // namespace engine::math
+}; // namespace engine::core::math

@@ -2,7 +2,7 @@
 
 #include "vec.hpp"
 
-namespace engine::math
+namespace engine::core::math
 {
 
     template <Primitive T>
@@ -19,7 +19,7 @@ namespace engine::math
         template <typename... U>
         explicit constexpr vec(U... data);
         template <typename U>
-        constexpr rvec<size, T> &operator=(rvec<size, U> const &b)
+        constexpr vec<size, T> &operator=(rvec<size, U> const &b)
         {
         for (int i = 0; i < size; i++)
         {
@@ -28,7 +28,7 @@ namespace engine::math
         return *this;
         }
         template <typename U>
-        constexpr rvec<size, T> &operator=(vec<size, U> const &b)
+        constexpr vec<size, T> &operator=(vec<size, U> const &b)
         {
         for (int i = 0; i < size; i++)
         {
@@ -106,6 +106,6 @@ namespace engine::math
         constexpr void unpack_data(int offset, A a, B b, C... c);
     };
 
-}; // namespace engine::math
+}; // namespace engine::core::math
 
 #include "vec4.inl"

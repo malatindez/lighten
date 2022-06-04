@@ -6,14 +6,16 @@
 
 namespace engine::render
 {
+    using namespace core;
+    using namespace math;
     struct ParserContext
     {
         std::vector<unsigned int> vertex_indices;
         std::vector<unsigned int> uv_indices;
         std::vector<unsigned int> normal_indices;
-        std::vector<math::vec3> temp_vertices;
-        std::vector<math::vec2> temp_uvs;
-        std::vector<math::vec3> temp_normals;
+        std::vector<vec3> temp_vertices;
+        std::vector<vec2> temp_uvs;
+        std::vector<vec3> temp_normals;
     };
 
     [[nodiscard]] inline bool ParsePrimitiveNoexcept(std::string_view &view,
@@ -44,7 +46,7 @@ namespace engine::render
         view = view.substr(end - view.data());
         return true;
     }
-    template <math::Primitive T>
+    template <Primitive T>
     inline void ParsePrimitive(std::string_view &view, T &f)
     {
         if (!ParsePrimitiveNoexcept(view, f))
@@ -56,7 +58,7 @@ namespace engine::render
     inline void ParseVertex(std::string_view view, ParserContext &context)
     {
         view = utils::ltrimview(view);
-        math::vec3 vertex;
+        vec3 vertex;
         ParsePrimitive(view, vertex.x);
         ParsePrimitive(view, vertex.y);
         ParsePrimitive(view, vertex.z);
@@ -65,7 +67,7 @@ namespace engine::render
     inline void ParseUV(std::string_view view, ParserContext &context)
     {
         view = utils::ltrimview(view);
-        math::vec2 uv;
+        vec2 uv;
         ParsePrimitive(view, uv.x);
         ParsePrimitive(view, uv.y);
         context.temp_uvs.emplace_back(std::move(uv));
@@ -73,7 +75,7 @@ namespace engine::render
     inline void ParseNormal(std::string_view view, ParserContext &context)
     {
         view = utils::ltrimview(view);
-        math::vec3 normal;
+        vec3 normal;
         ParsePrimitive(view, normal.x);
         ParsePrimitive(view, normal.y);
         ParsePrimitive(view, normal.z);
@@ -82,7 +84,7 @@ namespace engine::render
     inline void ParseFace(std::string_view view, ParserContext &context)
     {
         view = utils::ltrimview(view);
-        math::ivec3 vertex_index, uv_index, normal_index;
+        ivec3 vertex_index, uv_index, normal_index;
         ParsePrimitive(view, vertex_index.x);
         view = view.substr(1);
         ParsePrimitive(view, uv_index.x);

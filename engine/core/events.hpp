@@ -6,7 +6,7 @@
 
 #include <functional>
 
-namespace engine
+namespace engine::core
 {
-    using EventCallbackFn = std::function<void(Event &)>;
-} // namespace engine
+    using EventCallbackFn = std::function<void(core::events::Event &)>;
+} // namespace engine::core

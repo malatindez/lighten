@@ -1,5 +1,5 @@
 #include "parallel-executor.hpp"
-namespace engine
+namespace engine::core
 {
     const uint32_t ParallelExecutor::kMaxThreads =
         std::max(1u, std::thread::hardware_concurrency());
@@ -112,4 +112,4 @@ namespace engine
             tasks_to_execute(threadIndex);
         }
     }
-} // namespace engine
+} // namespace engine::core

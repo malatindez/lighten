@@ -2,7 +2,7 @@
 
 #include "vec.hpp"
 
-namespace engine::math
+namespace engine::core::math
 {
 
     template <Primitive T>
@@ -78,6 +78,6 @@ namespace engine::math
         static_assert(sizeof(data) == 2 * sizeof( _detail::primitive_reference_wrapper<T>));
     };
 
-}; // namespace engine::math
+}; // namespace engine::core::math
 
 #include "rvec2.inl"

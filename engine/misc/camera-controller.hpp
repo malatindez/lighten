@@ -10,14 +10,14 @@ namespace engine
   {
   public:
     CameraController(components::Camera &camera, components::Transform &transform,
-                     math::ivec2 const &window_size);
+                     core::math::ivec2 const &window_size);
     void UpdateProjectionMatrix();
 
-    void SetProjectionMatrix(math::mat4 const &proj);
+    void SetProjectionMatrix(core::math::mat4 const &proj);
 
-    void SetWorldOffset(math::vec3 const &offset);
-    void AddWorldOffset(math::vec3 const &offset);
-    void AddRelativeOffset(math::vec3 const &offset);
+    void SetWorldOffset(core::math::vec3 const &offset);
+    void AddWorldOffset(core::math::vec3 const &offset);
+    void AddRelativeOffset(core::math::vec3 const &offset);
 
     void SetWorldAngles(float roll, float pitch, float yaw);
     void AddWorldAngles(float roll, float pitch, float yaw);
@@ -29,22 +29,22 @@ namespace engine
 
     // nfc in range from -1 to 1
     // returns a projected ray from camera
-    [[nodiscard]] inline math::Ray Raycast(math::vec2 const &ndc) const noexcept
+    [[nodiscard]] inline core::math::Ray Raycast(core::math::vec2 const &ndc) const noexcept
     {
-      math::vec4 direction = math::vec4(ndc.x, ndc.y, 1, 1) * camera_.inv_view_projection;
-      return math::Ray(camera_.position(), math::normalize(direction.as_vec<3>() / direction.w - camera_.position()));
+      core::math::vec4 direction = core::math::vec4(ndc.x, ndc.y, 1, 1) * camera_.inv_view_projection;
+      return core::math::Ray(camera_.position(), core::math::normalize(direction.as_vec<3>() / direction.w - camera_.position()));
     }
 
     [[nodiscard]] constexpr components::Camera const &camera() const noexcept { return camera_; }
     [[nodiscard]] constexpr components::Transform const &transform() const noexcept { return transform_; }
-    [[nodiscard]] constexpr math::ivec2 const &window_size() const noexcept { return window_size_; }
+    [[nodiscard]] constexpr core::math::ivec2 const &window_size() const noexcept { return window_size_; }
 
-    [[nodiscard]] constexpr math::vec3 const &position() const noexcept { return transform_.position; }
-    [[nodiscard]] constexpr math::quat const &rotation() const noexcept { return transform_.rotation; }
+    [[nodiscard]] constexpr core::math::vec3 const &position() const noexcept { return transform_.position; }
+    [[nodiscard]] constexpr core::math::quat const &rotation() const noexcept { return transform_.rotation; }
 
-    [[nodiscard]] constexpr math::crvec3 right() const noexcept { return math::crvec3{camera_.inv_view[0][0], camera_.inv_view[0][1], camera_.inv_view[0][2]}; }
-    [[nodiscard]] constexpr math::crvec3 up() const noexcept { return math::crvec3{camera_.inv_view[1][0], camera_.inv_view[1][1], camera_.inv_view[1][2]}; }
-    [[nodiscard]] constexpr math::crvec3 forward() const noexcept { return math::crvec3{camera_.inv_view[2][0], camera_.inv_view[2][1], camera_.inv_view[2][2]}; }
+    [[nodiscard]] constexpr core::math::crvec3 right() const noexcept { return core::math::crvec3{camera_.inv_view[0][0], camera_.inv_view[0][1], camera_.inv_view[0][2]}; }
+    [[nodiscard]] constexpr core::math::crvec3 up() const noexcept { return core::math::crvec3{camera_.inv_view[1][0], camera_.inv_view[1][1], camera_.inv_view[1][2]}; }
+    [[nodiscard]] constexpr core::math::crvec3 forward() const noexcept { return core::math::crvec3{camera_.inv_view[2][0], camera_.inv_view[2][1], camera_.inv_view[2][2]}; }
 
     [[nodiscard]] constexpr float fovy() const noexcept { return camera_.fovy_; }
     [[nodiscard]] constexpr float z_near() const noexcept { return camera_.z_near_; }
@@ -53,7 +53,7 @@ namespace engine
   private:
     components::Camera &camera_;
     components::Transform &transform_;
-    math::ivec2 const &window_size_;
+    core::math::ivec2 const &window_size_;
 
     bool update_matrices_ = true;
     bool update_basis_ = true;

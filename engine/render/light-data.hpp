@@ -1,15 +1,15 @@
 #pragma once
 #include "math.hpp"
-#include "misc/color.hpp"
+#include "render/color.hpp"
 #include "math/ray.hpp"
 namespace engine::render
 {
     struct LightData
     {
         Color color;
-        math::Ray const ray;
-        math::vec3 const point;
-        math::vec3 const normal;
-        math::vec3 const view_dir; // normalize(point - ray.origin()))
+        core::math::Ray const ray;
+        core::math::vec3 const point;
+        core::math::vec3 const normal;
+        core::math::vec3 const view_dir; // normalize(point - ray.origin()))
     };
 } // namespace engine::components

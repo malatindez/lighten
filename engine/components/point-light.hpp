@@ -7,13 +7,13 @@ namespace engine::components
 {
     struct PointLight
     {
-        math::vec3 color;
+        core::math::vec3 color;
         float R;
         
         inline bool Illuminable(Transform const &transform, render::LightData const&light_data) const noexcept
         {
-            math::vec3 L = transform.position - light_data.point;
-            math::vec3 const H = math::normalize(light_data.ray.origin() - light_data.point);
+            core::math::vec3 L = transform.position - light_data.point;
+            core::math::vec3 const H = core::math::normalize(light_data.ray.origin() - light_data.point);
             float distance = length(L);
             L = normalize(L);
             float ndotl = dot(light_data.normal, L);
@@ -25,8 +25,8 @@ namespace engine::components
         }
         inline void Illuminate(Transform const &transform, render::LightData &light_data, render::Material const &mat) const
         {
-            math::vec3 L = transform.position - light_data.point;
-            math::vec3 const H = math::normalize(light_data.ray.origin() - light_data.point);
+            core::math::vec3 L = transform.position - light_data.point;
+            core::math::vec3 const H = core::math::normalize(light_data.ray.origin() - light_data.point);
             float distance = length(L);
             L = normalize(L);
             float ndotl = dot(light_data.normal, L);

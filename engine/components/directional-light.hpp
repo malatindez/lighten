@@ -10,8 +10,8 @@ namespace engine::components
 {
     struct DirectionalLight
     {
-        math::vec3 direction;
-        math::vec3 color;
+        core::math::vec3 direction;
+        core::math::vec3 color;
 
         inline void Illuminate(render::LightData &light_data, render::Material const &mat) const
         {

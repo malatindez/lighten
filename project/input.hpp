@@ -3,10 +3,10 @@
 #include "core/layer.hpp"
 #include "math.hpp"
 
-class Input : public engine::Layer
+class Input : public engine::core::Layer
 {
 public:
-    void OnEvent(engine::Event &event) override;
+    void OnEvent(engine::core::events::Event &event) override;
     void flush() noexcept { key_states_.clear(); }
 
     [[nodiscard]] inline bool key_state(uint32_t key) const noexcept
@@ -25,7 +25,7 @@ public:
     {
         return rbuttonstate_;
     }
-    [[nodiscard]] constexpr engine::math::ivec2 const &mouse_position() const noexcept
+    [[nodiscard]] constexpr engine::core::math::ivec2 const &mouse_position() const noexcept
     {
         return mouse_position_;
     }
@@ -33,5 +33,5 @@ private:
     std::unordered_map<uint32_t, bool> key_states_;
     bool lbuttonstate_ = false;
     bool rbuttonstate_ = false;
-    engine::math::ivec2 mouse_position_ {0, 0};
+    engine::core::math::ivec2 mouse_position_ {0, 0};
 };

@@ -19,16 +19,16 @@ namespace engine
         Scene() = default;
         void UpdateScene() noexcept;
 
-        void Draw(components::Camera const &cam, BitmapWindow &window, ParallelExecutor &executor);
+        void Draw(components::Camera const &cam, core::BitmapWindow &window, core::ParallelExecutor &executor);
 
-        [[nodiscard]] std::optional<entt::entity> GetIntersectedEntity(math::Intersection &intersection, math::Ray &ray);
+        [[nodiscard]] std::optional<entt::entity> GetIntersectedEntity(core::math::Intersection &intersection, core::math::Ray &ray);
 
         std::optional<entt::entity> GetIntersectedEntityIf(
-            math::Intersection &intersection, math::Ray &ray,
+            core::math::Intersection &intersection, core::math::Ray &ray,
             std::function<bool(entt::entity, components::Transform const &, render::Material const &)> const &func);
         bool update_scene{true};
 
         entt::registry registry;
-        Floor floor;
+        render::Floor floor;
     };
 } // namespace engine

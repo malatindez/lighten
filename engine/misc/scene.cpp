@@ -5,10 +5,11 @@
 #include <sstream>
 #include <tuple>
 #include <vector>
-using namespace engine::math;
 
 namespace engine
 {
+    using namespace core;
+    using namespace math;
     void Scene::UpdateScene() noexcept { update_scene = true; }
     void Scene::Draw(components::Camera const &cam, BitmapWindow &window,
                      ParallelExecutor &executor)
@@ -21,7 +22,7 @@ namespace engine
         auto directional_lights = registry.view<components::DirectionalLight>();
         auto point_lights = registry.group<components::PointLight>(entt::get<components::Transform>);
         auto spot_lights = registry.group<components::SpotLight>(entt::get<components::Transform>);
-        auto find_intersection = [this, &spheres, &meshes](math::Intersection &intersection, math::Ray &ray)
+        auto find_intersection = [this, &spheres, &meshes](Intersection &intersection, Ray &ray)
         {
             floor.CheckIntersection(intersection, ray);
             spheres.each([&intersection, &ray](auto const, auto const &, auto const &transform) __lambda_force_inline
@@ -32,8 +33,8 @@ namespace engine
         };
 
         auto find_intersection_if = [this, &spheres, &meshes](
-                                        math::Intersection &intersection,
-                                        math::Ray &ray,
+                                        Intersection &intersection,
+                                        Ray &ray,
                                         std::function<bool(entt::entity, Transform const &, render::Material const &)> const &func)
         {
             if (func(entt::entity{}, floor.transform, floor.material)) { floor.CheckIntersection(intersection, ray); }
@@ -46,7 +47,7 @@ namespace engine
             return intersection.exists();
         };
 
-        auto find_intersection_material = [this, &spheres, &meshes](math::Intersection &intersection, math::Ray &ray, render::Material &mat)
+        auto find_intersection_material = [this, &spheres, &meshes](Intersection &intersection, Ray &ray, render::Material &mat)
         {
             if (floor.CheckIntersection(intersection, ray))
             {
@@ -62,11 +63,11 @@ namespace engine
         update_scene = false;
         ivec2 bitmap_size = window.bitmap_size();
         uint32_t *bitmap = window.bitmap().data();
-        math::vec4 bl4 = vec4(-1, -1, 1, 1) * cam.inv_view_projection;
-        math::vec4 br4 = vec4(1, -1, 1, 1) * cam.inv_view_projection;
-        math::vec4 tl4 = vec4(-1, 1, 1, 1) * cam.inv_view_projection;
-        math::vec4 right4 = br4 - bl4;
-        math::vec4 up4 = tl4 - bl4;
+        vec4 bl4 = vec4(-1, -1, 1, 1) * cam.inv_view_projection;
+        vec4 br4 = vec4(1, -1, 1, 1) * cam.inv_view_projection;
+        vec4 tl4 = vec4(-1, 1, 1, 1) * cam.inv_view_projection;
+        vec4 right4 = br4 - bl4;
+        vec4 up4 = tl4 - bl4;
         auto func = [&](uint32_t, uint32_t task_num)
         {
             int j = task_num / bitmap_size.x;
@@ -74,9 +75,9 @@ namespace engine
             float u = ((float(i) + 0.5f) / float(bitmap_size.x));
             float v = ((float(j) + 0.5f) / float(bitmap_size.y));
 
-            math::vec4 t = (bl4 + up4 * v + right4 * u);
-            math::Ray ray(cam.position(), t.as_vec<3>() / t.w - cam.position());
-            math::Intersection intersection;
+            vec4 t = (bl4 + up4 * v + right4 * u);
+            Ray ray(cam.position(), t.as_vec<3>() / t.w - cam.position());
+            Intersection intersection;
             intersection.reset();
 
             render::Material mat;
@@ -89,16 +90,16 @@ namespace engine
                 return;
             }
 
-            render::LightData ld{.color = math::vec3{0, 0, 0},
+            render::LightData ld{.color = vec3{0, 0, 0},
                                  .ray = ray,
                                  .point = intersection.point,
                                  .normal = intersection.normal,
                                  .view_dir = normalize(ray.origin() - intersection.point)};
             directional_lights.each([&ld, &mat, &find_intersection_if](const auto, auto &dirlight)
                                     {
-                                math::Intersection nearest;
+                                Intersection nearest;
                                 nearest.reset();
-                                math::Ray ray(ld.point + dirlight.direction * 0.01f, +dirlight.direction);
+                                Ray ray(ld.point + dirlight.direction * 0.01f, +dirlight.direction);
                                 find_intersection_if(
                                     nearest, ray, 
                                     [](entt::entity, Transform const&, render::Material const& mat) __lambda_force_inline
@@ -113,12 +114,12 @@ namespace engine
             point_lights.each([&ld, &mat, &find_intersection_if](const auto, auto const &point_light, auto const &transform)
                               { 
                                 if(!point_light.Illuminable(transform, ld)) { return; }
-                                math::vec3 L = transform.position - ld.point;
-                                float d = math::length(L);
+                                vec3 L = transform.position - ld.point;
+                                float d = length(L);
                                 L /= d;
-                                math::Intersection nearest;
+                                Intersection nearest;
                                 nearest.reset();
-                                math::Ray ray(ld.point + L * 0.01f, +L);
+                                Ray ray(ld.point + L * 0.01f, +L);
                                 find_intersection_if(
                                     nearest, ray, 
                                     [](entt::entity, Transform const&, render::Material const& mat) __lambda_force_inline
@@ -133,12 +134,12 @@ namespace engine
             spot_lights.each([&ld, &mat, &find_intersection_if](const auto, auto const &spot_light, auto const &transform)
                              { 
                                 if(!spot_light.Illuminable(transform, ld)) { return; }
-                                math::vec3 L = transform.position - ld.point;
-                                float d = math::length(L);
+                                vec3 L = transform.position - ld.point;
+                                float d = length(L);
                                 L /= d;
-                                math::Intersection nearest;
+                                Intersection nearest;
                                 nearest.reset();
-                                math::Ray ray(transform.position + L * 0.01f, +L);
+                                Ray ray(transform.position + L * 0.01f, +L);
                                 find_intersection_if(
                                     nearest, ray, 
                                     [](entt::entity, Transform const&, render::Material const& mat) __lambda_force_inline
@@ -151,7 +152,7 @@ namespace engine
                                     spot_light.Illuminate(transform, ld, mat); 
                                 } });
             ivec3 color{256 * (mat.emission + ld.color)};
-            color = math::ivec3{color.r > 255 ? 255 : color.r,
+            color = ivec3{color.r > 255 ? 255 : color.r,
                                 color.g > 255 ? 255 : color.g,
                                 color.b > 255 ? 255 : color.b};
             color.r <<= 16;
@@ -169,7 +170,7 @@ namespace engine
 #endif
     }
 
-    std::optional<entt::entity> Scene::GetIntersectedEntity(math::Intersection &intersection, math::Ray &ray)
+    std::optional<entt::entity> Scene::GetIntersectedEntity(Intersection &intersection, Ray &ray)
     {
         auto spheres = registry.group<components::Sphere>(entt::get<components::Transform>);
         auto meshes = registry.group<components::MeshComponent>(entt::get<components::Transform>);
@@ -183,7 +184,7 @@ namespace engine
     }
 
     std::optional<entt::entity> Scene::GetIntersectedEntityIf(
-        math::Intersection &intersection, math::Ray &ray,
+        Intersection &intersection, Ray &ray,
         std::function<bool(entt::entity, components::Transform const &, render::Material const &)> const &func)
     {
         auto spheres = registry.group<components::Sphere>(entt::get<components::Transform>);

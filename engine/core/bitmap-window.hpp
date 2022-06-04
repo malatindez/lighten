@@ -2,7 +2,7 @@
 #include <exception>
 
 #include "core/window.hpp"
-namespace engine
+namespace engine::core
 {
   class BitmapWindow final : public Window
   {
@@ -40,4 +40,4 @@ namespace engine
 #endif
     math::ivec2 bitmap_size_;
   };
-} // namespace engine
+} // namespace engine::core

@@ -1,7 +1,7 @@
 #pragma once
 #include "rmatnxn.hpp"
 
-namespace engine::math
+namespace engine::core::math
 {
   template <size_t a, size_t b, Primitive T>
   template <size_t c, size_t d, Primitive P>
@@ -157,4 +157,4 @@ namespace engine::math
     }
     return *this;
   }
-} // namespace engine::math
+} // namespace engine::core::math

@@ -2,7 +2,7 @@
 
 #include "vec.hpp"
 
-namespace engine::math
+namespace engine::core::math
 {
 
     template <Primitive T>
@@ -108,5 +108,5 @@ namespace engine::math
     template <Primitive T, Primitive U>
     constexpr vec<3, T> cross(vec<3, T> const &left, vec<3, U> const &right);
 
-}; // namespace engine::math
+}; // namespace engine::core::math
 #include "vec3.inl"

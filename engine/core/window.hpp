@@ -9,7 +9,7 @@
 #include "events.hpp"
 #include "math/vec2.hpp"
 
-namespace engine
+namespace engine::core
 {
   class Window;
 
@@ -22,7 +22,7 @@ namespace engine
   public:
     Window(WNDCLASSEXW const &window_class_template, DWORD extended_style,
            std::wstring const &class_name, std::wstring const &window_name,
-           DWORD style, math::ivec2 position, math::ivec2 size,
+           DWORD style, core::math::ivec2 position, core::math::ivec2 size,
            HWND parent_window, HMENU menu, HINSTANCE instance, LPVOID lp_param);
     // remove copy and move semantics because the callback system is bound to the
     // address of the window
@@ -36,8 +36,8 @@ namespace engine
     void SetEventCallback(EventCallbackFn const &callback) noexcept { event_callback_ = callback; }
 
     [[nodiscard]] constexpr HWND handle() const noexcept { return handle_; }
-    [[nodiscard]] constexpr math::ivec2 const &window_size() const noexcept { return window_size_; }
-    [[nodiscard]] constexpr math::ivec2 const &position() const noexcept { return position_; }
+    [[nodiscard]] constexpr core::math::ivec2 const &window_size() const noexcept { return window_size_; }
+    [[nodiscard]] constexpr core::math::ivec2 const &position() const noexcept { return position_; }
     [[nodiscard]] constexpr bool running() const noexcept { return running_; }
 
     virtual bool PeekOSMessages();
@@ -55,7 +55,7 @@ namespace engine
 
     bool running_ = true;
     HWND handle_;
-    math::ivec2 position_;
-    math::ivec2 window_size_;
+    core::math::ivec2 position_;
+    core::math::ivec2 window_size_;
   };
-}; // namespace engine
+}; // namespace engine::core

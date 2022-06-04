@@ -1,6 +1,6 @@
 #pragma once
 #include "vec.hpp"
-namespace engine::math
+namespace engine::core::math
 
 {
     template <AnyVec U>
@@ -111,5 +111,5 @@ namespace engine::math
     template <AnyVec T, AnyVec U>
     constexpr vec<3, T> cross(T const &left, U const &right) requires(T::size == U::size && T::size == 3);
 
-} // namespace engine::math
+} // namespace engine::core::math
 #include "vec_math.inl"

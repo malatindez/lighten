@@ -1,5 +1,5 @@
 #include "mat.hpp"
-namespace engine::math
+namespace engine::core::math
 {
     template struct mat<4, 4, float>;
     template struct mat<4, 4, double>;
@@ -91,4 +91,4 @@ namespace engine::math
     template struct rmat<4, 3, float>;
     template struct rmat<4, 3, double>;
     template struct rmat<4, 3, int>;
-} // namespace engine::math
+} // namespace engine::core::math

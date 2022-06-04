@@ -1,7 +1,7 @@
 #pragma once
 #include "event.hpp"
 #include "math.hpp"
-namespace engine
+namespace engine::core::events
 {
     class AppUpdateEvent final : public Event
     {
@@ -25,4 +25,4 @@ namespace engine
         EVENT_CLASS_TYPE(AppRender)
     };
 
-} // namespace engine
+} // namespace engine::core::events

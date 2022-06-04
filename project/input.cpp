@@ -1,6 +1,7 @@
 #include "input.hpp"
 using namespace engine;
-void Input::OnEvent(engine::Event &event)
+using namespace core::events;
+void Input::OnEvent(Event &event)
 {
     if (event.in_category(EventCategoryMouse))
     {
