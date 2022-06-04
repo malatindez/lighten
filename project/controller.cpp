@@ -111,9 +111,9 @@ void Controller::InitScene()
     entt::entity sphere2 = registry.create();
     Transform &sphere2_transform = UpdateTransform(registry, sphere2, vec3{1}, vec3{1.5f});
     AddPointLight(registry, sphere2, vec3{0.2f, 0.0f, 0.2f}, 3);
-    UpdateMaterial(AddSphereComponent(registry, sphere2).material, vec3{0.3f}, vec3{0.2f, 0.0f, 0.2f}, 1, 2, true);
+    UpdateMaterial(AddSphereComponent(registry, sphere2).material, vec3{0}, vec3{0.2f, 0.0f, 0.2f}, 1, 2, true);
     update_callbacks_.emplace_back([&sphere2_transform, this](float dt)
-                                   { sphere2_transform.scale = vec3{1.0f} + cos(time_from_start_ - 1.2f) / 2; });
+                                   { sphere2_transform.scale = vec3{1.0f} + cos(time_from_start_ - 1.2f) / 2; sphere2_transform.UpdateMatrices(); });
 
     entt::entity cube1 = registry.create();
     UpdateTransform(registry, cube1, vec3{3}, vec3{1.0f});
@@ -123,35 +123,16 @@ void Controller::InitScene()
     UpdateTransform(registry, cube2, vec3{5}, vec3{1.5f});
     AddPointLight(registry, cube2, vec3{0.5f, 0.0f, 0.5f}, 3);
     UpdateMaterial(AddCubeComponent(registry, cube2).material(), vec3{0}, vec3{0.5f, 0.0f, 0.5f}, 1, 2, false);
-
+    
+    entt::entity spot_light = registry.create();
+    UpdateTransform(registry, spot_light, vec3{0,5,-5}, vec3{0.05f});
+    AddSpotLight(registry, spot_light, vec3{0.5f, 0.0f, 0.5f}, radians(45.0f), 8);
+    UpdateMaterial(AddSphereComponent(registry, spot_light).material, vec3{0}, vec3{1.0f}, 1, 2, false);
+    
     entt::entity main_light = registry.create();
     Transform &main_light_transform = UpdateTransform(registry, main_light, vec3{3, 2.5f, -3}, vec3{0.5f});
     AddPointLight(registry, main_light, vec3{1.0f, 1.0f, 0.25f}, 5);
-    UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{0.2f}, vec3{1.0f, 1.0f, 0.25f}, 1, 0.5, false);
-
-    entt::entity main_light_orbit = registry.create();
-    Transform &main_light_orbit_transform = UpdateTransform(registry, main_light_orbit, vec3{0}, vec3{0});
-    AddPointLight(registry, main_light_orbit, vec3{0.0f, 0.0f, 1.0f}, 5);
-    UpdateMaterial(AddSphereComponent(registry, main_light_orbit).material, vec3{0.2f}, vec3{0.0f, 0.0f, 1.0f}, 1, 2, false);
-    update_callbacks_.emplace_back(
-        [&main_light_orbit_transform, &main_light_transform, this](float dt)
-        {
-            main_light_orbit_transform.position = main_light_transform.position + 2 * vec3{2 * cos(time_from_start_ / 2 - 0.5f), cos(time_from_start_ + 1.7f) * sin(time_from_start_ + 0.9f) * dt, 2 * sin(time_from_start_ / 2 + 0.5f)};
-            main_light_orbit_transform.scale = vec3{0.25f + cos(time_from_start_ / 2) / 4};
-            main_light_orbit_transform.UpdateMatrices();
-        });
-
-    entt::entity main_light_orbit_orbit = registry.create();
-    Transform &main_light_orbit_orbit_transform = UpdateTransform(registry, main_light_orbit_orbit, vec3{0}, vec3{0});
-    AddPointLight(registry, main_light_orbit_orbit, vec3{1.0f, 0.0f, 0.0f}, 7.5f);
-    UpdateMaterial(AddSphereComponent(registry, main_light_orbit_orbit).material, vec3{0.2f}, vec3{1.0f, 0.0f, 0.0f}, 1, 15, false);
-    update_callbacks_.emplace_back(
-        [&main_light_orbit_transform, &main_light_orbit_orbit_transform, this](float dt)
-        {
-            main_light_orbit_orbit_transform.position = main_light_orbit_transform.position + 4 * vec3{cos(time_from_start_), cos(time_from_start_ / 2) * sin(time_from_start_ / 2), sin(time_from_start_)};
-            main_light_orbit_orbit_transform.scale = vec3{0.125f + cos(time_from_start_ / 2) / 8};
-            main_light_orbit_orbit_transform.UpdateMatrices();
-        });
+    UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{0}, vec3{1.0f, 1.0f, 0.25f}, 1, 0.5, false);
 }
 
 Controller::Controller(BitmapWindow &window,
@@ -183,6 +164,7 @@ void Controller::OnEvent(Event &event)
         else if (event.type() == EventType::WindowResize)
         {
             camera_controller_.UpdateProjectionMatrix();
+            OutputDebugStringA("asd");
         }
         else if (event.type() == EventType::WindowClose)
         {
@@ -208,7 +190,7 @@ void Controller::OnEvent(Event &event)
                 if (entity.has_value())
                 {
                     selected_object_ = &scene_->registry.get<components::Transform>(entity.value());
-                    selected_object_distance_ = length(ray.PointAtParameter(intersection.t) - camera_controller_.position());
+                    selected_object_distance_ = intersection.t;
                     selected_object_offset_ = selected_object_->position - ray.PointAtParameter(intersection.t);
                     rb_saved_mouse_position_ = mbpe.coordinates();
                 }
@@ -278,10 +260,13 @@ void Controller::Tick(float delta_time)
     }
     if (input_.rbutton_down() && selected_object_)
     {
-        Ray const b = PixelRaycast(vec2{rb_saved_mouse_position_});
+        Ray a = PixelRaycast(vec2{rb_saved_mouse_position_});
+        Ray b = PixelRaycast(vec2{input_.mouse_position()});
         rb_saved_mouse_position_ = input_.mouse_position();
 
-        selected_object_->position = selected_object_offset_ + b.PointAtParameter(selected_object_distance_);
+        vec3 offset = a.PointAtParameter(selected_object_distance_ * dot(a.direction(), b.direction()));
+        
+        selected_object_->position = selected_object_offset_ + offset;
         selected_object_->UpdateMatrices();
     }
     if (!(roll == 0 && pitch == 0 && yaw == 0))
@@ -297,13 +282,13 @@ void Controller::Tick(float delta_time)
     {
         if (selected_object_ && input_.rbutton_down())
         {
-            selected_object_->scale *= math::vec3{1 + delta_time / 120 * input_.scroll_delta()};
+            selected_object_->scale *= vec3{1 + delta_time / 120 * input_.scroll_delta()};
             rclamp(selected_object_->scale, 0.1f, std::numeric_limits<float>::max());
         }
         else
         {
-            camera_controller_.camera().fovy_ -= delta_time / 120 * math::radians(45.0f) * input_.scroll_delta();
-            rclamp(camera_controller_.camera().fovy_, math::radians(0.01f), math::radians(89.9f));
+            camera_controller_.camera().fovy_ -= delta_time / 120 * radians(45.0f) * input_.scroll_delta();
+            rclamp(camera_controller_.camera().fovy_, radians(0.01f), radians(89.9f));
             camera_controller_.UpdateProjectionMatrix();
         }
     }

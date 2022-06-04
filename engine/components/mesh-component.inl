@@ -2,21 +2,21 @@
 #include "mesh-component.hpp"
 namespace engine::components
 {
-    inline bool MeshComponent::CheckTriangleIntersection(std::vector<render::Vertex>::const_iterator &it,
-                                                core::math::Intersection &i,
-                                                core::math::Ray const &ray) noexcept
+    inline bool MeshComponent::CheckTriangleIntersection(
+        core::math::vec3 const &p0,
+        core::math::vec3 const &p1,
+        core::math::vec3 const &p2,
+        core::math::vec3 const &normal,
+        core::math::Intersection &i,
+        core::math::Ray const &ray) noexcept
     {
-        core::math::vec3 const &p0 = (it++)->position;
-        core::math::vec3 const &p1 = (it++)->position;
-        core::math::vec3 const &p2 = (it)->position;
-        core::math::vec3 const &normal = (it++)->normal;
 
         float ndotdir = core::math::dot(normal, ray.direction());
         if (fabs(ndotdir) < 1e-6f)
         {
             return false;
         }
-        float d = -dot(normal, p0); 
+        float d = -dot(normal, p0);
         float t = -(core::math::dot(ray.origin(), normal) + d) / ndotdir;
         if (t > i.t || t < 0)
         {

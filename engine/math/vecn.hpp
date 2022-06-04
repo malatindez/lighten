@@ -62,13 +62,13 @@ namespace engine::core::math
         [[nodiscard]] constexpr T &operator[](size_t i);
         [[nodiscard]] constexpr T const &operator[](size_t i) const;
 
-        template <size_t n = size, Primitive U = T>
-        [[nodiscard]] constexpr rvec<n, U> as_rvec() noexcept requires(n >= 2 && n <= size);
+        template <size_t n = size>
+        [[nodiscard]] constexpr rvec<n, T> as_rvec() noexcept requires(n >= 2 && n <= size);
 
         template <size_t n = size, Primitive U = T>
         [[nodiscard]] constexpr vec<n, U> as_vec() const noexcept requires(n >= 2 && n <= size);
-        template <size_t n = size, Primitive U = T>
-        [[nodiscard]] constexpr rvec<n, const U> as_crvec() const noexcept requires(n >= 2 && n <= size);
+        template <size_t n = size>
+        [[nodiscard]] constexpr rvec<n, const T> as_crvec() const noexcept requires(n >= 2 && n <= size);
 
         std::array<T, size> data;
 

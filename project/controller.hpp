@@ -44,7 +44,7 @@ private:
 
     float roll_speed_ = engine::core::math::radians(60.0f);
     float move_speed_ = 2.0f;
-    float sensivity_ = 2.0f;
+    float sensivity_ = 8.0f;
 
     engine::CameraController camera_controller_;
     Input input_;

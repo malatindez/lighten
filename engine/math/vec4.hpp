@@ -69,13 +69,13 @@ namespace engine::core::math
         constexpr explicit operator rvec<4, T>() noexcept { return rvec<4, T>{x, y, z, w}; }
         constexpr explicit operator rvec<4, const T>() const noexcept { return rvec<4, const T>{x, y, z, w}; }
 
-        template <size_t n = size, Primitive U = T>
-        [[nodiscard]] constexpr rvec<n, U> as_rvec() noexcept requires(n >= 2 && n <= size);
+        template <size_t n = size>
+        [[nodiscard]] constexpr rvec<n, T> as_rvec() noexcept requires(n >= 2 && n <= size);
 
         template <size_t n = size, Primitive U = T>
         [[nodiscard]] constexpr vec<n, U> as_vec() const noexcept requires(n >= 2 && n <= size);
-        template <size_t n = size, Primitive U = T>
-        [[nodiscard]] constexpr rvec<n, const U> as_crvec() const noexcept requires(n >= 2 && n <= size);
+        template <size_t n = size>
+        [[nodiscard]] constexpr rvec<n, const T> as_crvec() const noexcept requires(n >= 2 && n <= size);
         union
         {
             struct

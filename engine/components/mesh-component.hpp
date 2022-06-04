@@ -2,8 +2,8 @@
 #include "math.hpp"
 #include "math/intersection.hpp"
 #include "math/ray.hpp"
-#include "render/mesh.hpp"
 #include "render/material.hpp"
+#include "render/mesh.hpp"
 #include "transform.hpp"
 #include <array>
 #include <memory>
@@ -20,7 +20,10 @@ namespace engine::components
         [[nodiscard]] render::Material const &material() const noexcept { return material_; }
 
     private:
-        static inline bool CheckTriangleIntersection(std::vector<render::Vertex>::const_iterator &it,
+        static inline bool CheckTriangleIntersection(core::math::vec3 const &p0,
+                                                     core::math::vec3 const &p1,
+                                                     core::math::vec3 const &p2,
+                                                     core::math::vec3 const &normal,
                                                      core::math::Intersection &i,
                                                      core::math::Ray const &ray) noexcept;
         std::shared_ptr<const render::Mesh> mesh_;

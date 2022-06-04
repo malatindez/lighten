@@ -34,10 +34,12 @@ namespace engine::components
             return rv0;
         }
 
-        static bool CheckIntersection(Transform const &transform,
-                                      core::math::Intersection &i, core::math::Ray const &ray)
+        bool CheckIntersection(Transform const &transform, core::math::Intersection &i, core::math::Ray const &ray) const
         {
-            float t = Hit(ray, transform.position, transform.scale.x);
+            core::math::Ray local = ray;
+            local.direction() = (core::math::vec4{local.direction(), 0} * transform.inv_model).as_vec<3>();
+            local.origin() = (core::math::vec4{local.origin(), 1} * transform.inv_model).as_vec<3>();
+            float t = Hit(local, position, radius);
 
             if (t > i.t || t < 0)
             {
@@ -50,5 +52,7 @@ namespace engine::components
         }
         
         render::Material material;
+        core::math::vec3 position{0};
+        float radius{1};
     };
 } // namespace engine::components

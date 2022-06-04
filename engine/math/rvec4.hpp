@@ -15,6 +15,11 @@ namespace engine::core::math
         explicit constexpr rvec(T &other) requires(T::size >= size) : x{other.x}, y{other.y}, z{other.z}, w{other.w} {}
         template <AnyVec T>
         explicit constexpr rvec(T const &other) requires(T::size >= size && std::is_const_v<typename T::type>) : x{other.x}, y{other.y}, z{other.z}, w{other.w} {}
+        template <AnyVec U>
+        static constexpr rvec<4, T> from_vec(U &other) requires (U::size >= 4) { return rvec<4, T>{other.x, other.y, other.z, other.w}; }
+        template <AnyVec U>
+        static constexpr rvec<4, T> from_vec(U const&other) requires (U::size >= 4) { return rvec<4, T>{other.x, other.y, other.z, other.w}; }
+        
         template <typename U>
         constexpr rvec<size, T> &operator=(rvec<size, U> const &b)
         {
@@ -65,13 +70,13 @@ namespace engine::core::math
 
         constexpr explicit operator rvec<4, const T>() const noexcept { return rvec<4, const T>{x, y, z, w}; }
 
-        template <size_t n = size, Primitive U = T>
-        [[nodiscard]] constexpr rvec<n, U> as_rvec() noexcept requires(n >= 2 && n <= size);
+        template <size_t n = size>
+        [[nodiscard]] constexpr rvec<n, T> as_rvec() noexcept requires(n >= 2 && n <= size);
 
         template <size_t n = size, Primitive U = T>
         [[nodiscard]] constexpr vec<n, std::remove_const_t<U>> as_vec() const noexcept requires(n >= 2 && n <= size);
-        template <size_t n = size, Primitive U = T>
-        [[nodiscard]] constexpr rvec<n, const U> as_crvec() const noexcept requires(n >= 2 && n <= size);
+        template <size_t n = size>
+        [[nodiscard]] constexpr rvec<n, const T> as_crvec() const noexcept requires(n >= 2 && n <= size);
         union
         {
             struct

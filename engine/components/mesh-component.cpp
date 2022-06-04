@@ -20,7 +20,11 @@ namespace engine::components
         auto it = mesh_->vertices.begin();
         while (std::distance(it, mesh_->vertices.end()) > 2)
         {
-            rv |= CheckTriangleIntersection(it, i, local);
+            auto const &normal = it->normal;
+            auto const &p0 = (it++)->position;
+            auto const &p1 = (it++)->position;
+            auto const &p2 = (it++)->position;
+            rv |= CheckTriangleIntersection(p0, p1, p2, normal, i, local);
         }
 
         if (rv)
