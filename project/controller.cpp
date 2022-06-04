@@ -127,12 +127,12 @@ void Controller::InitScene()
     entt::entity main_light = registry.create();
     Transform &main_light_transform = UpdateTransform(registry, main_light, vec3{3, 2.5f, -3}, vec3{0.5f});
     AddPointLight(registry, main_light, vec3{1.0f, 1.0f, 0.25f}, 5);
-    UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{0}, vec3{1.0f, 1.0f, 0.25f}, 1, 0.5, false);
+    UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{0.2f}, vec3{1.0f, 1.0f, 0.25f}, 1, 0.5, false);
 
     entt::entity main_light_orbit = registry.create();
     Transform &main_light_orbit_transform = UpdateTransform(registry, main_light_orbit, vec3{0}, vec3{0});
-    AddPointLight(registry, main_light_orbit, vec3{0.5f, 0.0f, 0.5f}, 5);
-    UpdateMaterial(AddSphereComponent(registry, main_light_orbit).material, vec3{0}, vec3{0.5f, 0.0f, 0.5f}, 1, 2, false);
+    AddPointLight(registry, main_light_orbit, vec3{0.0f, 0.0f, 1.0f}, 5);
+    UpdateMaterial(AddSphereComponent(registry, main_light_orbit).material, vec3{0.2f}, vec3{0.0f, 0.0f, 1.0f}, 1, 2, false);
     update_callbacks_.emplace_back(
         [&main_light_orbit_transform, &main_light_transform, this](float dt)
         {
@@ -144,7 +144,7 @@ void Controller::InitScene()
     entt::entity main_light_orbit_orbit = registry.create();
     Transform &main_light_orbit_orbit_transform = UpdateTransform(registry, main_light_orbit_orbit, vec3{0}, vec3{0});
     AddPointLight(registry, main_light_orbit_orbit, vec3{1.0f, 0.0f, 0.0f}, 7.5f);
-    UpdateMaterial(AddSphereComponent(registry, main_light_orbit_orbit).material, vec3{0}, vec3{1.0f, 0.0f, 0.0f}, 1, 15, false);
+    UpdateMaterial(AddSphereComponent(registry, main_light_orbit_orbit).material, vec3{0.2f}, vec3{1.0f, 0.0f, 0.0f}, 1, 15, false);
     update_callbacks_.emplace_back(
         [&main_light_orbit_transform, &main_light_orbit_orbit_transform, this](float dt)
         {

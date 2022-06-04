@@ -99,7 +99,7 @@ namespace engine
                                     {
                                 Intersection nearest;
                                 nearest.reset();
-                                Ray ray(ld.point + dirlight.direction * 0.01f, +dirlight.direction);
+                                Ray ray(ld.point + ld.normal * 0.001f, normalize(-dirlight.direction + ld.normal));
                                 find_intersection_if(
                                     nearest, ray, 
                                     [](entt::entity, Transform const&, render::Material const& mat) __lambda_force_inline
@@ -118,7 +118,7 @@ namespace engine
                                 float d = length(L);
                                 Intersection nearest;
                                 nearest.reset();
-                                Ray ray(ld.point + ld.normal * 0.01f, normalize(L + ld.normal ));
+                                Ray ray(ld.point + ld.normal * 0.001f, normalize(L + ld.normal ));
                                 find_intersection_if(
                                     nearest, ray, 
                                     [](entt::entity, Transform const&, render::Material const& mat) __lambda_force_inline
