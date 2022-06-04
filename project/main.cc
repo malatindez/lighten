@@ -51,7 +51,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int cmd_show)
 
     entt::entity camera = registry.create();
     Transform &camera_transform = registry.emplace<Transform>(camera);
-    camera_transform.position = math::vec3{0, 0, -5};
+    camera_transform.position = math::vec3{0, 0, -10};
     camera_transform.UpdateMatrices();
     Camera &cam = registry.emplace<Camera>(camera);
     CameraController camera_controller(cam, camera_transform, bmwindow->window_size());

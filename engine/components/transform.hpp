@@ -15,9 +15,9 @@ namespace engine::components
     void UpdateMatrices() noexcept
     {
       model = math::mat4{1};
-      model = math::scale(model, scale);
-      model = model * rotation.as_mat4();
       model = math::translate(model, position);
+      model = model * rotation.as_mat4();
+      model = math::scale(model, scale);
       inv_model = math::inverse(model);
     }
     math::vec3 position;

@@ -1,5 +1,4 @@
 #pragma once
-#include "entt/entt.hpp"
 #include "math.hpp"
 #include "math/intersection.hpp"
 #include "math/ray.hpp"

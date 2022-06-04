@@ -36,7 +36,7 @@ namespace engine
                                         math::Ray &ray,
                                         std::function<bool(entt::entity, Transform const &, render::Material const &)> const &func)
         {
-            floor.CheckIntersection(intersection, ray);
+            if (func(entt::entity{}, floor.transform, floor.material)) { floor.CheckIntersection(intersection, ray); }
             spheres.each([&intersection, &ray, &func](auto const entity, auto const &sphere, auto const &transform) __lambda_force_inline
                          {
                              if(func(entity, transform, sphere.material)) { components::Sphere::CheckIntersection(transform, intersection, ray); } });
@@ -94,33 +94,48 @@ namespace engine
                                  .point = intersection.point,
                                  .normal = intersection.normal,
                                  .view_dir = normalize(ray.origin() - intersection.point)};
-            directional_lights.each([&ld, &mat, &find_intersection](const auto, auto &dirlight)
+            directional_lights.each([&ld, &mat, &find_intersection_if](const auto, auto &dirlight)
                                     {
                                 math::Intersection nearest;
                                 nearest.reset();
-                                math::Ray ray(ld.point - dirlight.direction * 0.01f, -dirlight.direction);
-                                find_intersection(nearest, ray);
+                                math::Ray ray(ld.point + dirlight.direction * 0.01f, +dirlight.direction);
+                                find_intersection_if(
+                                    nearest, ray, 
+                                    [](entt::entity, Transform const&, render::Material const& mat) __lambda_force_inline
+                                    {
+                                        return mat.casts_shadow;
+                                    }
+                                );
                                 if(!nearest.exists())
                                 {
                                   dirlight.Illuminate(ld, mat);
                                 } });
-            point_lights.each([&ld, &mat, &find_intersection](const auto, auto const &point_light, auto const &transform)
+            point_lights.each([&ld, &mat, &find_intersection_if](const auto, auto const &point_light, auto const &transform)
                               { 
                                 if(!point_light.Illuminable(transform, ld)) { return; }
-                                math::vec3 const L = math::normalize(ld.point - transform.position);
+                                math::vec3 L = transform.position - ld.point;
+                                float d = math::length(L);
+                                L /= d;
                                 math::Intersection nearest;
                                 nearest.reset();
-                                math::Ray ray(transform.position + L * 0.01f, +L);
-                                find_intersection(nearest, ray);
-                                if(nearest.exists() && nearest.point == ld.point)
+                                math::Ray ray(ld.point + L * 0.01f, +L);
+                                find_intersection_if(
+                                    nearest, ray, 
+                                    [](entt::entity, Transform const&, render::Material const& mat) __lambda_force_inline
+                                    {
+                                        return mat.casts_shadow;
+                                    }
+                                );
+                                if (!nearest.exists() || nearest.t >= d)
                                 {
-                                    return;
-                                } 
-                                point_light.Illuminate(transform, ld, mat); });
+                                    point_light.Illuminate(transform, ld, mat);
+                                }});
             spot_lights.each([&ld, &mat, &find_intersection_if](const auto, auto const &spot_light, auto const &transform)
                              { 
                                 if(!spot_light.Illuminable(transform, ld)) { return; }
-                                math::vec3 const L = math::normalize(ld.point - transform.position);
+                                math::vec3 L = transform.position - ld.point;
+                                float d = math::length(L);
+                                L /= d;
                                 math::Intersection nearest;
                                 nearest.reset();
                                 math::Ray ray(transform.position + L * 0.01f, +L);
@@ -131,11 +146,10 @@ namespace engine
                                         return mat.casts_shadow;
                                     }
                                 );
-                                if(nearest.exists() && nearest.point == ld.point)
+                                if (!nearest.exists() || nearest.t >= d)
                                 {
-                                    return;
-                                } 
-                                spot_light.Illuminate(transform, ld, mat); });
+                                    spot_light.Illuminate(transform, ld, mat); 
+                                } });
             ivec3 color{256 * (mat.emission + ld.color)};
             color = math::ivec3{color.r > 255 ? 255 : color.r,
                                 color.g > 255 ? 255 : color.g,

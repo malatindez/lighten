@@ -23,7 +23,7 @@ namespace
         mat.emission = emission;
         mat.specular = specular;
         mat.glossiness = glossiness;
-        mat.casts_shadow = false;
+        mat.casts_shadow = casts_shadow;
         return mat;
     }
 
@@ -81,7 +81,7 @@ namespace
 }
 void Controller::InitScene()
 {
-    scene_->floor.material.albedo = math::vec3{0.3f};
+    UpdateMaterial(scene_->floor.material, vec3{0.3f}, vec3{0}, 0.25f, 4, false);
     scene_->floor.transform.reset();
     scene_->floor.update_plane(math::vec3{0, 0, 1}, math::vec3{1, 0, 0});
     scene_->floor.transform.position = math::vec3{0, -2, 0};
@@ -104,31 +104,31 @@ void Controller::InitScene()
             });   */
     entt::entity sphere1 = registry.create();
     UpdateTransform(registry, sphere1, vec3{0}, vec3{0.5f});
-    UpdateMaterial(AddSphereComponent(registry, sphere1).material, vec3{1.0f}, vec3{0}, 1, 8);
+    UpdateMaterial(AddSphereComponent(registry, sphere1).material, vec3{1.0f}, vec3{0}, 1, 2);
 
     entt::entity sphere2 = registry.create();
     Transform &sphere2_transform = UpdateTransform(registry, sphere2, vec3{1}, vec3{1.5f});
     AddPointLight(registry, sphere2, vec3{0.2f, 0.0f, 0.2f}, 3);
-    UpdateMaterial(AddSphereComponent(registry, sphere2).material, vec3{0}, vec3{0.2f, 0.0f, 0.2f}, 1, 8);
+    UpdateMaterial(AddSphereComponent(registry, sphere2).material, vec3{0}, vec3{0.2f, 0.0f, 0.2f}, 1, 2, true);
     update_callbacks_.emplace_back( [&sphere2_transform, this](float dt) {sphere2_transform.scale = vec3{1.0f} + cos(time_from_start_ - 1.2f) / 2;});
     
     entt::entity cube1 = registry.create();
     UpdateTransform(registry, cube1, vec3{3}, vec3{1.0f});
-    UpdateMaterial(AddCubeComponent(registry, cube1).material(), vec3{1.0f}, vec3{0}, 1, 8);
+    UpdateMaterial(AddCubeComponent(registry, cube1).material(), vec3{1.0f}, vec3{0}, 1, 2, true);
 
     entt::entity cube2 = registry.create();
     UpdateTransform(registry, cube2, vec3{5}, vec3{1.5f});
     AddPointLight(registry, cube2, vec3{0.5f, 0.0f, 0.5f}, 3);
-    UpdateMaterial(AddCubeComponent(registry, cube2).material(), vec3{0}, vec3{0.5f, 0.0f, 0.5f}, 1, 8, false);
+    UpdateMaterial(AddCubeComponent(registry, cube2).material(), vec3{0}, vec3{0.5f, 0.0f, 0.5f}, 1, 2, false);
 
     entt::entity main_light = registry.create();
-    Transform &main_light_transform = UpdateTransform(registry, main_light, vec3{0, 15, 0}, vec3{0.5f});
+    Transform &main_light_transform = UpdateTransform(registry, main_light, vec3{3, 2.5f, -3}, vec3{0.5f});
     AddPointLight(registry, main_light, vec3{1.0f, 1.0f, 0.5f}, 10);
-    UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{0}, vec3{1.0f, 1.0f, 0.5f}, 1, 8, false);
+    UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{0}, vec3{1.0f, 1.0f, 0.5f}, 1, 4, false);
 
     entt::entity main_light_orbit = registry.create();
     Transform &main_light_orbit_transform = UpdateTransform(registry, main_light_orbit, vec3{0}, vec3{0});
-    UpdateMaterial(AddSphereComponent(registry, main_light_orbit).material, vec3{0}, vec3{0.0f, 0.0f, 1.0f}, 1, 8, false);
+    UpdateMaterial(AddSphereComponent(registry, main_light_orbit).material, vec3{0}, vec3{0.0f, 0.0f, 1.0f}, 1, 2, true);
     update_callbacks_.emplace_back(
         [&main_light_orbit_transform, &main_light_transform, this](float dt)
         {
@@ -140,7 +140,7 @@ void Controller::InitScene()
     entt::entity main_light_orbit_orbit = registry.create();
     Transform &main_light_orbit_orbit_transform = UpdateTransform(registry, main_light_orbit_orbit, vec3{0}, vec3{0});
     AddPointLight(registry, main_light_orbit_orbit, vec3{1.0f, 0.0f, 0.0f}, 2.5f);
-    UpdateMaterial(AddSphereComponent(registry, main_light_orbit_orbit).material, vec3{0}, vec3{1.0f, 0.0f, 0.0f}, 1, 32);
+    UpdateMaterial(AddSphereComponent(registry, main_light_orbit_orbit).material, vec3{0}, vec3{1.0f, 0.0f, 0.0f}, 1, 3);
     update_callbacks_.emplace_back(
         [&main_light_orbit_transform, &main_light_orbit_orbit_transform, this](float dt)
         {
