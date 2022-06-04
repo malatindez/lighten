@@ -37,14 +37,14 @@ private:
     [[nodiscard]] inline engine::core::math::Ray PixelRaycast(engine::core::math::vec2 ndc) const noexcept
     {
         ndc /= window_.window_size();
-        ndc = ndc * 2 - 1;
+        ndc = ndc * 2.0f - 1.0f;
         ndc.v = -ndc.v;
         return camera_controller_.Raycast(ndc);
     }
 
     float roll_speed_ = engine::core::math::radians(60.0f);
     float move_speed_ = 2.0f;
-    float sensivity_ = engine::core::math::radians(180.0f);
+    float sensivity_ = 2.0f;
 
     engine::CameraController camera_controller_;
     Input input_;
@@ -52,8 +52,9 @@ private:
     engine::core::BitmapWindow &window_;
     engine::core::math::ivec2 lb_saved_mouse_position_{0};
     engine::core::math::ivec2 rb_saved_mouse_position_{0};
-    engine::components::Transform *selected_object = nullptr;
-    float selected_object_distance = 0.0f;
+    engine::components::Transform *selected_object_ = nullptr;
+    float selected_object_distance_ = 0.0f;
+    engine::core::math::vec3 selected_object_offset_{0.0f};
     engine::core::ParallelExecutor executor{std::max(1, std::max(int32_t(engine::core::ParallelExecutor::kMaxThreads) - 4, int32_t(engine::core::ParallelExecutor::kHalfThreads)))};
 
     std::vector<std::function<void(float)>> update_callbacks_;

@@ -72,8 +72,8 @@ namespace engine
         {
             int j = task_num / bitmap_size.x;
             int i = task_num % bitmap_size.x;
-            float u = ((float(i) + 0.5f) / float(bitmap_size.x));
-            float v = ((float(j) + 0.5f) / float(bitmap_size.y));
+            float u = ((static_cast<float>(i) + 0.5f) / static_cast<float>(bitmap_size.x));
+            float v = ((static_cast<float>(j) + 0.5f) / static_cast<float>(bitmap_size.y));
 
             vec4 t = (bl4 + up4 * v + right4 * u);
             Ray ray(cam.position(), t.as_vec<3>() / t.w - cam.position());
@@ -147,10 +147,11 @@ namespace engine
                                         return mat.casts_shadow;
                                     }
                                 );
-                                if (!nearest.exists() || nearest.t >= d)
+                                if (!nearest.exists() || nearest.t - 0.01f >= d)
                                 {
                                     spot_light.Illuminate(transform, ld, mat); 
-                                } });
+                                }
+                });
             ivec3 color{256 * (mat.emission + ld.color)};
             color = ivec3{color.r > 255 ? 255 : color.r,
                                 color.g > 255 ? 255 : color.g,

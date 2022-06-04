@@ -10,23 +10,38 @@ namespace engine::core::math
     namespace _detail
     {
         template <class T>
-        struct is_vec : public std::false_type
+        struct is_reference_vec : public std::false_type
         {
         };
         template <size_t size, Primitive T>
-        struct is_vec<vec<size, T>> : public std::true_type
+        struct is_reference_vec<rvec<size, T>> : public std::true_type
         {
         };
-        template <size_t size, Primitive T>
-        struct is_vec<rvec<size, T>> : public std::true_type
-        {
-        };
+        
         template <class T>
-        constexpr bool is_vec_v = is_vec<T>::value;
+        struct is_default_vec : public std::false_type
+        {
+        };
+        template <size_t size, Primitive T>
+        struct is_default_vec<vec<size, T>> : public std::true_type
+        {
+        };
+        
+        template <class T>
+        constexpr bool is_reference_vec_v = is_reference_vec<T>::value;
+        template <class T>
+        constexpr bool is_default_vec_v = is_default_vec<T>::value;
+        template <class T>
+        constexpr bool is_vec_v = is_reference_vec_v<T> || is_default_vec_v<T>;
+        
     } // namespace _detail
 
     template <class T>
     concept AnyVec = _detail::is_vec_v<T>;
+    template <class T>
+    concept Vec = _detail::is_default_vec_v<T>;
+    template <class T>
+    concept RVec = _detail::is_reference_vec_v<T>;
 } // namespace engine::core::math
 #include "math/rvec2.hpp"
 #include "math/rvec3.hpp"
@@ -87,4 +102,14 @@ namespace engine::core::math
     static_assert(_detail::is_vec_v<rvec2>);
     static_assert(_detail::is_vec_v<vec<32, uint64_t>>);
     static_assert(_detail::is_vec_v<rvec<32, uint64_t>>);
+    static_assert(_detail::is_default_vec_v<vec2>);
+    static_assert(!_detail::is_default_vec_v<rvec2>);
+    static_assert(!_detail::is_reference_vec_v<vec2>);
+    static_assert(_detail::is_reference_vec_v<rvec2>);
+    static_assert(_detail::is_vec_v<vec<32, uint64_t>>);
+    static_assert(_detail::is_vec_v<rvec<32, uint64_t>>);
+    static_assert(_detail::is_default_vec_v<vec<32, uint64_t>>);
+    static_assert(!_detail::is_default_vec_v<rvec<32, uint64_t>>);
+    static_assert(!_detail::is_reference_vec_v<vec<32, uint64_t>>);
+    static_assert(_detail::is_reference_vec_v<rvec<32, uint64_t>>);
 }; // namespace engine::core::math

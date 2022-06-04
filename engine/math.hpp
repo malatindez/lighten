@@ -15,14 +15,12 @@ namespace engine::core::math
         return 2.0f * dot(normal, dir) * (normal - dir);
     }
     template <class T>
-    [[nodiscard]] constexpr vec<3, T>
-    reflect_normal(vec<3, T> const &normal, vec<3, T> const &dir)
+    [[nodiscard]] constexpr vec<3, T> reflect_normal(vec<3, T> const &normal, vec<3, T> const &dir)
     {
         return normalize(2.0f * dot(normal, dir) * (normal - dir));
     }
     template <class T>
-    [[nodiscard]] constexpr vec<3, T>
-    reflect_normal_safe(vec<3, T> const &normal, vec<3, T> const &dir)
+    [[nodiscard]] constexpr vec<3, T> reflect_normal_safe(vec<3, T> const &normal, vec<3, T> const &dir)
     {
         vec<3, T> t = 2.0f * dot(normal, dir) * (normal - dir);
         if (length(t) <= 1e-6f)

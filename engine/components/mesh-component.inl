@@ -16,7 +16,8 @@ namespace engine::components
         {
             return false;
         }
-        float t = core::math::dot(p0 - ray.origin(), normal) / ndotdir;
+        float d = -dot(normal, p0); 
+        float t = -(core::math::dot(ray.origin(), normal) + d) / ndotdir;
         if (t > i.t || t < 0)
         {
             return false;

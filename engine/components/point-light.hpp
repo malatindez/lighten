@@ -30,7 +30,7 @@ namespace engine::components
             float distance = length(L);
             L = normalize(L);
             float ndotl = dot(light_data.normal, L);
-            distance /= R;
+            distance /= R * std::cbrt(length(transform.scale));
             distance *= distance;
             light_data.color += ndotl * color * (ndotl * mat.albedo / distance + pow(dot(light_data.normal, H), mat.glossiness) * mat.specular);
         }

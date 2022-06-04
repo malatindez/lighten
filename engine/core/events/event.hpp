@@ -23,7 +23,8 @@ namespace engine::core::events
 
         MouseButtonPressed,
         MouseButtonReleased,
-        MouseMoved
+        MouseMoved,
+        MouseScrolled
     };
 
     enum EventCategory

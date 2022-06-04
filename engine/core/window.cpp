@@ -56,18 +56,6 @@ namespace engine::core
   LRESULT CALLBACK Window::WindowProcCallback(HWND handle, UINT message,
                                               WPARAM w_param, LPARAM l_param)
   {
-    // update the window size if it has changed
-    if (message == WM_SIZE)
-    {
-      window_size_ = core::math::ivec2{LOWORD(l_param), HIWORD(l_param)};
-      OnSizeChanged();
-    } // update window position if it has changed
-    else if (message == WM_WINDOWPOSCHANGED)
-    {
-      auto window_pos = reinterpret_cast<LPWINDOWPOS>(l_param);
-      position_ = core::math::ivec2{window_pos->x, window_pos->y};
-    }
-
     if (message == WM_KEYDOWN)
     {
       KeyPressedEvent event{uint32_t(w_param), LOWORD(l_param)};
@@ -85,27 +73,38 @@ namespace engine::core
     }
     else if (message == WM_LBUTTONDOWN)
     {
-      MouseButtonPressedEvent event{
-          0, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
+      MouseButtonPressedEvent event{0, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
       event_callback_(event);
     }
     else if (message == WM_LBUTTONUP)
     {
-      MouseButtonReleasedEvent event{
-          0, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
+      MouseButtonReleasedEvent event{0, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
       event_callback_(event);
     }
     else if (message == WM_RBUTTONDOWN)
     {
-      MouseButtonPressedEvent event{
-          1, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
+      MouseButtonPressedEvent event{1, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
       event_callback_(event);
     }
     else if (message == WM_RBUTTONUP)
     {
-      MouseButtonReleasedEvent event{
-          1, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
+      MouseButtonReleasedEvent event{1, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
       event_callback_(event);
+    }
+    else if (message == WM_MOUSEWHEEL)
+    {
+      MouseScrollEvent event{GET_WHEEL_DELTA_WPARAM(w_param), core::math::ivec2{LOWORD(l_param), HIWORD(l_param)}};
+      event_callback_(event);
+    }
+    else if (message == WM_SIZE) // update the window size if it has changed
+    {
+      window_size_ = core::math::ivec2{LOWORD(l_param), HIWORD(l_param)};
+      OnSizeChanged();
+    }
+    else if (message == WM_WINDOWPOSCHANGED) // update window position if it has changed
+    {
+      auto window_pos = reinterpret_cast<LPWINDOWPOS>(l_param);
+      position_ = core::math::ivec2{window_pos->x, window_pos->y};
     }
     else if (message == WM_DESTROY)
     {

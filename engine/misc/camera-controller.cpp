@@ -18,6 +18,7 @@ namespace engine
             camera_.fovy_,
             float(window_size_.x) / float(window_size_.y),
             camera_.z_far_, camera_.z_near_));
+        update_matrices_ = true;
     }
 
     void CameraController::SetProjectionMatrix(mat4 const &proj)

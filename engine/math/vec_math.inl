@@ -282,4 +282,56 @@ namespace engine::core::math
                      left.x * right.z - left.z * right.x,
                      left.x * right.y - left.y * right.x};
   }
+  
+    template <Primitive T, Primitive U>
+    [[nodiscard]] constexpr void rclamp(T &left, U const min, U const max)
+    {
+      if(left < min) left = min;
+      if(left > max) left = max;
+    }
+
+  template <AnyVec T, Primitive U>
+  [[nodiscard]] constexpr void rclamp(T &left, U const min, U const max)
+  {
+    for (size_t i = 0; i < T::size; i++)
+    {
+      if (left[i] < static_cast<T::type>(min))
+      {
+        left[i] = min;
+      }
+      if (left[i] > static_cast<T::type>(max))
+      {
+        left[i] = max;
+      }
+    }
+  }
+  template <AnyVec T, Primitive U>
+  [[nodiscard]] constexpr vec<T::size, typename T::type> clamp(T const &left, U const min, U const max)
+  {
+    vec<T::size, typename T::type> rvec{left};
+
+    for (size_t i = 0; i < T::size; i++)
+    {
+      if (left[i] < static_cast<T::type>(min))
+      {
+        rvec[i] = min;
+      }
+      if (left[i] > static_cast<T::type>(max))
+      {
+        rvec[i] = max;
+      }
+      else
+      {
+        rvec[i] = left[i];
+      }
+    }
+    return rvec;
+  }
+    template <Primitive T, Primitive U>
+    [[nodiscard]] constexpr T clamp(T left, U const min, U const max)
+    {
+      if(left < min) return min;
+      if(left > max) return max;
+      return left;
+    }
 } // namespace engine::core::math

@@ -37,8 +37,10 @@ namespace engine
 
     [[nodiscard]] constexpr components::Camera const &camera() const noexcept { return camera_; }
     [[nodiscard]] constexpr components::Transform const &transform() const noexcept { return transform_; }
-    [[nodiscard]] constexpr core::math::ivec2 const &window_size() const noexcept { return window_size_; }
+    [[nodiscard]] constexpr components::Camera &camera() noexcept { return camera_; }
+    [[nodiscard]] constexpr components::Transform &transform() noexcept { return transform_; }
 
+    [[nodiscard]] constexpr core::math::ivec2 const &window_size() const noexcept { return window_size_; }
     [[nodiscard]] constexpr core::math::vec3 const &position() const noexcept { return transform_.position; }
     [[nodiscard]] constexpr core::math::quat const &rotation() const noexcept { return transform_.rotation; }
 

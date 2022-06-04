@@ -34,7 +34,6 @@ namespace engine::core::math
     template <size_t size, Primitive T, Primitive U>
     [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator%(rvec<size, T> const &left, U const value) noexcept;
 
-
     template <size_t size, Primitive T, Primitive U>
     [[nodiscard]] constexpr vec<size, T> operator+(vec<size, T> const &left, vec<size, U> const &right) noexcept;
     template <size_t size, Primitive T, Primitive U>
@@ -83,6 +82,7 @@ namespace engine::core::math
 
     template <AnyVec T, AnyVec U>
     [[nodiscard]] constexpr bool operator==(T const &left, U const &right) requires(T::size == U::size);
+
     template <AnyVec T, AnyVec U>
     [[nodiscard]] constexpr bool operator!=(T const &left, U const &right) requires(T::size == U::size);
 
@@ -110,6 +110,18 @@ namespace engine::core::math
 
     template <AnyVec T, AnyVec U>
     constexpr vec<3, T> cross(T const &left, U const &right) requires(T::size == U::size && T::size == 3);
+
+    template <Primitive T, Primitive U>
+    [[nodiscard]] constexpr void rclamp(T &left, U const min, U const max);
+
+    template <AnyVec T, Primitive U>
+    [[nodiscard]] constexpr void rclamp(T &left, U const min, U const max);
+
+    template <AnyVec T, Primitive U>
+    [[nodiscard]] constexpr vec<T::size, typename T::type> clamp(T const &left, U const &right);
+
+    template <Primitive T, Primitive U>
+    [[nodiscard]] constexpr T clamp(T left, U const min, U const max);
 
 } // namespace engine::core::math
 #include "vec_math.inl"
