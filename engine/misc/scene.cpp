@@ -174,7 +174,7 @@ namespace engine
 
             if (!point_light.Illuminable(transform, ld))
             {
-                return;
+                continue;
             }
 
             vec3 L = transform.position - ld.point;
@@ -199,7 +199,7 @@ namespace engine
 
             if (!spot_light.Illuminable(transform, ld))
             {
-                return;
+                continue;
             }
 
             vec3 L = transform.position - ld.point;

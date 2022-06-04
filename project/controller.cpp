@@ -83,7 +83,7 @@ namespace
 }
 void Controller::InitScene()
 {
-    UpdateMaterial(scene_->floor.material, vec3{0.3f}, vec3{0}, 0.25f, 4, false);
+    UpdateMaterial(scene_->floor.material, vec3{0.3f}, vec3{0}, 0.25f, 4, true);
     scene_->floor.transform.reset();
     scene_->floor.update_plane(vec3{0, 0, 1}, vec3{1, 0, 0});
     scene_->floor.transform.position = vec3{0, -2, 0};
