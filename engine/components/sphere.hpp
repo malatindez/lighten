@@ -46,8 +46,10 @@ namespace engine::components
                 return false;
             }
             i.t = t;
-            i.point = ray.PointAtParameter(t);
-            i.normal = normalize(i.point - transform.position);
+            i.point = local.PointAtParameter(t);
+            i.normal = normalize(i.point - position);
+            i.normal = normalize((core::math::vec4{i.normal, 0} * transform.model).as_vec<3>());
+            i.point = (core::math::vec4{i.point, 1} * transform.model).as_vec<3>();
             return true;
         }
         

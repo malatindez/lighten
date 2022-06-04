@@ -10,11 +10,12 @@ namespace engine
 {
     using namespace core;
     using namespace math;
+    using namespace components;
+
     void Scene::UpdateScene() noexcept { update_scene = true; }
     void Scene::Draw(components::Camera const &cam, BitmapWindow &window,
                      ParallelExecutor &executor)
     {
-        using namespace components;
 
         auto spheres = registry.group<components::Sphere>(entt::get<components::Transform>);
         auto meshes = registry.group<components::MeshComponent>(entt::get<components::Transform>);
@@ -22,41 +23,6 @@ namespace engine
         auto directional_lights = registry.view<components::DirectionalLight>();
         auto point_lights = registry.group<components::PointLight>(entt::get<components::Transform>);
         auto spot_lights = registry.group<components::SpotLight>(entt::get<components::Transform>);
-        auto find_intersection = [this, &spheres, &meshes](Intersection &intersection, Ray &ray)
-        {
-            floor.CheckIntersection(intersection, ray);
-            spheres.each([&intersection, &ray](auto const, auto const & sphere, auto const &transform) __lambda_force_inline
-                         { sphere.CheckIntersection(transform, intersection, ray); });
-            meshes.each([&intersection, &ray](auto const, auto const &mesh, auto const &transform) __lambda_force_inline
-                        { mesh.CheckIntersection(transform, intersection, ray); });
-            return intersection.exists();
-        };
-
-        auto find_intersection_if = [this, &spheres, &meshes](
-                                        Intersection &intersection,
-                                        Ray &ray,
-                                        std::function<bool(entt::entity, Transform const &, render::Material const &)> const &func)
-        {
-            if (func(entt::entity{}, floor.transform, floor.material)) { floor.CheckIntersection(intersection, ray); }
-            spheres.each([&intersection, &ray, &func](auto const entity, auto const &sphere, auto const &transform) __lambda_force_inline
-                         { if(func(entity, transform, sphere.material)) { sphere.CheckIntersection(transform, intersection, ray); } });
-            meshes.each([&intersection, &ray, &func](auto const entity, auto const &mesh, auto const &transform) __lambda_force_inline
-                        {  if(func(entity, transform, mesh.material())) { mesh.CheckIntersection(transform, intersection, ray); } });
-            return intersection.exists();
-        };
-
-        auto find_intersection_material = [this, &spheres, &meshes](Intersection &intersection, Ray &ray, render::Material &mat)
-        {
-            if (floor.CheckIntersection(intersection, ray))
-            {
-                mat = floor.material;
-            }
-            spheres.each([&intersection, &ray, &mat](auto const, auto const &sphere, auto const &transform) __lambda_force_inline
-                         { if(sphere.CheckIntersection(transform, intersection, ray)) { mat = sphere.material; } });
-            meshes.each([&intersection, &ray, &mat](auto const, auto const &mesh, auto const &transform) __lambda_force_inline
-                        { if(mesh.CheckIntersection(transform, intersection, ray)) { mat = mesh.material(); } });
-            return intersection.exists();
-        };
 
         update_scene = false;
         ivec2 bitmap_size = window.bitmap_size();
@@ -75,14 +41,20 @@ namespace engine
 
             vec4 t = (bl4 + up4 * v + right4 * u);
             Ray ray(cam.position(), t.as_rvec<3>() / t.w - cam.position());
-            Intersection intersection;
-            intersection.reset();
+            Intersection nearest;
+            nearest.reset();
 
             render::Material mat;
+            if (floor.CheckIntersection(nearest, ray))
+            {
+                mat = floor.material;
+            }
+            spheres.each([&nearest, &ray, &mat](auto const, auto const &sphere, auto const &transform) __lambda_force_inline
+                         { if(sphere.CheckIntersection(transform, nearest, ray)) { mat = sphere.material; } });
+            meshes.each([&nearest, &ray, &mat](auto const, auto const &mesh, auto const &transform) __lambda_force_inline
+                        { if(mesh.CheckIntersection(transform, nearest, ray)) { mat = mesh.material(); } });
 
-            find_intersection_material(intersection, ray, mat);
-
-            if (!intersection.exists())
+            if (!nearest.exists())
             {
                 bitmap[task_num] = 0;
                 return;
@@ -90,65 +62,15 @@ namespace engine
 
             render::LightData ld{.color = vec3{0, 0, 0},
                                  .ray = ray,
-                                 .point = intersection.point,
-                                 .normal = intersection.normal,
-                                 .view_dir = normalize(ray.origin() - intersection.point)};
-            directional_lights.each([&ld, &mat, this, &spheres, &meshes](const auto, auto &dirlight)
-                                    {
-                                Intersection nearest;
-                                nearest.reset();
-                                Ray ray(ld.point + ld.normal * 0.001f, normalize(-dirlight.direction + ld.normal));
-                                if (floor.material.casts_shadow) { floor.CheckIntersection(nearest, ray); }
-                                spheres.each([&nearest, &ray](auto const entity, auto const &sphere, auto const &transform) __lambda_force_inline
-                                            { if(sphere.material.casts_shadow) { sphere.CheckIntersection(transform, nearest, ray); } });
-                                meshes.each([&nearest, &ray](auto const entity, auto const &mesh, auto const &transform) __lambda_force_inline
-                                            { if(mesh.material().casts_shadow) { mesh.CheckIntersection(transform, nearest, ray); } });
+                                 .point = nearest.point,
+                                 .normal = nearest.normal,
+                                 .view_dir = normalize(ray.origin() - nearest.point)};
 
-                                if(!nearest.exists())
-                                {
-                                  dirlight.Illuminate(ld, mat);
-                                } });
-            point_lights.each([&ld, &mat, this, &spheres, &meshes](const auto, auto const &point_light, auto const &transform)
-                              { 
-                                if(!point_light.Illuminable(transform, ld)) { return; }
-                                vec3 L = transform.position - ld.point;
-                                float d = length(L);
-                                vec3 dir = normalize(L - ld.normal * 0.001f);
-                                Intersection nearest;
-                                nearest.reset();
-                                Ray ray(ld.point + dir * 0.001f, dir);
-                                if (floor.material.casts_shadow) { floor.CheckIntersection(nearest, ray); }
-                                spheres.each([&nearest, &ray](auto const entity, auto const &sphere, auto const &transform) __lambda_force_inline
-                                            { if(sphere.material.casts_shadow) { sphere.CheckIntersection(transform, nearest, ray); } });
-                                meshes.each([&nearest, &ray](auto const entity, auto const &mesh, auto const &transform) __lambda_force_inline
-                                            { if(mesh.material().casts_shadow) { mesh.CheckIntersection(transform, nearest, ray); } });
-                                if (!nearest.exists() || nearest.t >= d)
-                                {
-                                    point_light.Illuminate(transform, ld, mat);
-                                }});
-            spot_lights.each([&ld, &mat, this, &spheres, &meshes](const auto, auto const &spot_light, auto const &transform)
-                             { 
-                                if(!spot_light.Illuminable(transform, ld)) { return; }
-                                vec3 L = transform.position - ld.point;
-                                float d = length(L);
-                                vec3 dir = normalize(L - ld.normal * 0.001f);
-                                Intersection nearest;
-                                nearest.reset();
-                                Ray ray(ld.point + dir * 0.001f, dir);
-                                if (floor.material.casts_shadow) { floor.CheckIntersection(nearest, ray); }
-                                spheres.each([&nearest, &ray](auto const entity, auto const &sphere, auto const &transform) __lambda_force_inline
-                                            { if(sphere.material.casts_shadow) { sphere.CheckIntersection(transform, nearest, ray); } });
-                                meshes.each([&nearest, &ray](auto const entity, auto const &mesh, auto const &transform) __lambda_force_inline
-                                            { if(mesh.material().casts_shadow) { mesh.CheckIntersection(transform, nearest, ray); } });
-                                if (!nearest.exists() || nearest.t - 0.01f >= d)
-                                {
-                                    spot_light.Illuminate(transform, ld, mat); 
-                                }
-                });
+            Illuminate(spheres, meshes, directional_lights, point_lights, spot_lights, ld, mat);
             ivec3 color{256 * (mat.emission + ld.color)};
             color = ivec3{color.r > 255 ? 255 : color.r,
-                                color.g > 255 ? 255 : color.g,
-                                color.b > 255 ? 255 : color.b};
+                          color.g > 255 ? 255 : color.g,
+                          color.b > 255 ? 255 : color.b};
             color.r <<= 16;
             color.g <<= 8;
 
@@ -190,6 +112,110 @@ namespace engine
         meshes.each([&func, &rv, &intersection, &ray](auto const e, auto const &mesh, auto const &transform) __lambda_force_inline
                     { if(func(e, transform, mesh.material()) && mesh.CheckIntersection(transform, intersection, ray)) {rv = e;} });
         return rv;
+    }
+
+    inline bool Scene::FindIntersection(SphereGroup &spheres, MeshGroup &meshes, Intersection &intersection, Ray &ray) const noexcept
+    {
+        floor.CheckIntersection(intersection, ray);
+        spheres.each([&intersection, &ray](auto const entity, auto const &sphere, auto const &transform) __lambda_force_inline
+                     { sphere.CheckIntersection(transform, intersection, ray); });
+        meshes.each([&intersection, &ray](auto const entity, auto const &mesh, auto const &transform) __lambda_force_inline
+                    { mesh.CheckIntersection(transform, intersection, ray); });
+        return intersection.exists();
+    }
+
+    inline bool Scene::FindIntersectionIf(SphereGroup &spheres, MeshGroup &meshes, Intersection &intersection, Ray &ray, IntersectionCallbackFn const &func) const noexcept
+    {
+        if (func(entt::entity{}, floor.transform, floor.material))
+        {
+            floor.CheckIntersection(intersection, ray);
+        }
+        spheres.each([&intersection, &ray, &func](auto const entity, auto const &sphere, auto const &transform) __lambda_force_inline
+                     { if(func(entity, transform, sphere.material)) { sphere.CheckIntersection(transform, intersection, ray); } });
+        meshes.each([&intersection, &ray, &func](auto const entity, auto const &mesh, auto const &transform) __lambda_force_inline
+                    {  if(func(entity, transform, mesh.material())) { mesh.CheckIntersection(transform, intersection, ray); } });
+        return intersection.exists();
+    }
+
+    void Scene::Illuminate(SphereGroup &spheres,
+                           MeshGroup &meshes,
+                           DirectionalLightView &directional_lights,
+                           PointLightGroup &point_lights,
+                           SpotLightGroup &spot_lights,
+                           render::LightData &ld,
+                           render::Material &mat)
+    {
+
+        auto find_intersection_if_casts_shadow = [this, &spheres, &meshes](Intersection &intersection, Ray &ray) __lambda_force_inline
+        {
+            return FindIntersectionIf(spheres, meshes, intersection, ray,
+                                      [](entt::entity, Transform const &, render::Material const &mat) __lambda_force_inline
+                                      { return mat.casts_shadow; });
+        };
+        for (auto entity : directional_lights)
+        {
+            auto &dirlight = directional_lights.get<DirectionalLight>(entity);
+
+            Ray ray(ld.point + ld.normal * 0.001f, -dirlight.direction);
+
+            Intersection nearest;
+            nearest.reset();
+            find_intersection_if_casts_shadow(nearest, ray);
+
+            if (!nearest.exists())
+            {
+              dirlight.Illuminate(ld, mat);
+            }
+        }
+        for (auto entity : point_lights)
+        {
+            auto &transform = point_lights.get<Transform>(entity);
+            auto &point_light = point_lights.get<PointLight>(entity);
+
+            if (!point_light.Illuminable(transform, ld))
+            {
+                return;
+            }
+
+            vec3 L = transform.position - ld.point;
+            float d = length(L);
+            vec3 dir = normalize(L - ld.normal * 0.001f);
+            Ray ray(ld.point + ld.normal * 0.001f, dir);
+
+            Intersection nearest;
+            nearest.reset();
+            find_intersection_if_casts_shadow(nearest, ray);
+
+            if (!nearest.exists() || nearest.t >= d)
+            {
+                point_light.Illuminate(transform, ld, mat);
+            }
+        }
+
+        for (auto entity : spot_lights)
+        {
+            auto &transform = spot_lights.get<Transform>(entity);
+            auto &spot_light = spot_lights.get<SpotLight>(entity);
+
+            if (!spot_light.Illuminable(transform, ld))
+            {
+                return;
+            }
+
+            vec3 L = transform.position - ld.point;
+            float d = length(L);
+            vec3 dir = normalize(L - ld.normal * 0.001f);
+            Ray ray(ld.point + ld.normal * 0.001f, dir);
+
+            Intersection nearest;
+            nearest.reset();
+            find_intersection_if_casts_shadow(nearest, ray);
+
+            if (!nearest.exists() || nearest.t - 0.01f >= d)
+            {
+               spot_light.Illuminate(transform, ld, mat);
+            }
+        }
     }
 
 } // namespace engine

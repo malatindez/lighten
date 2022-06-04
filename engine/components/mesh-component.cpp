@@ -6,7 +6,7 @@ namespace engine::components
     {
         assert(value != nullptr);
     }
-    bool MeshComponent::CheckIntersection(Transform const &transform, core::math::Intersection &i,
+    bool MeshComponent:: CheckIntersection(Transform const &transform, core::math::Intersection &i,
                                  core::math::Ray const &ray) const
     {
         core::math::Ray local = ray;
