@@ -116,10 +116,9 @@ namespace engine
                                 if(!point_light.Illuminable(transform, ld)) { return; }
                                 vec3 L = transform.position - ld.point;
                                 float d = length(L);
-                                L /= d;
                                 Intersection nearest;
                                 nearest.reset();
-                                Ray ray(ld.point + L * 0.01f, +L);
+                                Ray ray(ld.point + ld.normal * 0.01f, normalize(L + ld.normal ));
                                 find_intersection_if(
                                     nearest, ray, 
                                     [](entt::entity, Transform const&, render::Material const& mat) __lambda_force_inline
@@ -136,10 +135,9 @@ namespace engine
                                 if(!spot_light.Illuminable(transform, ld)) { return; }
                                 vec3 L = transform.position - ld.point;
                                 float d = length(L);
-                                L /= d;
                                 Intersection nearest;
                                 nearest.reset();
-                                Ray ray(transform.position + L * 0.01f, +L);
+                                Ray ray(ld.point + ld.normal * 0.001f, normalize(L + ld.normal));
                                 find_intersection_if(
                                     nearest, ray, 
                                     [](entt::entity, Transform const&, render::Material const& mat) __lambda_force_inline
