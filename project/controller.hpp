@@ -57,5 +57,5 @@ private:
     engine::ParallelExecutor executor{std::max(1, std::max(int32_t(engine::ParallelExecutor::kMaxThreads) - 4, int32_t(engine::ParallelExecutor::kHalfThreads)))};
 
     std::vector<std::function<void(float)>> update_callbacks_;
-    float time_from_start_ = 0;
+    long double time_from_start_ = 0;
 };
