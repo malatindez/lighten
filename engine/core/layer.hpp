@@ -14,7 +14,7 @@ namespace engine::core
 
     virtual void OnAttach() {}
     virtual void OnDetach() {}
-    virtual void OnEvent(events::Event &event) {}
+    virtual void OnEvent(events::Event &) {}
 
     [[nodiscard]] std::string_view name() const { return debug_name_; }
 

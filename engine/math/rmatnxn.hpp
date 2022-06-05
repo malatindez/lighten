@@ -1,6 +1,8 @@
 #pragma once
 #include "mat.hpp"
 #include "vec_math.hpp"
+#pragma warning( push )
+#pragma warning( disable : 4201 )
 namespace engine::core::math
 {
 
@@ -13,23 +15,23 @@ namespace engine::core::math
     template <size_t c, size_t d, Primitive P>
     constexpr rmat(mat<c, d, P> &p) requires(c >= a && d >= b);
     template <size_t c, size_t d, Primitive P>
-    constexpr rmat(rmat<c, d, P> p) requires(c >= a && d >= b);
+    constexpr rmat(rmat<c, d, P> &p) requires(c >= a && d >= b);
 
     template <typename U>
-    constexpr rmat<a, b, T>& operator=(mat<a, b, U> const& b)
+    constexpr rmat<a, b, T>& operator=(mat<a, b, U> const& mat)
     {
         for (int i = 0; i < size.x * size.y; i++)
         {
-            arr[i] = b.arr[i];
+            arr[i] = mat.arr[i];
         }
         return *this;
     }
     template <typename U>
-    constexpr rmat<a, b, T>& operator=(rmat<a, b, U> const& b)
+    constexpr rmat<a, b, T>& operator=(rmat<a, b, U> const& mat)
     {
         for (int i = 0; i < size.x * size.y; i++)
         {
-            arr[i] = b.arr[i];
+            arr[i] = mat.arr[i];
         }
         return *this;
     }
@@ -72,4 +74,5 @@ namespace engine::core::math
     static_assert(sizeof(arr) == sizeof(data));
   };
 } // namespace engine::core::math
+#pragma warning( pop )
 #include "rmatnxn.inl"

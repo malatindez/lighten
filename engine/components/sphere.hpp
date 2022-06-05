@@ -50,6 +50,7 @@ namespace engine::components
             i.normal = normalize(i.point - position);
             i.normal = normalize((core::math::vec4{i.normal, 0} * transform.model).as_vec<3>());
             i.point = (core::math::vec4{i.point, 1} * transform.model).as_vec<3>();
+            i.normal = i.normal * ((dot(i.normal, i.point - ray.origin()) > 0) ? -1 : 1);
             return true;
         }
         

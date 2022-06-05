@@ -1,32 +1,5 @@
 #pragma once
 #include "vec.hpp"
-namespace engine::core::math
-{
-    template <size_t rows, size_t columns, Primitive T>
-    struct mat;
-    template <size_t rows, size_t columns, Primitive T>
-    struct rmat;
-    namespace _detail
-    {
-        template <class T>
-        struct is_mat : public std::false_type
-        {
-        };
-        template <size_t a, size_t b, Primitive T>
-        struct is_mat<mat<a, b, T>> : public std::true_type
-        {
-        };
-        template <size_t a, size_t b, Primitive T>
-        struct is_mat<rmat<a, b, T>> : public std::true_type
-        {
-        };
-        template <class T>
-        constexpr bool is_mat_v = is_mat<T>::value;
-    } // namespace _detail
-    template <class T>
-    concept AnyMat = _detail::is_mat_v<T>;
-    
-}
 #include "matnxn.hpp"
 #include "rmatnxn.hpp"
 namespace engine::core::math

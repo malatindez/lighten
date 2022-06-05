@@ -7,9 +7,9 @@ namespace engine::core::math
   template <size_t c, size_t d, Primitive P>
   constexpr rmat<a, b, T>::rmat(mat<c, d, P> &p) requires(c >= a && d >= b)
   {
-      for (int i = 0; i < a; i++)
+      for (size_t i = 0; i < a; i++)
       {
-          for (int j = 0; j < b; j++)
+          for (size_t j = 0; j < b; j++)
           {
               arr[i * b + j].set_ptr(p.data[i][j]);
           }
@@ -17,14 +17,14 @@ namespace engine::core::math
   }
   template <size_t a, size_t b, Primitive T>
   template <size_t c, size_t d, Primitive P>
-  constexpr rmat<a, b, T>::rmat(rmat<c, d, P> p) requires(c >= a && d >= b)
+  constexpr rmat<a, b, T>::rmat(rmat<c, d, P> &p) requires(c >= a && d >= b)
   {
     reset();
-    for (int i = 0; i < a; i++)
+    for (size_t i = 0; i < a; i++)
     {
-      for (int j = 0; j < b; j++)
+      for (size_t j = 0; j < b; j++)
       {
-          arr[i * b + j].set_ptr(arr[i * b + j]);
+          arr[i * b + j].set_ptr(p.arr[i * b + j]);
       }
     }
   }
@@ -32,11 +32,11 @@ namespace engine::core::math
   template <size_t a, size_t b, Primitive T>
   constexpr void rmat<a, b, T>::reset() noexcept
   {
-    for (int i = 0; i < size.x; i++)
+    for (size_t i = 0; i < size.x; i++)
     {
       data[i].reset();
     }
-    for (int i = 0; i < a && i < b; i++)
+    for (size_t i = 0; i < a && i < b; i++)
     {
       data[i][i] = 1;
     }
@@ -65,7 +65,7 @@ namespace engine::core::math
   [[nodiscard]] constexpr mat<a, b, T> rmat<a, b, T>::operator-() const noexcept
   {
     mat<a, b, T> return_value{};
-    for (int i = 0; i < size.x; i++)
+    for (size_t i = 0; i < size.x; i++)
     {
       return_value.data[i] = -data[i];
     }
@@ -76,7 +76,7 @@ namespace engine::core::math
   template <Primitive U>
   constexpr rmat<a, b, T>& rmat<a, b, T>::operator+=(rmat<a, b, U> const& other)
   {
-      for (int i = 0; i < size.x; i++)
+      for (size_t i = 0; i < size.x; i++)
       {
           data[i] += other.data[i];
       }
@@ -86,7 +86,7 @@ namespace engine::core::math
   template <Primitive U>
   constexpr rmat<a, b, T>& rmat<a, b, T>::operator-=(rmat<a, b, U> const& other)
   {
-      for (int i = 0; i < size.x; i++)
+      for (size_t i = 0; i < size.x; i++)
       {
           data[i] -= other.data[i];
       }
@@ -103,7 +103,7 @@ namespace engine::core::math
   template <Primitive U>
   constexpr rmat<a, b, T>& rmat<a, b, T>::operator+=(mat<a, b, U> const& other)
   {
-      for (int i = 0; i < size.x; i++)
+      for (size_t i = 0; i < size.x; i++)
       {
           data[i] += other.data[i];
       }
@@ -113,7 +113,7 @@ namespace engine::core::math
   template <Primitive U>
   constexpr rmat<a, b, T>& rmat<a, b, T>::operator-=(mat<a, b, U> const& other)
   {
-      for (int i = 0; i < size.x; i++)
+      for (size_t i = 0; i < size.x; i++)
       {
           data[i] -= other.data[i];
       }
@@ -131,7 +131,7 @@ namespace engine::core::math
   template <Primitive U>
   constexpr rmat<a, b, T> &rmat<a, b, T>::operator+=(U const value)
   {
-    for (int i = 0; i < size.x; i++)
+    for (size_t i = 0; i < size.x; i++)
     {
       data[i] += value;
     }
@@ -141,7 +141,7 @@ namespace engine::core::math
   template <Primitive U>
   constexpr rmat<a, b, T> &rmat<a, b, T>::operator-=(U const value)
   {
-    for (int i = 0; i < size.x; i++)
+    for (size_t i = 0; i < size.x; i++)
     {
       data[i] -= value;
     }
@@ -151,7 +151,7 @@ namespace engine::core::math
   template <Primitive U>
   constexpr rmat<a, b, T> &rmat<a, b, T>::operator*=(U const value)
   {
-    for (int i = 0; i < size.x; i++)
+    for (size_t i = 0; i < size.x; i++)
     {
       data[i] *= value;
     }

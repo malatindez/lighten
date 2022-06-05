@@ -21,40 +21,40 @@ namespace engine::core::math
     template <Primitive U>
     constexpr rvec<2, T> &rvec<2, T>::operator+=(U const value) noexcept
     {
-        x += value;
-        y += value;
+        x += static_cast<T>(value);
+        y += static_cast<T>(value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr rvec<2, T> &rvec<2, T>::operator-=(U const value) noexcept
     {
-        x -= value;
-        y -= value;
+        x -= static_cast<T>(value);
+        y -= static_cast<T>(value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr rvec<2, T> &rvec<2, T>::operator*=(U const value) noexcept
     {
-        x *= value;
-        y *= value;
+        x *= static_cast<T>(value);
+        y *= static_cast<T>(value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr rvec<2, T> &rvec<2, T>::operator/=(U const value) noexcept
     {
-        x /= value;
-        y /= value;
+        x /= static_cast<T>(value);
+        y /= static_cast<T>(value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr rvec<2, T> &rvec<2, T>::operator%=(U const value) noexcept
     {
-        x %= value;
-        y %= value;
+        x %= static_cast<T>(value);
+        y %= static_cast<T>(value);
         return *this;
     }
     template <Primitive T>

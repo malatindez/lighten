@@ -4,11 +4,6 @@ namespace engine::render
 {
     struct Floor
     {
-        float Hit(core::math::Ray const &r, core::math::vec3 center, float radius) noexcept
-        {
-            return -1;
-        }
-
         bool CheckIntersection(core::math::Intersection &i, core::math::Ray const &ray) const
         {
             float denom = core::math::dot(normal, ray.direction());
@@ -47,4 +42,4 @@ namespace engine::render
         core::math::vec3 w;
         core::math::vec3 normal;
     };
-}
+} // namespace engine::render

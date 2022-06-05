@@ -80,7 +80,7 @@ namespace
         dir.color = color;
         return dir;
     }
-}
+} // namespace
 void Controller::InitScene()
 {
     UpdateMaterial(scene_->floor.material, vec3{0.3f}, vec3{0}, 0.25f, 4, true);
@@ -94,7 +94,7 @@ void Controller::InitScene()
 
     DirectionalLight &directional_light_v = registry.emplace<DirectionalLight>(directional_light);
     directional_light_v.direction = normalize(vec3{0, -1, -1});
-    directional_light_v.color = vec3{0.3f, 0.0f, 0.4f};
+    directional_light_v.color = vec3{0.1f};
     /*
          tick_layer->funcs.push_back(
             [&time_from_start_, &directional_light_v](float delta_time)
@@ -112,8 +112,8 @@ void Controller::InitScene()
     Transform &sphere2_transform = UpdateTransform(registry, sphere2, vec3{1}, vec3{1.5f});
     AddPointLight(registry, sphere2, vec3{0.2f, 0.0f, 0.2f}, 3);
     UpdateMaterial(AddSphereComponent(registry, sphere2).material, vec3{0}, vec3{0.2f, 0.0f, 0.2f}, 1, 2, true);
-    update_callbacks_.emplace_back([&sphere2_transform, this](float dt)
-                                   { sphere2_transform.scale = vec3{1.0f} + cos(time_from_start_ - 1.2f) / 2; sphere2_transform.UpdateMatrices(); });
+    update_callbacks_.emplace_back([&sphere2_transform, this](float)
+                                   { sphere2_transform.scale = vec3{1.0f} + math::cos(time_from_start_ - 1.2f) / 2; sphere2_transform.UpdateMatrices(); });
 
     entt::entity cube1 = registry.create();
     UpdateTransform(registry, cube1, vec3{3}, vec3{1.0f});
@@ -126,11 +126,11 @@ void Controller::InitScene()
     
     entt::entity spot_light = registry.create();
     UpdateTransform(registry, spot_light, vec3{0,5,-5}, vec3{0.05f});
-    AddSpotLight(registry, spot_light, vec3{0.5f, 0.0f, 0.5f}, radians(45.0f), 8);
+    AddSpotLight(registry, spot_light, vec3{1.0f}, radians(45.0f), 8);
     UpdateMaterial(AddSphereComponent(registry, spot_light).material, vec3{0}, vec3{1.0f}, 1, 2, false);
     
     entt::entity main_light = registry.create();
-    Transform &main_light_transform = UpdateTransform(registry, main_light, vec3{3, 2.5f, -3}, vec3{0.5f});
+    UpdateTransform(registry, main_light, vec3{3, 2.5f, -3}, vec3{0.5f});
     AddPointLight(registry, main_light, vec3{1.0f, 1.0f, 0.25f}, 5);
     UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{0}, vec3{1.0f, 1.0f, 0.25f}, 1, 0.5, false);
 }
@@ -264,9 +264,9 @@ void Controller::Tick(float delta_time)
         Ray b = PixelRaycast(vec2{input_.mouse_position()});
         rb_saved_mouse_position_ = input_.mouse_position();
 
-        vec3 offset = a.PointAtParameter(selected_object_distance_ * dot(a.direction(), b.direction()));
+        vec3 obj_offset = a.PointAtParameter(selected_object_distance_ * dot(a.direction(), b.direction()));
         
-        selected_object_->position = selected_object_offset_ + offset;
+        selected_object_->position = selected_object_offset_ + obj_offset;
         selected_object_->UpdateMatrices();
     }
     if (!(roll == 0 && pitch == 0 && yaw == 0))

@@ -2,20 +2,28 @@
 #include <algorithm>
 #include <array>
 #include <assert.h>
-#include <cmath>
 #include <concepts>
 #include <cstdint>
 #include <istream>
 #include <limits>
+#include <math.h>
 #include <numbers>
 #include <ostream>
 #include <type_traits>
 
 namespace engine::core::math
 {
-
     template <typename T>
     concept Primitive = std::floating_point<T> || std::integral<T>;
+    template <size_t L, Primitive T>
+    struct vec;
+    template <size_t L, Primitive T>
+    struct rvec;
+    template <size_t rows, size_t columns, Primitive T>
+    struct mat;
+    template <size_t rows, size_t columns, Primitive T>
+    struct rmat;
+
     namespace _detail
     {
         // reference wrapper without rebinding
@@ -61,8 +69,7 @@ namespace engine::core::math
                 return *this;
             }
 
-        private: 
-        T *ptr_{};
+        private : T *ptr_{};
         public:
             template <class... Types>
             constexpr auto operator()(Types &&...args) const
@@ -72,7 +79,43 @@ namespace engine::core::math
                 return std::invoke(*ptr_, static_cast<Types &&>(args)...);
             }
         };
+
+        template <class T>
+        struct is_mat : public std::false_type { };
+        template <size_t a, size_t b, Primitive T>
+        struct is_mat<mat<a, b, T>> : public std::true_type { };
+        template <size_t a, size_t b, Primitive T>
+        struct is_mat<rmat<a, b, T>> : public std::true_type { };
+
+        template <class T>
+        struct is_reference_vec : public std::false_type { };
+        template <size_t size, Primitive T>
+        struct is_reference_vec<rvec<size, T>> : public std::true_type { };
+        template <class T>
+        struct is_default_vec : public std::false_type { };
+        template <size_t size, Primitive T>
+        struct is_default_vec<vec<size, T>> : public std::true_type { };
+
+        template <class T>
+        constexpr bool is_mat_v = is_mat<T>::value;
+
+        template <class T>
+        constexpr bool is_reference_vec_v = is_reference_vec<T>::value;
+        template <class T>
+        constexpr bool is_default_vec_v = is_default_vec<T>::value;
+        template <class T>
+        constexpr bool is_vec_v = is_reference_vec_v<T> || is_default_vec_v<T>;
+
     } // namespace _detail
+
+    template <class T>
+    concept AnyMat = _detail::is_mat_v<T>;
+    template <class T>
+    concept AnyVec = _detail::is_vec_v<T>;
+    template <class T>
+    concept Vec = _detail::is_default_vec_v<T>;
+    template <class T>
+    concept RVec = _detail::is_reference_vec_v<T>;
 
     template <class T>
     [[nodiscard]] bool almost_equal(T x, T y, int ulp = 2) requires(!std::numeric_limits<T>::is_integer)
@@ -87,15 +130,27 @@ namespace engine::core::math
     template <class T>
     [[nodiscard]] constexpr T radians(T x) noexcept requires(!std::numeric_limits<T>::is_integer)
     {
-        return (x / 180.0f) * std::numbers::pi;
+        return (x / 180.0f) * static_cast<float>(std::numbers::pi);
     }
     template <Primitive T>
-    [[nodiscard]] inline T sin(T x) noexcept { return std::sinf(x); }
+    [[nodiscard]] inline float sin(T x) noexcept { return std::sinf(x); }
     [[nodiscard]] inline double sin(double x) { return std::sin(x); }
+    [[nodiscard]] inline long double sin(long double x) { return std::sinl(x); }
     template <Primitive T>
-    [[nodiscard]] inline T cos(T x) noexcept { return std::cosf(x); }
+    [[nodiscard]] inline float cos(T x) noexcept { return std::cosf(x); }
     [[nodiscard]] inline double cos(double x) { return std::cos(x); }
+    [[nodiscard]] inline long double cos(long double x) { return std::cosl(x); }
     template <Primitive T>
-    [[nodiscard]] inline T pow(T x, T y) noexcept { return std::powf(x, y); }
+    [[nodiscard]] inline float pow(T x, T y) noexcept { return std::powf(x, y); }
     [[nodiscard]] inline double pow(double x, double y) { return std::pow(x, y); }
+    [[nodiscard]] inline long double pow(long double x, long double y) { return std::powl(x, y); }
+    template <Primitive T>
+    [[nodiscard]] inline float sqrt(T x) noexcept { return std::sqrtf(x); }
+    [[nodiscard]] inline double sqrt(double x) { return std::sqrt(x); }
+    [[nodiscard]] inline long double sqrt(long double x) { return std::sqrtl(x); }
+    template <Primitive T>
+    [[nodiscard]] inline float cbrt(T x) noexcept { return std::cbrtf(x); }
+    [[nodiscard]] inline double cbrt(double x) { return std::cbrt(x); }
+    [[nodiscard]] inline long double cbrt(long double x) { return std::cbrtl(x); }
+
 } // namespace engine::core::math

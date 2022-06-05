@@ -12,10 +12,6 @@ using namespace core;
 using namespace math;
 using namespace components;
 
-void AddBasicSphere(entt::registry &registry, entt::entity sphere)
-{
-}
-
 // the entry point for any Windows program
 INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int cmd_show)
 {

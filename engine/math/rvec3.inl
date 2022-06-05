@@ -23,45 +23,45 @@ namespace engine::core::math
     template <Primitive U>
     constexpr rvec<3, T> &rvec<3, T>::operator+=(U const value) noexcept
     {
-        x += value;
-        y += value;
-        z += value;
+        x += static_cast<T>(value);
+        y += static_cast<T>(value);
+        z += static_cast<T>(value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr rvec<3, T> &rvec<3, T>::operator-=(U const value) noexcept
     {
-        x -= value;
-        y -= value;
-        z -= value;
+        x -= static_cast<T>(value);
+        y -= static_cast<T>(value);
+        z -= static_cast<T>(value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr rvec<3, T> &rvec<3, T>::operator*=(U const value) noexcept
     {
-        x *= value;
-        y *= value;
-        z *= value;
+        x *= static_cast<T>(value);
+        y *= static_cast<T>(value);
+        z *= static_cast<T>(value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr rvec<3, T> &rvec<3, T>::operator/=(U const value) noexcept
     {
-        x /= value;
-        y /= value;
-        z /= value;
+        x /= static_cast<T>(value);
+        y /= static_cast<T>(value);
+        z /= static_cast<T>(value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr rvec<3, T> &rvec<3, T>::operator%=(U const value) noexcept
     {
-        x %= value;
-        y %= value;
-        z %= value;
+        x %= static_cast<T>(value);
+        y %= static_cast<T>(value);
+        z %= static_cast<T>(value);
         return *this;
     }
 

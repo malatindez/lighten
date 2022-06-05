@@ -3,7 +3,19 @@ using namespace engine;
 using namespace core::events;
 void Input::OnEvent(Event &event)
 {
-    if (event.in_category(EventCategoryMouse))
+    if (event.in_category(EventCategoryApplication))
+    {
+        if (event.type() == EventType::AppTick)
+        {
+            auto const &ate = static_cast<AppTickEvent &>(event);
+            OnTick(ate.delta_time());
+        }
+        else if (event.type() == EventType::AppUpdate)
+        {
+            OnUpdate();
+        }
+    }
+    else if (event.in_category(EventCategoryMouse))
     {
         if (event.type() == EventType::MouseButtonPressed)
         {
@@ -55,5 +67,39 @@ void Input::OnEvent(Event &event)
             key_states_[kre.key_code()] = false;
         }
         event.handled = true;
+    }
+}
+void Input::OnTick(float dt)
+{
+    for(auto &[key, value] : on_tick_callbacks_)
+    {
+        bool t = true;
+        for(auto k : key)
+        {
+            t &= key_states_.at(k);
+        }
+        auto &[count, func] = value;
+        if(t) {
+            func(dt, key, ++count);
+            continue;
+        }
+        count = 0;
+    }
+}
+void Input::OnUpdate()
+{
+    for(auto &[key, value] : on_update_callbacks_)
+    {
+        bool t = true;
+        for(auto k : key)
+        {
+            t &= key_states_.at(k);
+        }
+        auto &[count, func] = value;
+        if(t) {
+            func(key, ++count);
+            continue;
+        }
+        count = 0;
     }
 }

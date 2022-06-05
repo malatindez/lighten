@@ -2,7 +2,7 @@
 #include "render/light-data.hpp"
 #include "render/material.hpp"
 #include "math.hpp"
-#include <cmath>
+#include <math.h>
 namespace engine::components
 {
     struct PointLight
@@ -12,10 +12,7 @@ namespace engine::components
         
         inline bool Illuminable(Transform const &transform, render::LightData const&light_data) const noexcept
         {
-            core::math::vec3 L = transform.position - light_data.point;
-            core::math::vec3 const H = core::math::normalize(light_data.ray.origin() - light_data.point);
-            float distance = length(L);
-            L = normalize(L);
+            core::math::vec3 const L = normalize(transform.position - light_data.point);
             float ndotl = dot(light_data.normal, L);
             if (ndotl < 0)
             {

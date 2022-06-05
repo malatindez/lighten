@@ -36,8 +36,14 @@ string(REPLACE "/" "\\" _source_path_msvc "${_source_path}")
 source_group("${_source_path_msvc}" FILES "${_source}")
 endforeach()
 
-if(MSVC)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Rpass=inline -Winline -W4 -mavx")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Winline /W4 /xCOMMON-AVX512")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /W4 /arch:AVX512")
 endif()
 
 add_subdirectory(third_party/entt)

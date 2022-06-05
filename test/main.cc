@@ -16,7 +16,6 @@ void random_fill(math::mat<a, b, T> &matrix)
         }
     }
 }
-constexpr float pi = 3.141592653589897932384626433;
 #include "core/parallel-executor.hpp"
 
 #include <array>
@@ -33,7 +32,7 @@ constexpr float pi = 3.141592653589897932384626433;
 int main()
 {
 	namespace t = std::chrono;
-    using engine::ParallelExecutor;
+    using engine::core::ParallelExecutor;
 	uint32_t numTasks = 1000;
 	uint32_t tasksPerBatch = 10;
 
@@ -42,7 +41,7 @@ int main()
 	values.resize(numTasks);
 	indices.resize(numTasks, -1);
 
-	auto heavyFunc = [&values, &indices](uint32_t threadIndex, uint32_t taskIndex)
+	auto heavyFunc = [&values, &indices](uint32_t, uint32_t taskIndex)
 	{
 		uint32_t x = 0;
 		for (uint32_t i = 0; i < 10000000; ++i)
@@ -59,15 +58,15 @@ int main()
 
 		for (uint32_t i = 0; i < 10; ++i)
 		{
-			for (uint32_t i = 0; i < indices.size(); ++i)
-				indices[i] = -1;
+			for (uint32_t j = 0; j < indices.size(); ++j)
+				indices[j] = -1;
 
 			auto start = t::steady_clock::now();
-			executor.execute(heavyFunc, values.size(), tasksPerBatch);
+			executor.execute(heavyFunc, static_cast<uint32_t>(values.size()), tasksPerBatch);
 			auto finish = t::steady_clock::now();
 
-			for (uint32_t i = 0; i < indices.size(); ++i)
-				assert(indices[i] == i);
+			for (uint32_t j = 0; j < indices.size(); ++j)
+				assert(static_cast<uint32_t>(indices[j]) == j);
 
 			std::cout << executor.thread_num() << " threads, time : " << t::duration_cast<t::microseconds>(finish - start).count() << " mcs" << std::endl;
 		}
@@ -77,8 +76,8 @@ int main()
 	{
 		auto start = t::steady_clock::now();
 
-		for (uint32_t i = 0; i < numTasks; ++i)
-			heavyFunc(0, i);
+		for (uint32_t j = 0; j < numTasks; ++j)
+			heavyFunc(0, j);
 
 		auto finish = t::steady_clock::now();
 

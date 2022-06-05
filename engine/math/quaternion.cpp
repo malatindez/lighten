@@ -1,4 +1,3 @@
-#pragma once
 #include "quaternion.hpp"
 namespace engine::core::math
 {

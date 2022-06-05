@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <thread>
+#include <numeric>
 
 namespace engine::core
 {
@@ -62,11 +63,11 @@ namespace engine::core
         render.reset();
         Application::OnEvent(render_event);
         assert(!render_event.handled);
-        static float spent_time = 0.0f;
+        static std::vector<float> last_100_frames(100);
         static int frame_num = 0;
-        spent_time += render.elapsed();
+        last_100_frames[frame_num % 100] = render.elapsed();
         frame_num++;
-        //OutputDebugStringA((std::to_string(frame_num / spent_time) + "\n").c_str());
+        OutputDebugStringA((std::to_string(100 / std::accumulate(last_100_frames.begin(), last_100_frames.end(), 0.0f)) + "\n").c_str());
       }
       std::this_thread::yield();
     }

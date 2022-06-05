@@ -1,20 +1,17 @@
 #pragma once
-#define NOMINMAX
-#include <Windows.h>
 #include "event.hpp"
 #include "math.hpp"
-#include "pch.hpp"
 
 namespace engine::core::events
 {
     class WindowCloseEvent final : public Event
     {
     public:
-        explicit WindowCloseEvent(HWND handle) : Event(EventType::WindowClose, EventCategoryApplication), handle_(handle) {}
-        [[nodiscard]] inline HWND handle() const noexcept { return handle_; }
+        explicit WindowCloseEvent(void *handle) : Event(EventType::WindowClose, EventCategoryApplication), handle_(handle) {}
+        [[nodiscard]] inline void *handle() const noexcept { return handle_; }
         EVENT_CLASS_TYPE(WindowClose)
     private:
-        HWND handle_;
+        void *handle_;
     };
     class WindowResizeEvent final : public Event
     {

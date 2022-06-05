@@ -8,7 +8,7 @@ namespace engine::core::math
   constexpr mat<a, b, T>::mat(P p) requires(a == b)
   {
     reset();
-    for (int i = 0; i < a; i++)
+    for (size_t i = 0; i < a; i++)
     {
       data[i][i] = static_cast<T>(p);
     }
@@ -18,9 +18,9 @@ namespace engine::core::math
   constexpr mat<a, b, T>::mat(mat<c, d, P> p) requires(a >= c && b >= d)
   {
     reset();
-    for (int i = 0; i < c; i++)
+    for (size_t i = 0; i < c; i++)
     {
-      for (int j = 0; j < d; j++)
+      for (size_t j = 0; j < d; j++)
       {
         data[i][j] = static_cast<T>(p.data[i][j]);
       }
@@ -31,9 +31,9 @@ namespace engine::core::math
   constexpr mat<a, b, T>::mat(rmat<c, d, P> p) requires(a >= c && b >= d)
   {
     reset();
-    for (int i = 0; i < c; i++)
+    for (size_t i = 0; i < c; i++)
     {
-      for (int j = 0; j < d; j++)
+      for (size_t j = 0; j < d; j++)
       {
         data[i][j] = static_cast<T>(p.data[i][j]);
       }
@@ -43,7 +43,7 @@ namespace engine::core::math
   template <Primitive P>
   constexpr mat<a, b, T>::mat(mat<a, b, P> p)
   {
-    for (int i = 0; i < a * b; i++)
+    for (size_t i = 0; i < a * b; i++)
     {
       arr[i] = static_cast<T>(p.arr[i]);
     }
@@ -52,7 +52,7 @@ namespace engine::core::math
   template <Primitive P>
   constexpr mat<a, b, T>::mat(rmat<a, b, P> p)
   {
-    for (int i = 0; i < a * b; i++)
+    for (size_t i = 0; i < a * b; i++)
     {
       arr[i] = static_cast<T>(p.arr[i]);
     }
@@ -69,11 +69,11 @@ namespace engine::core::math
   template <size_t a, size_t b, Primitive T>
   constexpr void mat<a, b, T>::reset() noexcept
   {
-    for (int i = 0; i < size.x; i++)
+    for (size_t i = 0; i < size.x; i++)
     {
       data[i].reset();
     }
-    for (int i = 0; i < a && i < b; i++)
+    for (size_t i = 0; i < a && i < b; i++)
     {
       data[i][i] = 1;
     }
@@ -102,7 +102,7 @@ namespace engine::core::math
   [[nodiscard]] constexpr mat<a, b, T> mat<a, b, T>::operator-() const noexcept
   {
     mat<a, b, T> return_value{};
-    for (int i = 0; i < size.x; i++)
+    for (size_t i = 0; i < size.x; i++)
     {
       return_value.data[i] = -data[i];
     }
@@ -113,7 +113,7 @@ namespace engine::core::math
   template <Primitive U>
   constexpr mat<a, b, T> &mat<a, b, T>::operator+=(mat<a, b, U> const &other)
   {
-    for (int i = 0; i < size.x; i++)
+    for (size_t i = 0; i < size.x; i++)
     {
       data[i] += other.data[i];
     }
@@ -123,7 +123,7 @@ namespace engine::core::math
   template <Primitive U>
   constexpr mat<a, b, T> &mat<a, b, T>::operator-=(mat<a, b, U> const &other)
   {
-    for (int i = 0; i < size.x; i++)
+    for (size_t i = 0; i < size.x; i++)
     {
       data[i] -= other.data[i];
     }
@@ -142,7 +142,7 @@ namespace engine::core::math
   template <Primitive U>
   constexpr mat<a, b, T> &mat<a, b, T>::operator+=(rmat<a, b, U> const &other)
   {
-    for (int i = 0; i < size.x; i++)
+    for (size_t i = 0; i < size.x; i++)
     {
       data[i] += other.data[i];
     }
@@ -152,7 +152,7 @@ namespace engine::core::math
   template <Primitive U>
   constexpr mat<a, b, T> &mat<a, b, T>::operator-=(rmat<a, b, U> const &other)
   {
-    for (int i = 0; i < size.x; i++)
+    for (size_t i = 0; i < size.x; i++)
     {
       data[i] -= other.data[i];
     }
@@ -170,7 +170,7 @@ namespace engine::core::math
   template <Primitive U>
   constexpr mat<a, b, T> &mat<a, b, T>::operator+=(U const value)
   {
-    for (int i = 0; i < size.x; i++)
+    for (size_t i = 0; i < size.x; i++)
     {
       data[i] += value;
     }
@@ -180,7 +180,7 @@ namespace engine::core::math
   template <Primitive U>
   constexpr mat<a, b, T> &mat<a, b, T>::operator-=(U const value)
   {
-    for (int i = 0; i < size.x; i++)
+    for (size_t i = 0; i < size.x; i++)
     {
       data[i] -= value;
     }
@@ -190,7 +190,7 @@ namespace engine::core::math
   template <Primitive U>
   constexpr mat<a, b, T> &mat<a, b, T>::operator*=(U const value)
   {
-    for (int i = 0; i < size.x; i++)
+    for (size_t i = 0; i < size.x; i++)
     {
       data[i] *= value;
     }
@@ -226,7 +226,7 @@ namespace engine::core::math
   template <class V> // vectors
   constexpr void mat<a, b, T>::unpack_data(int offset, V vec)
   {
-    for (int i = 0; i < V::size; i++)
+    for (size_t i = 0; i < V::size; i++)
     {
       arr[offset + i] = static_cast<T>(vec[i]);
     }

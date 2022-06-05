@@ -1,48 +1,5 @@
 #pragma once
-#include "mathpch.h"
-
-namespace engine::core::math
-{
-    template <size_t L, Primitive T>
-    struct vec;
-    template <size_t L, Primitive T>
-    struct rvec;
-    namespace _detail
-    {
-        template <class T>
-        struct is_reference_vec : public std::false_type
-        {
-        };
-        template <size_t size, Primitive T>
-        struct is_reference_vec<rvec<size, T>> : public std::true_type
-        {
-        };
-        
-        template <class T>
-        struct is_default_vec : public std::false_type
-        {
-        };
-        template <size_t size, Primitive T>
-        struct is_default_vec<vec<size, T>> : public std::true_type
-        {
-        };
-        
-        template <class T>
-        constexpr bool is_reference_vec_v = is_reference_vec<T>::value;
-        template <class T>
-        constexpr bool is_default_vec_v = is_default_vec<T>::value;
-        template <class T>
-        constexpr bool is_vec_v = is_reference_vec_v<T> || is_default_vec_v<T>;
-        
-    } // namespace _detail
-
-    template <class T>
-    concept AnyVec = _detail::is_vec_v<T>;
-    template <class T>
-    concept Vec = _detail::is_default_vec_v<T>;
-    template <class T>
-    concept RVec = _detail::is_reference_vec_v<T>;
-} // namespace engine::core::math
+#include "common.hpp"
 #include "math/rvec2.hpp"
 #include "math/rvec3.hpp"
 #include "math/rvec4.hpp"

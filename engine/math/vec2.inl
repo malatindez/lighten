@@ -9,8 +9,8 @@ namespace engine::core::math
     template <Primitive A, Primitive B>
     constexpr vec<2, T>::vec(A a, B b)
     {
-        x = a;
-        y = b;
+        x = static_cast<T>(a);
+        y = static_cast<T>(b);
     }
     template <Primitive T>
     template <typename... U>
@@ -39,40 +39,40 @@ namespace engine::core::math
     template <Primitive U>
     constexpr vec<2, T> &vec<2, T>::operator+=(U const value) noexcept
     {
-        x += value;
-        y += value;
+        x += static_cast<T>(value);
+        y += static_cast<T>(value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr vec<2, T> &vec<2, T>::operator-=(U const value) noexcept
     {
-        x -= value;
-        y -= value;
+        x -= static_cast<T>(value);
+        y -= static_cast<T>(value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr vec<2, T> &vec<2, T>::operator*=(U const value) noexcept
     {
-        x *= value;
-        y *= value;
+        x *= static_cast<T>(value);
+        y *= static_cast<T>(value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr vec<2, T> &vec<2, T>::operator/=(U const value) noexcept
     {
-        x /= value;
-        y /= value;
+        x /= static_cast<T>(value);
+        y /= static_cast<T>(value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr vec<2, T> &vec<2, T>::operator%=(U const value) noexcept
     {
-        x %= value;
-        y %= value;
+        x %= static_cast<T>(value);
+        y %= static_cast<T>(value);
         return *this;
     }
     template <Primitive T>
@@ -149,22 +149,22 @@ namespace engine::core::math
 
     template <Primitive T>
     template <Primitive U> // primitives
-    constexpr void vec<2, T>::unpack_data(int offset, U u)
+    constexpr void vec<2, T>::unpack_data(size_t offset, U u)
     {
         data[offset] = static_cast<T>(u);
     }
     template <Primitive T>
     template <class V> // vectors
-    constexpr void vec<2, T>::unpack_data(int offset, V vec)
+    constexpr void vec<2, T>::unpack_data(size_t offset, V vec)
     {
-        for (int i = 0; i < V::size; i++)
+        for (size_t i = 0; i < V::size; i++)
         {
             data[offset + i] = static_cast<T>(vec[i]);
         }
     }
     template <Primitive T>
     template <typename A, typename B, typename... C>
-    constexpr void vec<2, T>::unpack_data(int offset, A a, B b, C... c)
+    constexpr void vec<2, T>::unpack_data(size_t offset, A a, B b, C... c)
     {
         unpack_data(offset, a);
         offset += get_parameter_pack_size<A>();

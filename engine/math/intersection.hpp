@@ -1,5 +1,7 @@
 #pragma once
 #include "math.hpp"
+#pragma warning( push )
+#pragma warning( disable : 26495 )
 namespace engine::core::math
 {
     struct Intersection
@@ -19,3 +21,4 @@ namespace engine::core::math
         }
     };
 } // namespace engine::core::math
+#pragma warning( pop )

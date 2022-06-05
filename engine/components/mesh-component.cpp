@@ -1,5 +1,4 @@
 #include "mesh-component.hpp"
-#include "mesh-component.inl"
 namespace engine::components
 {
     MeshComponent::MeshComponent(std::shared_ptr<const render::Mesh> value) : mesh_(value)
@@ -10,15 +9,16 @@ namespace engine::components
                                  core::math::Ray const &ray) const
     {
         core::math::Ray local = ray;
-
+        static const float t0 = 0;
+        static const float t1 = 1;
         local.direction() =
             (core::math::vec4{local.direction(), 0} * transform.inv_model).as_vec<3>();
         local.origin() =
             (core::math::vec4{local.origin(), 1} * transform.inv_model).as_vec<3>();
 
-        bool rv = false;
+        bool rv = false; 
         auto it = mesh_->vertices.begin();
-        while (std::distance(it, mesh_->vertices.end()) > 2)
+        while (it != mesh_->vertices.end())
         {
             auto const &normal = it->normal;
             auto const &p0 = (it++)->position;
@@ -40,4 +40,67 @@ namespace engine::components
         assert(mesh != nullptr);
         mesh_ = mesh;
     }
-}
+    
+    bool MeshComponent::CheckTriangleIntersection(
+        core::math::vec3 const &p0,
+        core::math::vec3 const &p1,
+        core::math::vec3 const &p2,
+        core::math::vec3 const &normal,
+        core::math::Intersection &i,
+        core::math::Ray const &ray) noexcept
+    {
+
+        float ndotdir = core::math::dot(normal, ray.direction());
+        if (fabs(ndotdir) < 1e-6f)
+        {
+            return false;
+        }
+        float d = -dot(normal, p0);
+        float t = -(core::math::dot(ray.origin(), normal) + d) / ndotdir;
+        if (t > i.t || t < 0)
+        {
+            return false;
+        }
+        core::math::vec3 P = ray.PointAtParameter(t);
+        core::math::vec3 c;
+        core::math::vec3 edge0 = p1 - p0;
+        core::math::vec3 vp0 = P - p0;
+        c = core::math::cross(edge0, vp0);
+        if (core::math::dot(normal, c) < 0.0f)
+        {
+            return false;
+        }
+        core::math::vec3 edge1 = p2 - p1;
+        core::math::vec3 vp1 = P - p1;
+        c = core::math::cross(edge1, vp1);
+        if (core::math::dot(normal, c) < 0.0f)
+        {
+            return false;
+        }
+        core::math::vec3 edge2 = p0 - p2;
+        core::math::vec3 vp2 = P - p2;
+        c = core::math::cross(edge2, vp2);
+        if (core::math::dot(normal, c) < 0.0f)
+        {
+            return false;
+        }
+        i.point = P;
+        // reverse normal if the ray is on the opposite side of the triangle
+        i.normal = normal * (ndotdir > 0 ? -1 : 1);
+        i.t = t;
+        return true;
+    }
+    namespace {
+        extern "C" struct Vertex
+        {
+            typename decltype(render::Vertex::position)::type x, y, z;
+            typename decltype(render::Vertex::normal)::type nx, ny, nz;
+            typename decltype(render::Vertex::tex_coords)::type u, v;
+        };
+        extern "C" void process(Vertex * vertices);
+    }
+    bool MeshComponent::CheckTriangleIntersections(render::Vertex *vertices, core::math::Intersection &i, core::math::Ray const& ray)
+    {
+        return true;
+    }
+} // namespace engine::components

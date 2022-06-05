@@ -36,16 +36,17 @@ namespace engine
             std::function<bool(entt::entity, components::Transform const &, render::Material const &)> const &func);
         bool update_scene{true};
 
-        inline bool FindIntersection(SphereGroup &spheres, MeshGroup &meshes, core::math::Intersection &intersection, core::math::Ray &ray) const noexcept;
+        bool FindIntersection(SphereGroup &spheres, MeshGroup &meshes, core::math::Intersection &intersection, core::math::Ray &ray) const noexcept;
 
-        inline bool FindIntersectionIf(SphereGroup &spheres, MeshGroup &meshes, core::math::Intersection &intersection, core::math::Ray &ray, IntersectionCallbackFn const &func) const noexcept;
+        bool FindIntersectionIf(SphereGroup &spheres, MeshGroup &meshes, core::math::Intersection &intersection, core::math::Ray &ray, IntersectionCallbackFn const &func) const noexcept;
+        
         void Illuminate(SphereGroup &spheres,
                         MeshGroup &meshes,
                         DirectionalLightView &directional_lights,
                         PointLightGroup &point_lights,
                         SpotLightGroup &spot_lights,
                         render::LightData &ld,
-                        render::Material &mat);
+                        render::Material &mat) const;
 
         entt::registry registry;
         render::Floor floor;

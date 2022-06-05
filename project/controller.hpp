@@ -32,6 +32,7 @@ public:
 
     std::vector<std::function<void(float)>> &update_callbacks() {return update_callbacks_;}
 private:
+    void OnMoveCallback(float, Input::KeySeq const &, uint32_t);
     void Tick(float delta_time);
 
     [[nodiscard]] inline engine::core::math::Ray PixelRaycast(engine::core::math::vec2 ndc) const noexcept
@@ -55,7 +56,9 @@ private:
     engine::components::Transform *selected_object_ = nullptr;
     float selected_object_distance_ = 0.0f;
     engine::core::math::vec3 selected_object_offset_{0.0f};
-    engine::core::ParallelExecutor executor{std::max(1, std::max(int32_t(engine::core::ParallelExecutor::kMaxThreads) - 4, int32_t(engine::core::ParallelExecutor::kHalfThreads)))};
+    engine::core::ParallelExecutor executor{
+        static_cast<uint32_t>(std::max(1, std::max(int32_t(engine::core::ParallelExecutor::kMaxThreads) - 4, int32_t(engine::core::ParallelExecutor::kHalfThreads))))
+    };
 
     std::vector<std::function<void(float)>> update_callbacks_;
     long double time_from_start_ = 0;

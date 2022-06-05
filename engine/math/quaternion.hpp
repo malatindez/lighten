@@ -1,15 +1,17 @@
 #pragma once
 #include "matnxn.hpp"
 #include "vec_math.hpp"
+#pragma warning( push )
+#pragma warning( disable : 4201 )
+
 namespace engine::core::math
 {
     template <Primitive T>
-    class qua
+    struct qua
     {
-    public:
         using type = T;
         static constexpr size_t size = 4;
-        constexpr qua() = default;
+        constexpr qua() : qua(1,0,0,0) {}
         constexpr explicit qua(T w, T x, T y, T z);
         constexpr void reset();
         constexpr explicit qua(T radians, vec<3, T> axis);
@@ -97,7 +99,7 @@ namespace engine::core::math
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> inverse(qua<T> const &q);
     template <Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<3, T> cross(vec<3, T> const &left, vec<3, U> const &right);
+    [[nodiscard]] constexpr vec<3, T> cross(qua<T> const &left, vec<3, U> const &right);
     template <Primitive T, Primitive U>
     [[nodiscard]] constexpr vec<3, T> cross(vec<3, U> const &left, qua<T> const &right);
 
@@ -108,6 +110,8 @@ namespace engine::core::math
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> normalize(qua<T> const &q);
 } // namespace engine::core::math
+
+#pragma warning( pop )
 
 namespace engine::core::math
 {

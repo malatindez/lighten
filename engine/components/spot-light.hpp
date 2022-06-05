@@ -3,7 +3,7 @@
 #include "render/material.hpp"
 #include "math.hpp"
 #include "point-light.hpp"
-#include <cmath>
+#include <math.h>
 namespace engine::components
 {
     struct SpotLight : public PointLight

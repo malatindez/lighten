@@ -4,7 +4,7 @@
 #include "math.hpp"
 #include "math/ray.hpp"
 #include "math/intersection.hpp"
-#include <cmath>
+#include <math.h>
 #include <functional>
 namespace engine::components
 {

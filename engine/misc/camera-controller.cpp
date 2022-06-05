@@ -1,4 +1,3 @@
-#pragma once
 #include "camera-controller.hpp"
 namespace engine
 {

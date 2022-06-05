@@ -14,7 +14,7 @@ namespace engine
 
     void Scene::UpdateScene() noexcept { update_scene = true; }
     void Scene::Draw(components::Camera const &cam, BitmapWindow &window,
-                     ParallelExecutor &executor)
+                     [[maybe_unused]] ParallelExecutor &executor)
     {
 
         auto spheres = registry.group<components::Sphere>(entt::get<components::Transform>);
@@ -117,9 +117,9 @@ namespace engine
     inline bool Scene::FindIntersection(SphereGroup &spheres, MeshGroup &meshes, Intersection &intersection, Ray &ray) const noexcept
     {
         floor.CheckIntersection(intersection, ray);
-        spheres.each([&intersection, &ray](auto const entity, auto const &sphere, auto const &transform) __lambda_force_inline
+        spheres.each([&intersection, &ray](auto const, auto const &sphere, auto const &transform) __lambda_force_inline
                      { sphere.CheckIntersection(transform, intersection, ray); });
-        meshes.each([&intersection, &ray](auto const entity, auto const &mesh, auto const &transform) __lambda_force_inline
+        meshes.each([&intersection, &ray](auto const, auto const &mesh, auto const &transform) __lambda_force_inline
                     { mesh.CheckIntersection(transform, intersection, ray); });
         return intersection.exists();
     }
@@ -143,14 +143,14 @@ namespace engine
                            PointLightGroup &point_lights,
                            SpotLightGroup &spot_lights,
                            render::LightData &ld,
-                           render::Material &mat)
+                           render::Material &mat) const
     {
 
         auto find_intersection_if_casts_shadow = [this, &spheres, &meshes](Intersection &intersection, Ray &ray) __lambda_force_inline
         {
             return FindIntersectionIf(spheres, meshes, intersection, ray,
-                                      [](entt::entity, Transform const &, render::Material const &mat) __lambda_force_inline
-                                      { return mat.casts_shadow; });
+                                      [](entt::entity, Transform const &, render::Material const &m) __lambda_force_inline
+                                      { return m.casts_shadow; });
         };
         for (auto entity : directional_lights)
         {

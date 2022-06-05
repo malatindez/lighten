@@ -27,10 +27,10 @@ namespace engine::core::math
             axis = normalize(axis);
         }
         w = core::math::cos(radians / 2);
-        float const s = core::math::sin(radians / 2);
-        x = axis.x * s;
-        y = axis.y * s;
-        z = axis.z * s;
+        auto const ss = core::math::sin(radians / 2);
+        x = axis.x * ss;
+        y = axis.y * ss;
+        z = axis.z * ss;
     }
 
     template <Primitive T>
@@ -152,13 +152,13 @@ namespace engine::core::math
     template <Primitive U>
     constexpr qua<T> &qua<T>::operator*=(qua<U> const &other) noexcept
     {
-        qua<T> const p(*this);
-        qua<T> const q(other);
+        qua<T> const t0(*this);
+        qua<T> const t1(other);
 
-        this->w = p.w * q.w - p.x * q.x - p.y * q.y - p.z * q.z;
-        this->x = p.w * q.x + p.x * q.w + p.y * q.z - p.z * q.y;
-        this->y = p.w * q.y + p.y * q.w + p.z * q.x - p.x * q.z;
-        this->z = p.w * q.z + p.z * q.w + p.x * q.y - p.y * q.x;
+        this->w = t0.w * t1.w - t0.x * t1.x - t0.y * t1.y - t0.z * t1.z;
+        this->x = t0.w * t1.x + t0.x * t1.w + t0.y * t1.z - t0.z * t1.y;
+        this->y = t0.w * t1.y + t0.y * t1.w + t0.z * t1.x - t0.x * t1.z;
+        this->z = t0.w * t1.z + t0.z * t1.w + t0.x * t1.y - t0.y * t1.x;
         return *this;
     }
     template <Primitive T>
@@ -332,12 +332,6 @@ namespace engine::core::math
     [[nodiscard]] constexpr qua<T> conjugate(qua<T> const &q);
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> inverse(qua<T> const &q);
-    template <Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<3, T> cross(vec<3, T> const &left,
-                                            vec<3, U> const &right);
-    template <Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<3, T> cross(vec<3, U> const &left,
-                                            qua<T> const &right);
 
     template <Primitive T>
     [[nodiscard]] constexpr mat<4, 4, T> rotate(mat<4, 4, T> const &matrix,

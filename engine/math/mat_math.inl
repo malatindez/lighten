@@ -1,5 +1,7 @@
 #pragma once
 #include "mat_math.hpp"
+#pragma warning( push )
+#pragma warning( disable : 4701 )
 namespace engine::core::math
 {
   template <AnyMat U>
@@ -29,9 +31,9 @@ namespace engine::core::math
   }
 
   template <AnyMat T, AnyMat U>
-  [[nodiscard]] constexpr mat<T::size.x, T::size.y, typename T::type> operator*(T const left, U const &right) requires(T::size.y == U::size.x)
+  [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator*(T const left, U const &right) requires(T::size.y == U::size.x)
   {
-    mat<T::size.x, T::size.y, typename T::type> return_value;
+    mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> return_value;
     for (size_t i = 0; i < T::size.x; i++)
     {
       for (size_t j = 0; j < U::size.y; j++)
@@ -46,9 +48,9 @@ namespace engine::core::math
     return return_value;
   }
   template <AnyVec T, AnyMat U>
-  [[nodiscard]] constexpr vec<T::size, typename T::type> operator*(T const &left, U const &right) requires(U::size.x == T::size)
+  [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> operator*(T const &left, U const &right) requires(U::size.x == T::size)
   {
-    vec<T::size, typename T::type> return_value;
+    vec<T::size, std::remove_const_t<typename T::type>> return_value;
     for (size_t j = 0; j < U::size.y; j++)
     {
       return_value[j] = 0;
@@ -60,20 +62,20 @@ namespace engine::core::math
     return return_value;
   }
   template <AnyMat T, Primitive U>
-  [[nodiscard]] constexpr mat<T::size.x, T::size.y, typename T::type> operator*(T const &left, U const right)
+  [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator*(T const &left, U const right)
   {
-    return mat<T::size.x, T::size.y, typename T::type>(left) *= right;
+    return mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>>(left) *= right;
   }
   template <AnyMat T, Primitive U>
-  [[nodiscard]] constexpr mat<T::size.x, T::size.y, typename T::type> operator*(U const left, T const &right)
+  [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator*(U const left, T const &right)
   {
-    return mat<T::size.x, T::size.y, typename T::type>(right) *= left;
+    return mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>>(right) *= left;
   }
 
   template <AnyMat T>
-  constexpr mat<T::size.y, T::size.x, typename T::type> transpose(T const &matrix)
+  constexpr mat<T::size.y, T::size.x, std::remove_const_t<typename T::type>> transpose(T const &matrix)
   {
-    rmat<T::size.x, T::size.y, typename T::type> return_value;
+    rmat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> return_value;
     for (int i = 0; i < T::size.x; i++)
     {
       for (int j = 0; j < T::size.y; j++)
@@ -154,10 +156,10 @@ namespace engine::core::math
   }
 
   template <AnyMat T>
-  constexpr mat<T::size.x, T::size.y, typename T::type> adjugate(T const &m) requires(T::size.x == T::size.y)
+  constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> adjugate(T const &m) requires(T::size.x == T::size.y)
   {
-    mat<T::size.x, T::size.y, typename T::type> return_value;
-    mat<T::size.x - 1, T::size.y - 1, typename T::type> temp;
+    mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> return_value;
+    mat<T::size.x - 1, T::size.y - 1, std::remove_const_t<typename T::type>> temp;
     int sign = 1;
     for (int i = 0; i < T::size.x; i++)
     {
@@ -186,13 +188,13 @@ namespace engine::core::math
   }
 
   template <AnyMat T>
-  constexpr mat<T::size.x, T::size.y, typename T::type> inverse(T const &m) requires(T::size.x == T::size.y)
+  constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> inverse(T const &m) requires(T::size.x == T::size.y)
   {
     return adjugate(m) * (static_cast<typename T::type>(1) / det(m));
   }
 
   template <AnyMat T, AnyVec V>
-  constexpr mat<4, 4, typename T::type> translate(T const &matrix, V const &vec) requires(T::size.x == T::size.y && T::size.x == 4 && V::size == 3)
+  constexpr mat<4, 4, std::remove_const_t<typename T::type>> translate(T const &matrix, V const &vec) requires(T::size.x == T::size.y && T::size.x == 4 && V::size == 3)
   {
     mat<4, 4, typename T::type> return_value;
     return_value[0] = matrix[0];
@@ -203,7 +205,7 @@ namespace engine::core::math
     return return_value;
   }
   template <AnyMat T, Primitive U, AnyVec V>
-  constexpr mat<4, 4, typename T::type> rotate(T const &matrix, U angle, V const &vector) requires(T::size.x == T::size.y && T::size.x == 4 && V::size == 3)
+  constexpr mat<4, 4, std::remove_const_t<typename T::type>> rotate(T const &matrix, U angle, V const &vector) requires(T::size.x == T::size.y && T::size.x == 4 && V::size == 3)
   {
     typename T::type const c = core::math::cos(angle);
     typename T::type const s = core::math::sin(angle);
@@ -234,7 +236,7 @@ namespace engine::core::math
     return result;
   }
   template <AnyMat T, AnyVec V>
-  constexpr mat<4, 4, typename T::type> scale(T const& matrix, V const &scale) requires (T::size.x == T::size.y && T::size.x == 4 && V::size == 3)
+  constexpr mat<4, 4, std::remove_const_t<typename T::type>> scale(T const& matrix, V const &scale) requires (T::size.x == T::size.y && T::size.x == 4 && V::size == 3)
   {
     mat<4, 4, typename T::type> return_value;
     return_value[0] = matrix[0] * scale[0];
@@ -245,7 +247,7 @@ namespace engine::core::math
   }
 
     template <AnyVec Position>
-    constexpr mat<4, 4, typename Position::type> lookAt(Position const &eye, Position const &center, Position const &world_up) requires (Position::size == 3)
+    constexpr mat<4, 4, std::remove_const_t<typename Position::type>> lookAt(Position const &eye, Position const &center, Position const &world_up) requires (Position::size == 3)
   {
     vec<3, typename Position::type> const forward = normalize(center - eye);
     vec<3, typename Position::type> const right = normalize(cross(forward, world_up));
@@ -275,7 +277,7 @@ namespace engine::core::math
 
     mat<4, 4, T> return_value(0);
     return_value[0][0] = static_cast<T>(1) / (aspect_ratio * tan_half_fov_y);
-    return_value[1][1] = static_cast<T>(1) / (tan_half_fov_y);
+    return_value[1][1] = static_cast<T>(1) / tan_half_fov_y;
     return_value[2][2] = z_far / (z_far - z_near);
     return_value[2][3] = static_cast<T>(1);
     return_value[3][2] = -(z_far * z_near) / (z_far - z_near);
@@ -368,3 +370,4 @@ namespace engine::core::math
     return return_value;
   }
 } // namespace engine::core::math
+#pragma warning ( pop )

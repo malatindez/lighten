@@ -2,6 +2,8 @@
 
 #include "vec.hpp"
 
+#pragma warning( push )
+#pragma warning( disable : 4201 )
 namespace engine::core::math
 {
 
@@ -23,7 +25,7 @@ namespace engine::core::math
         template <typename U>
         constexpr vec<size, T> &operator=(rvec<size, U> const &b)
         {
-            for (int i = 0; i < size; i++)
+            for (size_t i = 0; i < size; i++)
             {
                 data[i] = b.data[i];
             }
@@ -32,7 +34,7 @@ namespace engine::core::math
         template <typename U>
         constexpr vec<size, T> &operator=(vec<size, U> const &b)
         {
-            for (int i = 0; i < size; i++)
+            for (size_t i = 0; i < size; i++)
             {
                 data[i] = b.data[i];
             }
@@ -98,15 +100,17 @@ namespace engine::core::math
         static constexpr size_t get_parameter_pack_size();
 
         template <Primitive U>
-        constexpr void unpack_data(int offset, U u);
+        constexpr void unpack_data(size_t offset, U u);
         template <class V>
-        constexpr void unpack_data(int offset, V vec);
+        constexpr void unpack_data(size_t offset, V vec);
         template <typename A, typename B, typename... C>
-        constexpr void unpack_data(int offset, A a, B b, C... c);
+        constexpr void unpack_data(size_t offset, A a, B b, C... c);
     };
 
     template <Primitive T, Primitive U>
     constexpr vec<3, T> cross(vec<3, T> const &left, vec<3, U> const &right);
 
 }; // namespace engine::core::math
+
+#pragma warning( pop )
 #include "vec3.inl"

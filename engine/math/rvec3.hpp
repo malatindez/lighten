@@ -2,6 +2,8 @@
 
 #include "vec.hpp"
 
+#pragma warning( push )
+#pragma warning( disable : 4201 )
 namespace engine::core::math
 {
 
@@ -11,10 +13,10 @@ namespace engine::core::math
         using type = T;
         static constexpr size_t size = 3;
         explicit constexpr rvec(T &a, T &b, T &c) : x{a}, y{b}, z{c} {}
-        template <AnyVec T>
-        explicit constexpr rvec(T &other) requires(T::size >= size) : x{other.x}, y{other.y}, z{other.z} {}
-        template <AnyVec T>
-        explicit constexpr rvec(T const &other) requires(T::size >= size && std::is_const_v<typename T::type>) : x{other.x}, y{other.y}, z{other.z} {}
+        template <AnyVec V>
+        explicit constexpr rvec(V &other) requires(V::size >= size) : x{other.x}, y{other.y}, z{other.z} {}
+        template <AnyVec V>
+        explicit constexpr rvec(V const &other) requires(V::size >= size && std::is_const_v<typename V::type>) : x{other.x}, y{other.y}, z{other.z} {}
         template <AnyVec U>
         static constexpr rvec<3, T> from_vec(U &other) requires (U::size >= 3) { return rvec<3, T>(other.x, other.y, other.z); }
         template <AnyVec U>
@@ -23,7 +25,7 @@ namespace engine::core::math
         template <typename U>
         constexpr rvec<size, T> &operator=(rvec<size, U> const &b)
         {
-            for (int i = 0; i < size; i++)
+            for (size_t i = 0; i < size; i++)
             {
                 data[i] = b.data[i];
             }
@@ -32,7 +34,7 @@ namespace engine::core::math
         template <typename U>
         constexpr rvec<size, T> &operator=(vec<size, U> const &b)
         {
-            for (int i = 0; i < size; i++)
+            for (size_t i = 0; i < size; i++)
             {
                 data[i] = b.data[i];
             }
@@ -88,7 +90,6 @@ namespace engine::core::math
         };
         static_assert(sizeof(data) == 3 * sizeof( _detail::primitive_reference_wrapper<T>));
     };
-
-
 }; // namespace engine::core::math
+#pragma warning ( pop )
 #include "rvec3.inl"

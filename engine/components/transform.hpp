@@ -1,5 +1,7 @@
 #pragma once
 #include "math.hpp"
+#pragma warning( push )
+#pragma warning( disable : 26495 )
 namespace engine::components
 {
   class Transform final
@@ -20,12 +22,13 @@ namespace engine::components
       model = core::math::scale(model, scale);
       inv_model = core::math::inverse(model);
     }
-    core::math::vec3 position;
-    float padding0;
+    core::math::vec3 position{0};
+    float padding0 = 0;
     core::math::vec3 scale{1};
-    float padding1;
+    float padding1 = 0;
     core::math::quat rotation;
     core::math::mat4 model;
     core::math::mat4 inv_model;
   };
+#pragma warning( pop )
 } // namespace engine::components
