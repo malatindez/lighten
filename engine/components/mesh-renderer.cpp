@@ -5,8 +5,8 @@ namespace engine::components
     {
         assert(value != nullptr);
     }
-    bool MeshRenderer:: CheckIntersection(Transform const &transform, core::math::Intersection &i,
-                                 core::math::Ray const &ray) const
+    bool MeshRenderer::CheckIntersection(Transform const &transform, core::math::Intersection &i,
+                                         core::math::Ray const &ray) const
     {
         core::math::Ray local = ray;
         static const float t0 = 0;
@@ -16,7 +16,7 @@ namespace engine::components
         local.origin() =
             (core::math::vec4{local.origin(), 1} * transform.inv_model).as_vec<3>();
 
-        bool rv = false; 
+        bool rv = false;
         auto it = mesh_->vertices.begin();
         while (it != mesh_->vertices.end())
         {
@@ -40,7 +40,7 @@ namespace engine::components
         assert(mesh != nullptr);
         mesh_ = mesh;
     }
-    
+
     bool MeshRenderer::CheckTriangleIntersection(
         core::math::vec3 const &p0,
         core::math::vec3 const &p1,

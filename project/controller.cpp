@@ -121,12 +121,12 @@ void Controller::InitScene()
     UpdateTransform(registry, cube2, vec3{5}, vec3{1.5f});
     AddPointLight(registry, cube2, vec3{0.5f, 0.0f, 0.5f}, 3);
     UpdateMaterial(AddCubeComponent(registry, cube2).material(), vec3{0}, vec3{0.5f, 0.0f, 0.5f}, 1, 2, false);
-    
+
     entt::entity spot_light = registry.create();
-    UpdateTransform(registry, spot_light, vec3{0,5,-5}, vec3{0.05f});
+    UpdateTransform(registry, spot_light, vec3{0, 5, -5}, vec3{0.05f});
     AddSpotLight(registry, spot_light, vec3{1.0f}, radians(45.0f), 8);
     UpdateMaterial(AddSphereComponent(registry, spot_light).material, vec3{0}, vec3{1.0f}, 1, 2, false);
-    
+
     entt::entity main_light = registry.create();
     UpdateTransform(registry, main_light, vec3{3, 2.5f, -3}, vec3{0.5f});
     AddPointLight(registry, main_light, vec3{1.0f, 1.0f, 0.25f}, 5);
@@ -263,7 +263,7 @@ void Controller::Tick(float delta_time)
         rb_saved_mouse_position_ = input_.mouse_position();
 
         vec3 obj_offset = a.PointAtParameter(selected_object_distance_ * dot(a.direction(), b.direction()));
-        
+
         selected_object_->position = selected_object_offset_ + obj_offset;
         selected_object_->UpdateMatrices();
     }

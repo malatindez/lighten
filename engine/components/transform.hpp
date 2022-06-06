@@ -1,7 +1,7 @@
 #pragma once
 #include "math.hpp"
-#pragma warning( push )
-#pragma warning( disable : 26495 )
+#pragma warning(push)
+#pragma warning(disable : 26495)
 namespace engine::components
 {
   class Transform final
@@ -30,5 +30,5 @@ namespace engine::components
     core::math::mat4 model;
     core::math::mat4 inv_model;
   };
-#pragma warning( pop )
+#pragma warning(pop)
 } // namespace engine::components

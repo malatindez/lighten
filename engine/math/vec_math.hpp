@@ -103,11 +103,11 @@ namespace engine::core::math
     constexpr typename T::type angle(T const &left, U const &right) requires(T::size == U::size);
 
     template <AnyVec T>
-    constexpr vec<T::size, typename T::type> cos(T const& vector);
+    constexpr vec<T::size, typename T::type> cos(T const &vector);
 
     template <AnyVec T>
-    constexpr vec<T::size, typename T::type> sin(T const& vector);
-    
+    constexpr vec<T::size, typename T::type> sin(T const &vector);
+
     template <AnyVec T, Primitive U>
     constexpr vec<T::size, typename T::type> pow(T const &vector, U const pow);
 
@@ -124,11 +124,10 @@ namespace engine::core::math
     constexpr void rclamp(T &left, U const min, U const max);
 
     template <AnyVec T, Primitive U>
-    [[nodiscard]] constexpr vec<T::size, typename T::type> clamp(T const& left, U const min, U const max);
+    [[nodiscard]] constexpr vec<T::size, typename T::type> clamp(T const &left, U const min, U const max);
 
     template <Primitive T, Primitive U>
     [[nodiscard]] constexpr T clamp(T left, U const min, U const max);
-
 
 } // namespace engine::core::math
 #include "vec_math.inl"

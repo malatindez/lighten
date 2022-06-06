@@ -2,7 +2,8 @@
 #include "math/ray.hpp"
 namespace engine::core::math
 {
-    struct Sphere {
+    struct Sphere
+    {
         static constexpr float Hit(core::math::Ray const &r, core::math::vec3 const &center, float radius) noexcept
         {
             const core::math::vec3 oc = r.origin() - center;

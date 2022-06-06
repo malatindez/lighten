@@ -19,6 +19,7 @@ if(test)
   target_include_directories(runUnitTests PRIVATE ${TEST_SOURCES_DIR})
   target_include_directories(runUnitTests PRIVATE ${ENGINE_SOURCES_DIR})
 
+  target_compile_options(runUnitTests  PRIVATE /bigobj)
   target_add_libraries(runUnitTests "entt" "spdlog" "benchmark" "gtest")
 
   add_test(NAME TEST COMMAND runUnitTests)

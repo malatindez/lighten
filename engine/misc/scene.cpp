@@ -164,7 +164,7 @@ namespace engine
 
             if (!nearest.exists())
             {
-              dirlight.Illuminate(ld, mat);
+                dirlight.Illuminate(ld, mat);
             }
         }
         for (auto entity : point_lights)
@@ -213,7 +213,7 @@ namespace engine
 
             if (!nearest.exists() || nearest.t - 0.01f >= d)
             {
-               spot_light.Illuminate(transform, ld, mat);
+                spot_light.Illuminate(transform, ld, mat);
             }
         }
     }

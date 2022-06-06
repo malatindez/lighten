@@ -7,7 +7,7 @@ namespace engine::core::events
     {
     public:
         explicit KeyPressedEvent(uint32_t const code, uint16_t const count)
-             : Event(EventType::KeyPressed, EventCategoryKeyboard | EventCategoryInput), key_code_(code), count_(count) {}
+            : Event(EventType::KeyPressed, EventCategoryKeyboard | EventCategoryInput), key_code_(code), count_(count) {}
         [[nodiscard]] std::string to_string() const noexcept override
         {
             return std::string(name()) + std::to_string(key_code_);
@@ -23,8 +23,8 @@ namespace engine::core::events
     class KeyReleasedEvent final : public Event
     {
     public:
-        explicit KeyReleasedEvent(uint32_t const code) 
-             : Event(EventType::KeyReleased, EventCategoryKeyboard | EventCategoryInput), key_code_(code) {}
+        explicit KeyReleasedEvent(uint32_t const code)
+            : Event(EventType::KeyReleased, EventCategoryKeyboard | EventCategoryInput), key_code_(code) {}
         [[nodiscard]] std::string to_string() const noexcept override
         {
             return std::string(name()) + std::to_string(key_code_);

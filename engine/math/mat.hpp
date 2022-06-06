@@ -1,7 +1,7 @@
 #pragma once
-#include "vec.hpp"
 #include "matnxn.hpp"
 #include "rmatnxn.hpp"
+#include "vec.hpp"
 namespace engine::core::math
 {
     using mat4 = mat<4, 4, float>;
@@ -49,7 +49,6 @@ namespace engine::core::math
     using dmat4x3 = mat<4, 3, double>;
     using imat4x3 = mat<4, 3, int>;
 
-    
     using rmat4 = rmat<4, 4, float>;
     using drmat4 = rmat<4, 4, double>;
     using irmat4 = rmat<4, 4, int>;

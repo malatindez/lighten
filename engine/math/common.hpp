@@ -81,20 +81,34 @@ namespace engine::core::math
         };
 
         template <class T>
-        struct is_mat : public std::false_type { };
+        struct is_mat : public std::false_type
+        {
+        };
         template <size_t a, size_t b, Primitive T>
-        struct is_mat<mat<a, b, T>> : public std::true_type { };
+        struct is_mat<mat<a, b, T>> : public std::true_type
+        {
+        };
         template <size_t a, size_t b, Primitive T>
-        struct is_mat<rmat<a, b, T>> : public std::true_type { };
+        struct is_mat<rmat<a, b, T>> : public std::true_type
+        {
+        };
 
         template <class T>
-        struct is_reference_vec : public std::false_type { };
+        struct is_reference_vec : public std::false_type
+        {
+        };
         template <size_t size, Primitive T>
-        struct is_reference_vec<rvec<size, T>> : public std::true_type { };
+        struct is_reference_vec<rvec<size, T>> : public std::true_type
+        {
+        };
         template <class T>
-        struct is_default_vec : public std::false_type { };
+        struct is_default_vec : public std::false_type
+        {
+        };
         template <size_t size, Primitive T>
-        struct is_default_vec<vec<size, T>> : public std::true_type { };
+        struct is_default_vec<vec<size, T>> : public std::true_type
+        {
+        };
 
         template <class T>
         constexpr bool is_mat_v = is_mat<T>::value;

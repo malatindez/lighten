@@ -1,11 +1,11 @@
 #pragma once
+#include "math.hpp"
+#include "math/intersection.hpp"
+#include "math/ray.hpp"
 #include "render/light-data.hpp"
 #include "render/material.hpp"
-#include "math.hpp"
-#include "math/ray.hpp"
-#include "math/intersection.hpp"
-#include <math.h>
 #include <functional>
+#include <math.h>
 namespace engine::components
 {
     struct DirectionalLight

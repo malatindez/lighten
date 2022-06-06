@@ -1,7 +1,7 @@
 #pragma once
 #include "mat_math.hpp"
-#pragma warning( push )
-#pragma warning( disable : 4701 )
+#pragma warning(push)
+#pragma warning(disable : 4701)
 namespace engine::core::math
 {
   template <AnyMat U>
@@ -236,7 +236,7 @@ namespace engine::core::math
     return result;
   }
   template <AnyMat T, AnyVec V>
-  constexpr mat<4, 4, std::remove_const_t<typename T::type>> scale(T const& matrix, V const &scale) requires (T::size.x == T::size.y && T::size.x == 4 && V::size == 3)
+  constexpr mat<4, 4, std::remove_const_t<typename T::type>> scale(T const &matrix, V const &scale) requires(T::size.x == T::size.y && T::size.x == 4 && V::size == 3)
   {
     mat<4, 4, typename T::type> return_value;
     return_value[0] = matrix[0] * scale[0];
@@ -246,8 +246,8 @@ namespace engine::core::math
     return return_value;
   }
 
-    template <AnyVec Position>
-    constexpr mat<4, 4, std::remove_const_t<typename Position::type>> lookAt(Position const &eye, Position const &center, Position const &world_up) requires (Position::size == 3)
+  template <AnyVec Position>
+  constexpr mat<4, 4, std::remove_const_t<typename Position::type>> lookAt(Position const &eye, Position const &center, Position const &world_up) requires(Position::size == 3)
   {
     vec<3, typename Position::type> const forward = normalize(center - eye);
     vec<3, typename Position::type> const right = normalize(cross(forward, world_up));
@@ -370,4 +370,4 @@ namespace engine::core::math
     return return_value;
   }
 } // namespace engine::core::math
-#pragma warning ( pop )
+#pragma warning(pop)

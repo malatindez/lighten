@@ -2,8 +2,8 @@
 
 #include "vec.hpp"
 
-#pragma warning( push )
-#pragma warning( disable : 4201 )
+#pragma warning(push)
+#pragma warning(disable : 4201)
 namespace engine::core::math
 {
 
@@ -20,8 +20,8 @@ namespace engine::core::math
         explicit constexpr vec(A a, B b, C c);
         template <typename... U>
         explicit constexpr vec(U... data);
-        explicit constexpr vec(std::array<T, size> const& arr) : data{ arr } { }
-        explicit constexpr vec(std::array<T, size> && arr) : data{ std::move(arr) } { }
+        explicit constexpr vec(std::array<T, size> const &arr) : data{arr} {}
+        explicit constexpr vec(std::array<T, size> &&arr) : data{std::move(arr)} {}
 
         constexpr void reset() noexcept;
         template <typename U>
@@ -57,23 +57,22 @@ namespace engine::core::math
         template <Primitive U>
         constexpr vec<3, T> &operator%=(U const value) noexcept;
         template <AnyVec U>
-        constexpr vec<3, T> &operator+=(U const &other) noexcept requires (size == U::size);
+        constexpr vec<3, T> &operator+=(U const &other) noexcept requires(size == U::size);
         template <AnyVec U>
-        constexpr vec<3, T> &operator-=(U const &other) noexcept requires (size == U::size);
+        constexpr vec<3, T> &operator-=(U const &other) noexcept requires(size == U::size);
         template <AnyVec U>
-        constexpr vec<3, T> &operator*=(U const &other) noexcept requires (size == U::size);
+        constexpr vec<3, T> &operator*=(U const &other) noexcept requires(size == U::size);
         template <AnyVec U>
-        constexpr vec<3, T> &operator/=(U const &other) noexcept requires (size == U::size);
+        constexpr vec<3, T> &operator/=(U const &other) noexcept requires(size == U::size);
         template <AnyVec U>
-        constexpr vec<3, T> &operator%=(U const &other) noexcept requires (size == U::size);
-
+        constexpr vec<3, T> &operator%=(U const &other) noexcept requires(size == U::size);
 
         [[nodiscard]] constexpr T &operator[](size_t i);
         [[nodiscard]] constexpr T const &operator[](size_t i) const;
 
         constexpr explicit operator rvec<3, T>() noexcept { return rvec<3, T>{x, y, z}; }
         constexpr explicit operator rvec<3, const T>() const noexcept { return rvec<3, const T>{x, y, z}; }
-        
+
         template <size_t n = size>
         [[nodiscard]] constexpr rvec<n, T> as_rvec() noexcept requires(n >= 2 && n <= size);
 
@@ -85,9 +84,18 @@ namespace engine::core::math
         {
             struct
             {
-                union { T x, r, s; };
-                union { T y, g, t; };
-                union { T z, b, p; };
+                union
+                {
+                    T x, r, s;
+                };
+                union
+                {
+                    T y, g, t;
+                };
+                union
+                {
+                    T z, b, p;
+                };
             };
             std::array<T, 3> data;
         };
@@ -114,5 +122,5 @@ namespace engine::core::math
 
 }; // namespace engine::core::math
 
-#pragma warning( pop )
+#pragma warning(pop)
 #include "vec3.inl"

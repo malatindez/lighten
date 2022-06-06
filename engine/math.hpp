@@ -1,7 +1,7 @@
 #pragma once
+#include "math/common.hpp"
 #include "math/mat.hpp"
 #include "math/mat_math.hpp"
-#include "math/common.hpp"
 #include "math/quaternion.hpp"
 #include "math/vec.hpp"
 #include "math/vec_math.hpp"
@@ -10,7 +10,7 @@ namespace engine::core::math
 {
     template <class T>
     [[nodiscard]] constexpr vec<3, T> reflect(vec<3, T> const &normal,
-                                                    vec<3, T> const &dir)
+                                              vec<3, T> const &dir)
     {
         return 2.0f * dot(normal, dir) * (normal - dir);
     }

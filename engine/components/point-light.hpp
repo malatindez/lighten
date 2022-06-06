@@ -1,7 +1,7 @@
 #pragma once
+#include "math.hpp"
 #include "render/light-data.hpp"
 #include "render/material.hpp"
-#include "math.hpp"
 #include <math.h>
 namespace engine::components
 {
@@ -9,8 +9,8 @@ namespace engine::components
     {
         core::math::vec3 color;
         float R;
-        
-        inline bool Illuminable(Transform const &transform, render::LightData const&light_data) const noexcept
+
+        inline bool Illuminable(Transform const &transform, render::LightData const &light_data) const noexcept
         {
             core::math::vec3 const L = normalize(transform.position - light_data.point);
             float ndotl = dot(light_data.normal, L);

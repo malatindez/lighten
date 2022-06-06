@@ -18,7 +18,7 @@ namespace engine::core::math
     constexpr vec<3, T>::vec(U... data)
     {
         static_assert(get_parameter_pack_size<U...>() == size,
-                                    "You have provided wrong amount of data");
+                      "You have provided wrong amount of data");
         unpack_data(0, data...);
     }
     template <Primitive T>
@@ -42,82 +42,82 @@ namespace engine::core::math
     template <Primitive U>
     constexpr vec<3, T> &vec<3, T>::operator+=(U const value) noexcept
     {
-        x += static_cast<T>(value);
-        y += static_cast<T>(value);
-        z += static_cast<T>(value);
+        x = static_cast<T>(x + value);
+        y = static_cast<T>(y + value);
+        z = static_cast<T>(z + value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr vec<3, T> &vec<3, T>::operator-=(U const value) noexcept
     {
-        x -= static_cast<T>(value);
-        y -= static_cast<T>(value);
-        z -= static_cast<T>(value);
+        x = static_cast<T>(x - value);
+        y = static_cast<T>(y - value);
+        z = static_cast<T>(z - value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr vec<3, T> &vec<3, T>::operator*=(U const value) noexcept
     {
-        x *= static_cast<T>(value);
-        y *= static_cast<T>(value);
-        z *= static_cast<T>(value);
+        x = static_cast<T>(x * value);
+        y = static_cast<T>(y * value);
+        z = static_cast<T>(z * value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr vec<3, T> &vec<3, T>::operator/=(U const value) noexcept
     {
-        x /= static_cast<T>(value);
-        y /= static_cast<T>(value);
-        z /= static_cast<T>(value);
+        x = static_cast<T>(x / value);
+        y = static_cast<T>(y / value);
+        z = static_cast<T>(z / value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr vec<3, T> &vec<3, T>::operator%=(U const value) noexcept
     {
-        x %= static_cast<T>(value);
-        y %= static_cast<T>(value);
-        z %= static_cast<T>(value);
+        x = static_cast<T>(x % value);
+        y = static_cast<T>(y % value);
+        z = static_cast<T>(z % value);
         return *this;
     }
 
     template <Primitive T>
     template <AnyVec U>
     constexpr vec<3, T> &vec<3, T>::operator+=(U const &other) noexcept requires(size == U::size)
-     {
-        x += other.x;
-        y += other.y;
-        z += other.z;
+    {
+        x = static_cast<T>(x + other.x);
+        y = static_cast<T>(y + other.y);
+        z = static_cast<T>(z + other.z);
         return *this;
     }
     template <Primitive T>
     template <AnyVec U>
     constexpr vec<3, T> &vec<3, T>::operator-=(U const &other) noexcept requires(size == U::size)
     {
-        x -= other.x;
-        y -= other.y;
-        z -= other.z;
+        x = static_cast<T>(x - other.x);
+        y = static_cast<T>(y - other.y);
+        z = static_cast<T>(z - other.z);
         return *this;
     }
     template <Primitive T>
     template <AnyVec U>
     constexpr vec<3, T> &vec<3, T>::operator*=(U const &other) noexcept requires(size == U::size)
     {
-        x *= other.x;
-        y *= other.y;
-        z *= other.z;
+        x = static_cast<T>(x * other.x);
+        y = static_cast<T>(y * other.y);
+        z = static_cast<T>(z * other.z);
         return *this;
     }
     template <Primitive T>
     template <AnyVec U>
     constexpr vec<3, T> &vec<3, T>::operator/=(U const &other) noexcept requires(size == U::size)
     {
-        x /= other.x;
-        y /= other.y;
-        z /= other.z;
+        x = static_cast<T>(x / other.x);
+        y = static_cast<T>(y / other.y);
+        z = static_cast<T>(z / other.z);
         return *this;
     }
 
@@ -125,9 +125,9 @@ namespace engine::core::math
     template <AnyVec U>
     constexpr vec<3, T> &vec<3, T>::operator%=(U const &other) noexcept requires(size == U::size)
     {
-        x %= other.x;
-        y %= other.y;
-        z %= other.z;
+        x = static_cast<T>(x % other.x);
+        y = static_cast<T>(y % other.y);
+        z = static_cast<T>(z % other.z);
         return *this;
     }
     template <Primitive T>
@@ -143,14 +143,13 @@ namespace engine::core::math
         return data[i];
     }
 
-    
     template <Primitive T>
     template <size_t n>
     [[nodiscard]] constexpr rvec<n, T> vec<3, T>::as_rvec() noexcept requires(n >= 2 && n <= size)
     {
         return rvec<n, T>::from_vec(*this);
     }
-    
+
     template <Primitive T>
     template <size_t n, Primitive U>
     [[nodiscard]] constexpr vec<n, U> vec<3, T>::as_vec() const noexcept requires(n >= 2 && n <= size)
@@ -162,14 +161,13 @@ namespace engine::core::math
         }
         return rv;
     }
-    
+
     template <Primitive T>
     template <size_t n>
     [[nodiscard]] constexpr rvec<n, const T> vec<3, T>::as_crvec() const noexcept requires(n >= 2 && n <= size)
     {
         return rvec<n, const T>::from_vec(*this);
     }
-    
 
     template <Primitive T>
     template <Primitive _> // primitives
@@ -218,7 +216,7 @@ namespace engine::core::math
     constexpr vec<3, T> cross(vec<3, T> const &left, vec<3, U> const &right)
     {
         return vec<3, T>{left.y * right.z - left.z * right.y,
-                                         left.x * right.z - left.z * right.x,
-                                         left.x * right.y - left.y * right.x};
+                         left.x * right.z - left.z * right.x,
+                         left.x * right.y - left.y * right.x};
     }
 } // namespace engine::core::math

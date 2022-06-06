@@ -12,9 +12,9 @@ namespace utils
     static std::mt19937 gen(rd());
 
     namespace fs = std::filesystem;
-    // https://www.youtube.com/watch?v=rpn_5Mrrxf8
     namespace _detail
     {
+        // https://www.youtube.com/watch?v=rpn_5Mrrxf8
         constexpr auto seed()
         {
             std::uint64_t shifted = 0;
@@ -60,7 +60,7 @@ namespace utils
                 // Advance internal state
                 rng.state = oldstate * 6364136223846793005ULL + (rng.inc | 1);
                 // Calculate output function (XSH RR), uses old state for max ILP
-                std::uint32_t xorshifted = ((oldstate >> 18u) ^ oldstate) >> 27u;
+                auto xorshifted = static_cast<uint32_t>(((oldstate >> 18u) ^ oldstate) >> 27u);
                 std::uint32_t rot = oldstate >> 59u;
                 return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
             }

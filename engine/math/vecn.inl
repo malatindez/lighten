@@ -34,7 +34,7 @@ namespace engine::core::math
   {
     for (int i = 0; i < size; i++)
     {
-      data[i] += value;
+      data[i] = static_cast<T>(data[i] + value);
     }
     return *this;
   }
@@ -44,7 +44,7 @@ namespace engine::core::math
   {
     for (int i = 0; i < size; i++)
     {
-      data[i] -= value;
+      data[i] = static_cast<T>(data[i] - value);
     }
     return *this;
   }
@@ -54,7 +54,7 @@ namespace engine::core::math
   {
     for (int i = 0; i < size; i++)
     {
-      data[i] *= value;
+      data[i] = static_cast<T>(data[i] * value);
     }
     return *this;
   }
@@ -64,7 +64,7 @@ namespace engine::core::math
   {
     for (int i = 0; i < size; i++)
     {
-      data[i] /= value;
+      data[i] = static_cast<T>(data[i] / value);
     }
     return *this;
   }
@@ -74,57 +74,57 @@ namespace engine::core::math
   {
     for (int i = 0; i < size; i++)
     {
-      data[i] %= value;
+      data[i] = static_cast<T>(data[i] % value);
     }
     return *this;
   }
   template <size_t L, Primitive T>
   template <AnyVec U>
-  constexpr vec<L, T> &vec<L, T>::operator+=(U const &other) noexcept requires (size == U::size)
+  constexpr vec<L, T> &vec<L, T>::operator+=(U const &other) noexcept requires(size == U::size)
   {
     for (int i = 0; i < size; i++)
     {
-      data[i] += other.data[i];
+      data[i] = static_cast<T>(data[i] + other.data[i]);
     }
     return *this;
   }
   template <size_t L, Primitive T>
   template <AnyVec U>
-  constexpr vec<L, T> &vec<L, T>::operator-=(U const &other) noexcept requires (size == U::size)
+  constexpr vec<L, T> &vec<L, T>::operator-=(U const &other) noexcept requires(size == U::size)
   {
     for (int i = 0; i < size; i++)
     {
-      data[i] -= other.data[i];
+      data[i] = static_cast<T>(data[i] - other.data[i]);
     }
     return *this;
   }
   template <size_t L, Primitive T>
   template <AnyVec U>
-  constexpr vec<L, T> &vec<L, T>::operator*=(U const &other) noexcept requires (size == U::size)
+  constexpr vec<L, T> &vec<L, T>::operator*=(U const &other) noexcept requires(size == U::size)
   {
     for (int i = 0; i < size; i++)
     {
-      data[i] *= other.data[i];
+      data[i] = static_cast<T>(data[i] * other.data[i]);
     }
     return *this;
   }
   template <size_t L, Primitive T>
   template <AnyVec U>
-  constexpr vec<L, T> &vec<L, T>::operator/=(U const &other) noexcept requires (size == U::size)
+  constexpr vec<L, T> &vec<L, T>::operator/=(U const &other) noexcept requires(size == U::size)
   {
     for (int i = 0; i < size; i++)
     {
-      data[i] /= other.data[i];
+      data[i] = static_cast<T>(data[i] / other.data[i]);
     }
     return *this;
   }
   template <size_t L, Primitive T>
   template <AnyVec U>
-  constexpr vec<L, T> &vec<L, T>::operator%=(U const &other) noexcept requires (size == U::size)
+  constexpr vec<L, T> &vec<L, T>::operator%=(U const &other) noexcept requires(size == U::size)
   {
     for (int i = 0; i < size; i++)
     {
-      data[i] %= other.data[i];
+      data[i] = static_cast<T>(data[i] % other.data[i]);
     }
     return *this;
   }
@@ -142,8 +142,8 @@ namespace engine::core::math
     return data[i];
   }
   template <size_t L, Primitive T>
-        template <size_t n, Primitive U>
-        [[nodiscard]] constexpr vec<n, U> vec<L, T>::as_vec() const noexcept requires(n >= 2 && n <= size)
+  template <size_t n, Primitive U>
+  [[nodiscard]] constexpr vec<n, U> vec<L, T>::as_vec() const noexcept requires(n >= 2 && n <= size)
   {
     vec<n, U> rv;
     for (int i = 0; i < n; i++)
@@ -156,13 +156,13 @@ namespace engine::core::math
   template <size_t n>
   [[nodiscard]] constexpr rvec<n, T> vec<L, T>::as_rvec() noexcept requires(n >= 2 && n <= size)
   {
-      return rvec<n, T>{*this};
+    return rvec<n, T>{*this};
   }
   template <size_t L, Primitive T>
   template <size_t n>
   [[nodiscard]] constexpr rvec<n, const T> vec<L, T>::as_crvec() const noexcept requires(n >= 2 && n <= size)
   {
-      return rvec<n, T>{*this};
+    return rvec<n, T>{*this};
   }
   template <size_t L, Primitive T>
   template <Primitive _> // primitives

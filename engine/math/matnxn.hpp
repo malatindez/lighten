@@ -1,8 +1,8 @@
 #pragma once
 #include "mat.hpp"
 #include "vec_math.hpp"
-#pragma warning( push )
-#pragma warning( disable : 4201 )
+#pragma warning(push)
+#pragma warning(disable : 4201)
 namespace engine::core::math
 {
 
@@ -55,7 +55,7 @@ namespace engine::core::math
     template <Primitive U>
     constexpr mat<a, b, T> &operator*=(U const value);
 
-    template<size_t c = a, size_t d = b> 
+    template <size_t c = a, size_t d = b>
     constexpr rmat<c, d, T> as_rmat() noexcept { return rmat<c, d, T>{*this}; }
 
     union
@@ -81,5 +81,5 @@ namespace engine::core::math
     constexpr void unpack_data(int offset, A, B, C...);
   };
 } // namespace engine::core::math
-#pragma warning ( pop )
+#pragma warning(pop)
 #include "matnxn.inl"

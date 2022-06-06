@@ -231,8 +231,8 @@ namespace engine::core::math
   {
     return vector / length(vector);
   }
-  template <size_t size, Primitive T>
-  [[nodiscard]] constexpr vec<size, T> normalize(vec<size, T> const &vector) noexcept
+  template <AnyVec T>
+  [[nodiscard]] constexpr vec<T::size, typename T::type> normalize(T const &vector) noexcept
   {
     return vector / length(vector);
   }
@@ -276,25 +276,25 @@ namespace engine::core::math
   }
 
   template <AnyVec T, Primitive U>
-  constexpr vec<T::size, typename T::type> pow(T const& vector, U const value)
+  constexpr vec<T::size, typename T::type> pow(T const &vector, U const value)
   {
-      vec<T::size, typename T::type> return_value;
-      for (size_t i = 0; i < T::size; i++)
-      {
-          return_value[i] = core::math::pow(vector[i], value);
-      }
-      return return_value;
+    vec<T::size, typename T::type> return_value;
+    for (size_t i = 0; i < T::size; i++)
+    {
+      return_value[i] = core::math::pow(vector[i], value);
+    }
+    return return_value;
   }
 
   template <AnyVec T, Primitive U>
-  constexpr vec<T::size, typename T::type> sqrt(T const& vector)
+  constexpr vec<T::size, typename T::type> sqrt(T const &vector)
   {
-      vec<T::size, typename T::type> return_value;
-      for (size_t i = 0; i < T::size; i++)
-      {
-          return_value[i] = core::math::sqrt(vector[i]);
-      }
-      return return_value;
+    vec<T::size, typename T::type> return_value;
+    for (size_t i = 0; i < T::size; i++)
+    {
+      return_value[i] = core::math::sqrt(vector[i]);
+    }
+    return return_value;
   }
 
   template <AnyVec T, AnyVec U>

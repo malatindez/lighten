@@ -23,82 +23,82 @@ namespace engine::core::math
     template <Primitive U>
     constexpr rvec<3, T> &rvec<3, T>::operator+=(U const value) noexcept
     {
-        x += static_cast<T>(value);
-        y += static_cast<T>(value);
-        z += static_cast<T>(value);
+        x = static_cast<T>(x + value);
+        y = static_cast<T>(y + value);
+        z = static_cast<T>(z + value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr rvec<3, T> &rvec<3, T>::operator-=(U const value) noexcept
     {
-        x -= static_cast<T>(value);
-        y -= static_cast<T>(value);
-        z -= static_cast<T>(value);
+        x = static_cast<T>(x - value);
+        y = static_cast<T>(y - value);
+        z = static_cast<T>(z - value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr rvec<3, T> &rvec<3, T>::operator*=(U const value) noexcept
     {
-        x *= static_cast<T>(value);
-        y *= static_cast<T>(value);
-        z *= static_cast<T>(value);
+        x = static_cast<T>(x * value);
+        y = static_cast<T>(y * value);
+        z = static_cast<T>(z * value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr rvec<3, T> &rvec<3, T>::operator/=(U const value) noexcept
     {
-        x /= static_cast<T>(value);
-        y /= static_cast<T>(value);
-        z /= static_cast<T>(value);
+        x = static_cast<T>(x / value);
+        y = static_cast<T>(y / value);
+        z = static_cast<T>(z / value);
         return *this;
     }
     template <Primitive T>
     template <Primitive U>
     constexpr rvec<3, T> &rvec<3, T>::operator%=(U const value) noexcept
     {
-        x %= static_cast<T>(value);
-        y %= static_cast<T>(value);
-        z %= static_cast<T>(value);
+        x = static_cast<T>(x % value);
+        y = static_cast<T>(y % value);
+        z = static_cast<T>(z % value);
         return *this;
     }
 
     template <Primitive T>
     template <AnyVec U>
     constexpr rvec<3, T> &rvec<3, T>::operator+=(U const &other) noexcept requires(size == U::size)
-     {
-        x += other.x;
-        y += other.y;
-        z += other.z;
+    {
+        x = static_cast<T>(x + other.x);
+        y = static_cast<T>(y + other.y);
+        z = static_cast<T>(z + other.z);
         return *this;
     }
     template <Primitive T>
     template <AnyVec U>
     constexpr rvec<3, T> &rvec<3, T>::operator-=(U const &other) noexcept requires(size == U::size)
     {
-        x -= other.x;
-        y -= other.y;
-        z -= other.z;
+        x = static_cast<T>(x - other.x);
+        y = static_cast<T>(y - other.y);
+        z = static_cast<T>(z - other.z);
         return *this;
     }
     template <Primitive T>
     template <AnyVec U>
     constexpr rvec<3, T> &rvec<3, T>::operator*=(U const &other) noexcept requires(size == U::size)
     {
-        x *= other.x;
-        y *= other.y;
-        z *= other.z;
+        x = static_cast<T>(x * other.x);
+        y = static_cast<T>(y * other.y);
+        z = static_cast<T>(z * other.z);
         return *this;
     }
     template <Primitive T>
     template <AnyVec U>
     constexpr rvec<3, T> &rvec<3, T>::operator/=(U const &other) noexcept requires(size == U::size)
     {
-        x /= other.x;
-        y /= other.y;
-        z /= other.z;
+        x = static_cast<T>(x / other.x);
+        y = static_cast<T>(y / other.y);
+        z = static_cast<T>(z / other.z);
         return *this;
     }
 
@@ -106,9 +106,9 @@ namespace engine::core::math
     template <AnyVec U>
     constexpr rvec<3, T> &rvec<3, T>::operator%=(U const &other) noexcept requires(size == U::size)
     {
-        x %= other.x;
-        y %= other.y;
-        z %= other.z;
+        x = static_cast<T>(x % other.x);
+        y = static_cast<T>(y % other.y);
+        z = static_cast<T>(z % other.z);
         return *this;
     }
     template <Primitive T>
@@ -124,14 +124,13 @@ namespace engine::core::math
         return data[i];
     }
 
-    
     template <Primitive T>
     template <size_t n>
     [[nodiscard]] constexpr rvec<n, T> rvec<3, T>::as_rvec() noexcept requires(n >= 2 && n <= size)
     {
         return rvec<n, T>{*this};
     }
-    
+
     template <Primitive T>
     template <size_t n, Primitive U>
     [[nodiscard]] constexpr vec<n, std::remove_const_t<U>> rvec<3, T>::as_vec() const noexcept requires(n >= 2 && n <= size)
@@ -143,7 +142,7 @@ namespace engine::core::math
         }
         return rv;
     }
-    
+
     template <Primitive T>
     template <size_t n>
     [[nodiscard]] constexpr rvec<n, const T> rvec<3, T>::as_crvec() const noexcept requires(n >= 2 && n <= size)

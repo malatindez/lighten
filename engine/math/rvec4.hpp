@@ -2,8 +2,8 @@
 
 #include "vec.hpp"
 
-#pragma warning( push )
-#pragma warning( disable : 4201 )
+#pragma warning(push)
+#pragma warning(disable : 4201)
 namespace engine::core::math
 {
 
@@ -17,12 +17,11 @@ namespace engine::core::math
         explicit constexpr rvec(T &other) requires(V::size >= size) : x{other.x}, y{other.y}, z{other.z}, w{other.w} {}
         template <AnyVec V>
         explicit constexpr rvec(T const &other) requires(V::size >= size && std::is_const_v<typename V::type>) : x{other.x}, y{other.y}, z{other.z}, w{other.w} {}
-        
+
         template <AnyVec U>
-        static constexpr rvec<4, T> from_vec(U &other) requires (U::size >= 4) { return rvec<4, T>{other.x, other.y, other.z, other.w}; }
+        static constexpr rvec<4, T> from_vec(U &other) requires(U::size >= 4) { return rvec<4, T>{other.x, other.y, other.z, other.w}; }
         template <AnyVec U>
-        static constexpr rvec<4, T> from_vec(U const&other) requires (U::size >= 4) { return rvec<4, T>{other.x, other.y, other.z, other.w}; }
-        
+        static constexpr rvec<4, T> from_vec(U const &other) requires(U::size >= 4) { return rvec<4, T>{other.x, other.y, other.z, other.w}; }
 
         template <typename U>
         constexpr rvec<size, T> &operator=(rvec<size, U> const &b)
@@ -85,16 +84,28 @@ namespace engine::core::math
         {
             struct
             {
-                union { _detail::primitive_reference_wrapper<T> x, r, s; };
-                union { _detail::primitive_reference_wrapper<T> y, g, t; };
-                union { _detail::primitive_reference_wrapper<T> z, b, p; };
-                union { _detail::primitive_reference_wrapper<T> w, a, q; };
+                union
+                {
+                    _detail::primitive_reference_wrapper<T> x, r, s;
+                };
+                union
+                {
+                    _detail::primitive_reference_wrapper<T> y, g, t;
+                };
+                union
+                {
+                    _detail::primitive_reference_wrapper<T> z, b, p;
+                };
+                union
+                {
+                    _detail::primitive_reference_wrapper<T> w, a, q;
+                };
             };
-            std::array<T, size> data;
+            std::array<_detail::primitive_reference_wrapper<T>, 4> data;
         };
-        static_assert(sizeof(data) == size * sizeof(T));
+        static_assert(sizeof(data) == 4 * sizeof(_detail::primitive_reference_wrapper<T>));
     };
 
 }; // namespace engine::core::math
-#pragma warning ( pop )
+#pragma warning(pop)
 #include "rvec4.inl"

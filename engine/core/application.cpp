@@ -3,8 +3,8 @@
 #include "core/events.hpp"
 
 #include <memory>
-#include <thread>
 #include <numeric>
+#include <thread>
 
 namespace engine::core
 {
@@ -38,7 +38,7 @@ namespace engine::core
   }
 
   void Application::Exit() { application_->running_ = false; }
-  
+
   void Application::Run()
   {
     render.reset();

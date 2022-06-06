@@ -16,8 +16,8 @@ namespace engine::core::math
         template <typename... U>
         explicit constexpr vec(U... data);
 
-        explicit constexpr vec(std::array<T, size> const& arr) : data{ arr } { }
-        explicit constexpr vec(std::array<T, size> && arr) : data{ std::move(arr) } { }
+        explicit constexpr vec(std::array<T, size> const &arr) : data{arr} {}
+        explicit constexpr vec(std::array<T, size> &&arr) : data{std::move(arr)} {}
 
         constexpr void reset() noexcept;
 
@@ -40,7 +40,6 @@ namespace engine::core::math
             return *this;
         }
 
-
         template <Primitive U>
         constexpr vec<L, T> &operator+=(U const value) noexcept;
         template <Primitive U>
@@ -52,16 +51,16 @@ namespace engine::core::math
         template <Primitive U>
         constexpr vec<L, T> &operator%=(U const value) noexcept;
         template <AnyVec U>
-        constexpr vec<L, T> &operator+=(U const &other) noexcept requires (size == U::size);
+        constexpr vec<L, T> &operator+=(U const &other) noexcept requires(size == U::size);
         template <AnyVec U>
-        constexpr vec<L, T> &operator-=(U const &other) noexcept requires (size == U::size);
+        constexpr vec<L, T> &operator-=(U const &other) noexcept requires(size == U::size);
         template <AnyVec U>
-        constexpr vec<L, T> &operator*=(U const &other) noexcept requires (size == U::size);
+        constexpr vec<L, T> &operator*=(U const &other) noexcept requires(size == U::size);
         template <AnyVec U>
-        constexpr vec<L, T> &operator/=(U const &other) noexcept requires (size == U::size);
+        constexpr vec<L, T> &operator/=(U const &other) noexcept requires(size == U::size);
         template <AnyVec U>
-        constexpr vec<L, T> &operator%=(U const &other) noexcept requires (size == U::size);
-        
+        constexpr vec<L, T> &operator%=(U const &other) noexcept requires(size == U::size);
+
         [[nodiscard]] constexpr T &operator[](size_t i);
         [[nodiscard]] constexpr T const &operator[](size_t i) const;
 

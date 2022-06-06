@@ -86,14 +86,14 @@ namespace engine::core::math
     return data[i];
   }
   template <size_t a, size_t b, Primitive T>
-  [[nodiscard]] constexpr vec<b, T> const & mat<a, b, T>::operator[](size_t i) const
+  [[nodiscard]] constexpr vec<b, T> const &mat<a, b, T>::operator[](size_t i) const
   {
     assert(i < size.x);
     return data[i];
   }
 
   template <size_t a, size_t b, Primitive T>
-  [[nodiscard]] constexpr mat<a, b, T> const & mat<a, b, T>::operator+() const noexcept
+  [[nodiscard]] constexpr mat<a, b, T> const &mat<a, b, T>::operator+() const noexcept
   {
     return *this;
   }
@@ -136,7 +136,6 @@ namespace engine::core::math
   {
     return (*this = *this * other);
   }
-  
 
   template <size_t a, size_t b, Primitive T>
   template <Primitive U>

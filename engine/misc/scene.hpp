@@ -39,7 +39,7 @@ namespace engine
         bool FindIntersection(SphereGroup &spheres, MeshGroup &meshes, core::math::Intersection &intersection, core::math::Ray &ray) const noexcept;
 
         bool FindIntersectionIf(SphereGroup &spheres, MeshGroup &meshes, core::math::Intersection &intersection, core::math::Ray &ray, IntersectionCallbackFn const &func) const noexcept;
-        
+
         void Illuminate(SphereGroup &spheres,
                         MeshGroup &meshes,
                         DirectionalLightView &directional_lights,

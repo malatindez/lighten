@@ -1,8 +1,8 @@
 #pragma once
 #include "mat.hpp"
 #include "vec_math.hpp"
-#pragma warning( push )
-#pragma warning( disable : 4201 )
+#pragma warning(push)
+#pragma warning(disable : 4201)
 namespace engine::core::math
 {
 
@@ -18,24 +18,23 @@ namespace engine::core::math
     constexpr rmat(rmat<c, d, P> &p) requires(c >= a && d >= b);
 
     template <typename U>
-    constexpr rmat<a, b, T>& operator=(mat<a, b, U> const& mat)
+    constexpr rmat<a, b, T> &operator=(mat<a, b, U> const &mat)
     {
-        for (int i = 0; i < size.x * size.y; i++)
-        {
-            arr[i] = mat.arr[i];
-        }
-        return *this;
+      for (int i = 0; i < size.x * size.y; i++)
+      {
+        arr[i] = mat.arr[i];
+      }
+      return *this;
     }
     template <typename U>
-    constexpr rmat<a, b, T>& operator=(rmat<a, b, U> const& mat)
+    constexpr rmat<a, b, T> &operator=(rmat<a, b, U> const &mat)
     {
-        for (int i = 0; i < size.x * size.y; i++)
-        {
-            arr[i] = mat.arr[i];
-        }
-        return *this;
+      for (int i = 0; i < size.x * size.y; i++)
+      {
+        arr[i] = mat.arr[i];
+      }
+      return *this;
     }
-
 
     // sets all values to zero
     constexpr void reset() noexcept;
@@ -51,7 +50,7 @@ namespace engine::core::math
     constexpr rmat<a, b, T> &operator-=(rmat<a, b, U> const &other);
     template <size_t c, Primitive U>
     constexpr rmat<a, c, T> &operator*=(rmat<b, c, U> const &other);
-    
+
     template <Primitive U>
     constexpr rmat<a, b, T> &operator+=(mat<a, b, U> const &other);
     template <Primitive U>
@@ -74,5 +73,5 @@ namespace engine::core::math
     static_assert(sizeof(arr) == sizeof(data));
   };
 } // namespace engine::core::math
-#pragma warning( pop )
+#pragma warning(pop)
 #include "rmatnxn.inl"

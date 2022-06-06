@@ -1,7 +1,7 @@
 #pragma once
 #include "math.hpp"
-#include "render/color.hpp"
 #include "math/ray.hpp"
+#include "render/color.hpp"
 namespace engine::render
 {
     struct LightData

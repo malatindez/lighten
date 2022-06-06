@@ -1,8 +1,8 @@
 #pragma once
 #include "matnxn.hpp"
 #include "vec_math.hpp"
-#pragma warning( push )
-#pragma warning( disable : 4201 )
+#pragma warning(push)
+#pragma warning(disable : 4201)
 
 namespace engine::core::math
 {
@@ -11,7 +11,7 @@ namespace engine::core::math
     {
         using type = T;
         static constexpr size_t size = 4;
-        constexpr qua() : qua(1,0,0,0) {}
+        constexpr qua() : qua(1, 0, 0, 0) {}
         constexpr explicit qua(T w, T x, T y, T z);
         constexpr void reset();
         constexpr explicit qua(T radians, vec<3, T> axis);
@@ -47,10 +47,22 @@ namespace engine::core::math
         {
             struct
             {
-                union { T x, r, s; };
-                union { T y, g, t; };
-                union { T z, b, p; };
-                union { T w, a, q; };
+                union
+                {
+                    T x, r, s;
+                };
+                union
+                {
+                    T y, g, t;
+                };
+                union
+                {
+                    T z, b, p;
+                };
+                union
+                {
+                    T w, a, q;
+                };
             };
             std::array<T, size> data;
         };
@@ -111,7 +123,7 @@ namespace engine::core::math
     [[nodiscard]] constexpr qua<T> normalize(qua<T> const &q);
 } // namespace engine::core::math
 
-#pragma warning( pop )
+#pragma warning(pop)
 
 namespace engine::core::math
 {

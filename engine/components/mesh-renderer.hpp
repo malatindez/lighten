@@ -21,11 +21,11 @@ namespace engine::components
 
     private:
         static bool CheckTriangleIntersection(core::math::vec3 const &p0,
-                                                     core::math::vec3 const &p1,
-                                                     core::math::vec3 const &p2,
-                                                     core::math::vec3 const &normal,
-                                                     core::math::Intersection &i,
-                                                     core::math::Ray const &ray) noexcept;
+                                              core::math::vec3 const &p1,
+                                              core::math::vec3 const &p2,
+                                              core::math::vec3 const &normal,
+                                              core::math::Intersection &i,
+                                              core::math::Ray const &ray) noexcept;
         std::shared_ptr<const render::Mesh> mesh_;
         render::Material material_;
     };

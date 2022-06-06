@@ -2,8 +2,8 @@
 
 #include "vec.hpp"
 
-#pragma warning( push )
-#pragma warning( disable : 4201 )
+#pragma warning(push)
+#pragma warning(disable : 4201)
 namespace engine::core::math
 {
 
@@ -18,9 +18,9 @@ namespace engine::core::math
         template <AnyVec V>
         explicit constexpr rvec(V const &other) requires(V::size >= size && std::is_const_v<typename V::type>) : x{other.x}, y{other.y}, z{other.z} {}
         template <AnyVec U>
-        static constexpr rvec<3, T> from_vec(U &other) requires (U::size >= 3) { return rvec<3, T>(other.x, other.y, other.z); }
+        static constexpr rvec<3, T> from_vec(U &other) requires(U::size >= 3) { return rvec<3, T>(other.x, other.y, other.z); }
         template <AnyVec U>
-        static constexpr rvec<3, T> from_vec(U const&other) requires (U::size >= 3) { return rvec<3, T>(other.x, other.y, other.z); }
+        static constexpr rvec<3, T> from_vec(U const &other) requires(U::size >= 3) { return rvec<3, T>(other.x, other.y, other.z); }
         constexpr void reset() noexcept;
         template <typename U>
         constexpr rvec<size, T> &operator=(rvec<size, U> const &b)
@@ -55,22 +55,21 @@ namespace engine::core::math
         template <Primitive U>
         constexpr rvec<3, T> &operator%=(U const value) noexcept;
         template <AnyVec U>
-        constexpr rvec<3, T> &operator+=(U const &other) noexcept requires (size == U::size);
+        constexpr rvec<3, T> &operator+=(U const &other) noexcept requires(size == U::size);
         template <AnyVec U>
-        constexpr rvec<3, T> &operator-=(U const &other) noexcept requires (size == U::size);
+        constexpr rvec<3, T> &operator-=(U const &other) noexcept requires(size == U::size);
         template <AnyVec U>
-        constexpr rvec<3, T> &operator*=(U const &other) noexcept requires (size == U::size);
+        constexpr rvec<3, T> &operator*=(U const &other) noexcept requires(size == U::size);
         template <AnyVec U>
-        constexpr rvec<3, T> &operator/=(U const &other) noexcept requires (size == U::size);
+        constexpr rvec<3, T> &operator/=(U const &other) noexcept requires(size == U::size);
         template <AnyVec U>
-        constexpr rvec<3, T> &operator%=(U const &other) noexcept requires (size == U::size);
-
+        constexpr rvec<3, T> &operator%=(U const &other) noexcept requires(size == U::size);
 
         [[nodiscard]] constexpr T &operator[](size_t i);
         [[nodiscard]] constexpr T const &operator[](size_t i) const;
 
         constexpr explicit operator rvec<3, const T>() const noexcept { return rvec<3, const T>{x, y, z}; }
-        
+
         template <size_t n = size>
         [[nodiscard]] constexpr rvec<n, T> as_rvec() noexcept requires(n >= 2 && n <= size);
 
@@ -82,14 +81,23 @@ namespace engine::core::math
         {
             struct
             {
-                union {  _detail::primitive_reference_wrapper<T> x, r, s; };
-                union {  _detail::primitive_reference_wrapper<T> y, g, t; };
-                union {  _detail::primitive_reference_wrapper<T> z, b, p; };
+                union
+                {
+                    _detail::primitive_reference_wrapper<T> x, r, s;
+                };
+                union
+                {
+                    _detail::primitive_reference_wrapper<T> y, g, t;
+                };
+                union
+                {
+                    _detail::primitive_reference_wrapper<T> z, b, p;
+                };
             };
-            std::array< _detail::primitive_reference_wrapper<T>, 3> data;
+            std::array<_detail::primitive_reference_wrapper<T>, 3> data;
         };
-        static_assert(sizeof(data) == 3 * sizeof( _detail::primitive_reference_wrapper<T>));
+        static_assert(sizeof(data) == 3 * sizeof(_detail::primitive_reference_wrapper<T>));
     };
 }; // namespace engine::core::math
-#pragma warning ( pop )
+#pragma warning(pop)
 #include "rvec3.inl"
