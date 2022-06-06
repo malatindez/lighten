@@ -41,13 +41,13 @@ namespace
         t.UpdateMatrices();
         return t;
     }
-    MeshComponent &AddCubeComponent(entt::registry &registry, entt::entity e)
+    MeshRenderer &AddCubeComponent(entt::registry &registry, entt::entity e)
     {
-        return registry.emplace<MeshComponent>(e, render::kCubeMesh);
+        return registry.emplace<MeshRenderer>(e, render::kCubeMesh);
     }
-    Sphere &AddSphereComponent(entt::registry &registry, entt::entity e)
+    SphereRenderer &AddSphereComponent(entt::registry &registry, entt::entity e)
     {
-        return registry.emplace<Sphere>(e);
+        return registry.emplace<SphereRenderer>(e);
     }
     PointLight &AddPointLight(entt::registry &registry, entt::entity e, vec3 color = vec3{1, 1, 1}, float R = 5)
     {
@@ -85,7 +85,7 @@ void Controller::InitScene()
 {
     UpdateMaterial(scene_->floor.material, vec3{0.3f}, vec3{0}, 0.25f, 4, true);
     scene_->floor.transform.reset();
-    scene_->floor.update_plane(vec3{0, 0, 1}, vec3{1, 0, 0});
+    scene_->floor.plane.update_plane(vec3{0, 0, 1}, vec3{1, 0, 0});
     scene_->floor.transform.position = vec3{0, -2, 0};
     scene_->floor.transform.UpdateMatrices();
     entt::registry &registry = scene_->registry;
@@ -112,8 +112,6 @@ void Controller::InitScene()
     Transform &sphere2_transform = UpdateTransform(registry, sphere2, vec3{1}, vec3{1.5f});
     AddPointLight(registry, sphere2, vec3{0.2f, 0.0f, 0.2f}, 3);
     UpdateMaterial(AddSphereComponent(registry, sphere2).material, vec3{0}, vec3{0.2f, 0.0f, 0.2f}, 1, 2, true);
-    update_callbacks_.emplace_back([&sphere2_transform, this](float)
-                                   { sphere2_transform.scale = vec3{1.0f} + math::cos(time_from_start_ - 1.2f) / 2; sphere2_transform.UpdateMatrices(); });
 
     entt::entity cube1 = registry.create();
     UpdateTransform(registry, cube1, vec3{3}, vec3{1.0f});

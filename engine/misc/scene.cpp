@@ -17,8 +17,8 @@ namespace engine
                      [[maybe_unused]] ParallelExecutor &executor)
     {
 
-        auto spheres = registry.group<components::Sphere>(entt::get<components::Transform>);
-        auto meshes = registry.group<components::MeshComponent>(entt::get<components::Transform>);
+        auto spheres = registry.group<components::SphereRenderer>(entt::get<components::Transform>);
+        auto meshes = registry.group<components::MeshRenderer>(entt::get<components::Transform>);
 
         auto directional_lights = registry.view<components::DirectionalLight>();
         auto point_lights = registry.group<components::PointLight>(entt::get<components::Transform>);
@@ -88,8 +88,8 @@ namespace engine
 
     std::optional<entt::entity> Scene::GetIntersectedEntity(Intersection &intersection, Ray &ray)
     {
-        auto spheres = registry.group<components::Sphere>(entt::get<components::Transform>);
-        auto meshes = registry.group<components::MeshComponent>(entt::get<components::Transform>);
+        auto spheres = registry.group<components::SphereRenderer>(entt::get<components::Transform>);
+        auto meshes = registry.group<components::MeshRenderer>(entt::get<components::Transform>);
         std::optional<entt::entity> rv = std::nullopt;
 
         spheres.each([&rv, &intersection, &ray](auto const e, auto const &sphere, auto const &transform) __lambda_force_inline
@@ -103,8 +103,8 @@ namespace engine
         Intersection &intersection, Ray &ray,
         std::function<bool(entt::entity, components::Transform const &, render::Material const &)> const &func)
     {
-        auto spheres = registry.group<components::Sphere>(entt::get<components::Transform>);
-        auto meshes = registry.group<components::MeshComponent>(entt::get<components::Transform>);
+        auto spheres = registry.group<components::SphereRenderer>(entt::get<components::Transform>);
+        auto meshes = registry.group<components::MeshRenderer>(entt::get<components::Transform>);
         std::optional<entt::entity> rv = std::nullopt;
 
         spheres.each([&func, &rv, &intersection, &ray](auto const e, auto const &sphere, auto const &transform) __lambda_force_inline

@@ -10,6 +10,6 @@
 #define __lambda_force_inline __attribute__((always_inline))
 #elif defined(__GNUC__)
 #define __lambda_force_inline __attribute__((always_inline))
-#elif defined(_MSC_VER)
+#elif _MSC_VER
 #define __lambda_force_inline [[msvc::forceinline]]
 #endif

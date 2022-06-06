@@ -1,11 +1,11 @@
-#include "mesh-component.hpp"
+#include "mesh-renderer.hpp"
 namespace engine::components
 {
-    MeshComponent::MeshComponent(std::shared_ptr<const render::Mesh> value) : mesh_(value)
+    MeshRenderer::MeshRenderer(std::shared_ptr<const render::Mesh> value) : mesh_(value)
     {
         assert(value != nullptr);
     }
-    bool MeshComponent:: CheckIntersection(Transform const &transform, core::math::Intersection &i,
+    bool MeshRenderer:: CheckIntersection(Transform const &transform, core::math::Intersection &i,
                                  core::math::Ray const &ray) const
     {
         core::math::Ray local = ray;
@@ -35,13 +35,13 @@ namespace engine::components
         }
         return rv;
     }
-    void MeshComponent::SetMesh(std::shared_ptr<const render::Mesh> mesh)
+    void MeshRenderer::SetMesh(std::shared_ptr<const render::Mesh> mesh)
     {
         assert(mesh != nullptr);
         mesh_ = mesh;
     }
     
-    bool MeshComponent::CheckTriangleIntersection(
+    bool MeshRenderer::CheckTriangleIntersection(
         core::math::vec3 const &p0,
         core::math::vec3 const &p1,
         core::math::vec3 const &p2,

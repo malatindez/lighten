@@ -2,9 +2,9 @@
 
 #include "components/camera.hpp"
 #include "components/directional-light.hpp"
-#include "components/mesh-component.hpp"
+#include "components/mesh-renderer.hpp"
 #include "components/point-light.hpp"
-#include "components/sphere.hpp"
+#include "components/sphere-renderer.hpp"
 #include "components/spot-light.hpp"
 #include "core/bitmap-window.hpp"
 #include "core/parallel-executor.hpp"
@@ -19,8 +19,8 @@ namespace engine
     public:
         Scene() = default;
         void UpdateScene() noexcept;
-        using SphereGroup = entt::basic_group<entt::entity, entt::type_list<engine::components::Sphere>, entt::type_list<engine::components::Transform>, entt::type_list<>>;
-        using MeshGroup = entt::basic_group<entt::entity, entt::type_list<engine::components::MeshComponent>, entt::type_list<engine::components::Transform>, entt::type_list<>>;
+        using SphereGroup = entt::basic_group<entt::entity, entt::type_list<engine::components::SphereRenderer>, entt::type_list<engine::components::Transform>, entt::type_list<>>;
+        using MeshGroup = entt::basic_group<entt::entity, entt::type_list<engine::components::MeshRenderer>, entt::type_list<engine::components::Transform>, entt::type_list<>>;
         using DirectionalLightView = entt::basic_view<entt::entity, entt::type_list<engine::components::DirectionalLight>, entt::type_list<>, void>;
         using PointLightGroup = entt::basic_group<entt::entity, entt::type_list<engine::components::PointLight>, entt::type_list<engine::components::Transform>, entt::type_list<>>;
         using SpotLightGroup = entt::basic_group<entt::entity, entt::type_list<engine::components::SpotLight>, entt::type_list<engine::components::Transform>, entt::type_list<>>;

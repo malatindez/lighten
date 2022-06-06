@@ -9,10 +9,10 @@
 #include <memory>
 namespace engine::components
 {
-    class MeshComponent
+    class MeshRenderer
     {
     public:
-        MeshComponent(std::shared_ptr<const render::Mesh> value);
+        MeshRenderer(std::shared_ptr<const render::Mesh> value);
         bool CheckIntersection(Transform const &transform, core::math::Intersection &i, core::math::Ray const &ray) const;
         void SetMesh(std::shared_ptr<const render::Mesh> mesh);
         [[nodiscard]] std::shared_ptr<const render::Mesh> mesh_data() const noexcept { return mesh_; }
