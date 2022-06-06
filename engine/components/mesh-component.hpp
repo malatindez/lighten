@@ -26,7 +26,6 @@ namespace engine::components
                                                      core::math::vec3 const &normal,
                                                      core::math::Intersection &i,
                                                      core::math::Ray const &ray) noexcept;
-        static bool CheckTriangleIntersections(render::Vertex *vertices, core::math::Intersection &i, core::math::Ray const& ray);
         std::shared_ptr<const render::Mesh> mesh_;
         render::Material material_;
     };

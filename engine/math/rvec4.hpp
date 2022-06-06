@@ -17,11 +17,13 @@ namespace engine::core::math
         explicit constexpr rvec(T &other) requires(V::size >= size) : x{other.x}, y{other.y}, z{other.z}, w{other.w} {}
         template <AnyVec V>
         explicit constexpr rvec(T const &other) requires(V::size >= size && std::is_const_v<typename V::type>) : x{other.x}, y{other.y}, z{other.z}, w{other.w} {}
+        
         template <AnyVec U>
         static constexpr rvec<4, T> from_vec(U &other) requires (U::size >= 4) { return rvec<4, T>{other.x, other.y, other.z, other.w}; }
         template <AnyVec U>
         static constexpr rvec<4, T> from_vec(U const&other) requires (U::size >= 4) { return rvec<4, T>{other.x, other.y, other.z, other.w}; }
         
+
         template <typename U>
         constexpr rvec<size, T> &operator=(rvec<size, U> const &b)
         {

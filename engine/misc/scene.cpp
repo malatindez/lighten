@@ -82,7 +82,7 @@ namespace engine
             func(0, i);
         }
 #else
-        executor.execute(func, bitmap_size.x * bitmap_size.y, 25);
+        executor.execute(func, bitmap_size.x * bitmap_size.y, 100);
 #endif
     }
 

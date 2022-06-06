@@ -90,17 +90,4 @@ namespace engine::components
         i.t = t;
         return true;
     }
-    namespace {
-        extern "C" struct Vertex
-        {
-            typename decltype(render::Vertex::position)::type x, y, z;
-            typename decltype(render::Vertex::normal)::type nx, ny, nz;
-            typename decltype(render::Vertex::tex_coords)::type u, v;
-        };
-        extern "C" void process(Vertex * vertices);
-    }
-    bool MeshComponent::CheckTriangleIntersections(render::Vertex *vertices, core::math::Intersection &i, core::math::Ray const& ray)
-    {
-        return true;
-    }
 } // namespace engine::components
