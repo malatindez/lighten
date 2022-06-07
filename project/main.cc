@@ -1,15 +1,21 @@
+#include "pch.hpp"
+#define NOMINMAX
 #include <Windows.h>
 
+#include "render/material.hpp"
+#include "components/mesh-renderer.hpp"
 #include "controller.hpp"
-#include "engine.hpp"
+#include "core/application.hpp"
+#include "misc/camera-controller.hpp"
 using namespace engine;
+using namespace core;
+using namespace math;
+using namespace components;
 
 // the entry point for any Windows program
-INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
-                    int cmd_show)
+INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int cmd_show)
 {
     WNDCLASSEXW wc;
-
     // clear out the window class for use
     ZeroMemory(&wc, sizeof(WNDCLASSEX));
 
@@ -32,21 +38,45 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, PWSTR cmd_line,
         nullptr,                          // we aren't using menus, nullptr
         instance,                         // application handle
         nullptr);                         // used with multiple windows, nullptr
-    auto window = std::static_pointer_cast<Window>(bmwindow);
-
     // display the window on the screen
-    ShowWindow(window->handle(), cmd_show);
+    ShowWindow(bmwindow->handle(), cmd_show);
 
     auto scene = std::make_shared<Scene>();
+    entt::registry &registry = scene->registry;
 
-    scene->sphere = math::Sphere{{0, 0, -1}, 0.5f};
 
-    auto controller = std::make_shared<Controller>(*bmwindow, scene);
 
-    Engine &engine = GetEngine();
-    engine.AddWindow(window);
-    engine.AddUpdatable(controller);
-    engine.Start();
+
+    entt::entity camera = registry.create();
+    Transform &camera_transform = registry.emplace<Transform>(camera);
+    camera_transform.position = vec3{0, 0, -10};
+    camera_transform.UpdateMatrices();
+    Camera &cam = registry.emplace<Camera>(camera);
+    CameraController camera_controller(cam, camera_transform, bmwindow->window_size());
+
+    Application::Init();
+
+    bmwindow->SetEventCallback(Application::event_function());
+
+    auto controller = std::make_shared<Controller>(*bmwindow, scene, camera_controller);
+
+
+    SpotLight &spot = registry.emplace<SpotLight>(camera);
+    spot.direction = normalize(vec3{0, -1, 0});
+    spot.color = vec3{0.3f, 0.3f, 0.7f};
+    spot.cut_off = radians(45.0F);
+    spot.attenuation.constant = 1.0f;
+    spot.attenuation.linear = 0.35f;
+    spot.attenuation.quadratic = 0.44f;
+
+    controller->update_callbacks().emplace_back(
+        [&spot, &controller](float)
+        {
+            spot.direction = controller->camera_controller().forward();
+        });
+    Application &application = Application::Get();
+    application.AddLayer(controller);
+    application.Run();
     PostQuitMessage(0);
     return 0;
 }

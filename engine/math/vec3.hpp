@@ -2,227 +2,125 @@
 
 #include "vec.hpp"
 
-namespace engine::math
+#pragma warning(push)
+#pragma warning(disable : 4201)
+namespace engine::core::math
 {
 
     template <Primitive T>
-    class type_vec3 final
+    struct vec<3, T>
     {
-    public:
-        explicit constexpr type_vec3(T value = 0) { x = y = z = value; }
-        constexpr type_vec3(T x, T y, T z)
-        {
-            this->x = x;
-            this->y = y;
-            this->z = z;
-        }
-        [[nodiscard]] constexpr T r() const noexcept { return x; }
-        [[nodiscard]] constexpr T g() const noexcept { return y; }
-        [[nodiscard]] constexpr T b() const noexcept { return z; }
+        static_assert(!std::is_const_v<T>);
+        using type = T;
+        static constexpr size_t size = 3;
+        constexpr vec() = default;
+        template <Primitive U>
+        explicit constexpr vec(U value);
+        template <Primitive A, Primitive B, Primitive C>
+        explicit constexpr vec(A a, B b, C c);
+        template <typename... U>
+        explicit constexpr vec(U... data);
+        explicit constexpr vec(std::array<T, size> const &arr) : data{arr} {}
+        explicit constexpr vec(std::array<T, size> &&arr) : data{std::move(arr)} {}
 
-        [[nodiscard]] constexpr float length() const noexcept
+        constexpr void reset() noexcept;
+        template <typename U>
+        constexpr vec<size, T> &operator=(rvec<size, U> const &b)
         {
-            return std::sqrt(squared_length());
-        }
-        [[nodiscard]] constexpr float squared_length() const noexcept
-        {
-            return x * x + y * y + z * z;
-        }
-
-        [[nodiscard]] constexpr type_vec3<T> unit_vector() const noexcept
-        {
-            return *this / length();
-        }
-        constexpr void make_unit_vector() { operator/=(length()); }
-
-        [[nodiscard]] constexpr type_vec3<T> const &operator+() const noexcept
-        {
+            for (size_t i = 0; i < size; i++)
+            {
+                data[i] = b.data[i];
+            }
             return *this;
         }
-        [[nodiscard]] constexpr type_vec3<T> operator-() const noexcept
+        template <typename U>
+        constexpr vec<size, T> &operator=(vec<size, U> const &b)
         {
-            return type_vec3<T>{-x, -y, -z};
-        }
-
-        template <Primitive U>
-        constexpr type_vec3<T> &operator+=(U const value) noexcept
-        {
-            x += value;
-            y += value;
-            z += value;
-            return *this;
-        }
-        template <Primitive U>
-        constexpr type_vec3<T> &operator-=(U const value) noexcept
-        {
-            x -= value;
-            y -= value;
-            z -= value;
-            return *this;
-        }
-        template <Primitive U>
-        constexpr type_vec3<T> &operator*=(U const value) noexcept
-        {
-            x *= value;
-            y *= value;
-            z *= value;
-            return *this;
-        }
-        template <Primitive U>
-        constexpr type_vec3<T> &operator/=(U const value) noexcept
-        {
-            x /= value;
-            y /= value;
-            z /= value;
+            for (size_t i = 0; i < size; i++)
+            {
+                data[i] = b.data[i];
+            }
             return *this;
         }
 
-        template <Primitive U>
-        [[nodiscard]] constexpr type_vec3<T> operator+(U const value) const noexcept
-        {
-            type_vec3<T> return_value{*this};
-            return_value += value;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr type_vec3<T> operator-(U const value) const noexcept
-        {
-            type_vec3<T> return_value{*this};
-            return_value -= value;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr type_vec3<T> operator*(U const value) const noexcept
-        {
-            type_vec3<T> return_value{*this};
-            return_value *= value;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr type_vec3<T> operator/(U const value) const noexcept
-        {
-            type_vec3<T> return_value{*this};
-            return_value /= value;
-            return return_value;
-        }
-        template <Primitive U>
-        constexpr type_vec3<T> &operator+=(type_vec3<U> const &other) noexcept
-        {
-            x += other.x;
-            y += other.y;
-            z += other.z;
-            return *this;
-        }
-        template <Primitive U>
-        constexpr type_vec3<T> &operator-=(type_vec3<U> const &other) noexcept
-        {
-            x -= other.x;
-            y -= other.y;
-            z -= other.z;
-            return *this;
-        }
-        template <Primitive U>
-        constexpr type_vec3<T> &operator*=(type_vec3<U> const &other) noexcept
-        {
-            x *= other.x;
-            y *= other.y;
-            z *= other.z;
-            return *this;
-        }
-        template <Primitive U>
-        constexpr type_vec3<T> &operator/=(type_vec3<U> const &other) noexcept
-        {
-            x /= other.x;
-            y /= other.y;
-            z /= other.z;
-            return *this;
-        }
+        [[nodiscard]] constexpr vec<3, T> const &operator+() const noexcept;
+        [[nodiscard]] constexpr vec<3, T> operator-() const noexcept;
 
         template <Primitive U>
-        [[nodiscard]] constexpr type_vec3<T> operator+(type_vec3<U> const &other) const noexcept
-        {
-            type_vec3<T> return_value{*this};
-            return_value += other;
-            return return_value;
-        }
+        constexpr vec<3, T> &operator+=(U const value) noexcept;
         template <Primitive U>
-        [[nodiscard]] constexpr type_vec3<T> operator-(type_vec3<U> const &other) const noexcept
-        {
-            type_vec3<T> return_value{*this};
-            return_value -= other;
-            return return_value;
-        }
+        constexpr vec<3, T> &operator-=(U const value) noexcept;
         template <Primitive U>
-        [[nodiscard]] constexpr type_vec3<T> operator*(type_vec3<U> const &other) const noexcept
-        {
-            type_vec3<T> return_value{*this};
-            return_value *= other;
-            return return_value;
-        }
+        constexpr vec<3, T> &operator*=(U const value) noexcept;
         template <Primitive U>
-        [[nodiscard]] constexpr type_vec3<T> operator/(type_vec3<U> const &other) const noexcept
-        {
-            type_vec3<T> return_value{*this};
-            return_value /= other;
-            return return_value;
-        }
+        constexpr vec<3, T> &operator/=(U const value) noexcept;
+        template <Primitive U>
+        constexpr vec<3, T> &operator%=(U const value) noexcept;
+        template <AnyVec U>
+        constexpr vec<3, T> &operator+=(U const &other) noexcept requires(size == U::size);
+        template <AnyVec U>
+        constexpr vec<3, T> &operator-=(U const &other) noexcept requires(size == U::size);
+        template <AnyVec U>
+        constexpr vec<3, T> &operator*=(U const &other) noexcept requires(size == U::size);
+        template <AnyVec U>
+        constexpr vec<3, T> &operator/=(U const &other) noexcept requires(size == U::size);
+        template <AnyVec U>
+        constexpr vec<3, T> &operator%=(U const &other) noexcept requires(size == U::size);
 
-        T x;
-        T y;
-        T z;
+        [[nodiscard]] constexpr T &operator[](size_t i);
+        [[nodiscard]] constexpr T const &operator[](size_t i) const;
+
+        constexpr explicit operator rvec<3, T>() noexcept { return rvec<3, T>{x, y, z}; }
+        constexpr explicit operator rvec<3, const T>() const noexcept { return rvec<3, const T>{x, y, z}; }
+
+        template <size_t n = size>
+        [[nodiscard]] constexpr rvec<n, T> as_rvec() noexcept requires(n >= 2 && n <= size);
+
+        template <size_t n = size, Primitive U = T>
+        [[nodiscard]] constexpr vec<n, U> as_vec() const noexcept requires(n >= 2 && n <= size);
+        template <size_t n = size>
+        [[nodiscard]] constexpr rvec<n, const T> as_crvec() const noexcept requires(n >= 2 && n <= size);
+        union
+        {
+            struct
+            {
+                union
+                {
+                    T x, r, s;
+                };
+                union
+                {
+                    T y, g, t;
+                };
+                union
+                {
+                    T z, b, p;
+                };
+            };
+            std::array<T, 3> data;
+        };
+        static_assert(sizeof(data) == 3 * sizeof(T));
+
+    private:
+        template <Primitive _>
+        static constexpr size_t get_parameter_pack_size();
+        template <class V>
+        static constexpr size_t get_parameter_pack_size();
+        template <typename A, typename B, typename... C>
+        static constexpr size_t get_parameter_pack_size();
+
+        template <Primitive U>
+        constexpr void unpack_data(size_t offset, U u);
+        template <class V>
+        constexpr void unpack_data(size_t offset, V vec);
+        template <typename A, typename B, typename... C>
+        constexpr void unpack_data(size_t offset, A a, B b, C... c);
     };
-    template <Primitive T>
-    constexpr std::istream &operator>>(std::istream &is, type_vec3<T> &vec)
-    {
-        is >> vec.x >> vec.y >> vec.z;
-        return is;
-    }
-    template <Primitive T>
-    constexpr std::ostream &operator>>(std::ostream &os, type_vec3<T> &vec)
-    {
-        os << vec.x << " " << vec.y << " " << vec.z;
-        return os;
-    }
 
     template <Primitive T, Primitive U>
-    constexpr T dot(type_vec3<T> const &left, type_vec3<U> const &right)
-    {
-        return left.x * right.x + left.y * right.y + left.z * right.z;
-    }
-    template <Primitive T, Primitive U>
-    constexpr T angle(type_vec3<T> const &left, type_vec3<U> const &right)
-    {
-        return std::acos(dot(left, right) / left.length() / right.length());
-    }
+    constexpr vec<3, T> cross(vec<3, T> const &left, vec<3, U> const &right);
 
-    template <Primitive T, Primitive U>
-    constexpr type_vec3<T> cross(type_vec3<T> const &left,
-                                 type_vec3<U> const &right)
-    {
-        return type_vec3<T>{left.y * right.z - left.z * right.y,
-                            left.x * right.z - left.z * right.x,
-                            left.x * right.y - left.y * right.x};
-    }
+}; // namespace engine::core::math
 
-    template <Primitive T, Primitive U>
-    [[nodiscard]] constexpr type_vec3<T> operator*(U const value,
-                                                   type_vec3<T> const &vec)
-    {
-        type_vec3<T> return_value{vec};
-        return_value *= value;
-        return return_value;
-    }
-    template <Primitive T, Primitive U>
-    [[nodiscard]] constexpr type_vec3<T> operator/(U const value,
-                                                   type_vec3<T> const &vec)
-    {
-        type_vec3<T> return_value{vec};
-        return_value /= value;
-        return return_value;
-    }
-
-    using vec3 = type_vec3<float>;
-    using dvec3 = type_vec3<double>;
-    using ivec3 = type_vec3<int>;
-    using bvec3 = type_vec3<bool>;
-}; // namespace engine::math
+#pragma warning(pop)
+#include "vec3.inl"

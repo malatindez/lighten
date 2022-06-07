@@ -2,205 +2,110 @@
 
 #include "vec.hpp"
 
-namespace engine::math
+#pragma warning(push)
+#pragma warning(disable : 4201)
+namespace engine::core::math
 {
 
     template <Primitive T>
-    class type_vec2 final
+    struct vec<2, T>
     {
-    public:
-        explicit constexpr type_vec2(T value = 0) { x = y = value; }
-        constexpr type_vec2(T x, T y)
-        {
-            this->x = x;
-            this->y = y;
-        }
-        [[nodiscard]] constexpr float length() const noexcept
-        {
-            return std::sqrt(squared_length());
-        }
-        [[nodiscard]] constexpr float squared_length() const noexcept
-        {
-            return x * x + y * y;
-        }
+        static_assert(!std::is_const_v<T>);
+        using type = T;
+        static constexpr size_t size = 2;
+        constexpr vec() = default;
+        template <Primitive U>
+        explicit constexpr vec(U value);
+        template <Primitive A, Primitive B>
+        explicit constexpr vec(A a, B b);
+        template <typename... U>
+        explicit constexpr vec(U... data);
+        explicit constexpr vec(std::array<T, size> const &arr) : data{arr} {}
+        explicit constexpr vec(std::array<T, size> &&arr) : data{std::move(arr)} {}
+        constexpr void reset() noexcept;
 
-        [[nodiscard]] constexpr type_vec2<T> unit_vector() const noexcept
+        template <typename U>
+        constexpr vec<size, T> &operator=(rvec<size, U> const &b)
         {
-            return *this / length();
-        }
-        constexpr void make_unit_vector() { operator/=(length()); }
-
-        [[nodiscard]] constexpr type_vec2<T> const &operator+() const noexcept
-        {
+            for (size_t i = 0; i < size; i++)
+            {
+                data[i] = b.data[i];
+            }
             return *this;
         }
-        [[nodiscard]] constexpr type_vec2<T> operator-() const noexcept
+        template <typename U>
+        constexpr vec<size, T> &operator=(vec<size, U> const &b)
         {
-            return type_vec2<T>{-x, -y};
-        }
-
-        template <Primitive U>
-        constexpr type_vec2<T> &operator+=(U const value) noexcept
-        {
-            x += value;
-            y += value;
-            return *this;
-        }
-        template <Primitive U>
-        constexpr type_vec2<T> &operator-=(U const value) noexcept
-        {
-            x -= value;
-            y -= value;
-            return *this;
-        }
-        template <Primitive U>
-        constexpr type_vec2<T> &operator*=(U const value) noexcept
-        {
-            x *= value;
-            y *= value;
-            return *this;
-        }
-        template <Primitive U>
-        constexpr type_vec2<T> &operator/=(U const value) noexcept
-        {
-            x /= value;
-            y /= value;
+            for (size_t i = 0; i < size; i++)
+            {
+                data[i] = b.data[i];
+            }
             return *this;
         }
 
-        template <Primitive U>
-        [[nodiscard]] constexpr type_vec2<T> operator+(U const value) const noexcept
-        {
-            type_vec2<T> return_value{*this};
-            return_value += value;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr type_vec2<T> operator-(U const value) const noexcept
-        {
-            type_vec2<T> return_value{*this};
-            return_value -= value;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr type_vec2<T> operator*(U const value) const noexcept
-        {
-            type_vec2<T> return_value{*this};
-            return_value *= value;
-            return return_value;
-        }
-        template <Primitive U>
-        [[nodiscard]] constexpr type_vec2<T> operator/(U const value) const noexcept
-        {
-            type_vec2<T> return_value{*this};
-            return_value /= value;
-            return return_value;
-        }
-        template <Primitive U>
-        constexpr type_vec2<T> &operator+=(type_vec2<U> const &other) noexcept
-        {
-            x += other.x;
-            y += other.y;
-            return *this;
-        }
-        template <Primitive U>
-        constexpr type_vec2<T> &operator-=(type_vec2<U> const &other) noexcept
-        {
-            x -= other.x;
-            y -= other.y;
-            return *this;
-        }
-        template <Primitive U>
-        constexpr type_vec2<T> &operator*=(type_vec2<U> const &other) noexcept
-        {
-            x *= other.x;
-            y *= other.y;
-            return *this;
-        }
-        template <Primitive U>
-        constexpr type_vec2<T> &operator/=(type_vec2<U> const &other) noexcept
-        {
-            x /= other.x;
-            y /= other.y;
-            return *this;
-        }
+        [[nodiscard]] constexpr vec<2, T> const &operator+() const noexcept;
+
+        [[nodiscard]] constexpr vec<2, T> operator-() const noexcept;
 
         template <Primitive U>
-        [[nodiscard]] constexpr type_vec2<T>
-        operator+(type_vec2<U> const &other) const noexcept
-        {
-            type_vec2<T> return_value{*this};
-            return_value += other;
-            return return_value;
-        }
+        constexpr vec<2, T> &operator+=(U const value) noexcept;
         template <Primitive U>
-        [[nodiscard]] constexpr type_vec2<T> operator-(type_vec2<U> const &other) const noexcept
-        {
-            type_vec2<T> return_value{*this};
-            return_value -= other;
-            return return_value;
-        }
+        constexpr vec<2, T> &operator-=(U const value) noexcept;
         template <Primitive U>
-        [[nodiscard]] constexpr type_vec2<T> operator*(type_vec2<U> const &other) const noexcept
-        {
-            type_vec2<T> return_value{*this};
-            return_value *= other;
-            return return_value;
-        }
+        constexpr vec<2, T> &operator*=(U const value) noexcept;
         template <Primitive U>
-        [[nodiscard]] constexpr type_vec2<T> operator/(type_vec2<U> const &other) const noexcept
-        {
-            type_vec2<T> return_value{*this};
-            return_value /= other;
-            return return_value;
-        }
+        constexpr vec<2, T> &operator/=(U const value) noexcept;
+        template <Primitive U>
+        constexpr vec<2, T> &operator%=(U const value) noexcept;
+        template <AnyVec U>
+        constexpr vec<2, T> &operator+=(U const &other) noexcept requires(size == U::size);
+        template <AnyVec U>
+        constexpr vec<2, T> &operator-=(U const &other) noexcept requires(size == U::size);
+        template <AnyVec U>
+        constexpr vec<2, T> &operator*=(U const &other) noexcept requires(size == U::size);
+        template <AnyVec U>
+        constexpr vec<2, T> &operator/=(U const &other) noexcept requires(size == U::size);
+        template <AnyVec U>
+        constexpr vec<2, T> &operator%=(U const &other) noexcept requires(size == U::size);
 
-        T x;
-        T y;
+        [[nodiscard]] constexpr T &operator[](size_t i);
+        [[nodiscard]] constexpr T const &operator[](size_t i) const;
+
+        constexpr explicit operator rvec<2, T>() noexcept { return rvec<2, T>{x, y}; }
+        constexpr explicit operator rvec<2, const T>() const noexcept { return rvec<2, const T>{x, y}; }
+        union
+        {
+            struct
+            {
+                union
+                {
+                    T x, r, s, u;
+                };
+                union
+                {
+                    T y, g, t, v;
+                };
+            };
+            std::array<T, 2> data;
+        };
+        static_assert(sizeof(data) == 2 * sizeof(T));
+
+    private:
+        template <Primitive _>
+        static constexpr size_t get_parameter_pack_size();
+        template <class V>
+        static constexpr size_t get_parameter_pack_size();
+        template <typename A, typename B, typename... C>
+        static constexpr size_t get_parameter_pack_size();
+
+        template <Primitive U>
+        constexpr void unpack_data(size_t offset, U u);
+        template <class V>
+        constexpr void unpack_data(size_t offset, V vec);
+        template <typename A, typename B, typename... C>
+        constexpr void unpack_data(size_t offset, A a, B b, C... c);
     };
-    template <Primitive T>
-    constexpr std::istream &operator>>(std::istream &is, type_vec2<T> &vec)
-    {
-        is >> vec.x >> vec.y;
-        return is;
-    }
-    template <Primitive T>
-    constexpr std::ostream &operator>>(std::ostream &os, type_vec2<T> &vec)
-    {
-        os << vec.x << " " << vec.y;
-        return os;
-    }
 
-    template <Primitive T, Primitive U>
-    constexpr T dot(type_vec2<T> const &left, type_vec2<U> const &right)
-    {
-        return left.x * right.x + left.y * right.y;
-    }
-    template <Primitive T, Primitive U>
-    constexpr T angle(type_vec2<T> const &left, type_vec2<U> const &right)
-    {
-        return std::acos(dot(left, right) / left.length() / right.length());
-    }
-
-    template <Primitive T, Primitive U>
-    [[nodiscard]] constexpr type_vec2<T> operator*(U const value,
-                                                   type_vec2<T> const &vec)
-    {
-        type_vec2<T> return_value{vec};
-        return_value *= value;
-        return return_value;
-    }
-    template <Primitive T, Primitive U>
-    [[nodiscard]] constexpr type_vec2<T> operator/(U const value,
-                                                   type_vec2<T> const &vec)
-    {
-        type_vec2<T> return_value{vec};
-        return_value /= value;
-        return return_value;
-    }
-
-    using vec2 = type_vec2<float>;
-    using dvec2 = type_vec2<double>;
-    using ivec2 = type_vec2<int>;
-    using bvec2 = type_vec2<bool>;
-}; // namespace engine::math
+}; // namespace engine::core::math
+#pragma warning(pop)
+#include "vec2.inl"
