@@ -111,6 +111,9 @@ namespace engine::core::math
     template <AnyVec T, Primitive U>
     constexpr vec<T::size, typename T::type> pow(T const &vector, U const pow);
 
+    template <AnyVec T, AnyVec U>
+    constexpr vec<T::size, typename T::type> pow(T const &vector1, U const &vector2);
+
     template <AnyVec T>
     constexpr vec<T::size, typename T::type> sqrt(T const &vector);
 
@@ -120,11 +123,14 @@ namespace engine::core::math
     template <Primitive T, Primitive U>
     constexpr void rclamp(T &left, U const min, U const max);
 
-    template <AnyVec T, Primitive U>
+    template <AnyVec T, AnyVec U>
     constexpr void rclamp(T &left, U const min, U const max);
 
     template <AnyVec T, Primitive U>
     [[nodiscard]] constexpr vec<T::size, typename T::type> clamp(T const &left, U const min, U const max);
+
+    template <AnyVec T, AnyVec U>
+    [[nodiscard]] constexpr vec<T::size, typename T::type> clamp(T const &left, U const &min, U const &max);
 
     template <Primitive T, Primitive U>
     [[nodiscard]] constexpr T clamp(T left, U const min, U const max);

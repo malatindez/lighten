@@ -40,6 +40,7 @@ namespace engine::core::math
             i.t = t;
             i.point = ray.PointAtParameter(t);
             i.normal = normalize(i.point - position);
+            i.normal = i.normal * (core::math::length(ray.origin()) < 1 ? -1 : 1);
             return true;
         }
 

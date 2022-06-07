@@ -147,6 +147,10 @@ namespace engine::core::math
         return (x / 180.0f) * static_cast<float>(std::numbers::pi);
     }
     template <Primitive T>
+    [[nodiscard]] inline float tan(T x) noexcept { return std::tanf(x); }
+    [[nodiscard]] inline double tan(double x) { return std::tan(x); }
+    [[nodiscard]] inline long double tan(long double x) { return std::tanl(x); }
+    template <Primitive T>
     [[nodiscard]] inline float sin(T x) noexcept { return std::sinf(x); }
     [[nodiscard]] inline double sin(double x) { return std::sin(x); }
     [[nodiscard]] inline long double sin(long double x) { return std::sinl(x); }
@@ -155,7 +159,19 @@ namespace engine::core::math
     [[nodiscard]] inline double cos(double x) { return std::cos(x); }
     [[nodiscard]] inline long double cos(long double x) { return std::cosl(x); }
     template <Primitive T>
-    [[nodiscard]] inline float pow(T x, T y) noexcept { return std::powf(x, y); }
+    [[nodiscard]] inline float atan(T x) noexcept { return std::atanf(x); }
+    [[nodiscard]] inline double atan(double x) { return std::atan(x); }
+    [[nodiscard]] inline long double atan(long double x) { return std::atanl(x); }
+    template <Primitive T>
+    [[nodiscard]] inline float asin(T x) noexcept { return std::asinf(x); }
+    [[nodiscard]] inline double asin(double x) { return std::asin(x); }
+    [[nodiscard]] inline long double asin(long double x) { return std::asinl(x); }
+    template <Primitive T>
+    [[nodiscard]] inline float acos(T x) noexcept { return std::acosf(x); }
+    [[nodiscard]] inline double acos(double x) { return std::acos(x); }
+    [[nodiscard]] inline long double acos(long double x) { return std::acosl(x); }
+    template <Primitive T, Primitive U>
+    [[nodiscard]] inline float pow(T x, U y) noexcept { return std::powf(x, y); }
     [[nodiscard]] inline double pow(double x, double y) { return std::pow(x, y); }
     [[nodiscard]] inline long double pow(long double x, long double y) { return std::powl(x, y); }
     template <Primitive T>

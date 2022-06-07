@@ -10,6 +10,6 @@ namespace engine::render
         core::math::Ray const ray;
         core::math::vec3 const point;
         core::math::vec3 const normal;
-        core::math::vec3 const view_dir; // normalize(point - ray.origin()))
+        core::math::vec3 const view_dir; // point - ray.origin()
     };
 } // namespace engine::components

@@ -110,8 +110,7 @@ void Controller::InitScene()
 
     entt::entity sphere2 = registry.create();
     Transform &sphere2_transform = UpdateTransform(registry, sphere2, vec3{1}, vec3{1.5f});
-    AddPointLight(registry, sphere2, vec3{0.2f, 0.0f, 0.2f}, 3);
-    UpdateMaterial(AddSphereComponent(registry, sphere2).material, vec3{0}, vec3{0.2f, 0.0f, 0.2f}, 1, 2, true);
+    UpdateMaterial(AddSphereComponent(registry, sphere2).material, vec3{1}, vec3{0.0f, 0.0f, 0.0f}, 1, 2, true);
 
     entt::entity cube1 = registry.create();
     UpdateTransform(registry, cube1, vec3{3}, vec3{1.0f});
@@ -280,7 +279,7 @@ void Controller::Tick(float delta_time)
     {
         if (selected_object_ && input_.rbutton_down())
         {
-            selected_object_->scale *= vec3{1 + delta_time / 120 * input_.scroll_delta()};
+            selected_object_->scale *= vec3{pow(math::clamp(1 + delta_time / 120 * input_.scroll_delta(), 0.5f, 1.5f), 0.5f)};
             rclamp(selected_object_->scale, 0.1f, std::numeric_limits<float>::max());
         }
         else

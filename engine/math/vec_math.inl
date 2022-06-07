@@ -250,7 +250,7 @@ namespace engine::core::math
   template <AnyVec T, AnyVec U>
   constexpr typename T::type angle(T const &left, U const &right) requires(T::size == U::size)
   {
-    return std::acos(dot(left, right) / length(left) / length(right));
+    return acos(dot(left, right) / length(left) / length(right));
   }
 
   template <AnyVec T>
@@ -259,7 +259,7 @@ namespace engine::core::math
     vec<T::size, typename T::type> return_value;
     for (size_t i = 0; i < T::size; i++)
     {
-      return_value[i] = core::math::cos(vector[i]);
+      return_value[i] = cos(vector[i]);
     }
     return return_value;
   }
@@ -270,7 +270,7 @@ namespace engine::core::math
     vec<T::size, typename T::type> return_value;
     for (size_t i = 0; i < T::size; i++)
     {
-      return_value[i] = core::math::sin(vector[i]);
+      return_value[i] = sin(vector[i]);
     }
     return return_value;
   }
@@ -281,7 +281,17 @@ namespace engine::core::math
     vec<T::size, typename T::type> return_value;
     for (size_t i = 0; i < T::size; i++)
     {
-      return_value[i] = core::math::pow(vector[i], value);
+      return_value[i] = pow(vector[i], value);
+    }
+    return return_value;
+  }
+  template <AnyVec T, AnyVec U>
+  constexpr vec<T::size, typename T::type> pow(T const &vector1, U const &vector2)
+  {
+    vec<T::size, typename T::type> return_value;
+    for (size_t i = 0; i < T::size; i++)
+    {
+      return_value[i] = pow(vector1[i], vector2[i]);
     }
     return return_value;
   }
@@ -292,7 +302,7 @@ namespace engine::core::math
     vec<T::size, typename T::type> return_value;
     for (size_t i = 0; i < T::size; i++)
     {
-      return_value[i] = core::math::sqrt(vector[i]);
+      return_value[i] = sqrt(vector[i]);
     }
     return return_value;
   }
@@ -309,9 +319,9 @@ namespace engine::core::math
   constexpr void rclamp(T &left, U const min, U const max)
   {
     if (left < min)
-      left = min;
+      left = static_cast<T>(min);
     if (left > max)
-      left = max;
+      left = static_cast<T>(max);
   }
 
   template <AnyVec T, Primitive U>
@@ -329,20 +339,56 @@ namespace engine::core::math
       }
     }
   }
+  template <AnyVec T, AnyVec U>
+  constexpr void rclamp(T &left, U const min, U const max)
+  {
+    for (size_t i = 0; i < T::size; i++)
+    {
+      if (left[i] < static_cast<typename T::type>(min[i]))
+      {
+        left[i] = min[i];
+      }
+      if (left[i] > static_cast<typename T::type>(max[i]))
+      {
+        left[i] = max[i];
+      }
+    }
+  }
   template <AnyVec T, Primitive U>
   [[nodiscard]] constexpr vec<T::size, typename T::type> clamp(T const &left, U const min, U const max)
   {
-    vec<T::size, typename T::type> rvec{left};
+    vec<T::size, typename T::type> rvec;
 
     for (size_t i = 0; i < T::size; i++)
     {
       if (left[i] < static_cast<typename T::type>(min))
       {
-        rvec[i] = min;
+        rvec[i] = static_cast<typename T::type>(min);
       }
       if (left[i] > static_cast<typename T::type>(max))
       {
-        rvec[i] = max;
+        rvec[i] = static_cast<typename T::type>(max);
+      }
+      else
+      {
+        rvec[i] = left[i];
+      }
+    }
+    return rvec;
+  }
+  template <AnyVec T, Primitive U>
+  [[nodiscard]] constexpr vec<T::size, typename T::type> clamp(T const &left, U const &min, U const &max)
+  {
+    vec<T::size, typename T::type> rvec;
+    for (size_t i = 0; i < T::size; i++)
+    {
+      if (left[i] < static_cast<typename T::type>(min[i]))
+      {
+        rvec[i] = static_cast<typename T::type>(min[i]);
+      }
+      if (left[i] > static_cast<typename T::type>(max[i]))
+      {
+        rvec[i] = static_cast<typename T::type>(max[i]);
       }
       else
       {
