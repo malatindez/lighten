@@ -3,7 +3,7 @@
 #include <Windows.h>
 
 #include "render/material.hpp"
-#include "components/mesh-renderer.hpp"
+#include "components/scene-mesh.hpp"
 #include "controller.hpp"
 #include "core/application.hpp"
 #include "misc/camera-controller.hpp"

@@ -2,7 +2,7 @@
 
 #include "components/camera.hpp"
 #include "components/directional-light.hpp"
-#include "components/mesh-renderer.hpp"
+#include "components/scene-mesh.hpp"
 #include "components/point-light.hpp"
 #include "components/scene-sphere.hpp"
 #include "components/spot-light.hpp"
@@ -20,7 +20,7 @@ namespace engine
         Scene() = default;
         void UpdateScene() noexcept;
         using SphereGroup = entt::basic_group<entt::entity, entt::type_list<engine::components::SceneSphere>, entt::type_list<engine::components::Transform>, entt::type_list<>>;
-        using MeshGroup = entt::basic_group<entt::entity, entt::type_list<engine::components::MeshRenderer>, entt::type_list<engine::components::Transform>, entt::type_list<>>;
+        using MeshGroup = entt::basic_group<entt::entity, entt::type_list<engine::components::SceneMesh>, entt::type_list<engine::components::Transform>, entt::type_list<>>;
         using DirectionalLightView = entt::basic_view<entt::entity, entt::type_list<engine::components::DirectionalLight>, entt::type_list<>, void>;
         using PointLightGroup = entt::basic_group<entt::entity, entt::type_list<engine::components::PointLight>, entt::type_list<engine::components::Transform>, entt::type_list<>>;
         using SpotLightGroup = entt::basic_group<entt::entity, entt::type_list<engine::components::SpotLight>, entt::type_list<engine::components::Transform>, entt::type_list<>>;

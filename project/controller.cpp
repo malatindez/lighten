@@ -41,9 +41,9 @@ namespace
         t.UpdateMatrices();
         return t;
     }
-    MeshRenderer &AddCubeComponent(entt::registry &registry, entt::entity e)
+    SceneMesh &AddCubeComponent(entt::registry &registry, entt::entity e)
     {
-        return registry.emplace<MeshRenderer>(e, render::kCubeMesh);
+        return registry.emplace<SceneMesh>(e, render::kCubeMesh);
     }
     SceneSphere &AddSphereComponent(entt::registry &registry, entt::entity e)
     {
@@ -145,10 +145,8 @@ void Controller::InitInput()
         rclamp(window_.resolution_scale(), 1, 128);
         window_.OnScaleChanged();
     };
-    input_.AddTickKeyCallback({Key::KEY_PLUS}, update_bitmap, false);
-    input_.AddTickKeyCallback({Key::KEY_MINUS}, update_bitmap, false);
-    input_.AddTickKeyCallback({Key::KEY_NUMPAD_PLUS}, update_bitmap, false);
-    input_.AddTickKeyCallback({Key::KEY_NUMPAD_MINUS}, update_bitmap, false);
+    input_.AddTickKeyCallback({'P'}, update_bitmap, false);
+    input_.AddTickKeyCallback({'L'}, update_bitmap, false);
 }
 
 Controller::Controller(BitmapWindow &window,
