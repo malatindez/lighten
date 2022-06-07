@@ -17,7 +17,7 @@ namespace engine
                      [[maybe_unused]] ParallelExecutor &executor)
     {
 
-        auto spheres = registry.group<components::SphereRenderer>(entt::get<components::Transform>);
+        auto spheres = registry.group<components::SceneSphere>(entt::get<components::Transform>);
         auto meshes = registry.group<components::MeshRenderer>(entt::get<components::Transform>);
 
         auto directional_lights = registry.view<components::DirectionalLight>();
@@ -88,7 +88,7 @@ namespace engine
 
     std::optional<entt::entity> Scene::GetIntersectedEntity(Intersection &intersection, Ray &ray)
     {
-        auto spheres = registry.group<components::SphereRenderer>(entt::get<components::Transform>);
+        auto spheres = registry.group<components::SceneSphere>(entt::get<components::Transform>);
         auto meshes = registry.group<components::MeshRenderer>(entt::get<components::Transform>);
         std::optional<entt::entity> rv = std::nullopt;
 
@@ -103,7 +103,7 @@ namespace engine
         Intersection &intersection, Ray &ray,
         std::function<bool(entt::entity, components::Transform const &, render::Material const &)> const &func)
     {
-        auto spheres = registry.group<components::SphereRenderer>(entt::get<components::Transform>);
+        auto spheres = registry.group<components::SceneSphere>(entt::get<components::Transform>);
         auto meshes = registry.group<components::MeshRenderer>(entt::get<components::Transform>);
         std::optional<entt::entity> rv = std::nullopt;
 

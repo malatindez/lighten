@@ -45,9 +45,9 @@ namespace
     {
         return registry.emplace<MeshRenderer>(e, render::kCubeMesh);
     }
-    SphereRenderer &AddSphereComponent(entt::registry &registry, entt::entity e)
+    SceneSphere &AddSphereComponent(entt::registry &registry, entt::entity e)
     {
-        return registry.emplace<SphereRenderer>(e);
+        return registry.emplace<SceneSphere>(e);
     }
     PointLight &AddPointLight(entt::registry &registry, entt::entity e, vec3 color = vec3{1, 1, 1},
                               float constant = 1.0f, float linear = 0.7f, float quadratic = 1.8f)
@@ -239,7 +239,7 @@ void Controller::Tick(float delta_time)
         Ray b = PixelRaycast(vec2{input_.mouse_position()});
         rb_saved_mouse_position_ = input_.mouse_position();
 
-        vec3 obj_offset = a.PointAtParameter(selected_object_distance_ * dot(a.direction(), b.direction()));
+        vec3 obj_offset = b.PointAtParameter(selected_object_distance_);
 
         selected_object_->position = selected_object_offset_ + obj_offset;
         selected_object_->UpdateMatrices();

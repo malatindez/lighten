@@ -7,13 +7,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(dle_internship LANGUAGES CXX C)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Rpass=inline -Winline -W4 -mavx")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Rpass=inline -Winline -W4")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Winline /W4 /xCOMMON-AVX512")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Winline /W4")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /W4 /arch:AVX512")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /W4")
 endif()
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/third_party/CMakeLists.txt")

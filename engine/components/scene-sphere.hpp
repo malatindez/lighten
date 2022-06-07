@@ -5,7 +5,7 @@
 #include "transform.hpp"
 namespace engine::components
 {
-    struct SphereRenderer
+    struct SceneSphere
     {
     public:
         bool CheckIntersection(Transform const &transform, core::math::Intersection &i, core::math::Ray const &ray) const
