@@ -60,7 +60,6 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int cmd_show)
 
     auto controller = std::make_shared<Controller>(*bmwindow, scene, camera_controller);
 
-    controller->InitScene();
 
     SpotLight &spot = registry.emplace<SpotLight>(camera);
     spot.direction = normalize(vec3{0, -1, 0});

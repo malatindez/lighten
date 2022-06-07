@@ -28,6 +28,10 @@ namespace engine::core
 
     bool PeekOSMessages() override;
 
+    constexpr int &resolution_scale() { return resolution_scale_; }
+
+    void OnScaleChanged();
+    
   private:
     void OnSizeChanged() override;
     HDC hdc_;

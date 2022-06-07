@@ -124,22 +124,41 @@ void Controller::InitScene()
     entt::entity cube2 = registry.create();
     UpdateTransform(registry, cube2, vec3{5}, vec3{1.5f});
     AddPointLight(registry, cube2, vec3{0.5f, 0.0f, 0.5f}, 1, 0.07f, 0.017f);
-    UpdateMaterial(AddCubeComponent(registry, cube2).material(), vec3{0}, vec3{0.5f, 0.0f, 0.5f}, 1, 2, false);
+    UpdateMaterial(AddCubeComponent(registry, cube2).material(), vec3{0}, vec3{0.5f, 0.0f, 0.5f}, 0, 0, false);
 
     entt::entity spot_light = registry.create();
     UpdateTransform(registry, spot_light, vec3{0, 5, -5}, vec3{0.05f});
-    AddSpotLight(registry, spot_light, vec3{1.0f}, radians(45.0f), math::vec3{0,-1,0}, 1.0f, 0.045f, 0.0075f);
-    UpdateMaterial(AddSphereComponent(registry, spot_light).material, vec3{0}, vec3{1.0f}, 1, 2, false);
+    AddSpotLight(registry, spot_light, vec3{1.0f}, radians(45.0f), math::vec3{0, -1, 0}, 1.0f, 0.045f, 0.0075f);
+    UpdateMaterial(AddSphereComponent(registry, spot_light).material, vec3{0}, vec3{1.0f}, 0, 0, false);
 
     entt::entity main_light = registry.create();
     UpdateTransform(registry, main_light, vec3{3, 2.5f, -3}, vec3{0.5f});
     AddPointLight(registry, main_light, vec3{1.0f, 1.0f, 0.25f}, 1.0f, 0.027f, 0.0028f);
-    UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{0}, vec3{1.0f, 1.0f, 0.25f}, 1, 0.5, false);
+    UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{0}, vec3{1.0f, 1.0f, 0.25f}, 0, 0, false);
+}
+void Controller::InitInput()
+{
+    auto update_bitmap = [this](float, Input::KeySeq const &seq, uint32_t count) {
+        if (count == UINT32_MAX) { return; }
+        int32_t offset = (seq[0] == Key::KEY_PLUS || seq[0] == Key::KEY_NUMPAD_PLUS) ? -1 : 1;
+        window_.resolution_scale() += offset;
+        rclamp(window_.resolution_scale(), 1, 128);
+        window_.OnScaleChanged();
+    };
+    input_.AddTickKeyCallback({Key::KEY_PLUS}, update_bitmap, false);
+    input_.AddTickKeyCallback({Key::KEY_MINUS}, update_bitmap, false);
+    input_.AddTickKeyCallback({Key::KEY_NUMPAD_PLUS}, update_bitmap, false);
+    input_.AddTickKeyCallback({Key::KEY_NUMPAD_MINUS}, update_bitmap, false);
 }
 
 Controller::Controller(BitmapWindow &window,
                        std::shared_ptr<Scene> scene,
-                       CameraController const &cam) : camera_controller_(cam), scene_(scene), window_(window) {}
+                       CameraController const &cam) : camera_controller_(cam), scene_(scene), window_(window)
+{
+    InitScene();
+    InitInput();
+}
+
 void Controller::OnEvent(Event &event)
 {
     if (event.in_category(EventCategoryApplication))
@@ -147,10 +166,12 @@ void Controller::OnEvent(Event &event)
         if (event.type() == EventType::AppUpdate)
         {
             window_.PeekOSMessages();
+            input_.OnEvent(event);
         }
         else if (event.type() == EventType::AppTick)
         {
             auto const &ate = static_cast<AppTickEvent &>(event);
+            input_.OnEvent(event); // process input callbacks
             Tick(ate.delta_time());
             time_from_start_ += ate.delta_time();
             for (auto const &func : update_callbacks_)
@@ -212,11 +233,34 @@ void Controller::OnEvent(Event &event)
 
 void Controller::Tick(float delta_time)
 {
-    vec3 offset{0, 0, 0};
-    float roll = 0;
-    float pitch = 0;
-    float yaw = 0;
+    if (input_.rbutton_down() && selected_object_)
+    {
+        Ray a = PixelRaycast(vec2{rb_saved_mouse_position_});
+        Ray b = PixelRaycast(vec2{input_.mouse_position()});
+        rb_saved_mouse_position_ = input_.mouse_position();
 
+        vec3 obj_offset = a.PointAtParameter(selected_object_distance_ * dot(a.direction(), b.direction()));
+
+        selected_object_->position = selected_object_offset_ + obj_offset;
+        selected_object_->UpdateMatrices();
+    }
+    if (input_.mouse_scrolled())
+    {
+        if (selected_object_ && input_.rbutton_down())
+        {
+            selected_object_->scale *= vec3{pow(math::clamp(1 + delta_time / 120 * input_.scroll_delta(), 0.5f, 1.5f), 0.5f)};
+            rclamp(selected_object_->scale, 0.1f, std::numeric_limits<float>::max());
+        }
+        else
+        {
+            camera_controller_.camera().fovy_ -= delta_time / 120 * radians(45.0f) * input_.scroll_delta();
+            rclamp(camera_controller_.camera().fovy_, radians(0.01f), radians(89.9f));
+            camera_controller_.UpdateProjectionMatrix();
+        }
+    }
+
+    engine::core::math::vec3 offset{0};
+    // process movement
     if (input_.key_state('W'))
     {
         offset += kForward;
@@ -242,14 +286,17 @@ void Controller::Tick(float delta_time)
         offset += kUp;
     }
 
-    // 180 degrees per second
+    float roll = 0;
+    float yaw = 0;
+    float pitch = 0;
+    // process camera rotation
     if (input_.key_state('Q'))
     {
-        roll -= delta_time * roll_speed_;
+        roll -= roll_speed_;
     }
     if (input_.key_state('E'))
     {
-        roll += delta_time * roll_speed_;
+        roll += roll_speed_;
     }
     if (input_.lbutton_down())
     {
@@ -257,43 +304,16 @@ void Controller::Tick(float delta_time)
         t = t / window_.window_size();
         t *= sensivity_;
         t *= camera_controller_.camera().fovy_;
-        yaw = delta_time * t.x;
-        pitch = delta_time * t.y;
-    }
-    if (input_.rbutton_down() && selected_object_)
-    {
-        Ray a = PixelRaycast(vec2{rb_saved_mouse_position_});
-        Ray b = PixelRaycast(vec2{input_.mouse_position()});
-        rb_saved_mouse_position_ = input_.mouse_position();
-
-        vec3 obj_offset = a.PointAtParameter(selected_object_distance_ * dot(a.direction(), b.direction()));
-
-        selected_object_->position = selected_object_offset_ + obj_offset;
-        selected_object_->UpdateMatrices();
+        yaw = t.x;
+        pitch = t.y;
     }
     if (!(roll == 0 && pitch == 0 && yaw == 0))
     {
-        camera_controller_.AddRelativeAngles(roll, pitch, yaw);
+        camera_controller_.AddRelativeAngles(delta_time * roll, delta_time * pitch, delta_time * yaw);
     }
-    if (length(offset) != 0)
+    if (squared_length(offset) != 0)
     {
         camera_controller_.AddRelativeOffset(move_speed_ * offset * delta_time);
     }
-
-    if (input_.mouse_scrolled())
-    {
-        if (selected_object_ && input_.rbutton_down())
-        {
-            selected_object_->scale *= vec3{pow(math::clamp(1 + delta_time / 120 * input_.scroll_delta(), 0.5f, 1.5f), 0.5f)};
-            rclamp(selected_object_->scale, 0.1f, std::numeric_limits<float>::max());
-        }
-        else
-        {
-            camera_controller_.camera().fovy_ -= delta_time / 120 * radians(45.0f) * input_.scroll_delta();
-            rclamp(camera_controller_.camera().fovy_, radians(0.01f), radians(89.9f));
-            camera_controller_.UpdateProjectionMatrix();
-        }
-    }
-
     camera_controller_.UpdateMatrices();
 }

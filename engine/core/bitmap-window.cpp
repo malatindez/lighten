@@ -22,13 +22,29 @@ namespace engine::core
     bitmap_info_.bmiHeader.biWidth = bitmap_size_.x;
     bitmap_info_.bmiHeader.biHeight = bitmap_size_.y;
   }
+  void BitmapWindow::OnScaleChanged()
+  {
+    core::math::ivec2 prev = bitmap_size_;
+    std::vector<uint32_t> copy = bitmap_;
+    OnSizeChanged();
+    for(int i = 0; i < bitmap_size_.y; ++i)
+    {
+      for(int j = 0; j < bitmap_size_.x; ++j)
+      {
+        bitmap_[i * bitmap_size_.x + j] = copy[
+          static_cast<uint32_t>(static_cast<float>(i) / bitmap_size_.y * prev.y) * prev.x +
+          static_cast<uint32_t>(static_cast<float>(j) / bitmap_size_.x * prev.x)
+        ];
+      }
+    }
+  }
   void BitmapWindow::OnSizeChanged()
   {
-    const core::math::ivec2 size = this->window_size();
+    const core::math::ivec2 &size = this->window_size();
     bitmap_size_ = size / resolution_scale_;
+    bitmap_.resize(size_t(bitmap_size_.x) * bitmap_size_.y);
     bitmap_info_.bmiHeader.biWidth = bitmap_size_.x;
     bitmap_info_.bmiHeader.biHeight = bitmap_size_.y;
-    bitmap_.resize(size_t(bitmap_size_.x) * bitmap_size_.y);
   }
 
   void BitmapWindow::SetResolutionScale(int resolution_scale)

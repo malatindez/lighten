@@ -10,6 +10,7 @@
 #include "misc/scene.hpp"
 #include "render/cube.hpp"
 #include <memory>
+#include <stdint.h>
 #include <unordered_map>
 
 class Controller : public engine::core::Layer
@@ -27,11 +28,12 @@ public:
     [[nodiscard]] float &roll_speed() noexcept { return roll_speed_; }
     [[nodiscard]] float &move_speed() noexcept { return move_speed_; }
     [[nodiscard]] float &sensivity() noexcept { return sensivity_; }
-   
-    void InitScene();
 
-    std::vector<std::function<void(float)>> &update_callbacks() {return update_callbacks_;}
+    std::vector<std::function<void(float)>> &update_callbacks() { return update_callbacks_; }
+
 private:
+    void InitScene();
+    void InitInput();
     void OnMoveCallback(float, Input::KeySeq const &, uint32_t);
     void Tick(float delta_time);
 
@@ -46,20 +48,18 @@ private:
     float roll_speed_ = engine::core::math::radians(60.0f);
     float move_speed_ = 2.0f;
     float sensivity_ = 8.0f;
-
-    engine::CameraController camera_controller_;
-    Input input_;
-    std::shared_ptr<engine::Scene> scene_;
-    engine::core::BitmapWindow &window_;
     engine::core::math::ivec2 lb_saved_mouse_position_{0};
     engine::core::math::ivec2 rb_saved_mouse_position_{0};
     engine::components::Transform *selected_object_ = nullptr;
     float selected_object_distance_ = 0.0f;
     engine::core::math::vec3 selected_object_offset_{0.0f};
-    engine::core::ParallelExecutor executor{
-        static_cast<uint32_t>(std::max(1, std::max(int32_t(engine::core::ParallelExecutor::kMaxThreads) - 4, int32_t(engine::core::ParallelExecutor::kHalfThreads))))
-    };
 
+    engine::CameraController camera_controller_;
+    Input input_;
+    std::shared_ptr<engine::Scene> scene_;
+    engine::core::BitmapWindow &window_;
+    engine::core::ParallelExecutor executor{
+        static_cast<uint32_t>(std::max(1, std::max(int32_t(engine::core::ParallelExecutor::kMaxThreads) - 4, int32_t(engine::core::ParallelExecutor::kHalfThreads))))};
     std::vector<std::function<void(float)>> update_callbacks_;
     long double time_from_start_ = 0;
 };

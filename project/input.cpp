@@ -1,4 +1,5 @@
 #include "input.hpp"
+#include <Windows.h>
 using namespace engine;
 using namespace core::events;
 void Input::OnEvent(Event &event)
@@ -22,11 +23,11 @@ void Input::OnEvent(Event &event)
             auto const &mbpe = static_cast<MouseButtonPressedEvent &>(event);
             if (mbpe.mouse_button() == 0)
             {
-                lbuttonstate_ = true;
+                key_states_[Key::KEY_LBUTTON] = true;
             }
             else if (mbpe.mouse_button() == 1)
             {
-                rbuttonstate_ = true;
+                key_states_[Key::KEY_RBUTTON] = true;
             }
         }
         else if (event.type() == EventType::MouseButtonReleased)
@@ -34,11 +35,11 @@ void Input::OnEvent(Event &event)
             auto const &mbre = static_cast<MouseButtonReleasedEvent &>(event);
             if (mbre.mouse_button() == 0)
             {
-                lbuttonstate_ = false;
+                key_states_[Key::KEY_LBUTTON] = false;
             }
             else if (mbre.mouse_button() == 1)
             {
-                rbuttonstate_ = false;
+                key_states_[Key::KEY_RBUTTON] = false;
             }
         }
         else if (event.type() == EventType::MouseMoved)
@@ -69,36 +70,73 @@ void Input::OnEvent(Event &event)
         event.handled = true;
     }
 }
+void Input::AddUpdateKeyCallback(KeySeq const &sequence, OnUpdateKeyCallbackFn const &fn, bool on_hold)
+{
+    for(auto &k : sequence)
+    {
+        if(!key_states_.contains(k))
+        {
+            key_states_[k] = 0;
+        }
+    }
+    on_update_callbacks_[sequence] = std::tuple{on_hold, 0u, fn};
+}
+// if on_hold is true then the function will be called each tick/update that the KeySeq is being held
+void Input::AddTickKeyCallback(KeySeq const &sequence, OnTickKeyCallbackFn const &fn, bool on_hold)
+{
+    for(auto &k : sequence)
+    {
+        if(!key_states_.contains(k))
+        {
+            key_states_[k] = 0;
+        }
+    }
+    on_tick_callbacks_[sequence] = std::tuple{on_hold, 0u, fn};
+}
 void Input::OnTick(float dt)
 {
-    for(auto &[key, value] : on_tick_callbacks_)
+    for (auto &[key, value] : on_tick_callbacks_)
     {
         bool t = true;
-        for(auto k : key)
+        for (auto k : key)
         {
             t &= key_states_.at(k);
         }
-        auto &[count, func] = value;
-        if(t) {
-            func(dt, key, ++count);
+        auto &[on_hold, count, func] = value;
+        if (t)
+        {
+            if (on_hold || count == 0)
+            {
+                func(dt, key, ++count);
+            }
             continue;
+        }
+        if (count != 0) {
+            func(dt, key, UINT32_MAX);
         }
         count = 0;
     }
 }
 void Input::OnUpdate()
 {
-    for(auto &[key, value] : on_update_callbacks_)
+    for (auto &[key, value] : on_update_callbacks_)
     {
         bool t = true;
-        for(auto k : key)
+        for (auto k : key)
         {
             t &= key_states_.at(k);
         }
-        auto &[count, func] = value;
-        if(t) {
-            func(key, ++count);
+        auto &[on_hold, count, func] = value;
+        if (t)
+        {
+            if (on_hold || count == 0)
+            {
+                func(key, ++count);
+            }
             continue;
+        }
+        if (count != 0) {
+            func(key, UINT32_MAX);
         }
         count = 0;
     }
