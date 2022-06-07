@@ -66,7 +66,9 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int cmd_show)
     spot.direction = normalize(vec3{0, -1, 0});
     spot.color = vec3{0.3f, 0.3f, 0.7f};
     spot.cut_off = radians(45.0F);
-    spot.R = 1.0f;
+    spot.attenuation.constant = 1.0f;
+    spot.attenuation.linear = 0.35f;
+    spot.attenuation.quadratic = 0.44f;
 
     controller->update_callbacks().emplace_back(
         [&spot, &controller](float)

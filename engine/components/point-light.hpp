@@ -8,7 +8,12 @@ namespace engine::components
     struct PointLight
     {
         core::math::vec3 color;
-        float R;
+        struct attenuation
+        {
+            float constant;
+            float linear;
+            float quadratic;
+        } attenuation;
 
         inline bool Illuminable(Transform const &transform, render::LightData const &light_data) const noexcept
         {
@@ -27,10 +32,13 @@ namespace engine::components
             L = normalize(L);
             core::math::vec3 const H = core::math::normalize(normalize(L) + light_data.view_dir);
             float ndotl = dot(light_data.normal, L);
-            distance /= R * std::cbrt(length(transform.scale));
-            distance *= distance;
+            distance /= std::cbrt(length(transform.scale));
+            
+            float a = 1.0f / (attenuation.constant + attenuation.linear * distance + 
+    		    attenuation.quadratic * (distance * distance));    
+
             float spec = std::max(dot(light_data.normal, H), 0.0f);
-            light_data.color += ndotl * color / distance * (ndotl * mat.albedo + pow(spec, mat.glossiness) * mat.specular);
+            light_data.color += ndotl * color * a * (ndotl * mat.albedo + pow(spec, mat.glossiness) * mat.specular);
         }
     };
 } // namespace engine::components

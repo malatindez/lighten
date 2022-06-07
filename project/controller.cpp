@@ -49,25 +49,30 @@ namespace
     {
         return registry.emplace<SphereRenderer>(e);
     }
-    PointLight &AddPointLight(entt::registry &registry, entt::entity e, vec3 color = vec3{1, 1, 1}, float R = 5)
+    PointLight &AddPointLight(entt::registry &registry, entt::entity e, vec3 color = vec3{1, 1, 1},
+                              float constant = 1.0f, float linear = 0.7f, float quadratic = 1.8f)
     {
         PointLight &point_light = registry.get_or_emplace<PointLight>(e);
         point_light.color = color;
-        point_light.R = R;
+        point_light.attenuation.constant = constant;
+        point_light.attenuation.linear = linear;
+        point_light.attenuation.quadratic = quadratic;
         return point_light;
     }
 
     SpotLight &AddSpotLight(entt::registry &registry, entt::entity e,
                             vec3 color = vec3{1, 1, 1},
                             float cut_off = radians(45.0F),
-                            float R = 1.0f,
-                            vec3 direction = vec3{0, -1, 0})
+                            vec3 direction = vec3{0, -1, 0},
+                            float constant = 1.0f, float linear = 0.7f, float quadratic = 1.8f)
     {
         SpotLight &spot = registry.get_or_emplace<SpotLight>(e);
         spot.direction = direction;
         spot.color = color;
         spot.cut_off = cut_off;
-        spot.R = R;
+        spot.attenuation.constant = constant;
+        spot.attenuation.linear = linear;
+        spot.attenuation.quadratic = quadratic;
         return spot;
     }
 
@@ -118,17 +123,17 @@ void Controller::InitScene()
 
     entt::entity cube2 = registry.create();
     UpdateTransform(registry, cube2, vec3{5}, vec3{1.5f});
-    AddPointLight(registry, cube2, vec3{0.5f, 0.0f, 0.5f}, 3);
+    AddPointLight(registry, cube2, vec3{0.5f, 0.0f, 0.5f}, 1, 0.07f, 0.017f);
     UpdateMaterial(AddCubeComponent(registry, cube2).material(), vec3{0}, vec3{0.5f, 0.0f, 0.5f}, 1, 2, false);
 
     entt::entity spot_light = registry.create();
     UpdateTransform(registry, spot_light, vec3{0, 5, -5}, vec3{0.05f});
-    AddSpotLight(registry, spot_light, vec3{1.0f}, radians(45.0f), 8);
+    AddSpotLight(registry, spot_light, vec3{1.0f}, radians(45.0f), math::vec3{0,-1,0}, 1.0f, 0.045f, 0.0075f);
     UpdateMaterial(AddSphereComponent(registry, spot_light).material, vec3{0}, vec3{1.0f}, 1, 2, false);
 
     entt::entity main_light = registry.create();
     UpdateTransform(registry, main_light, vec3{3, 2.5f, -3}, vec3{0.5f});
-    AddPointLight(registry, main_light, vec3{1.0f, 1.0f, 0.25f}, 5);
+    AddPointLight(registry, main_light, vec3{1.0f, 1.0f, 0.25f}, 1.0f, 0.027f, 0.0028f);
     UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{0}, vec3{1.0f, 1.0f, 0.25f}, 1, 0.5, false);
 }
 
