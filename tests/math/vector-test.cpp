@@ -140,8 +140,8 @@ void vec_test_basic_arithmetic_different_types()
     {
         vec2[i] = utils::Random<U>(1);
     }
-    vec<size, U> _test1{ vec1 };
-    vec<size, T> _test2{ vec2 };
+    vec<size, U> _test1{vec1};
+    vec<size, T> _test2{vec2};
 
     for (int i = 0; i < size; ++i)
     {
@@ -176,8 +176,8 @@ void vec_test_basic_arithmetic_different_types()
         if constexpr (std::is_integral_v<T> && std::is_integral_v<U>)
         {
             ASSERT_TRUE(static_cast<T>(vec1[i] % vec2[i]) == mod[i]) << vec1 << std::endl
-                                                       << vec2 << std::endl
-                                                       << mod << " " << i << " " << static_cast<T>(vec1[i] % static_cast<T>(vec2[i])) << std::endl;
+                                                                     << vec2 << std::endl
+                                                                     << mod << " " << i << " " << static_cast<T>(vec1[i] % static_cast<T>(vec2[i])) << std::endl;
         }
     }
 
@@ -250,12 +250,12 @@ TEST(TEST_VECTORS_ARITHMETIC, RandomTestDifferentTypes)
 {
     for (size_t i = 0; i < utils::RandomConstexpr(-1, 10, 25); i++)
     {
-        vec_test_basic_arithmetic_different_types_all<utils::RandomConstexpr(0, 2, 256)>();
-        vec_test_basic_arithmetic_different_types_all<utils::RandomConstexpr(1, 2, 256)>();
+        vec_test_basic_arithmetic_different_types_all<utils::RandomConstexpr(15, 2, 256)>();
+        vec_test_basic_arithmetic_different_types_all<utils::RandomConstexpr(34, 2, 256)>();
     }
 }
 
-template<size_t size, typename T>
+template <size_t size, typename T>
 void vec_reference_test()
 {
     std::array<T, size> arr;
@@ -263,35 +263,50 @@ void vec_reference_test()
     {
         arr[i] = utils::Random<T>(1);
     }
-    vec<size, T> vec1{ arr };
-    rvec<size, T> vec2{ vec1 };
+    vec<size, T> vec1{arr};
+    rvec<size, T> vec2{vec1};
+    rvec<size, const T> vec3{vec2};
+    rvec<size, const T> vec4{vec1};
 
-    ASSERT_TRUE(vec1 == vec2) << vec1 << std::endl << vec2 << std::endl;
+    ASSERT_TRUE(vec1 == vec2) << vec1 << std::endl
+                              << vec2 << std::endl;
+    ASSERT_TRUE(vec2 == vec3) << vec1 << std::endl
+                              << vec2 << std::endl;
+    ASSERT_TRUE(vec4 == vec1) << vec1 << std::endl
+                              << vec2 << std::endl;
     ASSERT_FALSE(vec1 != vec2);
 
     for (int i = 0; i < arr.size(); ++i)
     {
+        ASSERT_TRUE(vec3[i] == vec4[i]);
+        ASSERT_TRUE(vec2[i] == vec3[i]);
         ASSERT_TRUE(vec1[i] == vec2[i]);
         ASSERT_TRUE(vec1[i] == arr[i]);
     }
-
 
     for (int i = 0; i < arr.size(); ++i)
     {
         vec2[i] = utils::Random<T>(1);
     }
 
-    ASSERT_TRUE(vec1 == vec2) << vec1 << std::endl << vec2 << std::endl;
+    ASSERT_TRUE(vec1 == vec2) << vec1 << std::endl
+                              << vec2 << std::endl;
+    ASSERT_TRUE(vec2 == vec3) << vec1 << std::endl
+                              << vec2 << std::endl;
+    ASSERT_TRUE(vec4 == vec1) << vec1 << std::endl
+                              << vec2 << std::endl;
     ASSERT_FALSE(vec1 != vec2);
 
     for (int i = 0; i < arr.size(); ++i)
     {
+        ASSERT_TRUE(vec3[i] == vec4[i]);
+        ASSERT_TRUE(vec2[i] == vec3[i]);
         ASSERT_TRUE(vec1[i] == vec2[i]);
         ASSERT_TRUE(vec1[i] != arr[i]);
     }
 
-    rvec<2, T> vec3{ vec1 };
-    ASSERT_TRUE(vec3.x == vec1[0] && vec3.y == vec1[1]);
+    rvec<2, const T> vec5{vec4};
+    ASSERT_TRUE(vec5.x == vec1[0] && vec5.y == vec1[1]);
 }
 
 TEST(TEST_REFERENCE_VECTORS, DefaultTest)
@@ -306,7 +321,28 @@ TEST(TEST_REFERENCE_VECTORS, DefaultTest)
     vec_reference_test<3, double>();
     vec_reference_test<4, double>();
 }
+
 TEST(TEST_VECTORS, DefaultMathTest)
 {
-
+    vec4 vec1;
+    rvec4 rvec1{vec1};
+    crvec4 rcvec1{rvec1};
+    vec4 vec2;
+    rvec4 rvec2{vec2};
+    crvec4 rcvec2{rvec2};
+    for (int i = 0; i < 4; ++i)
+    {
+        vec1[i] = utils::Random<float>(-1.0e9f, 1.0e9f);
+        vec2[i] = utils::Random<float>(-1.0e9f, 1.0e9f);
+    }
+    ASSERT_TRUE(squared_length(vec1) == squared_length(rvec1) && squared_length(rvec1) == squared_length(rcvec1));
+    ASSERT_TRUE(squared_length(vec2) == squared_length(rvec2) && squared_length(rvec2) == squared_length(rcvec2));
+    ASSERT_TRUE(squared_length(vec2) == vec2.x * vec2.x + vec2.y * vec2.y + vec2.z * vec2.z + vec2.w * vec2.w);
+    ASSERT_TRUE(length(vec1) == length(rvec1) && length(rvec1) == length(rcvec1));
+    ASSERT_TRUE(length(vec2) == length(rvec2) && length(rvec2) == length(rcvec2));
+    ASSERT_TRUE(length(vec1) == sqrt(squared_length(vec1)) && length(vec2) == sqrt(squared_length(vec2)));
+    ASSERT_TRUE(normalize(vec2) == normalize(rvec2) && normalize(rvec2) == normalize(rcvec2) && almost_equal(length(normalize(rcvec2)), 1.0f));
+    ASSERT_TRUE(normalize(vec2) == normalize(rvec2) && normalize(rvec2) == normalize(rcvec2) && almost_equal(length(normalize(rcvec2)), 1.0f));
+    ASSERT_TRUE(dot(vec1, rcvec2) == dot(vec2, rcvec1) && dot(rvec2, rvec1) == dot(vec2, vec1) && dot(rcvec1, rcvec2) == dot(rvec1, rvec2) && dot(vec1, rcvec2) == dot(rvec2, rvec1));
+    ASSERT_TRUE(angle(vec1, rcvec2) == angle(vec2, rcvec1) && angle(rvec2, rvec1) == angle(vec2, vec1) && angle(rcvec1, rcvec2) == angle(rvec1, rvec2) && angle(vec1, rcvec2) == angle(rvec2, rvec1));
 }

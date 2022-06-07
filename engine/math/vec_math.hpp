@@ -87,38 +87,38 @@ namespace engine::core::math
     [[nodiscard]] constexpr bool operator!=(T const &left, U const &right) requires(T::size == U::size);
 
     template <AnyVec T>
-    [[nodiscard]] constexpr typename T::type squared_length(T const &vector) noexcept;
+    [[nodiscard]] constexpr typename std::remove_const_t<typename T::type> squared_length(T const &vector) noexcept;
     template <AnyVec T>
     [[nodiscard]] constexpr auto length(T const &vector) noexcept;
 
     template <AnyVec T>
-    [[nodiscard]] constexpr vec<T::size, typename T::type> unit_vector(T const &vector) noexcept;
+    [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> unit_vector(T const &vector) noexcept;
     template <AnyVec T>
-    [[nodiscard]] constexpr vec<T::size, typename T::type> normalize(T const &vector) noexcept;
+    [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> normalize(T const &vector) noexcept;
 
     template <AnyVec T, AnyVec U>
-    constexpr typename T::type dot(T const &left, U const &right) requires(T::size == U::size);
+    constexpr std::remove_const_t<typename T::type> dot(T const &left, U const &right) requires(T::size == U::size);
 
     template <AnyVec T, AnyVec U>
-    constexpr typename T::type angle(T const &left, U const &right) requires(T::size == U::size);
+    constexpr std::remove_const_t<typename T::type> angle(T const &left, U const &right) requires(T::size == U::size);
 
     template <AnyVec T>
-    constexpr vec<T::size, typename T::type> cos(T const &vector);
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> cos(T const &vector);
 
     template <AnyVec T>
-    constexpr vec<T::size, typename T::type> sin(T const &vector);
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> sin(T const &vector);
 
     template <AnyVec T, Primitive U>
-    constexpr vec<T::size, typename T::type> pow(T const &vector, U const pow);
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> pow(T const &vector, U const pow);
 
     template <AnyVec T, AnyVec U>
-    constexpr vec<T::size, typename T::type> pow(T const &vector1, U const &vector2);
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> pow(T const &vector1, U const &vector2);
 
     template <AnyVec T>
-    constexpr vec<T::size, typename T::type> sqrt(T const &vector);
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> sqrt(T const &vector);
 
     template <AnyVec T, AnyVec U>
-    constexpr vec<3, T> cross(T const &left, U const &right) requires(T::size == U::size && T::size == 3);
+    constexpr vec<3, std::remove_const_t<typename T::type>> cross(T const &left, U const &right) requires(T::size == U::size && T::size == 3);
 
     template <Primitive T, Primitive U>
     constexpr void rclamp(T &left, U const min, U const max);
@@ -127,10 +127,10 @@ namespace engine::core::math
     constexpr void rclamp(T &left, U const min, U const max);
 
     template <AnyVec T, Primitive U>
-    [[nodiscard]] constexpr vec<T::size, typename T::type> clamp(T const &left, U const min, U const max);
+    [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> clamp(T const &left, U const min, U const max);
 
     template <AnyVec T, AnyVec U>
-    [[nodiscard]] constexpr vec<T::size, typename T::type> clamp(T const &left, U const &min, U const &max);
+    [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> clamp(T const &left, U const &min, U const &max);
 
     template <Primitive T, Primitive U>
     [[nodiscard]] constexpr T clamp(T left, U const min, U const max);
