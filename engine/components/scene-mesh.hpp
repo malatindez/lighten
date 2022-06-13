@@ -1,7 +1,7 @@
 #pragma once
-#include "math.hpp"
-#include "math/intersection.hpp"
-#include "math/ray.hpp"
+#include "core/math.hpp"
+#include "core/math/intersection.hpp"
+#include "core/math/ray.hpp"
 #include "render/material.hpp"
 #include "render/mesh.hpp"
 #include "transform.hpp"

@@ -1,5 +1,5 @@
 #pragma once
-#include "math.hpp"
+#include "core/math.hpp"
 #pragma warning(push)
 #pragma warning(disable : 26495)
 namespace engine::core::math

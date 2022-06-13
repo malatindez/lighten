@@ -217,13 +217,13 @@ namespace engine::core::math
 
   template <size_t a, size_t b, Primitive T>
   template <Primitive U> // primitives
-  constexpr void mat<a, b, T>::unpack_data(int offset, U u)
+  constexpr void mat<a, b, T>::unpack_data(size_t offset, U u)
   {
     arr[offset] = static_cast<T>(u);
   }
   template <size_t a, size_t b, Primitive T>
   template <class V> // vectors
-  constexpr void mat<a, b, T>::unpack_data(int offset, V vec)
+  constexpr void mat<a, b, T>::unpack_data(size_t offset, V vec)
   {
     for (size_t i = 0; i < V::size; i++)
     {
@@ -232,7 +232,7 @@ namespace engine::core::math
   }
   template <size_t a, size_t b, Primitive T>
   template <typename A, typename B, typename... C>
-  constexpr void mat<a, b, T>::unpack_data(int offset, A first, B second,
+  constexpr void mat<a, b, T>::unpack_data(size_t offset, A first, B second,
                                            C... rest)
   {
     unpack_data(offset, first);

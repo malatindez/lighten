@@ -1,5 +1,5 @@
 #pragma once
-#include "math.hpp"
+#include "core/math.hpp"
 #include "point-light.hpp"
 #include "render/light-data.hpp"
 #include "render/material.hpp"

@@ -133,20 +133,29 @@ void Controller::InitScene()
 
     entt::entity main_light = registry.create();
     UpdateTransform(registry, main_light, vec3{3, 2.5f, -3}, vec3{0.5f});
-    AddPointLight(registry, main_light, vec3{1.0f, 1.0f, 0.25f}, 1.0f, 0.027f, 0.0028f);
-    UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{0}, vec3{1.0f, 1.0f, 0.25f}, 0, 0, false);
+    AddPointLight(registry, main_light, vec3{1.0f, 1.0f, 1.0f}, 1.0f, 0.027f, 0.0028f);
+    UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{0}, vec3{1.0f, 1.0f, 1.0f}, 0, 0, false);
 }
 void Controller::InitInput()
 {
     auto update_bitmap = [this](float, Input::KeySeq const &seq, uint32_t count) {
         if (count == UINT32_MAX) { return; }
-        int32_t offset = (seq[0] == Key::KEY_PLUS || seq[0] == Key::KEY_NUMPAD_PLUS) ? -1 : 1;
+        int32_t offset = (seq[0] == 'P') ? -1 : 1;
         window_.resolution_scale() += offset;
         rclamp(window_.resolution_scale(), 1, 128);
         window_.OnScaleChanged();
     };
     input_.AddTickKeyCallback({'P'}, update_bitmap, false);
     input_.AddTickKeyCallback({'L'}, update_bitmap, false);
+    auto adjust_exposure = [this](float dt, Input::KeySeq const &seq, uint32_t) {
+        float offset = ((seq[0] == Key::KEY_PLUS || seq[0] == Key::KEY_NUMPAD_PLUS)) ? 0.5f : -0.5f;
+        scene_->exposure += offset * dt;
+        OutputDebugStringA(("Exposure value: "+ std::to_string(scene_->exposure) + "\n").c_str());
+    };
+    input_.AddTickKeyCallback({Key::KEY_PLUS},          adjust_exposure, true);
+    input_.AddTickKeyCallback({Key::KEY_MINUS},         adjust_exposure, true);
+    input_.AddTickKeyCallback({Key::KEY_NUMPAD_PLUS},   adjust_exposure, true);
+    input_.AddTickKeyCallback({Key::KEY_NUMPAD_MINUS},  adjust_exposure, true);
 }
 
 Controller::Controller(BitmapWindow &window,
@@ -246,7 +255,7 @@ void Controller::Tick(float delta_time)
     {
         if (selected_object_ && input_.rbutton_down())
         {
-            selected_object_->scale *= vec3{pow(math::clamp(1 + delta_time / 120 * input_.scroll_delta(), 0.5f, 1.5f), 0.5f)};
+            selected_object_->scale *= vec3{powf(math::clamp(1 + delta_time / 120 * input_.scroll_delta(), 0.5f, 1.5f), 0.5f)};
             rclamp(selected_object_->scale, 0.1f, std::numeric_limits<float>::max());
         }
         else

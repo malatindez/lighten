@@ -2,15 +2,15 @@
 
 #include "components/camera.hpp"
 #include "components/directional-light.hpp"
-#include "components/scene-mesh.hpp"
 #include "components/point-light.hpp"
+#include "components/scene-mesh.hpp"
 #include "components/scene-sphere.hpp"
 #include "components/spot-light.hpp"
 #include "core/bitmap-window.hpp"
 #include "core/parallel-executor.hpp"
 #include "core/utils.hpp"
 #include "entt/entt.hpp"
-#include "math/ray.hpp"
+#include "core/math/ray.hpp"
 #include "render/floor.hpp"
 namespace engine
 {
@@ -34,11 +34,17 @@ namespace engine
         std::optional<entt::entity> GetIntersectedEntityIf(
             core::math::Intersection &intersection, core::math::Ray &ray,
             std::function<bool(entt::entity, components::Transform const &, render::Material const &)> const &func);
-        bool update_scene{true};
 
         bool FindIntersection(SphereGroup &spheres, MeshGroup &meshes, core::math::Intersection &intersection, core::math::Ray &ray) const noexcept;
 
         bool FindIntersectionIf(SphereGroup &spheres, MeshGroup &meshes, core::math::Intersection &intersection, core::math::Ray &ray, IntersectionCallbackFn const &func) const noexcept;
+
+        core::math::vec3 CalculatePointColor(SphereGroup &spheres,
+                                 MeshGroup &meshes,
+                                 DirectionalLightView &directional_lights,
+                                 PointLightGroup &point_lights,
+                                 SpotLightGroup &spot_lights,
+                                 core::math::Ray &ray, core::math::Intersection &nearest);
 
         void Illuminate(SphereGroup &spheres,
                         MeshGroup &meshes,
@@ -48,6 +54,9 @@ namespace engine
                         render::LightData &ld,
                         render::Material &mat) const;
 
+        bool update_scene{true};
+        float exposure = 2.0f;
+        float gamma = 2.2f;
         entt::registry registry;
         render::Floor floor;
     };

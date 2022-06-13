@@ -1,6 +1,6 @@
 #pragma once
-#include "math.hpp"
-#include "math/ray.hpp"
+#include "core/math.hpp"
+#include "core/math/ray.hpp"
 #include "render/color.hpp"
 namespace engine::render
 {

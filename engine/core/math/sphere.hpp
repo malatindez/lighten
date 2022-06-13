@@ -1,5 +1,5 @@
 #pragma once
-#include "math/ray.hpp"
+#include "core/math/ray.hpp"
 namespace engine::core::math
 {
     struct Sphere
@@ -15,7 +15,7 @@ namespace engine::core::math
             {
                 return -1.0f;
             }
-            const float d = std::sqrt(discriminant);
+            const float d = core::math::detail::sqrt(discriminant);
             float rv0 = (-b - d) / a;
             float rv1 = (-b + d) / a;
             if (rv0 > rv1)

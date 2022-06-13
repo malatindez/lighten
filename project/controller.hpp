@@ -4,7 +4,7 @@
 #include "core/parallel-executor.hpp"
 #include "core/window.hpp"
 #include "input.hpp"
-#include "math.hpp"
+#include "core/math.hpp"
 #include "misc/camera-controller.hpp"
 
 #include "misc/scene.hpp"

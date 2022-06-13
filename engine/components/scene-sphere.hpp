@@ -1,7 +1,7 @@
 #pragma once
-#include "math.hpp"
-#include "math/intersection.hpp"
-#include "math/sphere.hpp"
+#include "core/math.hpp"
+#include "core/math/intersection.hpp"
+#include "core/math/sphere.hpp"
 #include "transform.hpp"
 namespace engine::components
 {

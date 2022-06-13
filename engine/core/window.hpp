@@ -5,9 +5,9 @@
 #define NOMINMAX
 #include <Windows.h>
 
-#include "core/events/mouse-events.hpp"
+#include "events/mouse-events.hpp"
 #include "events.hpp"
-#include "math/vec2.hpp"
+#include "core/math.hpp"
 
 namespace engine::core
 {

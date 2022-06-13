@@ -1,12 +1,12 @@
 #pragma once
 #include "common.hpp"
-#include "math/rvec2.hpp"
-#include "math/rvec3.hpp"
-#include "math/rvec4.hpp"
-#include "math/vec2.hpp"
-#include "math/vec3.hpp"
-#include "math/vec4.hpp"
-#include "math/vecn.hpp"
+#include "rvec2.hpp"
+#include "rvec3.hpp"
+#include "rvec4.hpp"
+#include "vec2.hpp"
+#include "vec3.hpp"
+#include "vec4.hpp"
+#include "vecn.hpp"
 
 namespace engine::core::math
 {

@@ -2,7 +2,7 @@
 #include "components/camera.hpp"
 #include "components/transform.hpp"
 #include "entt/entt.hpp"
-#include "math/ray.hpp"
+#include "core/math/ray.hpp"
 #include <iostream>
 namespace engine
 {

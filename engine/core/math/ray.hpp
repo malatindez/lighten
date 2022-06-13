@@ -1,5 +1,5 @@
 #pragma once
-#include "math/vec3.hpp"
+#include "vec3.hpp"
 namespace engine::core::math
 {
   class Ray

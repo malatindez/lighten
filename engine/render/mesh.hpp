@@ -1,5 +1,5 @@
 #pragma once
-#include "math.hpp"
+#include "core/math.hpp"
 #include <filesystem>
 #include <fstream>
 #include <vector>
