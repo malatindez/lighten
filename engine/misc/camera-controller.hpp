@@ -35,6 +35,9 @@ namespace engine
       return core::math::Ray(camera_.position(), core::math::normalize(direction.as_vec<3>() / direction.w - camera_.position()));
     }
 
+    [[nodiscard]] constexpr bool &roll_enabled() noexcept { return roll_enabled_; }
+    [[nodiscard]] constexpr bool const &roll_enabled() const noexcept { return roll_enabled_; }
+
     [[nodiscard]] constexpr components::Camera const &camera() const noexcept { return camera_; }
     [[nodiscard]] constexpr components::Transform const &transform() const noexcept { return transform_; }
     [[nodiscard]] constexpr components::Camera &camera() noexcept { return camera_; }
@@ -59,5 +62,6 @@ namespace engine
 
     bool update_matrices_ = true;
     bool update_basis_ = true;
+    bool roll_enabled_ = false;
   };
 } // namespace engine

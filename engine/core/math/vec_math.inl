@@ -443,4 +443,64 @@ namespace engine::core::math
   {
     return from * (1 - param) + to * param;
   }
+  
+    template <AnyVec T, Primitive U>
+    [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> min(T const &left, U const max) noexcept
+    {
+      vec<T::size, std::remove_const_t<typename T::type>> rv;
+      for(int i = 0; i < T::size; i++)
+      {
+        if(left[i] > max)
+        {
+          rv[i] = static_cast<T::type>(max);
+        }
+        else
+        {
+          rv[i] = left[i];
+        }
+      }
+      return rv;
+    }
+    
+    template <AnyVec T, Primitive U>
+    [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> max(T const &left, U const min) noexcept
+    {
+      vec<T::size, std::remove_const_t<typename T::type>> rv;
+      for(int i = 0; i < T::size; i++)
+      {
+        if(left[i] < min)
+        {
+          rv[i] = static_cast<T::type>(min);
+        }
+        else
+        {
+          rv[i] = left[i];
+        }
+      }
+      return rv;
+    }
+    
+    template <AnyVec T, Primitive U>
+    [[nodiscard]] constexpr void rmin(T &left, U const max) noexcept
+    {
+      for(int i = 0; i < T::size; i++)
+      {
+        if(left[i] > max)
+        {
+          left[i] = static_cast<T::type>(max);
+        }
+      }
+    }
+    
+    template <AnyVec T, Primitive U>
+    [[nodiscard]] constexpr void rmax(T &left, U const min) noexcept
+    {
+      for(int i = 0; i < T::size; i++)
+      {
+        if(left[i] < min)
+        {
+          left[i] = static_cast<T::type>(min);
+        }
+      }
+    }
 } // namespace engine::core::math

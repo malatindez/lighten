@@ -17,14 +17,14 @@ namespace
     render::Material &UpdateMaterial(render::Material &mat,
                                      vec3 albedo = vec3{0.3f},
                                      vec3 emission = vec3{0.0f},
-                                     float specular = 1,
-                                     float glossiness = 8,
+                                     float roughness = 1,
+                                     float metalness = 8,
                                      bool casts_shadow = true)
     {
         mat.albedo = albedo;
         mat.emission = emission;
-        mat.specular = specular;
-        mat.glossiness = glossiness;
+        mat.roughness = roughness;
+        mat.metalness = metalness;
         mat.casts_shadow = casts_shadow;
         return mat;
     }
@@ -49,30 +49,22 @@ namespace
     {
         return registry.emplace<SceneSphere>(e);
     }
-    PointLight &AddPointLight(entt::registry &registry, entt::entity e, vec3 color = vec3{1, 1, 1},
-                              float constant = 1.0f, float linear = 0.7f, float quadratic = 1.8f)
+    PointLight &AddPointLight(entt::registry &registry, entt::entity e, vec3 color = vec3{1, 1, 1})
     {
         PointLight &point_light = registry.get_or_emplace<PointLight>(e);
         point_light.color = color;
-        point_light.attenuation.constant = constant;
-        point_light.attenuation.linear = linear;
-        point_light.attenuation.quadratic = quadratic;
         return point_light;
     }
 
     SpotLight &AddSpotLight(entt::registry &registry, entt::entity e,
                             vec3 color = vec3{1, 1, 1},
                             float cut_off = radians(45.0F),
-                            vec3 direction = vec3{0, -1, 0},
-                            float constant = 1.0f, float linear = 0.7f, float quadratic = 1.8f)
+                            vec3 direction = vec3{0, -1, 0})
     {
         SpotLight &spot = registry.get_or_emplace<SpotLight>(e);
         spot.direction = direction;
         spot.color = color;
         spot.cut_off = cut_off;
-        spot.attenuation.constant = constant;
-        spot.attenuation.linear = linear;
-        spot.attenuation.quadratic = quadratic;
         return spot;
     }
 
@@ -95,11 +87,10 @@ void Controller::InitScene()
     scene_->floor.transform.UpdateMatrices();
     entt::registry &registry = scene_->registry;
 
-    entt::entity directional_light = registry.create();
-
-    DirectionalLight &directional_light_v = registry.emplace<DirectionalLight>(directional_light);
-    directional_light_v.direction = normalize(vec3{0, -1, -1});
-    directional_light_v.color = vec3{0.1f};
+    /*     entt::entity directional_light = registry.create();
+        DirectionalLight &directional_light_v = registry.emplace<DirectionalLight>(directional_light);
+        directional_light_v.direction = normalize(vec3{0, -1, -1});
+        directional_light_v.color = vec3{0.1f};  */
     /*
          tick_layer->funcs.push_back(
             [&time_from_start_, &directional_light_v](float delta_time)
@@ -109,37 +100,28 @@ void Controller::InitScene()
                     cos(time_from_start_),
                     0 });
             });   */
-    entt::entity sphere1 = registry.create();
-    UpdateTransform(registry, sphere1, vec3{0}, vec3{0.5f});
-    UpdateMaterial(AddSphereComponent(registry, sphere1).material, vec3{1.0f}, vec3{0}, 1, 2);
-
-    entt::entity sphere2 = registry.create();
-    Transform &sphere2_transform = UpdateTransform(registry, sphere2, vec3{1}, vec3{1.5f});
-    UpdateMaterial(AddSphereComponent(registry, sphere2).material, vec3{1}, vec3{0.0f, 0.0f, 0.0f}, 1, 2, true);
-
-    entt::entity cube1 = registry.create();
-    UpdateTransform(registry, cube1, vec3{3}, vec3{1.0f});
-    UpdateMaterial(AddCubeComponent(registry, cube1).material(), vec3{1.0f}, vec3{0}, 1, 2, true);
-
-    entt::entity cube2 = registry.create();
-    UpdateTransform(registry, cube2, vec3{5}, vec3{1.5f});
-    AddPointLight(registry, cube2, vec3{0.5f, 0.0f, 0.5f}, 1, 0.07f, 0.017f);
-    UpdateMaterial(AddCubeComponent(registry, cube2).material(), vec3{0}, vec3{0.5f, 0.0f, 0.5f}, 0, 0, false);
-
-    entt::entity spot_light = registry.create();
-    UpdateTransform(registry, spot_light, vec3{0, 5, -5}, vec3{0.05f});
-    AddSpotLight(registry, spot_light, vec3{1.0f}, radians(45.0f), math::vec3{0, -1, 0}, 1.0f, 0.045f, 0.0075f);
-    UpdateMaterial(AddSphereComponent(registry, spot_light).material, vec3{0}, vec3{1.0f}, 0, 0, false);
-
+    for (int j = 0; j < 1; j++)
+        for (int i = 0; i < 1; i++)
+        {
+            entt::entity sphere = registry.create();
+            UpdateTransform(registry, sphere, vec3{i, j, 0}, vec3{0.5f});
+            auto &mat = UpdateMaterial(AddSphereComponent(registry, sphere).material, vec3{0.7f}, vec3{0.0f}, 1, 2);
+            mat.roughness = lerp(1.0f, 1.0f, static_cast<float>(i) / 5.0f);
+            mat.F0 = vec3(1.0f);
+            mat.metalness = lerp(1.0f, 1.0f, static_cast<float>(j) / 5.0f);
+            mat.albedo = vec3(float(rand() % 256) / 256, float(rand() % 256) / 256, float(rand() % 256) / 256);
+        }
     entt::entity main_light = registry.create();
     UpdateTransform(registry, main_light, vec3{3, 2.5f, -3}, vec3{0.5f});
-    AddPointLight(registry, main_light, vec3{1.0f, 1.0f, 1.0f}, 1.0f, 0.027f, 0.0028f);
+    // color times power of the light
+    AddSpotLight(registry, main_light, vec3{1.0f, 1.0f, 1.0f} * 50.0f);
     UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{0}, vec3{1.0f, 1.0f, 1.0f}, 0, 0, false);
 }
 void Controller::InitInput()
 {
-    auto update_bitmap = [this](float, Input::KeySeq const &seq, uint32_t count) {
-        if (count == UINT32_MAX) { return; }
+    auto update_bitmap = [this](float, Input::KeySeq const &seq, uint32_t count)
+    {
+        if (count == UINT32_MAX) return;
         int32_t offset = (seq[0] == 'P') ? -1 : 1;
         window_.resolution_scale() += offset;
         rclamp(window_.resolution_scale(), 1, 128);
@@ -147,15 +129,31 @@ void Controller::InitInput()
     };
     input_.AddTickKeyCallback({'P'}, update_bitmap, false);
     input_.AddTickKeyCallback({'L'}, update_bitmap, false);
-    auto adjust_exposure = [this](float dt, Input::KeySeq const &seq, uint32_t) {
+
+    auto adjust_exposure = [this](float dt, Input::KeySeq const &seq, uint32_t)
+    {
         float offset = ((seq[0] == Key::KEY_PLUS || seq[0] == Key::KEY_NUMPAD_PLUS)) ? 0.5f : -0.5f;
         scene_->exposure += offset * dt;
-        OutputDebugStringA(("Exposure value: "+ std::to_string(scene_->exposure) + "\n").c_str());
+        OutputDebugStringA(("Exposure value: " + std::to_string(scene_->exposure) + "\n").c_str());
     };
-    input_.AddTickKeyCallback({Key::KEY_PLUS},          adjust_exposure, true);
-    input_.AddTickKeyCallback({Key::KEY_MINUS},         adjust_exposure, true);
-    input_.AddTickKeyCallback({Key::KEY_NUMPAD_PLUS},   adjust_exposure, true);
-    input_.AddTickKeyCallback({Key::KEY_NUMPAD_MINUS},  adjust_exposure, true);
+    input_.AddTickKeyCallback({Key::KEY_PLUS}, adjust_exposure, true);
+    input_.AddTickKeyCallback({Key::KEY_MINUS}, adjust_exposure, true);
+    input_.AddTickKeyCallback({Key::KEY_NUMPAD_PLUS}, adjust_exposure, true);
+    input_.AddTickKeyCallback({Key::KEY_NUMPAD_MINUS}, adjust_exposure, true);
+
+    auto reflect_switch = [this](float, Input::KeySeq const &, uint32_t count)
+    {
+        if (count == UINT32_MAX) return;
+        scene_->reflections_on = !scene_->reflections_on;
+    };
+    input_.AddTickKeyCallback({Key::KEY_R}, reflect_switch, false);
+    auto gi_switch = [this](float, Input::KeySeq const &, uint32_t count)
+    {
+        if (count == UINT32_MAX) return;
+        scene_->UpdateScene();
+        scene_->global_illumination_on = !scene_->global_illumination_on;
+    };
+    input_.AddTickKeyCallback({Key::KEY_G}, gi_switch, false);
 }
 
 Controller::Controller(BitmapWindow &window,
@@ -189,6 +187,10 @@ void Controller::OnEvent(Event &event)
         }
         else if (event.type() == EventType::AppRender)
         {
+            if(!scene_->global_illumination_on)
+            {
+                scene_->UpdateScene();
+            }
             scene_->Draw(camera_controller_.camera(), window_, executor);
         }
         else if (event.type() == EventType::WindowResize)
@@ -297,13 +299,27 @@ void Controller::Tick(float delta_time)
     float yaw = 0;
     float pitch = 0;
     // process camera rotation
-    if (input_.key_state('Q'))
+    if (camera_controller_.roll_enabled())
     {
-        roll -= roll_speed_;
+        if (input_.key_state('Q'))
+        {
+            roll -= roll_speed_;
+        }
+        if (input_.key_state('E'))
+        {
+            roll += roll_speed_;
+        }
     }
-    if (input_.key_state('E'))
+    else
     {
-        roll += roll_speed_;
+        if (input_.key_state('Q'))
+        {
+            offset += kDown;
+        }
+        if (input_.key_state('E'))
+        {
+            offset += kUp;
+        }
     }
     if (input_.lbutton_down())
     {
@@ -317,10 +333,12 @@ void Controller::Tick(float delta_time)
     if (!(roll == 0 && pitch == 0 && yaw == 0))
     {
         camera_controller_.AddRelativeAngles(delta_time * roll, delta_time * pitch, delta_time * yaw);
+        scene_->global_illumination_on = false;
     }
     if (squared_length(offset) != 0)
     {
-        camera_controller_.AddRelativeOffset(move_speed_ * offset * delta_time);
+        camera_controller_.AddRelativeOffset(move_speed_ * offset * delta_time * (input_.key_state(Key::KEY_SHIFT) ? 5.0f : 1.0f));
+        scene_->global_illumination_on = false;
     }
     camera_controller_.UpdateMatrices();
 }

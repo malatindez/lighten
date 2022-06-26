@@ -7,10 +7,10 @@
 #include "components/scene-sphere.hpp"
 #include "components/spot-light.hpp"
 #include "core/bitmap-window.hpp"
+#include "core/math/ray.hpp"
 #include "core/parallel-executor.hpp"
 #include "core/utils.hpp"
 #include "entt/entt.hpp"
-#include "core/math/ray.hpp"
 #include "render/floor.hpp"
 namespace engine
 {
@@ -40,23 +40,38 @@ namespace engine
         bool FindIntersectionIf(SphereGroup &spheres, MeshGroup &meshes, core::math::Intersection &intersection, core::math::Ray &ray, IntersectionCallbackFn const &func) const noexcept;
 
         core::math::vec3 CalculatePointColor(SphereGroup &spheres,
-                                 MeshGroup &meshes,
-                                 DirectionalLightView &directional_lights,
-                                 PointLightGroup &point_lights,
-                                 SpotLightGroup &spot_lights,
-                                 core::math::Ray &ray, core::math::Intersection &nearest);
+                                             MeshGroup &meshes,
+                                             DirectionalLightView &directional_lights,
+                                             PointLightGroup &point_lights,
+                                             SpotLightGroup &spot_lights,
+                                             core::math::Ray const &ray, core::math::Intersection const &nearest,
+                                             engine::render::Material const &mat,
+                                             int depth = 0);
 
         void Illuminate(SphereGroup &spheres,
-                        MeshGroup &meshes,
-                        DirectionalLightView &directional_lights,
-                        PointLightGroup &point_lights,
-                        SpotLightGroup &spot_lights,
-                        render::LightData &ld,
-                        render::Material &mat) const;
+                               MeshGroup &meshes,
+                               DirectionalLightView &directional_lights,
+                               PointLightGroup &point_lights,
+                               SpotLightGroup &spot_lights,
+                               render::Material const &mat,
+                               render::LightData &ld);
+        core::math::vec3 CalculatePointGIAmbient(SphereGroup &spheres,
+                                                 MeshGroup &meshes,
+                                                 DirectionalLightView &directional_lights,
+                                                 PointLightGroup &point_lights,
+                                                 SpotLightGroup &spot_lights,
+                                                 core::math::Intersection const &nearest,
+                                                 int depth = 0);
 
         bool update_scene{true};
+        bool reflections_on{true};
+        bool global_illumination_on{false};
+        int hemisphere_ray_count = 100;
         float exposure = 2.0f;
         float gamma = 2.2f;
+        float reflection_roughness_threshold = 0.1f;
+        int max_ray_depth = 4;
+        core::math::vec3 ambient = render::UIntToRGB(0x0B1026) / 0xff;
         entt::registry registry;
         render::Floor floor;
     };

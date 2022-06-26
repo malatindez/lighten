@@ -27,14 +27,12 @@ namespace engine::core
     core::math::ivec2 prev = bitmap_size_;
     std::vector<uint32_t> copy = bitmap_;
     OnSizeChanged();
-    for(int i = 0; i < bitmap_size_.y; ++i)
+    for (int i = 0; i < bitmap_size_.y; ++i)
     {
-      for(int j = 0; j < bitmap_size_.x; ++j)
+      for (int j = 0; j < bitmap_size_.x; ++j)
       {
-        bitmap_[i * bitmap_size_.x + j] = copy[
-          static_cast<uint32_t>(static_cast<float>(i) / bitmap_size_.y * prev.y) * prev.x +
-          static_cast<uint32_t>(static_cast<float>(j) / bitmap_size_.x * prev.x)
-        ];
+        bitmap_[i * bitmap_size_.x + j] = copy[static_cast<uint32_t>(static_cast<float>(i) / bitmap_size_.y * prev.y) * prev.x +
+                                               static_cast<uint32_t>(static_cast<float>(j) / bitmap_size_.x * prev.x)];
       }
     }
   }

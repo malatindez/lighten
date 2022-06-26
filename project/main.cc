@@ -30,7 +30,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int cmd_show)
     auto bmwindow = std::make_shared<BitmapWindow>(
         wc, NULL,
         L"WindowClass1",                  // name of the window class
-        L"Our First Windowed Program",    // title of the window
+        L"Engine",                        // title of the window
         WS_OVERLAPPEDWINDOW | WS_VISIBLE, // window style
         kWindowPosition,                  // position of the window
         kWindowResolution,                // window size
@@ -61,7 +61,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int cmd_show)
     auto controller = std::make_shared<Controller>(*bmwindow, scene, camera_controller);
 
 
-    SpotLight &spot = registry.emplace<SpotLight>(camera);
+   /*  SpotLight &spot = registry.emplace<SpotLight>(camera);
     spot.direction = normalize(vec3{0, -1, 0});
     spot.color = vec3{0.3f, 0.3f, 0.7f};
     spot.cut_off = radians(45.0F);
@@ -73,7 +73,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int cmd_show)
         [&spot, &controller](float)
         {
             spot.direction = controller->camera_controller().forward();
-        });
+        }); */
     Application &application = Application::Get();
     application.AddLayer(controller);
     application.Run();

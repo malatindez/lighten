@@ -75,7 +75,7 @@ namespace engine::core::math
   template <AnyMat T>
   constexpr mat<T::size.y, T::size.x, std::remove_const_t<typename T::type>> transpose(T const &matrix)
   {
-    rmat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> return_value;
+    mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> return_value;
     for (int i = 0; i < T::size.x; i++)
     {
       for (int j = 0; j < T::size.y; j++)
@@ -161,16 +161,16 @@ namespace engine::core::math
     mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> return_value;
     mat<T::size.x - 1, T::size.y - 1, std::remove_const_t<typename T::type>> temp;
     int sign = 1;
-    for (int i = 0; i < T::size.x; i++)
+    for (size_t i = 0; i < T::size.x; i++)
     {
-      for (int j = 0; j < T::size.x; j++)
+      for (size_t j = 0; j < T::size.x; j++)
       {
         // create 3x3 matrix using m without column i and row j
-        for (int k = 0, s = 0; k < T::size.x; k++)
+        for (size_t k = 0, s = 0; k < T::size.x; k++)
         {
           if (k == j)
             continue;
-          for (int l = 0, t = 0; l < T::size.x; l++)
+          for (size_t l = 0, t = 0; l < T::size.x; l++)
           {
             if (l == i)
               continue;

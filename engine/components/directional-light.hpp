@@ -13,16 +13,17 @@ namespace engine::components
     {
         core::math::vec3 direction;
         core::math::vec3 color;
+        float solid_angle = 2.0f * static_cast<float>(std::numbers::pi);
 
         inline void Illuminate(render::LightData &light_data, render::Material const &mat) const
         {
-            float ndotl = dot(light_data.normal, -direction);
+            core::math::vec3 L = -direction;
+            float ndotl = dot(light_data.normal, L);
             if (ndotl <= 0)
             {
                 return;
             }
-            float specular = std::powf(dot(light_data.normal, light_data.view_dir), mat.glossiness) * mat.specular;
-            light_data.color += color * ndotl * (ndotl * mat.albedo + specular);
+            light_data.color += render::Illuminate(L, light_data, mat, solid_angle, color);
         }
     };
 } // namespace engine::components

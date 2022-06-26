@@ -145,5 +145,11 @@ namespace engine::core::math
 
     template <typename T, Primitive U>
     constexpr auto lerp(T const from, T const to, U const param) noexcept;
+
+    template <AnyVec T, Primitive U>
+    [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> min(T const &left, U const min) noexcept;
+    
+    template <AnyVec T, Primitive U>
+    [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> max(T const &left, U const max) noexcept;
 } // namespace engine::core::math
 #include "vec_math.inl"

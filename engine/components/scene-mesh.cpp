@@ -9,8 +9,6 @@ namespace engine::components
                                          core::math::Ray const &ray) const
     {
         core::math::Ray local = ray;
-        static const float t0 = 0;
-        static const float t1 = 1;
         local.direction() =
             (core::math::vec4{local.direction(), 0} * transform.inv_model).as_vec<3>();
         local.origin() =

@@ -16,7 +16,10 @@ namespace engine
     void Scene::Draw(components::Camera const &cam, BitmapWindow &window,
                      [[maybe_unused]] ParallelExecutor &executor)
     {
-
+        if (!update_scene)
+        {
+            return;
+        }
         auto spheres = registry.group<components::SceneSphere>(entt::get<components::Transform>);
         auto meshes = registry.group<components::SceneMesh>(entt::get<components::Transform>);
 
@@ -24,7 +27,6 @@ namespace engine
         auto point_lights = registry.group<components::PointLight>(entt::get<components::Transform>);
         auto spot_lights = registry.group<components::SpotLight>(entt::get<components::Transform>);
 
-        update_scene = false;
         ivec2 bitmap_size = window.bitmap_size();
         uint32_t *bitmap = window.bitmap().data();
         vec4 bl4 = vec4(-1, -1, 1, 1) * cam.inv_view_projection;
@@ -44,18 +46,28 @@ namespace engine
             Ray ray(cam.position(), t.as_rvec<3>() / t.w - cam.position());
             Intersection nearest;
             nearest.reset();
+            render::Material mat;
+            if (floor.CheckIntersection(nearest, ray))
+            {
+                mat = floor.material;
+            }
 
-            vec3 const hdr = CalculatePointColor(spheres, meshes, directional_lights, point_lights, spot_lights, ray, nearest);
+            spheres.each([&nearest, &ray, &mat](auto const, auto const &sphere, auto const &transform) __lambda_force_inline
+                         { if(sphere.CheckIntersection(transform, nearest, ray)) { mat = sphere.material; } });
+            meshes.each([&nearest, &ray, &mat](auto const, auto const &mesh, auto const &transform) __lambda_force_inline
+                        { if(mesh.CheckIntersection(transform, nearest, ray)) { mat = mesh.material(); } });
+
+            vec3 const hdr = CalculatePointColor(spheres, meshes, directional_lights, point_lights, spot_lights, ray, nearest, mat);
 
             vec3 const tone_mapped = render::AcesHdr2Ldr(render::AdjustExposure(hdr, exposure));
-            
+
             vec3 const gamma_corrected = pow(tone_mapped, vec3(1.0 / gamma));
 
             ivec3 ldr{256 * gamma_corrected};
 
             ldr = ivec3{ldr.r > 0xff ? 0xff : ldr.r,
-                          ldr.g > 0xff ? 0xff : ldr.g,
-                          ldr.b > 0xff ? 0xff : ldr.b};
+                        ldr.g > 0xff ? 0xff : ldr.g,
+                        ldr.b > 0xff ? 0xff : ldr.b};
 
             ldr.r <<= 16;
             ldr.g <<= 8;
@@ -70,6 +82,7 @@ namespace engine
 #else
         executor.execute(func, bitmap_size.x * bitmap_size.y, 100);
 #endif
+        update_scene = false;
     }
 
     std::optional<entt::entity> Scene::GetIntersectedEntity(Intersection &intersection, Ray &ray)
@@ -127,22 +140,18 @@ namespace engine
                                     DirectionalLightView &directional_lights,
                                     PointLightGroup &point_lights,
                                     SpotLightGroup &spot_lights,
-                                    core::math::Ray &ray, core::math::Intersection &nearest)
+                                    core::math::Ray const &ray, core::math::Intersection const &nearest,
+                                    render::Material const &mat,
+                                    int depth)
     {
-        render::Material mat;
-        if (floor.CheckIntersection(nearest, ray))
-        {
-            mat = floor.material;
-        }
-
-        spheres.each([&nearest, &ray, &mat](auto const, auto const &sphere, auto const &transform) __lambda_force_inline
-                     { if(sphere.CheckIntersection(transform, nearest, ray)) { mat = sphere.material; } });
-        meshes.each([&nearest, &ray, &mat](auto const, auto const &mesh, auto const &transform) __lambda_force_inline
-                    { if(mesh.CheckIntersection(transform, nearest, ray)) { mat = mesh.material(); } });
-
+        vec3 ambient = this->ambient;
         if (!nearest.exists())
         {
-            return vec3{0};
+            return ambient;
+        }
+        if (global_illumination_on)
+        {
+            ambient = CalculatePointGIAmbient(spheres, meshes, directional_lights, point_lights, spot_lights, nearest, depth);
         }
 
         render::LightData ld{.color = vec3{0, 0, 0},
@@ -151,8 +160,33 @@ namespace engine
                              .normal = nearest.normal,
                              .view_dir = normalize(ray.origin() - nearest.point)};
 
-        Illuminate(spheres, meshes, directional_lights, point_lights, spot_lights, ld, mat);
-        return ld.color + mat.emission;
+        Illuminate(spheres, meshes, directional_lights, point_lights, spot_lights, mat, ld);
+
+        if (reflections_on && mat.roughness < reflection_roughness_threshold && depth < max_ray_depth)
+        {
+            float reflectivity = 1.0f - mat.roughness / reflection_roughness_threshold;
+
+            Ray reflect_ray(nearest.point + nearest.normal * 0.001f, normalize(reflect_normal_safe(nearest.normal, ray.direction())));
+
+            Intersection reflect_nearest;
+            reflect_nearest.reset();
+
+            render::Material reflect_mat;
+
+            if (floor.CheckIntersection(reflect_nearest, reflect_ray) && floor.material.casts_shadow)
+            {
+                reflect_mat = floor.material;
+            }
+
+            spheres.each([&reflect_nearest, &reflect_ray, &reflect_mat](auto const, auto const &sphere, auto const &transform) __lambda_force_inline
+                         { if(sphere.material.casts_shadow && sphere.CheckIntersection(transform, reflect_nearest, reflect_ray)) { reflect_mat = sphere.material; } });
+            meshes.each([&reflect_nearest, &reflect_ray, &reflect_mat](auto const, auto const &mesh, auto const &transform) __lambda_force_inline
+                        { if(mesh.material().casts_shadow && mesh.CheckIntersection(transform, reflect_nearest, reflect_ray)) { reflect_mat = mesh.material(); } });
+
+            ld.color += reflectivity * CalculatePointColor(spheres, meshes, directional_lights, point_lights, spot_lights, reflect_ray, reflect_nearest, reflect_mat, depth + 1);
+        }
+
+        return ambient * mat.albedo + ld.color + mat.emission;
     }
 
     void Scene::Illuminate(SphereGroup &spheres,
@@ -160,10 +194,9 @@ namespace engine
                            DirectionalLightView &directional_lights,
                            PointLightGroup &point_lights,
                            SpotLightGroup &spot_lights,
-                           render::LightData &ld,
-                           render::Material &mat) const
+                           render::Material const &mat,
+                           render::LightData &ld)
     {
-
         auto find_intersection_if_casts_shadow = [this, &spheres, &meshes](Intersection &intersection, Ray &ray) __lambda_force_inline
         {
             return FindIntersectionIf(spheres, meshes, intersection, ray,
@@ -209,7 +242,6 @@ namespace engine
                 point_light.Illuminate(transform, ld, mat);
             }
         }
-
         for (auto entity : spot_lights)
         {
             auto &transform = spot_lights.get<Transform>(entity);
@@ -229,11 +261,94 @@ namespace engine
             nearest.reset();
             find_intersection_if_casts_shadow(nearest, ray);
 
-            if (!nearest.exists() || nearest.t - 0.01f >= d)
+            if (!nearest.exists() || nearest.t >= d)
             {
                 spot_light.Illuminate(transform, ld, mat);
             }
         }
     }
+    vec3 Scene::CalculatePointGIAmbient(SphereGroup &spheres,
+                                        MeshGroup &meshes,
+                                        DirectionalLightView &directional_lights,
+                                        PointLightGroup &point_lights,
+                                        SpotLightGroup &spot_lights,
+                                        core::math::Intersection const &nearest,
+                                        int depth)
+    {
+        if (depth >= max_ray_depth)
+        {
+            return ambient;
+        }
 
+        vec3 rv_color{0};
+        // rotation matrix to align (0,1,0) to normal
+        mat3 rotation_matrix{ 1 };
+        
+        if (vec3 axis = cross(vec3{ 0,1,0 }, nearest.normal); length(axis) != 0)
+        {
+            axis = normalize(axis);
+            mat3 A;
+            mat3 B;
+            A[0] = vec3{ 0,1,0 };
+            A[1] = axis;
+            A[2] = cross(axis, A[0]);
+            B[0] = nearest.normal;
+            B[1] = axis;
+            B[2] = cross(axis, B[0]);
+            A = transpose(A);
+            rotation_matrix = B * A;
+        }
+        auto t = vec3{ 0,1,0 } * rotation_matrix;
+        assert(almost_equal(length(t - nearest.normal), 0.0f));
+
+        
+        auto const phi_radians = float(2 * std::numbers::phi * std::numbers::pi);
+        auto const hrcm1 = float(hemisphere_ray_count - 1);
+        
+        for (int i = 0; i < hemisphere_ray_count; i++)
+        {
+            float j = i + 0.5f;
+            float const phi = std::acos(1.0f - 2.0f * j / hrcm1);
+            float const theta = phi_radians * float(j);
+            float const x = std::cosf(theta) * std::sinf(phi);
+            float const y = std::sinf(theta) * std::sinf(phi);
+            float const z = std::cosf(phi);
+
+            vec3 const ray_dir = vec3{x, y, z} *rotation_matrix;
+            vec3 const ray_origin = nearest.point + ray_dir * 0.001f;
+
+            Ray const hs_ray(ray_dir, ray_origin);
+
+            Intersection hs_nearest;
+            hs_nearest.reset();
+
+            render::Material hs_mat;
+
+            if (floor.CheckIntersection(hs_nearest, hs_ray) && floor.material.casts_shadow)
+            {
+                hs_mat = floor.material;
+            }
+
+            spheres.each([&hs_nearest, &hs_ray, &hs_mat](auto const, auto const &sphere, auto const &transform) __lambda_force_inline
+                         { if(sphere.material.casts_shadow && sphere.CheckIntersection(transform, hs_nearest, hs_ray)) { hs_mat = sphere.material; } });
+            meshes.each([&hs_nearest, &hs_ray, &hs_mat](auto const, auto const &mesh, auto const &transform) __lambda_force_inline
+                        { if(mesh.material().casts_shadow && mesh.CheckIntersection(transform, hs_nearest, hs_ray)) { hs_mat = mesh.material(); } });
+
+            if (!hs_nearest.exists())
+            {
+                rv_color += ambient;
+                continue;
+            }
+
+            render::LightData ld{.color = vec3{0, 0, 0},
+                                 .ray = hs_ray,
+                                 .point = hs_nearest.point,
+                                 .normal = hs_nearest.normal,
+                                 .view_dir = normalize(hs_ray.origin() - hs_nearest.point)};
+
+            Illuminate(spheres, meshes, directional_lights, point_lights, spot_lights, hs_mat, ld);
+            rv_color += ambient * hs_mat.albedo + ld.color + hs_mat.emission;
+        }
+        return rv_color / hemisphere_ray_count;
+    }
 } // namespace engine
