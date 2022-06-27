@@ -48,7 +48,7 @@ namespace engine
                                              engine::render::Material const &mat,
                                              int depth = 0);
 
-        void Illuminate(SphereGroup &spheres,
+        core::math::vec3  Illuminate(SphereGroup &spheres,
                                MeshGroup &meshes,
                                DirectionalLightView &directional_lights,
                                PointLightGroup &point_lights,
@@ -66,12 +66,12 @@ namespace engine
         bool update_scene{true};
         bool reflections_on{true};
         bool global_illumination_on{false};
-        int hemisphere_ray_count = 100;
+        int hemisphere_ray_count = 1000;
         float exposure = 2.0f;
         float gamma = 2.2f;
         float reflection_roughness_threshold = 0.1f;
         int max_ray_depth = 4;
-        core::math::vec3 ambient = render::UIntToRGB(0x0B1026) / 0xff;
+        core::math::vec3 ambient = core::math::vec3{ 0 };// render::UIntToRGB(0x0B1026) / 0xff;
         entt::registry registry;
         render::Floor floor;
     };

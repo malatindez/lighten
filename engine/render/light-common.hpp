@@ -51,7 +51,7 @@ namespace engine::render
                                        render::LightData &light_data,
                                        render::Material const &mat,
                                        float const solid_angle,
-                                       core::math::vec3 const &light_color)
+                                       core::math::vec3 const &light_energy)
     {
         core::math::vec3 const H = core::math::normalize(L + normalize(light_data.view_dir));
         float ndotl = dot(light_data.normal, L);
@@ -72,7 +72,7 @@ namespace engine::render
         core::math::vec3 spec = albedo_metallic * F * G * std::min(1.0f, solid_angle * D / (4 * ndotl * ndotv));
         spec = core::math::clamp(spec, 0.0f, 1.0f);
         ndotl = std::max(ndotl, 0.0f);
-        return max((diffuse * solid_angle * ndotl + spec) * light_color * ndotl, 0);
+        return max((diffuse * solid_angle * ndotl + spec) * light_energy * ndotl, 0);
     }
 
     inline core::math::vec4 UIntToRGBA(uint32_t value)

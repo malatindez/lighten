@@ -154,13 +154,14 @@ namespace engine
             ambient = CalculatePointGIAmbient(spheres, meshes, directional_lights, point_lights, spot_lights, nearest, depth);
         }
 
-        render::LightData ld{.color = vec3{0, 0, 0},
-                             .ray = ray,
+        core::math::vec3 light_energy{0};
+
+        render::LightData ld{.ray = ray,
                              .point = nearest.point,
                              .normal = nearest.normal,
                              .view_dir = normalize(ray.origin() - nearest.point)};
 
-        Illuminate(spheres, meshes, directional_lights, point_lights, spot_lights, mat, ld);
+        light_energy = Illuminate(spheres, meshes, directional_lights, point_lights, spot_lights, mat, ld);
 
         if (reflections_on && mat.roughness < reflection_roughness_threshold && depth < max_ray_depth)
         {
@@ -183,13 +184,13 @@ namespace engine
             meshes.each([&reflect_nearest, &reflect_ray, &reflect_mat](auto const, auto const &mesh, auto const &transform) __lambda_force_inline
                         { if(mesh.material().casts_shadow && mesh.CheckIntersection(transform, reflect_nearest, reflect_ray)) { reflect_mat = mesh.material(); } });
 
-            ld.color += reflectivity * CalculatePointColor(spheres, meshes, directional_lights, point_lights, spot_lights, reflect_ray, reflect_nearest, reflect_mat, depth + 1);
+            light_energy += reflectivity * CalculatePointColor(spheres, meshes, directional_lights, point_lights, spot_lights, reflect_ray, reflect_nearest, reflect_mat, depth + 1);
         }
 
-        return ambient * mat.albedo + ld.color + mat.emission;
+        return ambient * mat.albedo + light_energy + mat.emission;
     }
 
-    void Scene::Illuminate(SphereGroup &spheres,
+    core::math::vec3 Scene::Illuminate(SphereGroup &spheres,
                            MeshGroup &meshes,
                            DirectionalLightView &directional_lights,
                            PointLightGroup &point_lights,
@@ -197,6 +198,7 @@ namespace engine
                            render::Material const &mat,
                            render::LightData &ld)
     {
+        core::math::vec3 light_energy{ 0 };
         auto find_intersection_if_casts_shadow = [this, &spheres, &meshes](Intersection &intersection, Ray &ray) __lambda_force_inline
         {
             return FindIntersectionIf(spheres, meshes, intersection, ray,
@@ -205,7 +207,7 @@ namespace engine
         };
         for (auto entity : directional_lights)
         {
-            auto &dirlight = directional_lights.get<DirectionalLight>(entity);
+            auto const &dirlight = directional_lights.get<DirectionalLight>(entity);
 
             Ray ray(ld.point + ld.normal * 0.001f, -dirlight.direction);
 
@@ -215,13 +217,13 @@ namespace engine
 
             if (!nearest.exists())
             {
-                dirlight.Illuminate(ld, mat);
+                light_energy += dirlight.Illuminate(ld, mat);
             }
         }
         for (auto entity : point_lights)
         {
-            auto &transform = point_lights.get<Transform>(entity);
-            auto &point_light = point_lights.get<PointLight>(entity);
+            auto const &transform = point_lights.get<Transform>(entity);
+            auto const &point_light = point_lights.get<PointLight>(entity);
 
             if (!point_light.Illuminable(transform, ld))
             {
@@ -239,13 +241,13 @@ namespace engine
 
             if (!nearest.exists() || nearest.t >= d)
             {
-                point_light.Illuminate(transform, ld, mat);
+                light_energy += point_light.Illuminate(transform, ld, mat);
             }
         }
         for (auto entity : spot_lights)
         {
-            auto &transform = spot_lights.get<Transform>(entity);
-            auto &spot_light = spot_lights.get<SpotLight>(entity);
+            auto const &transform = spot_lights.get<Transform>(entity);
+            auto const &spot_light = spot_lights.get<SpotLight>(entity);
 
             if (!spot_light.Illuminable(transform, ld))
             {
@@ -263,9 +265,10 @@ namespace engine
 
             if (!nearest.exists() || nearest.t >= d)
             {
-                spot_light.Illuminate(transform, ld, mat);
+                light_energy += spot_light.Illuminate(transform, ld, mat);
             }
         }
+        return light_energy;
     }
     vec3 Scene::CalculatePointGIAmbient(SphereGroup &spheres,
                                         MeshGroup &meshes,
@@ -339,15 +342,14 @@ namespace engine
                 rv_color += ambient;
                 continue;
             }
-
-            render::LightData ld{.color = vec3{0, 0, 0},
-                                 .ray = hs_ray,
+            render::Color light_energy{ 0 };
+            render::LightData ld{.ray = hs_ray,
                                  .point = hs_nearest.point,
                                  .normal = hs_nearest.normal,
                                  .view_dir = normalize(hs_ray.origin() - hs_nearest.point)};
 
-            Illuminate(spheres, meshes, directional_lights, point_lights, spot_lights, hs_mat, ld);
-            rv_color += ambient * hs_mat.albedo + ld.color + hs_mat.emission;
+            light_energy = Illuminate(spheres, meshes, directional_lights, point_lights, spot_lights, hs_mat, ld);
+            rv_color += ambient * hs_mat.albedo + light_energy + hs_mat.emission;
         }
         return rv_color / hemisphere_ray_count;
     }

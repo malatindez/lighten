@@ -19,5 +19,10 @@ namespace engine::components
             }
             return PointLight::Illuminable(transform, light_data);
         }
+        inline core::math::vec3 Illuminate(Transform const &transform, render::LightData &light_data, render::Material const &mat) const
+        {
+            core::math::vec3 const L = normalize(light_data.point - transform.position);
+            return PointLight::Illuminate(transform, light_data, mat) * (dot(L, direction) - cut_off);
+        }
     };
 } // namespace engine::components

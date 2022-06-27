@@ -18,20 +18,20 @@ namespace engine::components
             }
             return true;
         }
-        inline void Illuminate(Transform const &transform, render::LightData &light_data, render::Material const &mat) const
+        inline core::math::vec3 Illuminate(Transform const &transform, render::LightData &light_data, render::Material const &mat) const
         {
             core::math::vec3 L = transform.position - light_data.point;
             float const distance = length(L);
             L = normalize(L);
             float const radius = length(transform.scale);
             
-            float solid_angle = 2.0f * std::numbers::pi;
+            float solid_angle = float(2.0f * std::numbers::pi);
             if(distance > radius) 
             {
                 solid_angle = 2.0f * static_cast<float>(std::numbers::pi) * (1.0f - sqrtf(distance * distance - radius * radius) / distance);
             }
 
-            light_data.color += render::Illuminate(L, light_data, mat, solid_angle, color);
+            return render::Illuminate(L, light_data, mat, solid_angle, color);
         }
     };
 } // namespace engine::components
