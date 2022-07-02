@@ -35,7 +35,7 @@ namespace engine::components
             
             bool intersects = false;
             core::math::vec3 const R = core::math::reflect_normal_safe(-L, N);
-            core::math::vec3 D = render::approximateClosestSphereDir(intersects, R,sqrtf(1 -  radius/distance * radius/distance), sphereRelPos, L, distance, radius);
+            core::math::vec3 D = render::approximateClosestSphereDir(intersects, R, sqrtf(1 -  radius/distance * radius/distance), sphereRelPos, L, distance, radius);
             float ndotl = std::min(dot(N, L), 0.0f);
             render::clampDirToHorizon(D, ndotl, N, 0.0f);
 

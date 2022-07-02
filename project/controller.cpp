@@ -6,6 +6,11 @@ using namespace events;
 using namespace math;
 using namespace components;
 
+// 1: roughness / metalness showcase
+// 2: global illumination scene
+#define SCENE 2
+
+
 namespace
 {
     const vec3 kUp{0, 1, 0};
@@ -108,32 +113,45 @@ void Controller::InitScene()
                     cos(time_from_start_),
                     0 });
             });   */
-    for (int j = 0; j < 10; j++)
-        for (int i = 0; i < 10; i++)
+#if SCENE == 1
+    vec3 a{1,0,0};
+    for (int j = 0; j < 7; j++)
+        for (int i = 0; i < 7; i++)
         {
             entt::entity sphere = registry.create();
             UpdateTransform(registry, sphere, vec3{i, j, 0}, vec3{0.5f});
-            float r = lerp(0.001f, 1.0f, static_cast<float>(i) / 9.0f);
-            float m = lerp(0.0f, 1.0f, static_cast<float>(j) / 9.0f);
-            vec3 a = vec3(float(rand() % 256) / 256, float(rand() % 256) / 256, float(rand() % 256) / 256);
+            float r = lerp(0.001f, 1.0f, static_cast<float>(i) /  7.0f);
+            float m = lerp(0.0f, 1.0f, static_cast<float>(j) / 7.0f);
             UpdateMaterial(AddSphereComponent(registry, sphere).material, a, vec3{0.04f}, vec3{0.0f}, r, m);
         }
-   /*  auto gen_cube = [this, &registry](vec3 coords, vec3 scale, vec3 color){
+    entt::entity main_light = registry.create();
+    UpdateTransform(registry, main_light, vec3{4,4,-10}, vec3{1.0f});
+    AddPointLight(registry, main_light, vec3{1.0f, 1.0f, 1.0f}, 50);
+    UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{0}, vec3{0.04f}, vec3{1.0f} * 50, 1, 0, false);
+#elif SCENE == 2
+    auto gen_cube = [this, &registry](vec3 coords, vec3 scale, vec3 color, quat rotation = quat(), float roughness = 1, float metalness = 0){
         entt::entity cube = registry.create();
-        UpdateTransform(registry, cube, coords, scale);
-        UpdateMaterial(AddCubeComponent(registry, cube).material(), color, vec3{0.04f}, vec3{0.0f}, 1, 0);
+        UpdateTransform(registry, cube, coords, scale, rotation);
+        UpdateMaterial(AddCubeComponent(registry, cube).material(), color, vec3{0.04f}, vec3{0.0f}, roughness, metalness);
     };
     gen_cube(vec3{-2,1,0},vec3{2}, vec3{1,0,0});
     gen_cube(vec3{0,-1,0}, vec3{2}, vec3{1});
     gen_cube(vec3{0,3,0}, vec3{2}, vec3{1});
     gen_cube(vec3{0,1,2}, vec3{2}, vec3{1});
-    gen_cube(vec3{2,1,0}, vec3{2}, vec3{0,1,0}); */
+    gen_cube(vec3{2,1,0}, vec3{2}, vec3{0,1,0});
+    gen_cube(vec3{-0.25f,0.25f,-0.25f}, vec3{0.5f}, vec3{1}, quat(), 1, 0);
+    gen_cube(vec3{0.5f,0.625f,0.0f}, vec3{0.45f, 1.25f, 0.45f}, vec3{1}, quat{1, 0, -radians(30.0f), 0});
+    
     entt::entity spot_light = registry.create();
-    UpdateTransform(registry, spot_light, vec3{4,4,-10}, vec3{1.0f});
-    // color times power of the light
-    //AddSpotLight(registry, spot_light, vec3{1.0f, 1.0f, 1.0f}, radians(45.0f), normalize(vec3{-1,1,1}), 2e4f);
-    AddPointLight(registry, spot_light, vec3{1.0f, 1.0f, 1.0f}, 5e3f);
-    UpdateMaterial(AddSphereComponent(registry, spot_light).material, vec3{0}, vec3{0.04f}, vec3{1.0f} * 5e3f, 1, 0, false);
+    UpdateTransform(registry, spot_light, vec3{0,1,0}, vec3{0.01f});
+    UpdateMaterial(AddSphereComponent(registry, spot_light).material, vec3{0}, vec3{0.04f}, vec3{1.0f} * 50, 1, 0, false);
+    AddSpotLight(registry, spot_light, vec3{1.0f, 1.0f, 1.0f}, radians(45.0f), normalize(vec3{-1,1,1}), 5e5f);
+    camera_controller_.SetWorldOffset(vec3{0,0.95f,-3.6f});
+/*     entt::entity main_light = registry.create();
+    UpdateTransform(registry, main_light, vec3{0,1,0}, vec3{0.01f});
+    AddPointLight(registry, main_light, vec3{1.0f, 1.0f, 1.0f}, 5e3f);
+    UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{0}, vec3{0.04f}, vec3{1.0f} * 5e3f, 1, 0, false); */
+#endif
     
     //entt::entity main_light = registry.create();
    // UpdateTransform(registry, main_light, vec3{3, 2.5f, -3}, vec3{0.5f});

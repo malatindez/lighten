@@ -38,9 +38,9 @@ namespace engine::core
     std::vector<uint32_t> bitmap_;
     BITMAPINFO bitmap_info_;
 #ifdef _DEBUG
-    int resolution_scale_ = 8;
+    int resolution_scale_ = 16;
 #else
-    int resolution_scale_ = 1;
+    int resolution_scale_ = 4;
 #endif
     math::ivec2 bitmap_size_;
   };

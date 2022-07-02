@@ -289,27 +289,23 @@ namespace engine
         mat3 rotation_matrix{ 1 };
         rotation_matrix[2] = nearest.normal;
         render::branchlessONB(nearest.normal, rotation_matrix[0], rotation_matrix[1]);
-        if(nearest.normal.z <= 0) {
-            rotation_matrix[0] *= -1;
-        }
-        rotation_matrix[1] *= -1;
         
-        auto const phi_radians = float(2 / std::numbers::phi * std::numbers::pi);
+        auto const delta_phi = float(2.0f * std::numbers::pi * (2.0f - std::numbers::phi));
         auto const hrcm1 = float(hemisphere_ray_count - 1);
-        
         for (int i = 0; i < hemisphere_ray_count; i++)
         {
-            float j = i + 0.5f;
-            float const phi = std::acos(1.0f - j / hrcm1);
-            float const theta = phi_radians * j;
-            float const x = std::cosf(theta) * std::sinf(phi);
-            float const y = std::sinf(theta) * std::sinf(phi);
-            float const z = std::cosf(phi);
+            float const j = i + 0.5f;
+            float const z = 1.0f - j / hemisphere_ray_count;
+            float const phi = std::acosf(z);
+            float const theta = fmodf(delta_phi * i, float(2 * std::numbers::pi));
+
+            float const x = std::sinf(phi) * std::cosf(theta);
+            float const y = std::sinf(phi) * std::sinf(theta);
 
             vec3 const ray_dir = normalize(vec3{x, y, z} * rotation_matrix);
             vec3 const ray_origin = nearest.point + nearest.normal * 0.001f;
 
-            Ray const hs_ray(ray_dir, ray_origin);
+            Ray const hs_ray(ray_origin, ray_dir);
 
             Intersection hs_nearest;
             hs_nearest.reset();

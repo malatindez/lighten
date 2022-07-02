@@ -63,7 +63,7 @@ namespace engine::core::math
   template <size_t size, Primitive T, Primitive U>
   [[nodiscard]] constexpr vec<size, T> operator-(U const value, vec<size, T> const &vector) noexcept
   {
-    return vec<size, T>(vector) -= value;
+    return vec<size, T>(-vector) += value;
   }
 
   template <size_t size, Primitive T, Primitive U>
@@ -110,8 +110,7 @@ namespace engine::core::math
   template <size_t size, Primitive T, Primitive U>
   [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator-(U const value, rvec<size, T> const &vector) noexcept
   {
-
-    return vec<size, std::remove_const_t<T>>(vector) -= value;
+    return vec<size, std::remove_const_t<T>>(-vector) += value;
   }
   template <size_t size, Primitive T, Primitive U>
   [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator+(rvec<size, T> const &vector, U const value) noexcept

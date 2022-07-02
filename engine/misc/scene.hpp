@@ -66,7 +66,7 @@ namespace engine
         bool update_scene{true};
         bool reflections_on{true};
         bool global_illumination_on{false};
-        int hemisphere_ray_count = 200;
+        int hemisphere_ray_count = 1000;
         float exposure = 2.0f;
         float gamma = 2.2f;
         float reflection_roughness_threshold = 0.1f;

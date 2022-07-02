@@ -22,7 +22,7 @@ namespace engine::components
             if (float ndotl = dot(light_data.normal, L); 
                 ndotl <= 0)
             {
-                return { 0, 0, 0 };
+                return core::math::vec3{ 0, 0, 0 };
             }
             return render::Illuminate(L, light_data, mat, solid_angle, color, power);
         }

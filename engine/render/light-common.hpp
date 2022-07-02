@@ -5,7 +5,7 @@
 namespace engine::render
 {
     // Schlick's approximation of Fresnel reflectance,
-    inline core::math::vec3 Fresnel(float NdotL, const core::math::vec3 &F0)
+    inline core::math::vec3 F_Schlick(float NdotL, const core::math::vec3 &F0)
     {
         return F0 + (1 - F0) * powf(1 - NdotL, 5);
     }
@@ -89,22 +89,22 @@ namespace engine::render
         float ndotv = dot(N, V);
         float ndoth = dot(N, H);
         
-        core::math::vec3 diffuse = (1 - render::Fresnel(ndotl, mat.F0));
+        core::math::vec3 diffuse = clamp(render::F_Schlick(ndotl, mat.F0), 0.0f, 1.0f);
+        diffuse = 1 - diffuse;
         diffuse *= (1 - mat.metalness);
         diffuse *= (mat.albedo / static_cast<float>(std::numbers::pi));
         
 
         float const rough2 = mat.roughness * mat.roughness;
 
-        core::math::vec3 const F = render::Fresnel(dot(L, H), mat.F0);
+        core::math::vec3 const F = render::F_Schlick(dot(L, H), mat.F0);
         float const G = render::Smith(rough2, ndotv, ndotl);
         float const D = render::GGX(rough2, ndoth);
-
-        core::math::vec3 spec = F * G * std::min(1.0f, D * solid_angle / (4 * ndotv));
+        core::math::vec3 spec = F * G * D * solid_angle / (4 * ndotv);
         
         spec = core::math::clamp(spec, 0.0f, 1.0f);
 
-        return max((diffuse + spec), 0) * light_energy * power * ndotl;
+        return max((diffuse * solid_angle + spec), 0) * light_energy * power * ndotl;
     }
 
     inline core::math::vec4 UIntToRGBA(uint32_t value)
