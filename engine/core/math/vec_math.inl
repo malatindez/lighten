@@ -450,14 +450,7 @@ namespace engine::core::math
       vec<T::size, std::remove_const_t<typename T::type>> rv;
       for(int i = 0; i < T::size; i++)
       {
-        if(left[i] > max)
-        {
-          rv[i] = static_cast<T::type>(max);
-        }
-        else
-        {
-          rv[i] = left[i];
-        }
+          rv[i] = std::min(left[i], static_cast<T::type>(max));
       }
       return rv;
     }
@@ -468,14 +461,7 @@ namespace engine::core::math
       vec<T::size, std::remove_const_t<typename T::type>> rv;
       for(int i = 0; i < T::size; i++)
       {
-        if(left[i] < min)
-        {
-          rv[i] = static_cast<T::type>(min);
-        }
-        else
-        {
-          rv[i] = left[i];
-        }
+          rv[i] = std::max(left[i], static_cast<T::type>(min));
       }
       return rv;
     }
@@ -485,10 +471,7 @@ namespace engine::core::math
     {
       for(int i = 0; i < T::size; i++)
       {
-        if(left[i] > max)
-        {
-          left[i] = static_cast<T::type>(max);
-        }
+        left[i] = std::min(left[i], static_cast<T::type>(max));
       }
     }
     
@@ -497,10 +480,7 @@ namespace engine::core::math
     {
       for(int i = 0; i < T::size; i++)
       {
-        if(left[i] < min)
-        {
-          left[i] = static_cast<T::type>(min);
-        }
+        left[i] = std::max(left[i], static_cast<T::type>(min));
       }
     }
 } // namespace engine::core::math

@@ -23,10 +23,8 @@ namespace engine::core::math
     [[nodiscard]] constexpr vec<3, T> reflect_normal_safe(vec<3, T> const &normal, vec<3, T> const &dir)
     {
         vec<3, T> t = dir - 2.0f * dot(normal, dir) * normal;
-        if (length(t) <= 1e-6f)
-        {
-            return t;
-        }
-        return normalize(t);
+        float l  = length(t);
+        l = l * (l > 1e-6f) + 1 * (l <= 1e-6f);
+        return t / l;
     }
 } // namespace engine::core::math

@@ -16,16 +16,19 @@ namespace
     const vec3 kBackwards{0, 0, -1};
     render::Material &UpdateMaterial(render::Material &mat,
                                      vec3 albedo = vec3{0.3f},
+                                     vec3 inF0 = vec3{0.04f},
                                      vec3 emission = vec3{0.0f},
                                      float roughness = 1,
-                                     float metalness = 8,
+                                     float metalness = 1,
                                      bool casts_shadow = true)
     {
         mat.albedo = albedo;
+        mat.F0 = lerp(inF0, mat.albedo, mat.metalness);
         mat.emission = emission;
         mat.roughness = roughness;
         mat.metalness = metalness;
         mat.casts_shadow = casts_shadow;
+
         return mat;
     }
 
@@ -49,38 +52,43 @@ namespace
     {
         return registry.emplace<SceneSphere>(e);
     }
-    PointLight &AddPointLight(entt::registry &registry, entt::entity e, vec3 color = vec3{1, 1, 1})
+    PointLight &AddPointLight(entt::registry &registry, entt::entity e, vec3 color = vec3{1, 1, 1}, float power = 1e6f)
     {
         PointLight &point_light = registry.get_or_emplace<PointLight>(e);
         point_light.color = color;
+        point_light.power = power;
         return point_light;
     }
 
     SpotLight &AddSpotLight(entt::registry &registry, entt::entity e,
                             vec3 color = vec3{1, 1, 1},
                             float cut_off = radians(45.0F),
-                            vec3 direction = vec3{0, -1, 0})
+                            vec3 direction = vec3{0, -1, 0}, 
+                            float power = 1e6f)
     {
         SpotLight &spot = registry.get_or_emplace<SpotLight>(e);
         spot.direction = direction;
         spot.color = color;
         spot.cut_off = cut_off;
+        spot.power = power;
         return spot;
     }
 
     DirectionalLight &AddDirLight(entt::registry &registry, entt::entity e,
                                   vec3 color = vec3{1, 1, 1},
-                                  vec3 direction = vec3{0, -1, 0})
+                                  vec3 direction = vec3{0, -1, 0},
+                                  float power = 1.0f)
     {
         DirectionalLight &dir = registry.get_or_emplace<DirectionalLight>(e);
         dir.direction = direction;
         dir.color = color;
+        dir.power = power;
         return dir;
     }
 } // namespace
 void Controller::InitScene()
 {
-    UpdateMaterial(scene_->floor.material, vec3{0.3f}, vec3{0}, 0.25f, 4, true);
+    UpdateMaterial(scene_->floor.material, vec3{0.3f}, vec3{0.04f}, vec3{0}, 1.0f, 1, true);
     scene_->floor.transform.reset();
     scene_->floor.plane.update_plane(vec3{0, 0, 1}, vec3{1, 0, 0});
     scene_->floor.transform.position = vec3{0, -2, 0};
@@ -100,22 +108,38 @@ void Controller::InitScene()
                     cos(time_from_start_),
                     0 });
             });   */
-    for (int j = 0; j < 1; j++)
-        for (int i = 0; i < 1; i++)
+    for (int j = 0; j < 10; j++)
+        for (int i = 0; i < 10; i++)
         {
             entt::entity sphere = registry.create();
             UpdateTransform(registry, sphere, vec3{i, j, 0}, vec3{0.5f});
-            auto &mat = UpdateMaterial(AddSphereComponent(registry, sphere).material, vec3{0.7f}, vec3{0.0f}, 1, 2);
-            mat.roughness = lerp(1.0f, 1.0f, static_cast<float>(i) / 5.0f);
-            mat.F0 = vec3(1.0f);
-            mat.metalness = lerp(1.0f, 1.0f, static_cast<float>(j) / 5.0f);
-            mat.albedo = vec3(float(rand() % 256) / 256, float(rand() % 256) / 256, float(rand() % 256) / 256);
+            float r = lerp(0.001f, 1.0f, static_cast<float>(i) / 9.0f);
+            float m = lerp(0.0f, 1.0f, static_cast<float>(j) / 9.0f);
+            vec3 a = vec3(float(rand() % 256) / 256, float(rand() % 256) / 256, float(rand() % 256) / 256);
+            UpdateMaterial(AddSphereComponent(registry, sphere).material, a, vec3{0.04f}, vec3{0.0f}, r, m);
         }
-    entt::entity main_light = registry.create();
-    UpdateTransform(registry, main_light, vec3{3, 2.5f, -3}, vec3{0.5f});
+   /*  auto gen_cube = [this, &registry](vec3 coords, vec3 scale, vec3 color){
+        entt::entity cube = registry.create();
+        UpdateTransform(registry, cube, coords, scale);
+        UpdateMaterial(AddCubeComponent(registry, cube).material(), color, vec3{0.04f}, vec3{0.0f}, 1, 0);
+    };
+    gen_cube(vec3{-2,1,0},vec3{2}, vec3{1,0,0});
+    gen_cube(vec3{0,-1,0}, vec3{2}, vec3{1});
+    gen_cube(vec3{0,3,0}, vec3{2}, vec3{1});
+    gen_cube(vec3{0,1,2}, vec3{2}, vec3{1});
+    gen_cube(vec3{2,1,0}, vec3{2}, vec3{0,1,0}); */
+    entt::entity spot_light = registry.create();
+    UpdateTransform(registry, spot_light, vec3{4,4,-10}, vec3{1.0f});
     // color times power of the light
-    AddSpotLight(registry, main_light, vec3{1.0f, 1.0f, 1.0f} * 50.0f);
-    UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{0}, vec3{1.0f, 1.0f, 1.0f}, 0, 0, false);
+    //AddSpotLight(registry, spot_light, vec3{1.0f, 1.0f, 1.0f}, radians(45.0f), normalize(vec3{-1,1,1}), 2e4f);
+    AddPointLight(registry, spot_light, vec3{1.0f, 1.0f, 1.0f}, 5e3f);
+    UpdateMaterial(AddSphereComponent(registry, spot_light).material, vec3{0}, vec3{0.04f}, vec3{1.0f} * 5e3f, 1, 0, false);
+    
+    //entt::entity main_light = registry.create();
+   // UpdateTransform(registry, main_light, vec3{3, 2.5f, -3}, vec3{0.5f});
+    // color times power of the light
+  //  AddPointLight(registry, main_light, vec3{1.0f, 1.0f, 1.0f} * 50.0f);
+  // UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{0}, vec3{1.0f, 1.0f, 1.0f}, 0, 0, false);
 }
 void Controller::InitInput()
 {

@@ -1,5 +1,7 @@
 #pragma once
 #include "core/math.hpp"
+#include "light-data.hpp"
+#include "material.hpp"
 namespace engine::render
 {
     // Schlick's approximation of Fresnel reflectance,
@@ -46,33 +48,63 @@ namespace engine::render
         float LMax = (78.0f / (0.65f * 100.0f)) * powf(2.0f, EV100);
         return color * (1.0f / LMax);
     }
+    // May return direction pointing beneath surface horizon (dot(N, dir) < 0), use clampDirToHorizon to fix it.
+    // sphereCos is cosine of light sphere solid angle.
+    // sphereRelPos is position of a sphere relative to surface:
+    // 'sphereDir == normalize(sphereRelPos)' and 'sphereDir * sphereDist == sphereRelPos'
+    inline core::math::vec3 approximateClosestSphereDir(bool& intersects, core::math::vec3 const &reflectionDir, float sphereCos,
+        core::math::vec3 const &sphereRelPos, core::math::vec3 const &sphereDir, float sphereDist, float sphereRadius)
+    {
+        float RoS = dot(reflectionDir, sphereDir);
+
+        intersects = RoS >= sphereCos;
+        if (intersects) return reflectionDir;
+        if (RoS < 0.0) return sphereDir;
+
+        core::math::vec3 closestPointDir = normalize(reflectionDir * sphereDist * RoS - sphereRelPos);
+        return normalize(sphereRelPos + sphereRadius * closestPointDir);
+    }
+
+    // Input dir and NoD is N and NoL in a case of lighting computation 
+    inline void clampDirToHorizon(core::math::vec3 &dir, float& NoD, core::math::vec3 const &normal, float minNoD)
+    {
+        if (NoD < minNoD)
+        {
+            dir = normalize(dir + (minNoD - NoD) * normal);
+            NoD = minNoD;
+        }
+    }
 
     inline core::math::vec3 Illuminate(core::math::vec3 const &L,
                                        render::LightData &light_data,
                                        render::Material const &mat,
                                        float const solid_angle,
-                                       core::math::vec3 const &light_energy)
+                                       core::math::vec3 const &light_energy,
+                                       float const power)
     {
-        core::math::vec3 const H = core::math::normalize(L + normalize(light_data.view_dir));
-        float ndotl = dot(light_data.normal, L);
-
-        float const rough2 = mat.roughness * mat.roughness;
-        core::math::vec3 diffuse = (1 - render::Fresnel(1 - ndotl, mat.F0));
+        core::math::vec3 const &N = light_data.normal;
+        core::math::vec3 const V = normalize(light_data.view_dir);
+        core::math::vec3 const H = core::math::normalize(L + V);
+        float ndotl = dot(N, L);
+        float ndotv = dot(N, V);
+        float ndoth = dot(N, H);
+        
+        core::math::vec3 diffuse = (1 - render::Fresnel(ndotl, mat.F0));
         diffuse *= (1 - mat.metalness);
         diffuse *= (mat.albedo / static_cast<float>(std::numbers::pi));
         
-        core::math::vec3 const albedo_metallic = core::math::lerp(core::math::vec3{1}, mat.albedo, mat.metalness);
 
-        core::math::vec3 const F = core::math::clamp(render::Fresnel(dot(L, H), mat.F0), 0.0f, 1.0f);
-        float const G = render::Smith(rough2, dot(light_data.normal, normalize(light_data.view_dir)), ndotl);
-        float const D = render::GGX(rough2, dot(light_data.normal, H));
+        float const rough2 = mat.roughness * mat.roughness;
 
-        float const ndotv = dot(light_data.normal, normalize(light_data.view_dir));
+        core::math::vec3 const F = render::Fresnel(dot(L, H), mat.F0);
+        float const G = render::Smith(rough2, ndotv, ndotl);
+        float const D = render::GGX(rough2, ndoth);
 
-        core::math::vec3 spec = albedo_metallic * F * G * std::min(1.0f, solid_angle * D / (4 * ndotl * ndotv));
+        core::math::vec3 spec = F * G * std::min(1.0f, D * solid_angle / (4 * ndotv));
+        
         spec = core::math::clamp(spec, 0.0f, 1.0f);
-        ndotl = std::max(ndotl, 0.0f);
-        return max((diffuse * solid_angle * ndotl + spec) * light_energy * ndotl, 0);
+
+        return max((diffuse + spec), 0) * light_energy * power * ndotl;
     }
 
     inline core::math::vec4 UIntToRGBA(uint32_t value)
@@ -93,13 +125,14 @@ namespace engine::render
         };
     }
     
-    inline void branchlessONB(core::math::vec3 const &n, core::math::vec3 &b1, core::math::vec3 &b2)
+    template<core::math::AnyVec T>
+    inline void branchlessONB(T const &n, T &b1, T &b2)
     {
         float sign = copysignf(1.0f, n.z);
         float const a = -1.0f / (sign + n.z);
         float const b = n.x * n.y * a;
-        b1 = core::math::vec3(1.0f + sign * n.x * n.x * a, sign * b, -sign * n.x);
-        b2 = core::math::vec3(b, sign + n.y * n.y * a, -n.y);
+        b1 = T(1.0f + sign * n.x * n.x * a, sign * b, -sign * n.x);
+        b2 = T(b, sign + n.y * n.y * a, -n.y);
     }
 
 } // namespace engine::render
