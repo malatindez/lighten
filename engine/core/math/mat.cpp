@@ -37,7 +37,7 @@ namespace engine::core::math
     template struct mat<4, 3, double>;
     template struct mat<4, 3, int>;
 
-        template struct rmat<4, 4, float>;
+    template struct rmat<4, 4, float>;
     template struct rmat<4, 4, double>;
     template struct rmat<4, 4, int>;
 

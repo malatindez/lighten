@@ -52,21 +52,23 @@ namespace engine::render
     // sphereCos is cosine of light sphere solid angle.
     // sphereRelPos is position of a sphere relative to surface:
     // 'sphereDir == normalize(sphereRelPos)' and 'sphereDir * sphereDist == sphereRelPos'
-    inline core::math::vec3 approximateClosestSphereDir(bool& intersects, core::math::vec3 const &reflectionDir, float sphereCos,
-        core::math::vec3 const &sphereRelPos, core::math::vec3 const &sphereDir, float sphereDist, float sphereRadius)
+    inline core::math::vec3 approximateClosestSphereDir(bool &intersects, core::math::vec3 const &reflectionDir, float sphereCos,
+                                                        core::math::vec3 const &sphereRelPos, core::math::vec3 const &sphereDir, float sphereDist, float sphereRadius)
     {
         float RoS = dot(reflectionDir, sphereDir);
 
         intersects = RoS >= sphereCos;
-        if (intersects) return reflectionDir;
-        if (RoS < 0.0) return sphereDir;
+        if (intersects)
+            return reflectionDir;
+        if (RoS < 0.0)
+            return sphereDir;
 
         core::math::vec3 closestPointDir = normalize(reflectionDir * sphereDist * RoS - sphereRelPos);
         return normalize(sphereRelPos + sphereRadius * closestPointDir);
     }
 
-    // Input dir and NoD is N and NoL in a case of lighting computation 
-    inline void clampDirToHorizon(core::math::vec3 &dir, float& NoD, core::math::vec3 const &normal, float minNoD)
+    // Input dir and NoD is N and NoL in a case of lighting computation
+    inline void clampDirToHorizon(core::math::vec3 &dir, float &NoD, core::math::vec3 const &normal, float minNoD)
     {
         if (NoD < minNoD)
         {
@@ -88,12 +90,11 @@ namespace engine::render
         float ndotl = dot(N, L);
         float ndotv = dot(N, V);
         float ndoth = dot(N, H);
-        
+
         core::math::vec3 diffuse = clamp(render::F_Schlick(ndotl, mat.F0), 0.0f, 1.0f);
         diffuse = 1 - diffuse;
         diffuse *= (1 - mat.metalness);
         diffuse *= (mat.albedo / static_cast<float>(std::numbers::pi));
-        
 
         float const rough2 = mat.roughness * mat.roughness;
 
@@ -101,7 +102,7 @@ namespace engine::render
         float const G = render::Smith(rough2, ndotv, ndotl);
         float const D = render::GGX(rough2, ndoth);
         core::math::vec3 spec = F * G * D * solid_angle / (4 * ndotv);
-        
+
         spec = core::math::clamp(spec, 0.0f, 1.0f);
 
         return max((diffuse * solid_angle + spec), 0) * light_energy * power * ndotl;
@@ -113,19 +114,17 @@ namespace engine::render
             (value >> 24) % 256,
             (value >> 16) % 256,
             (value >> 8) % 256,
-            value % 256
-        };
+            value % 256};
     }
     inline core::math::vec3 UIntToRGB(uint32_t value)
     {
         return core::math::vec3{
             (value >> 16) % 256,
             (value >> 8) % 256,
-            value % 256
-        };
+            value % 256};
     }
-    
-    template<core::math::AnyVec T>
+
+    template <core::math::AnyVec T>
     inline void branchlessONB(T const &n, T &b1, T &b2)
     {
         float sign = copysignf(1.0f, n.z);

@@ -31,7 +31,7 @@ namespace engine::core
     constexpr int &resolution_scale() { return resolution_scale_; }
 
     void OnScaleChanged();
-    
+
   private:
     void OnSizeChanged() override;
     HDC hdc_;

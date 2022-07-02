@@ -120,9 +120,7 @@ namespace engine::core::math
   template <AnyMat T>
   constexpr typename T::type det_3(T const &m) requires(T::size.x == T::size.y && T::size.x == 3)
   {
-    return + m[0][0] * (m[1][1] * m[2][2] - m[2][1] * m[1][2])
-           - m[1][0] * (m[0][1] * m[2][2] - m[2][1] * m[0][2])
-           + m[2][0] * (m[0][1] * m[1][2] - m[1][1] * m[0][2]);
+    return +m[0][0] * (m[1][1] * m[2][2] - m[2][1] * m[1][2]) - m[1][0] * (m[0][1] * m[2][2] - m[2][1] * m[0][2]) + m[2][0] * (m[0][1] * m[1][2] - m[1][1] * m[0][2]);
   }
   template <AnyMat T>
   constexpr typename T::type det_4(T const &m) requires(T::size.x == T::size.y && T::size.x == 4)
@@ -324,11 +322,11 @@ namespace engine::core::math
 
     vec3 lengths{
         core::math::detail::sqrt(dst[0][0] * dst[0][0] + dst[0][1] * dst[0][1] +
-                  dst[0][2] * dst[0][2]),
+                                 dst[0][2] * dst[0][2]),
         core::math::detail::sqrt(dst[1][0] * dst[1][0] + dst[1][1] * dst[1][1] +
-                  dst[1][2] * dst[1][2]),
+                                 dst[1][2] * dst[1][2]),
         core::math::detail::sqrt(dst[2][0] * dst[2][0] + dst[2][1] * dst[2][1] +
-                  dst[2][2] * dst[2][2]),
+                                 dst[2][2] * dst[2][2]),
     };
 
     dst[0][0] = 1.0f / (dst[0][0] * lengths[0]);

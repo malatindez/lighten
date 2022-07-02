@@ -47,15 +47,8 @@ namespace engine
             Intersection nearest;
             nearest.reset();
             render::Material mat;
-            if (floor.CheckIntersection(nearest, ray))
-            {
-                mat = floor.material;
-            }
 
-            spheres.each([&nearest, &ray, &mat](auto const, auto const &sphere, auto const &transform) __lambda_force_inline
-                         { if(sphere.CheckIntersection(transform, nearest, ray)) { mat = sphere.material; } });
-            meshes.each([&nearest, &ray, &mat](auto const, auto const &mesh, auto const &transform) __lambda_force_inline
-                        { if(mesh.CheckIntersection(transform, nearest, ray)) { mat = mesh.material(); } });
+            FindIntersectedMaterial(spheres, meshes, nearest, ray, mat);
 
             vec3 const hdr = CalculatePointColor(spheres, meshes, directional_lights, point_lights, spot_lights, ray, nearest, mat);
 
@@ -85,55 +78,72 @@ namespace engine
         update_scene = false;
     }
 
-    std::optional<entt::entity> Scene::GetIntersectedEntity(Intersection &intersection, Ray &ray)
+    std::optional<entt::entity> Scene::GetIntersectedEntity(Intersection &nearest, Ray const &ray)
     {
         auto spheres = registry.group<components::SceneSphere>(entt::get<components::Transform>);
         auto meshes = registry.group<components::SceneMesh>(entt::get<components::Transform>);
         std::optional<entt::entity> rv = std::nullopt;
 
-        spheres.each([&rv, &intersection, &ray](auto const e, auto const &sphere, auto const &transform) __lambda_force_inline
-                     { if(sphere.CheckIntersection(transform, intersection, ray)) {rv = e;} });
-        meshes.each([&rv, &intersection, &ray](auto const e, auto const &mesh, auto const &transform) __lambda_force_inline
-                    { if(mesh.CheckIntersection(transform, intersection, ray)) {rv = e;} });
+        spheres.each([&rv, &nearest, &ray](auto const e, auto const &sphere, auto const &transform) __lambda_force_inline
+                     { if(sphere.CheckIntersection(transform, nearest, ray)) {rv = e;} });
+        meshes.each([&rv, &nearest, &ray](auto const e, auto const &mesh, auto const &transform) __lambda_force_inline
+                    { if(mesh.CheckIntersection(transform, nearest, ray)) {rv = e;} });
         return rv;
     }
 
     std::optional<entt::entity> Scene::GetIntersectedEntityIf(
-        Intersection &intersection, Ray &ray,
+        Intersection &nearest, Ray const &ray,
         std::function<bool(entt::entity, components::Transform const &, render::Material const &)> const &func)
     {
         auto spheres = registry.group<components::SceneSphere>(entt::get<components::Transform>);
         auto meshes = registry.group<components::SceneMesh>(entt::get<components::Transform>);
         std::optional<entt::entity> rv = std::nullopt;
 
-        spheres.each([&func, &rv, &intersection, &ray](auto const e, auto const &sphere, auto const &transform) __lambda_force_inline
-                     { if(func(e, transform, sphere.material) && sphere.CheckIntersection(transform, intersection, ray)) {rv = e;} });
-        meshes.each([&func, &rv, &intersection, &ray](auto const e, auto const &mesh, auto const &transform) __lambda_force_inline
-                    { if(func(e, transform, mesh.material()) && mesh.CheckIntersection(transform, intersection, ray)) {rv = e;} });
+        spheres.each([&func, &rv, &nearest, &ray](auto const e, auto const &sphere, auto const &transform) __lambda_force_inline
+                     { if(func(e, transform, sphere.material) && sphere.CheckIntersection(transform, nearest, ray)) {rv = e;} });
+        meshes.each([&func, &rv, &nearest, &ray](auto const e, auto const &mesh, auto const &transform) __lambda_force_inline
+                    { if(func(e, transform, mesh.material()) && mesh.CheckIntersection(transform, nearest, ray)) {rv = e;} });
         return rv;
     }
 
-    inline bool Scene::FindIntersection(SphereGroup &spheres, MeshGroup &meshes, Intersection &intersection, Ray &ray) const noexcept
+    bool Scene::FindIntersectedMaterial(SphereGroup &spheres,
+                                        MeshGroup &meshes,
+                                        core::math::Intersection &nearest,
+                                        core::math::Ray const &ray,
+                                        render::Material &mat) const noexcept
     {
-        floor.CheckIntersection(intersection, ray);
-        spheres.each([&intersection, &ray](auto const, auto const &sphere, auto const &transform) __lambda_force_inline
-                     { sphere.CheckIntersection(transform, intersection, ray); });
-        meshes.each([&intersection, &ray](auto const, auto const &mesh, auto const &transform) __lambda_force_inline
-                    { mesh.CheckIntersection(transform, intersection, ray); });
-        return intersection.exists();
+        if (floor.CheckIntersection(nearest, ray) && floor.material.casts_shadow)
+        {
+            mat = floor.material;
+        }
+        spheres.each([&nearest, &ray, &mat](auto const, auto const &sphere, auto const &transform) __lambda_force_inline
+                     { if(sphere.material.casts_shadow && sphere.CheckIntersection(transform, nearest, ray)) { mat = sphere.material; } });
+        meshes.each([&nearest, &ray, &mat](auto const, auto const &mesh, auto const &transform) __lambda_force_inline
+                    { if(mesh.material().casts_shadow && mesh.CheckIntersection(transform, nearest, ray)) { mat = mesh.material(); } });
+        return nearest.exists();
     }
 
-    inline bool Scene::FindIntersectionIf(SphereGroup &spheres, MeshGroup &meshes, Intersection &intersection, Ray &ray, IntersectionCallbackFn const &func) const noexcept
+    inline bool Scene::FindIntersection(SphereGroup &spheres, MeshGroup &meshes, Intersection &nearest, Ray const &ray) const noexcept
+    {
+        floor.CheckIntersection(nearest, ray);
+        spheres.each([&nearest, &ray](auto const, auto const &sphere, auto const &transform) __lambda_force_inline
+                     { sphere.CheckIntersection(transform, nearest, ray); });
+        meshes.each([&nearest, &ray](auto const, auto const &mesh, auto const &transform) __lambda_force_inline
+                    { mesh.CheckIntersection(transform, nearest, ray); });
+        return nearest.exists();
+    }
+
+    inline bool Scene::FindIntersectionIf(SphereGroup &spheres, MeshGroup &meshes, Intersection &nearest, Ray const &ray, IntersectionCallbackFn const &func) const noexcept
     {
         if (func(entt::entity{}, floor.transform, floor.material))
         {
-            floor.CheckIntersection(intersection, ray);
+            floor.CheckIntersection(nearest, ray);
         }
-        spheres.each([&intersection, &ray, &func](auto const entity, auto const &sphere, auto const &transform) __lambda_force_inline
-                     { if(func(entity, transform, sphere.material)) { sphere.CheckIntersection(transform, intersection, ray); } });
-        meshes.each([&intersection, &ray, &func](auto const entity, auto const &mesh, auto const &transform) __lambda_force_inline
-                    {  if(func(entity, transform, mesh.material())) { mesh.CheckIntersection(transform, intersection, ray); } });
-        return intersection.exists();
+        spheres.each([&nearest, &ray, &func](auto const entity, auto const &sphere, auto const &transform) __lambda_force_inline
+                     { if(func(entity, transform, sphere.material)) { sphere.CheckIntersection(transform, nearest, ray); } });
+        meshes.each([&nearest, &ray, &func](auto const entity, auto const &mesh, auto const &transform) __lambda_force_inline
+                    {  if(func(entity, transform, mesh.material())) { mesh.CheckIntersection(transform, nearest, ray); } });
+        return nearest.exists();
     }
     vec3 Scene::CalculatePointColor(SphereGroup &spheres,
                                     MeshGroup &meshes,
@@ -144,14 +154,14 @@ namespace engine
                                     render::Material const &mat,
                                     int depth)
     {
-        vec3 ambient = this->ambient;
+        vec3 amb = ambient;
         if (!nearest.exists())
         {
-            return ambient;
+            return amb;
         }
         if (global_illumination_on)
         {
-            ambient = CalculatePointGIAmbient(spheres, meshes, directional_lights, point_lights, spot_lights, nearest, depth);
+            amb = CalculatePointGIAmbient(spheres, meshes, directional_lights, point_lights, spot_lights, nearest, depth);
         }
 
         core::math::vec3 light_energy{0};
@@ -174,34 +184,26 @@ namespace engine
 
             render::Material reflect_mat;
 
-            if (floor.CheckIntersection(reflect_nearest, reflect_ray) && floor.material.casts_shadow)
-            {
-                reflect_mat = floor.material;
-            }
-
-            spheres.each([&reflect_nearest, &reflect_ray, &reflect_mat](auto const, auto const &sphere, auto const &transform) __lambda_force_inline
-                         { if(sphere.material.casts_shadow && sphere.CheckIntersection(transform, reflect_nearest, reflect_ray)) { reflect_mat = sphere.material; } });
-            meshes.each([&reflect_nearest, &reflect_ray, &reflect_mat](auto const, auto const &mesh, auto const &transform) __lambda_force_inline
-                        { if(mesh.material().casts_shadow && mesh.CheckIntersection(transform, reflect_nearest, reflect_ray)) { reflect_mat = mesh.material(); } });
+            FindIntersectedMaterial(spheres, meshes, reflect_nearest, reflect_ray, reflect_mat);
 
             light_energy += reflectivity * CalculatePointColor(spheres, meshes, directional_lights, point_lights, spot_lights, reflect_ray, reflect_nearest, reflect_mat, depth + 1);
         }
 
-        return ambient * mat.albedo + light_energy + mat.emission;
+        return amb * mat.albedo + light_energy + mat.emission;
     }
 
     core::math::vec3 Scene::Illuminate(SphereGroup &spheres,
-                           MeshGroup &meshes,
-                           DirectionalLightView &directional_lights,
-                           PointLightGroup &point_lights,
-                           SpotLightGroup &spot_lights,
-                           render::Material const &mat,
-                           render::LightData &ld)
+                                       MeshGroup &meshes,
+                                       DirectionalLightView &directional_lights,
+                                       PointLightGroup &point_lights,
+                                       SpotLightGroup &spot_lights,
+                                       render::Material const &mat,
+                                       render::LightData &ld)
     {
-        core::math::vec3 light_energy{ 0 };
-        auto find_intersection_if_casts_shadow = [this, &spheres, &meshes](Intersection &intersection, Ray &ray) __lambda_force_inline
+        core::math::vec3 light_energy{0};
+        auto find_nearest_if_casts_shadow = [this, &spheres, &meshes](Intersection &nearest, Ray &ray) __lambda_force_inline
         {
-            return FindIntersectionIf(spheres, meshes, intersection, ray,
+            return FindIntersectionIf(spheres, meshes, nearest, ray,
                                       [](entt::entity, Transform const &, render::Material const &m) __lambda_force_inline
                                       { return m.casts_shadow; });
         };
@@ -213,7 +215,7 @@ namespace engine
 
             Intersection nearest;
             nearest.reset();
-            find_intersection_if_casts_shadow(nearest, ray);
+            find_nearest_if_casts_shadow(nearest, ray);
 
             if (!nearest.exists())
             {
@@ -237,7 +239,7 @@ namespace engine
 
             Intersection nearest;
             nearest.reset();
-            find_intersection_if_casts_shadow(nearest, ray);
+            find_nearest_if_casts_shadow(nearest, ray);
 
             if (!nearest.exists() || nearest.t >= d)
             {
@@ -261,7 +263,7 @@ namespace engine
 
             Intersection nearest;
             nearest.reset();
-            find_intersection_if_casts_shadow(nearest, ray);
+            find_nearest_if_casts_shadow(nearest, ray);
 
             if (!nearest.exists() || nearest.t >= d)
             {
@@ -286,12 +288,11 @@ namespace engine
         vec3 rv_color{0};
 
         // rotation matrix to align (0,1,0) to normal
-        mat3 rotation_matrix{ 1 };
+        mat3 rotation_matrix{1};
         rotation_matrix[2] = nearest.normal;
         render::branchlessONB(nearest.normal, rotation_matrix[0], rotation_matrix[1]);
-        
+
         auto const delta_phi = float(2.0f * std::numbers::pi * (2.0f - std::numbers::phi));
-        auto const hrcm1 = float(hemisphere_ray_count - 1);
         for (int i = 0; i < hemisphere_ray_count; i++)
         {
             float const j = i + 0.5f;
@@ -312,22 +313,12 @@ namespace engine
 
             render::Material hs_mat;
 
-            if (floor.CheckIntersection(hs_nearest, hs_ray) && floor.material.casts_shadow)
-            {
-                hs_mat = floor.material;
-            }
-
-            spheres.each([&hs_nearest, &hs_ray, &hs_mat](auto const, auto const &sphere, auto const &transform) __lambda_force_inline
-                         { if(sphere.material.casts_shadow && sphere.CheckIntersection(transform, hs_nearest, hs_ray)) { hs_mat = sphere.material; } });
-            meshes.each([&hs_nearest, &hs_ray, &hs_mat](auto const, auto const &mesh, auto const &transform) __lambda_force_inline
-                        { if(mesh.material().casts_shadow && mesh.CheckIntersection(transform, hs_nearest, hs_ray)) { hs_mat = mesh.material(); } });
-
-            if (!hs_nearest.exists())
+            if (!FindIntersectedMaterial(spheres, meshes, hs_nearest, hs_ray, hs_mat))
             {
                 rv_color += ambient;
                 continue;
             }
-            render::Color light_energy{ 0 };
+            render::Color light_energy{0};
             render::LightData ld{.ray = hs_ray,
                                  .point = hs_nearest.point,
                                  .normal = hs_nearest.normal,
