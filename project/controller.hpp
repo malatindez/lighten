@@ -16,7 +16,7 @@
 class Controller : public engine::core::Layer
 {
 public:
-    Controller(engine::core::BitmapWindow &window, std::shared_ptr<engine::Scene> scene, engine::CameraController const &cam);
+    Controller(engine::core::BitmapWindow &window);
 
     void OnEvent(engine::core::events::Event &event) override;
 
@@ -32,9 +32,8 @@ public:
     std::vector<std::function<void(float)>> &update_callbacks() { return update_callbacks_; }
 
 private:
-    void InitScene();
+    void InitScenes();
     void InitInput();
-    void OnMoveCallback(float, Input::KeySeq const &, uint32_t);
     void Tick(float delta_time);
 
     [[nodiscard]] inline engine::core::math::Ray PixelRaycast(engine::core::math::vec2 ndc) const noexcept
@@ -54,9 +53,10 @@ private:
     float selected_object_distance_ = 0.0f;
     engine::core::math::vec3 selected_object_offset_{0.0f};
 
-    engine::CameraController camera_controller_;
     Input input_;
-    std::shared_ptr<engine::Scene> scene_;
+    std::vector<std::shared_ptr<engine::Scene>> scenes_;
+    std::shared_ptr<engine::Scene> selected_scene_;
+    engine::CameraController camera_controller_;
     engine::core::BitmapWindow &window_;
     engine::core::ParallelExecutor executor{
         static_cast<uint32_t>(std::max(1, std::max(int32_t(engine::core::ParallelExecutor::kMaxThreads) - 4, int32_t(engine::core::ParallelExecutor::kHalfThreads))))};

@@ -48,7 +48,14 @@ namespace engine
             nearest.reset();
             render::Material mat;
 
-            FindIntersectedMaterial(spheres, meshes, nearest, ray, mat);
+            if (floor.CheckIntersection(nearest, ray))
+            {
+                mat = floor.material;
+            }
+            spheres.each([&nearest, &ray, &mat](auto const, auto const& sphere, auto const& transform) __lambda_force_inline
+                { if (sphere.CheckIntersection(transform, nearest, ray)) { mat = sphere.material; } });
+            meshes.each([&nearest, &ray, &mat](auto const, auto const& mesh, auto const& transform) __lambda_force_inline
+                { if (mesh.CheckIntersection(transform, nearest, ray)) { mat = mesh.material(); } });
 
             vec3 const hdr = CalculatePointColor(spheres, meshes, directional_lights, point_lights, spot_lights, ray, nearest, mat);
 

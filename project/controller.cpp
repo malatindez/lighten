@@ -8,7 +8,7 @@ using namespace components;
 
 // 1: roughness / metalness showcase
 // 2: global illumination scene
-#define SCENE 2
+#define SCENE 1
 
 
 namespace
@@ -91,67 +91,81 @@ namespace
         return dir;
     }
 } // namespace
-void Controller::InitScene()
+void Controller::InitScenes()
 {
-    UpdateMaterial(scene_->floor.material, vec3{0.3f}, vec3{0.04f}, vec3{0}, 1.0f, 1, true);
-    scene_->floor.transform.reset();
-    scene_->floor.plane.update_plane(vec3{0, 0, 1}, vec3{1, 0, 0});
-    scene_->floor.transform.position = vec3{0, -2, 0};
-    scene_->floor.transform.UpdateMatrices();
-    entt::registry &registry = scene_->registry;
+    {
+        auto scene = std::make_shared<Scene>();
+        scenes_.push_back(scene);
 
-    /*     entt::entity directional_light = registry.create();
-        DirectionalLight &directional_light_v = registry.emplace<DirectionalLight>(directional_light);
-        directional_light_v.direction = normalize(vec3{0, -1, -1});
-        directional_light_v.color = vec3{0.1f};  */
-    /*
-         tick_layer->funcs.push_back(
-            [&time_from_start_, &directional_light_v](float delta_time)
+        entt::registry& registry = scene->registry;
+
+        entt::entity camera = registry.create();
+        Transform& camera_transform = registry.emplace<Transform>(camera);
+        camera_transform.position = vec3{ 0, 0, -10 };
+        camera_transform.UpdateMatrices();
+        Camera& cam = registry.emplace<Camera>(camera);
+        camera_controller_.SetNewCamera(&cam, &camera_transform);
+        
+
+        UpdateMaterial(scene->floor.material, vec3{ 0.3f }, vec3{ 0.04f }, vec3{ 0 }, 1.0f, 1, true);
+        scene->floor.transform.reset();
+        scene->floor.plane.update_plane(vec3{ 0, 0, 1 }, vec3{ 1, 0, 0 });
+        scene->floor.transform.position = vec3{ 0, -2, 0 };
+        scene->floor.transform.UpdateMatrices();
+
+
+        vec3 a{ 1,0,0 };
+        for (int j = 0; j < 7; j++)
+            for (int i = 0; i < 7; i++)
             {
-                directional_light_v.direction = normalize(vec3{
-                    sin(time_from_start_),
-                    cos(time_from_start_),
-                    0 });
-            });   */
-#if SCENE == 1
-    vec3 a{1,0,0};
-    for (int j = 0; j < 7; j++)
-        for (int i = 0; i < 7; i++)
-        {
-            entt::entity sphere = registry.create();
-            UpdateTransform(registry, sphere, vec3{i, j, 0}, vec3{0.5f});
-            float r = lerp(0.001f, 1.0f, static_cast<float>(i) /  7.0f);
-            float m = lerp(0.0f, 1.0f, static_cast<float>(j) / 7.0f);
-            UpdateMaterial(AddSphereComponent(registry, sphere).material, a, vec3{0.04f}, vec3{0.0f}, r, m);
-        }
-    entt::entity main_light = registry.create();
-    UpdateTransform(registry, main_light, vec3{4,4,-10}, vec3{1.0f});
-    AddPointLight(registry, main_light, vec3{1.0f, 1.0f, 1.0f}, 50);
-    UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{0}, vec3{0.04f}, vec3{1.0f} * 50, 1, 0, false);
-#elif SCENE == 2
-    auto gen_cube = [this, &registry](vec3 coords, vec3 scale, vec3 color, quat rotation = quat(), float roughness = 1, float metalness = 0){
-        entt::entity cube = registry.create();
-        UpdateTransform(registry, cube, coords, scale, rotation);
-        UpdateMaterial(AddCubeComponent(registry, cube).material(), color, vec3{0.04f}, vec3{0.0f}, roughness, metalness);
-    };
-    gen_cube(vec3{-2,1,0},vec3{2}, vec3{1,0,0});
-    gen_cube(vec3{0,-1,0}, vec3{2}, vec3{1});
-    gen_cube(vec3{0,3,0}, vec3{2}, vec3{1});
-    gen_cube(vec3{0,1,2}, vec3{2}, vec3{1});
-    gen_cube(vec3{2,1,0}, vec3{2}, vec3{0,1,0});
-    gen_cube(vec3{-0.25f,0.25f,-0.25f}, vec3{0.5f}, vec3{1}, quat(), 1, 0);
-    gen_cube(vec3{0.5f,0.625f,0.0f}, vec3{0.45f, 1.25f, 0.45f}, vec3{1}, quat{1, 0, -radians(30.0f), 0});
-    
-    entt::entity spot_light = registry.create();
-    UpdateTransform(registry, spot_light, vec3{0,1,0}, vec3{0.01f});
-    UpdateMaterial(AddSphereComponent(registry, spot_light).material, vec3{0}, vec3{0.04f}, vec3{1.0f} * 50, 1, 0, false);
-    AddSpotLight(registry, spot_light, vec3{1.0f, 1.0f, 1.0f}, radians(45.0f), normalize(vec3{-1,1,1}), 5e5f);
-    camera_controller_.SetWorldOffset(vec3{0,0.95f,-3.6f});
+                entt::entity sphere = registry.create();
+                UpdateTransform(registry, sphere, vec3{ i, j, 0 }, vec3{ 0.5f });
+                float r = lerp(0.001f, 1.0f, static_cast<float>(i) / 7.0f);
+                float m = lerp(0.0f, 1.0f, static_cast<float>(j) / 7.0f);
+                UpdateMaterial(AddSphereComponent(registry, sphere).material, a, vec3{ 0.04f }, vec3{ 0.0f }, r, m);
+            }
+        entt::entity main_light = registry.create();
+        UpdateTransform(registry, main_light, vec3{ 4,4,-10 }, vec3{ 1.0f });
+        AddPointLight(registry, main_light, vec3{ 1.0f, 1.0f, 1.0f }, 50);
+        UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{ 0 }, vec3{ 0.04f }, vec3{ 1.0f } *50, 1, 0, false);
+    }
+    {
+        auto scene = std::make_shared<Scene>();
+        scenes_.push_back(scene);
+
+        entt::registry& registry = scene->registry;
+
+        entt::entity camera = registry.create();
+        Transform& camera_transform = registry.emplace<Transform>(camera);
+        camera_transform.position = vec3{ 0, 0, -10 };
+        camera_transform.UpdateMatrices();
+        Camera& cam = registry.emplace<Camera>(camera);
+        camera_controller_.SetNewCamera(&cam, &camera_transform);
+
+        auto gen_cube = [&registry](vec3 coords, vec3 scale, vec3 color, quat rotation = quat(), float roughness = 1, float metalness = 0) {
+            entt::entity cube = registry.create();
+            UpdateTransform(registry, cube, coords, scale, rotation);
+            UpdateMaterial(AddCubeComponent(registry, cube).material(), color, vec3{ 0.04f }, vec3{ 0.0f }, roughness, metalness);
+        };
+        gen_cube(vec3{ -2,1,0 }, vec3{ 2 }, vec3{ 1,0,0 });
+        gen_cube(vec3{ 0,-1,0 }, vec3{ 2 }, vec3{ 1 });
+        gen_cube(vec3{ 0,3,0 }, vec3{ 2 }, vec3{ 1 });
+        gen_cube(vec3{ 0,1,2 }, vec3{ 2 }, vec3{ 1 });
+        gen_cube(vec3{ 2,1,0 }, vec3{ 2 }, vec3{ 0,1,0 });
+        gen_cube(vec3{ -0.25f,0.25f,-0.25f }, vec3{ 0.5f }, vec3{ 1 }, quat(), 1, 0);
+        gen_cube(vec3{ 0.5f,0.625f,0.0f }, vec3{ 0.45f, 1.25f, 0.45f }, vec3{ 1 }, quat{ 1, 0, -radians(30.0f), 0 });
+
+        entt::entity spot_light = registry.create();
+        UpdateTransform(registry, spot_light, vec3{ 0,1,0 }, vec3{ 0.01f });
+        UpdateMaterial(AddSphereComponent(registry, spot_light).material, vec3{ 0 }, vec3{ 0.04f }, vec3{ 1.0f } *50, 1, 0, false);
+        AddSpotLight(registry, spot_light, vec3{ 1.0f, 1.0f, 1.0f }, radians(45.0f), normalize(vec3{ -1,1,1 }), 5e5f);
+        camera_controller_.SetWorldOffset(vec3{ 0,0.95f,-3.6f });
+    }
+    selected_scene_ = scenes_[0];
 /*     entt::entity main_light = registry.create();
     UpdateTransform(registry, main_light, vec3{0,1,0}, vec3{0.01f});
     AddPointLight(registry, main_light, vec3{1.0f, 1.0f, 1.0f}, 5e3f);
     UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{0}, vec3{0.04f}, vec3{1.0f} * 5e3f, 1, 0, false); */
-#endif
     
     //entt::entity main_light = registry.create();
    // UpdateTransform(registry, main_light, vec3{3, 2.5f, -3}, vec3{0.5f});
@@ -175,8 +189,8 @@ void Controller::InitInput()
     auto adjust_exposure = [this](float dt, Input::KeySeq const &seq, uint32_t)
     {
         float offset = ((seq[0] == Key::KEY_PLUS || seq[0] == Key::KEY_NUMPAD_PLUS)) ? 0.5f : -0.5f;
-        scene_->exposure += offset * dt;
-        OutputDebugStringA(("Exposure value: " + std::to_string(scene_->exposure) + "\n").c_str());
+        selected_scene_->exposure += offset * dt;
+        OutputDebugStringA(("Exposure value: " + std::to_string(selected_scene_->exposure) + "\n").c_str());
     };
     input_.AddTickKeyCallback({Key::KEY_PLUS}, adjust_exposure, true);
     input_.AddTickKeyCallback({Key::KEY_MINUS}, adjust_exposure, true);
@@ -186,23 +200,36 @@ void Controller::InitInput()
     auto reflect_switch = [this](float, Input::KeySeq const &, uint32_t count)
     {
         if (count == UINT32_MAX) return;
-        scene_->reflections_on = !scene_->reflections_on;
+        selected_scene_->reflections_on = !selected_scene_->reflections_on;
     };
     input_.AddTickKeyCallback({Key::KEY_R}, reflect_switch, false);
-    auto gi_switch = [this](float, Input::KeySeq const &, uint32_t count)
+    auto gi_switch = [this](float, Input::KeySeq const&, uint32_t count)
     {
         if (count == UINT32_MAX) return;
-        scene_->UpdateScene();
-        scene_->global_illumination_on = !scene_->global_illumination_on;
+        selected_scene_->UpdateScene();
+        selected_scene_->global_illumination_on = !selected_scene_->global_illumination_on;
     };
-    input_.AddTickKeyCallback({Key::KEY_G}, gi_switch, false);
+    input_.AddTickKeyCallback({ Key::KEY_G }, gi_switch, false);
+
+    auto scene_switch = [this](float, Input::KeySeq const& seq, uint32_t count)
+    {
+        if (count == UINT32_MAX) return;
+        selected_scene_ = scenes_[std::min(scenes_.size() - 1, size_t(seq[0] - Key::KEY_1))];
+    };
+    input_.AddTickKeyCallback({ Key::KEY_1 }, scene_switch, false);
+    input_.AddTickKeyCallback({ Key::KEY_2 }, scene_switch, false);
+    input_.AddTickKeyCallback({ Key::KEY_3 }, scene_switch, false);
+    input_.AddTickKeyCallback({ Key::KEY_4 }, scene_switch, false);
+    input_.AddTickKeyCallback({ Key::KEY_5 }, scene_switch, false);
+    input_.AddTickKeyCallback({ Key::KEY_6 }, scene_switch, false);
+    input_.AddTickKeyCallback({ Key::KEY_7 }, scene_switch, false);
+    input_.AddTickKeyCallback({ Key::KEY_8 }, scene_switch, false);
+    input_.AddTickKeyCallback({ Key::KEY_9 }, scene_switch, false);
 }
 
-Controller::Controller(BitmapWindow &window,
-                       std::shared_ptr<Scene> scene,
-                       CameraController const &cam) : camera_controller_(cam), scene_(scene), window_(window)
+Controller::Controller(BitmapWindow &window) : window_(window), camera_controller_(nullptr, nullptr, window.window_size())
 {
-    InitScene();
+    InitScenes();
     InitInput();
 }
 
@@ -229,16 +256,15 @@ void Controller::OnEvent(Event &event)
         }
         else if (event.type() == EventType::AppRender)
         {
-            if(!scene_->global_illumination_on)
+            if(!selected_scene_->global_illumination_on)
             {
-                scene_->UpdateScene();
+                selected_scene_->UpdateScene();
             }
-            scene_->Draw(camera_controller_.camera(), window_, executor);
+            selected_scene_->Draw(camera_controller_.camera(), window_, executor);
         }
         else if (event.type() == EventType::WindowResize)
         {
             camera_controller_.UpdateProjectionMatrix();
-            OutputDebugStringA("asd");
         }
         else if (event.type() == EventType::WindowClose)
         {
@@ -260,10 +286,10 @@ void Controller::OnEvent(Event &event)
                 Ray ray = PixelRaycast(vec2{mbpe.coordinates()});
                 Intersection intersection;
                 intersection.reset();
-                std::optional<entt::entity> entity = scene_->GetIntersectedEntity(intersection, ray);
+                std::optional<entt::entity> entity = selected_scene_->GetIntersectedEntity(intersection, ray);
                 if (entity.has_value())
                 {
-                    selected_object_ = &scene_->registry.get<components::Transform>(entity.value());
+                    selected_object_ = &selected_scene_->registry.get<components::Transform>(entity.value());
                     selected_object_distance_ = intersection.t;
                     selected_object_offset_ = selected_object_->position - ray.PointAtParameter(intersection.t);
                     rb_saved_mouse_position_ = mbpe.coordinates();
@@ -304,9 +330,7 @@ void Controller::Tick(float delta_time)
         }
         else
         {
-            camera_controller_.camera().fovy_ -= delta_time / 120 * radians(45.0f) * input_.scroll_delta();
-            rclamp(camera_controller_.camera().fovy_, radians(0.01f), radians(89.9f));
-            camera_controller_.UpdateProjectionMatrix();
+            move_speed_ = std::max(0.01f, move_speed_ * (input_.scroll_delta() > 0 ? 1.1f : 1.0f / 1.1f));
         }
     }
 
@@ -375,12 +399,12 @@ void Controller::Tick(float delta_time)
     if (!(roll == 0 && pitch == 0 && yaw == 0))
     {
         camera_controller_.AddRelativeAngles(delta_time * roll, delta_time * pitch, delta_time * yaw);
-        scene_->global_illumination_on = false;
+        selected_scene_->global_illumination_on = false;
     }
     if (squared_length(offset) != 0)
     {
         camera_controller_.AddRelativeOffset(move_speed_ * offset * delta_time * (input_.key_state(Key::KEY_SHIFT) ? 5.0f : 1.0f));
-        scene_->global_illumination_on = false;
+        selected_scene_->global_illumination_on = false;
     }
     camera_controller_.UpdateMatrices();
 }

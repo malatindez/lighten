@@ -41,24 +41,12 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int cmd_show)
     // display the window on the screen
     ShowWindow(bmwindow->handle(), cmd_show);
 
-    auto scene = std::make_shared<Scene>();
-    entt::registry &registry = scene->registry;
-
-
-
-
-    entt::entity camera = registry.create();
-    Transform &camera_transform = registry.emplace<Transform>(camera);
-    camera_transform.position = vec3{0, 0, -10};
-    camera_transform.UpdateMatrices();
-    Camera &cam = registry.emplace<Camera>(camera);
-    CameraController camera_controller(cam, camera_transform, bmwindow->window_size());
 
     Application::Init();
 
     bmwindow->SetEventCallback(Application::event_function());
 
-    auto controller = std::make_shared<Controller>(*bmwindow, scene, camera_controller);
+    auto controller = std::make_shared<Controller>(*bmwindow);
 
 
    /*  SpotLight &spot = registry.emplace<SpotLight>(camera);
