@@ -124,10 +124,23 @@ void Controller::InitScenes()
                 float m = lerp(0.0f, 1.0f, static_cast<float>(j) / 7.0f);
                 UpdateMaterial(AddSphereComponent(registry, sphere).material, a, vec3{ 0.04f }, vec3{ 0.0f }, r, m);
             }
-        entt::entity main_light = registry.create();
-        UpdateTransform(registry, main_light, vec3{ 4,4,-10 }, vec3{ 1.0f });
-        AddPointLight(registry, main_light, vec3{ 1.0f, 1.0f, 1.0f }, 50);
-        UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{ 0 }, vec3{ 0.04f }, vec3{ 1.0f } *50, 1, 0, false);
+        {
+            entt::entity main_light = registry.create();
+            UpdateTransform(registry, main_light, vec3{ 2,4,-10 }, vec3{ 1.0f });
+            AddPointLight(registry, main_light, vec3{ 1.0f, 1.0f, 1.0f }, 50);
+            UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{ 0 }, vec3{ 0.04f }, vec3{ 1.0f } *50, 1, 0, false);
+        }
+        {
+            entt::entity main_light = registry.create();
+            UpdateTransform(registry, main_light, vec3{ 6,4,-10 }, vec3{ 1.0f });
+            AddPointLight(registry, main_light, vec3{ 1.0f, 1.0f, 1.0f }, 50);
+            UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{ 0 }, vec3{ 0.04f }, vec3{ 1.0f } *50, 1, 0, false);
+        }
+        entt::entity spot_light = registry.create();
+        UpdateTransform(registry, spot_light, vec3{ 4,4,-10 }, vec3{ 1.0f });
+        UpdateMaterial(AddSphereComponent(registry, spot_light).material, vec3{ 0 }, vec3{ 0.04f }, vec3{ 1.0f } *50, 1, 0, false);
+        AddSpotLight(registry, spot_light, vec3{ 1.0f, 1.0f, 1.0f }, radians(45.0f), normalize(vec3{ 0,0, 1 }), 500);
+        camera_controller_.SetWorldOffset(vec3{ 0,2,-5.0f });
     }
     {
         auto scene = std::make_shared<Scene>();
@@ -215,6 +228,11 @@ void Controller::InitInput()
     {
         if (count == UINT32_MAX) return;
         selected_scene_ = scenes_[std::min(scenes_.size() - 1, size_t(seq[0] - Key::KEY_1))];
+        for (entt::entity entity : selected_scene_->registry.view<components::Camera, components::Transform>()) {
+            camera_controller_.SetNewCamera(
+                &selected_scene_->registry.get<Camera>(entity), 
+                &selected_scene_->registry.get<Transform>(entity));
+        }
     };
     input_.AddTickKeyCallback({ Key::KEY_1 }, scene_switch, false);
     input_.AddTickKeyCallback({ Key::KEY_2 }, scene_switch, false);
