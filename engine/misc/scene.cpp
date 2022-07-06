@@ -1,6 +1,8 @@
 #include "misc/scene.hpp"
 #include "render/light-data.hpp"
 #include "render/material.hpp"
+#include <Windows.h>
+#include <string>
 #include <functional>
 #include <sstream>
 #include <tuple>
@@ -38,8 +40,8 @@ namespace engine
         {
             int j = task_num / bitmap_size.x;
             int i = task_num % bitmap_size.x;
-            float u = ((static_cast<float>(i) + 0.5f) / static_cast<float>(bitmap_size.x));
-            float v = ((static_cast<float>(j) + 0.5f) / static_cast<float>(bitmap_size.y));
+            float u = ((float(i) + 0.5f) / float(bitmap_size.x));
+            float v = ((float(j) + 0.5f) / float(bitmap_size.y));
 
             vec4 t = (bl4 + up4 * v + right4 * u);
 
@@ -287,7 +289,7 @@ namespace engine
                                         core::math::Intersection const &nearest,
                                         int depth)
     {
-        if (depth >= max_ray_depth)
+        if (depth >= max_ray_depth || !nearest.exists())
         {
             return ambient;
         }
@@ -299,18 +301,10 @@ namespace engine
         rotation_matrix[2] = nearest.normal;
         render::branchlessONB(nearest.normal, rotation_matrix[0], rotation_matrix[1]);
 
-        auto const delta_phi = float(2.0f * std::numbers::pi * (2.0f - std::numbers::phi));
         for (int i = 0; i < hemisphere_ray_count; i++)
         {
-            float const j = i + 0.5f;
-            float const z = 1.0f - j / hemisphere_ray_count;
-            float const phi = std::acosf(z);
-            float const theta = fmodf(delta_phi * i, float(2 * std::numbers::pi));
 
-            float const x = std::sinf(phi) * std::cosf(theta);
-            float const y = std::sinf(phi) * std::sinf(theta);
-
-            vec3 const ray_dir = normalize(vec3{x, y, z} * rotation_matrix);
+            vec3 const ray_dir = normalize(GetHemispherePoint(i, hemisphere_ray_count));
             vec3 const ray_origin = nearest.point + nearest.normal * 0.001f;
 
             Ray const hs_ray(ray_origin, ray_dir);
@@ -330,9 +324,9 @@ namespace engine
                                  .point = hs_nearest.point,
                                  .normal = hs_nearest.normal,
                                  .view_dir = normalize(hs_ray.origin() - hs_nearest.point)};
-
+            std::stringstream s;
             light_energy = Illuminate(spheres, meshes, directional_lights, point_lights, spot_lights, hs_mat, ld);
-            rv_color += ambient * hs_mat.albedo + light_energy + hs_mat.emission;
+            rv_color += dot(vec3{0,1,0}, ray_dir);
         }
         return rv_color / hemisphere_ray_count;
     }

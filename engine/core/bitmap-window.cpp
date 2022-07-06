@@ -31,8 +31,8 @@ namespace engine::core
     {
       for (int j = 0; j < bitmap_size_.x; ++j)
       {
-        bitmap_[i * bitmap_size_.x + j] = copy[static_cast<uint32_t>(static_cast<float>(i) / bitmap_size_.y * prev.y) * prev.x +
-                                               static_cast<uint32_t>(static_cast<float>(j) / bitmap_size_.x * prev.x)];
+        bitmap_[i * bitmap_size_.x + j] = copy[static_cast<uint32_t>(float(i) / bitmap_size_.y * prev.y) * prev.x +
+                                               static_cast<uint32_t>(float(j) / bitmap_size_.x * prev.x)];
       }
     }
   }

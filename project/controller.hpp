@@ -31,6 +31,8 @@ public:
 
     std::vector<std::function<void(float)>> &update_callbacks() { return update_callbacks_; }
 
+    void SelectScene(size_t scene_num);
+
 private:
     void InitScenes();
     void InitInput();

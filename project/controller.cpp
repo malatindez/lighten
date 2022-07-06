@@ -6,9 +6,6 @@ using namespace events;
 using namespace math;
 using namespace components;
 
-// 1: roughness / metalness showcase
-// 2: global illumination scene
-#define SCENE 1
 
 
 namespace
@@ -91,8 +88,33 @@ namespace
         return dir;
     }
 } // namespace
+
+void Controller::SelectScene(size_t scene_num)
+{
+    assert(scene_num < scenes.size());
+    selected_scene_ = scenes_[scene_num];
+    for (entt::entity entity : selected_scene_->registry.view<components::Camera, components::Transform>()) {
+        camera_controller_.SetNewCamera(
+            &selected_scene_->registry.get<Camera>(entity),
+            &selected_scene_->registry.get<Transform>(entity));
+    }
+}
 void Controller::InitScenes()
 {
+
+    auto gen_cube = [](entt::registry &registry, vec3 coords, vec3 scale, vec3 color, quat rotation = quat(), float roughness = 1, float metalness = 0) __lambda_force_inline {
+        entt::entity cube = registry.create();
+        UpdateTransform(registry, cube, coords, scale, rotation);
+        UpdateMaterial(AddCubeComponent(registry, cube).material(), color, vec3{ 0.04f }, vec3{ 0.0f }, roughness, metalness);
+        return cube;
+    };
+    auto gen_sphere = [](entt::registry& registry, vec3 coords, vec3 scale, vec3 color, quat rotation = quat(), float roughness = 1, float metalness = 0) __lambda_force_inline {
+        entt::entity sphere = registry.create();
+        UpdateTransform(registry, sphere, coords, scale, rotation);
+        UpdateMaterial(AddSphereComponent(registry, sphere).material, color, vec3{ 0.04f }, vec3{ 0.0f }, roughness, metalness);
+        return sphere;
+    };
+
     {
         auto scene = std::make_shared<Scene>();
         scenes_.push_back(scene);
@@ -118,28 +140,26 @@ void Controller::InitScenes()
         for (int j = 0; j < 7; j++)
             for (int i = 0; i < 7; i++)
             {
-                entt::entity sphere = registry.create();
-                UpdateTransform(registry, sphere, vec3{ i, j, 0 }, vec3{ 0.5f });
-                float r = lerp(0.001f, 1.0f, static_cast<float>(i) / 7.0f);
-                float m = lerp(0.0f, 1.0f, static_cast<float>(j) / 7.0f);
-                UpdateMaterial(AddSphereComponent(registry, sphere).material, a, vec3{ 0.04f }, vec3{ 0.0f }, r, m);
+                float r = lerp(0.001f, 1.0f, float(i) / 7.0f);
+                float m = lerp(0.0f, 1.0f, float(j) / 7.0f);
+                gen_sphere(registry, vec3{ -7.0f / 2 + i, 1, -7.0f / 2 + j }, vec3{ 0.5f }, vec3{ 1,0,0 }, quat(), r, m);
             }
         {
             entt::entity main_light = registry.create();
-            UpdateTransform(registry, main_light, vec3{ 2,4,-10 }, vec3{ 1.0f });
+            UpdateTransform(registry, main_light, vec3{ 3,10,0 }, vec3{ 1.0f });
             AddPointLight(registry, main_light, vec3{ 1.0f, 1.0f, 1.0f }, 50);
             UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{ 0 }, vec3{ 0.04f }, vec3{ 1.0f } *50, 1, 0, false);
         }
         {
             entt::entity main_light = registry.create();
-            UpdateTransform(registry, main_light, vec3{ 6,4,-10 }, vec3{ 1.0f });
+            UpdateTransform(registry, main_light, vec3{ -3,10,0 }, vec3{ 1.0f });
             AddPointLight(registry, main_light, vec3{ 1.0f, 1.0f, 1.0f }, 50);
             UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{ 0 }, vec3{ 0.04f }, vec3{ 1.0f } *50, 1, 0, false);
         }
         entt::entity spot_light = registry.create();
-        UpdateTransform(registry, spot_light, vec3{ 4,4,-10 }, vec3{ 1.0f });
+        UpdateTransform(registry, spot_light, vec3{ 0,10,0 }, vec3{ 1.0f });
         UpdateMaterial(AddSphereComponent(registry, spot_light).material, vec3{ 0 }, vec3{ 0.04f }, vec3{ 1.0f } *50, 1, 0, false);
-        AddSpotLight(registry, spot_light, vec3{ 1.0f, 1.0f, 1.0f }, radians(45.0f), normalize(vec3{ 0,0, 1 }), 500);
+        AddSpotLight(registry, spot_light, vec3{ 1.0f, 1.0f, 1.0f }, radians(45.0f), normalize(vec3{ 0, -1, 0 }), 500);
         camera_controller_.SetWorldOffset(vec3{ 0,2,-5.0f });
     }
     {
@@ -155,18 +175,13 @@ void Controller::InitScenes()
         Camera& cam = registry.emplace<Camera>(camera);
         camera_controller_.SetNewCamera(&cam, &camera_transform);
 
-        auto gen_cube = [&registry](vec3 coords, vec3 scale, vec3 color, quat rotation = quat(), float roughness = 1, float metalness = 0) {
-            entt::entity cube = registry.create();
-            UpdateTransform(registry, cube, coords, scale, rotation);
-            UpdateMaterial(AddCubeComponent(registry, cube).material(), color, vec3{ 0.04f }, vec3{ 0.0f }, roughness, metalness);
-        };
-        gen_cube(vec3{ -2,1,0 }, vec3{ 2 }, vec3{ 1,0,0 });
-        gen_cube(vec3{ 0,-1,0 }, vec3{ 2 }, vec3{ 1 });
-        gen_cube(vec3{ 0,3,0 }, vec3{ 2 }, vec3{ 1 });
-        gen_cube(vec3{ 0,1,2 }, vec3{ 2 }, vec3{ 1 });
-        gen_cube(vec3{ 2,1,0 }, vec3{ 2 }, vec3{ 0,1,0 });
-        gen_cube(vec3{ -0.25f,0.25f,-0.25f }, vec3{ 0.5f }, vec3{ 1 }, quat(), 1, 0);
-        gen_cube(vec3{ 0.5f,0.625f,0.0f }, vec3{ 0.45f, 1.25f, 0.45f }, vec3{ 1 }, quat{ 1, 0, -radians(30.0f), 0 });
+        gen_cube(registry, vec3{ -2,1,0 }, vec3{ 2 }, vec3{ 1,0,0 });
+        gen_cube(registry, vec3{ 0,-1,0 }, vec3{ 2 }, vec3{ 1 });
+        gen_cube(registry, vec3{ 0,3,0 }, vec3{ 2 }, vec3{ 1 });
+        gen_cube(registry, vec3{ 0,1,2 }, vec3{ 2 }, vec3{ 1 });
+        gen_cube(registry, vec3{ 2,1,0 }, vec3{ 2 }, vec3{ 0,1,0 });
+        gen_cube(registry, vec3{ -0.25f,0.25f,-0.25f }, vec3{ 0.5f }, vec3{ 1 }, quat(), 1, 0);
+        gen_cube(registry, vec3{ 0.5f,0.625f,0.0f }, vec3{ 0.45f, 1.25f, 0.45f }, vec3{ 1 }, quat{ 1, 0, -radians(30.0f), 0 });
 
         entt::entity spot_light = registry.create();
         UpdateTransform(registry, spot_light, vec3{ 0,1,0 }, vec3{ 0.01f });
@@ -174,7 +189,38 @@ void Controller::InitScenes()
         AddSpotLight(registry, spot_light, vec3{ 1.0f, 1.0f, 1.0f }, radians(45.0f), normalize(vec3{ -1,1,1 }), 5e5f);
         camera_controller_.SetWorldOffset(vec3{ 0,0.95f,-3.6f });
     }
-    selected_scene_ = scenes_[0];
+    { // scene #3
+        auto scene = std::make_shared<Scene>();
+        scenes_.push_back(scene);
+
+        entt::registry& registry = scene->registry;
+
+        entt::entity camera = registry.create();
+        Transform& camera_transform = registry.emplace<Transform>(camera);
+        camera_transform.position = vec3{ 0, 15, -5 };
+        camera_transform.UpdateMatrices();
+        Camera& cam = registry.emplace<Camera>(camera);
+        camera_controller_.SetNewCamera(&cam, &camera_transform);
+        
+        for (int i = 0; i < 100; i++)
+        {
+            gen_sphere(registry, GetHemispherePoint(i, 100) * 5 + vec3{ 0,10,0 }, vec3{ 0.1f }, vec3{ 1 });
+        }
+        gen_cube(registry, vec3{ 0 }, vec3{ 20 }, vec3{ 1 });
+
+        entt::entity dir_light = registry.create();
+        AddDirLight(registry, dir_light);
+
+        auto &spot = AddSpotLight(registry, camera, vec3{ 1 });
+        spot.power = 500.0f;
+         update_callbacks_.emplace_back(
+             [&spot, this](float)
+             {
+                 spot.direction = camera_controller_.forward();
+             }); 
+    }
+    SelectScene(0);
+
 /*     entt::entity main_light = registry.create();
     UpdateTransform(registry, main_light, vec3{0,1,0}, vec3{0.01f});
     AddPointLight(registry, main_light, vec3{1.0f, 1.0f, 1.0f}, 5e3f);
@@ -227,12 +273,7 @@ void Controller::InitInput()
     auto scene_switch = [this](float, Input::KeySeq const& seq, uint32_t count)
     {
         if (count == UINT32_MAX) return;
-        selected_scene_ = scenes_[std::min(scenes_.size() - 1, size_t(seq[0] - Key::KEY_1))];
-        for (entt::entity entity : selected_scene_->registry.view<components::Camera, components::Transform>()) {
-            camera_controller_.SetNewCamera(
-                &selected_scene_->registry.get<Camera>(entity), 
-                &selected_scene_->registry.get<Transform>(entity));
-        }
+        SelectScene(std::min(scenes_.size() - 1, size_t(seq[0] - Key::KEY_1)));
     };
     input_.AddTickKeyCallback({ Key::KEY_1 }, scene_switch, false);
     input_.AddTickKeyCallback({ Key::KEY_2 }, scene_switch, false);

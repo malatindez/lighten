@@ -13,7 +13,7 @@ namespace engine::components
     {
         core::math::vec3 direction;
         core::math::vec3 color;
-        float solid_angle = 2.0f * static_cast<float>(std::numbers::pi);
+        float solid_angle = 2.0f * float(std::numbers::pi);
         float power;
 
         inline core::math::vec3 Illuminate(render::LightData &light_data, render::Material const &mat) const
@@ -24,7 +24,7 @@ namespace engine::components
             {
                 return core::math::vec3{0, 0, 0};
             }
-            return render::Illuminate(L, light_data, mat, solid_angle, color, power);
+            return render::Illuminate(L, light_data, mat, solid_angle/(2.0f * float(std::numbers::pi)), color, power);
         }
     };
 } // namespace engine::components

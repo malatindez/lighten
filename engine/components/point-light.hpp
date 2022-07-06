@@ -22,25 +22,26 @@ namespace engine::components
         inline core::math::vec3 Illuminate(Transform const &transform, render::LightData &light_data, render::Material const &mat) const
         {
             core::math::vec3 sphereRelPos = transform.position - light_data.point;
-            float const distance = length(sphereRelPos);
+            float distance = length(sphereRelPos);
             core::math::vec3 const &N = light_data.normal;
             core::math::vec3 L = normalize(sphereRelPos);
-            float const radius = length(transform.scale);
-
-            float solid_angle = float(2.0f * std::numbers::pi);
-            float cosa = sqrtf(distance * distance - radius * radius) / distance;
-            if (distance > radius)
+            float radius = length(transform.scale);
+            if (distance < radius)
             {
-                solid_angle = 2.0f * static_cast<float>(std::numbers::pi) * (1.0f - cosa);
+                std::swap(distance, radius);
             }
+            float cosa = sqrtf(1.0f - radius * radius / distance / distance);
+            float attenuation = (1.0f - cosa); // solid_angle / 2.0f * float(std::numbers::pi)
+           
+                
 
             bool intersects = false;
             core::math::vec3 const R = core::math::reflect_normal_safe(-L, N);
             core::math::vec3 D = render::approximateClosestSphereDir(intersects, R, cosa, sphereRelPos, L, distance, radius);
-            float ndotl = std::min(dot(N, L), 0.0f);
+            float ndotl = dot(N, L);
             render::clampDirToHorizon(D, ndotl, N, 0.0f);
 
-            return render::Illuminate(D, light_data, mat, solid_angle, color, power);
+            return render::Illuminate(D, light_data, mat, attenuation, color, power);
         }
     };
 } // namespace engine::components

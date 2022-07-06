@@ -11,7 +11,7 @@ namespace engine::core
 {
 
   const core::math::ivec2 kWindowPosition{0};
-  const core::math::ivec2 kWindowResolution{1280, 720};
+  const core::math::ivec2 kWindowResolution{640, 360};
 
   const float kFpsLimit = 60.0f;
   const float kFrameDuration = 1.0f / kFpsLimit;

@@ -24,7 +24,7 @@ namespace engine::render
     inline float GGX(float rough2, float NoH)
     {
         float denom = NoH * NoH * (rough2 - 1.0f) + 1.0f;
-        denom = static_cast<float>(std::numbers::pi) * denom * denom;
+        denom = float(std::numbers::pi) * denom * denom;
         return rough2 / denom;
     }
     inline core::math::vec3 AcesHdr2Ldr(const core::math::vec3 &hdr)
@@ -80,7 +80,7 @@ namespace engine::render
     inline core::math::vec3 Illuminate(core::math::vec3 const &L,
                                        render::LightData &light_data,
                                        render::Material const &mat,
-                                       float const solid_angle,
+                                       float const attenuation,
                                        core::math::vec3 const &light_energy,
                                        float const power)
     {
@@ -94,18 +94,16 @@ namespace engine::render
         core::math::vec3 diffuse = clamp(render::F_Schlick(ndotl, mat.F0), 0.0f, 1.0f);
         diffuse = 1 - diffuse;
         diffuse *= (1 - mat.metalness);
-        diffuse *= (mat.albedo / static_cast<float>(std::numbers::pi));
+        diffuse *= (mat.albedo / float(std::numbers::pi));
 
         float const rough2 = mat.roughness * mat.roughness;
 
         core::math::vec3 const F = render::F_Schlick(dot(L, H), mat.F0);
         float const G = render::Smith(rough2, ndotv, ndotl);
         float const D = render::GGX(rough2, ndoth);
-        core::math::vec3 spec = F * G * D * solid_angle / (4 * ndotv);
+        core::math::vec3 spec = F * G * core::math::clamp(D * attenuation / (4 * ndotv * ndotl), 0.0f, 1.0f);
 
-        spec = core::math::clamp(spec, 0.0f, 1.0f);
-
-        return max((diffuse * solid_angle + spec), 0) * light_energy * power * ndotl;
+        return (diffuse * attenuation + spec) * light_energy * power * ndotl;
     }
 
     inline core::math::vec4 UIntToRGBA(uint32_t value)

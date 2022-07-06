@@ -48,20 +48,6 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int cmd_show)
 
     auto controller = std::make_shared<Controller>(*bmwindow);
 
-
-   /*  SpotLight &spot = registry.emplace<SpotLight>(camera);
-    spot.direction = normalize(vec3{0, -1, 0});
-    spot.color = vec3{0.3f, 0.3f, 0.7f};
-    spot.cut_off = radians(45.0F);
-    spot.attenuation.constant = 1.0f;
-    spot.attenuation.linear = 0.35f;
-    spot.attenuation.quadratic = 0.44f;
-
-    controller->update_callbacks().emplace_back(
-        [&spot, &controller](float)
-        {
-            spot.direction = controller->camera_controller().forward();
-        }); */
     Application &application = Application::Get();
     application.AddLayer(controller);
     application.Run();
