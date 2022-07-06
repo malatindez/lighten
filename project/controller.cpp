@@ -91,7 +91,7 @@ namespace
 
 void Controller::SelectScene(size_t scene_num)
 {
-    assert(scene_num < scenes.size());
+    assert(scene_num < scenes_.size());
     selected_scene_ = scenes_[scene_num];
     for (entt::entity entity : selected_scene_->registry.view<components::Camera, components::Transform>()) {
         camera_controller_.SetNewCamera(
@@ -102,17 +102,39 @@ void Controller::SelectScene(size_t scene_num)
 void Controller::InitScenes()
 {
 
-    auto gen_cube = [](entt::registry &registry, vec3 coords, vec3 scale, vec3 color, quat rotation = quat(), float roughness = 1, float metalness = 0) __lambda_force_inline {
+    auto gen_cube = [](entt::registry &registry, vec3 coords, vec3 scale, vec3 color, quat rotation = quat(), float roughness = 1, float metalness = 0) __lambda_force_inline 
+    {
         entt::entity cube = registry.create();
         UpdateTransform(registry, cube, coords, scale, rotation);
         UpdateMaterial(AddCubeComponent(registry, cube).material(), color, vec3{ 0.04f }, vec3{ 0.0f }, roughness, metalness);
         return cube;
     };
-    auto gen_sphere = [](entt::registry& registry, vec3 coords, vec3 scale, vec3 color, quat rotation = quat(), float roughness = 1, float metalness = 0) __lambda_force_inline {
+    auto gen_sphere = [](entt::registry& registry, vec3 coords, vec3 scale, vec3 color, quat rotation = quat(), float roughness = 1, float metalness = 0) __lambda_force_inline 
+    {
         entt::entity sphere = registry.create();
         UpdateTransform(registry, sphere, coords, scale, rotation);
         UpdateMaterial(AddSphereComponent(registry, sphere).material, color, vec3{ 0.04f }, vec3{ 0.0f }, roughness, metalness);
         return sphere;
+    };
+
+    auto add_camera = [](entt::registry& registry, vec3 position = vec3{ 0 }, quat rotation = quat())
+    {
+        entt::entity camera = registry.create();
+        Transform& camera_transform = registry.emplace<Transform>(camera);
+        registry.emplace<Camera>(camera);
+        camera_transform.position = position;
+        camera_transform.rotation = rotation;
+        camera_transform.UpdateMatrices();
+        return camera;
+    };
+    auto update_floor = [](Scene& scene, vec3 position = vec3{ 0,-2,0 }, vec3 color = vec3{ 1 }, quat rotation = quat(), float roughness = 1, float metalness = 0)
+    {
+        UpdateMaterial(scene.floor.material, color, vec3{ 0.04f }, vec3{ 0 }, roughness, metalness, true);
+        scene.floor.transform.rotation = rotation;
+        scene.floor.transform.reset();
+        scene.floor.plane.update_plane(vec3{ 0, 0, 1 }, vec3{ 1, 0, 0 });
+        scene.floor.transform.position = vec3{ 0, -2, 0 };
+        scene.floor.transform.UpdateMatrices();
     };
 
     {
@@ -120,20 +142,8 @@ void Controller::InitScenes()
         scenes_.push_back(scene);
 
         entt::registry& registry = scene->registry;
-
-        entt::entity camera = registry.create();
-        Transform& camera_transform = registry.emplace<Transform>(camera);
-        camera_transform.position = vec3{ 0, 0, -10 };
-        camera_transform.UpdateMatrices();
-        Camera& cam = registry.emplace<Camera>(camera);
-        camera_controller_.SetNewCamera(&cam, &camera_transform);
-        
-
-        UpdateMaterial(scene->floor.material, vec3{ 0.3f }, vec3{ 0.04f }, vec3{ 0 }, 1.0f, 1, true);
-        scene->floor.transform.reset();
-        scene->floor.plane.update_plane(vec3{ 0, 0, 1 }, vec3{ 1, 0, 0 });
-        scene->floor.transform.position = vec3{ 0, -2, 0 };
-        scene->floor.transform.UpdateMatrices();
+        add_camera(registry, vec3{ 0,2,-5.0f });
+        update_floor(*scene);
 
 
         vec3 a{ 1,0,0 };
@@ -160,7 +170,7 @@ void Controller::InitScenes()
         UpdateTransform(registry, spot_light, vec3{ 0,10,0 }, vec3{ 1.0f });
         UpdateMaterial(AddSphereComponent(registry, spot_light).material, vec3{ 0 }, vec3{ 0.04f }, vec3{ 1.0f } *50, 1, 0, false);
         AddSpotLight(registry, spot_light, vec3{ 1.0f, 1.0f, 1.0f }, radians(45.0f), normalize(vec3{ 0, -1, 0 }), 500);
-        camera_controller_.SetWorldOffset(vec3{ 0,2,-5.0f });
+
     }
     {
         auto scene = std::make_shared<Scene>();
@@ -168,12 +178,8 @@ void Controller::InitScenes()
 
         entt::registry& registry = scene->registry;
 
-        entt::entity camera = registry.create();
-        Transform& camera_transform = registry.emplace<Transform>(camera);
-        camera_transform.position = vec3{ 0, 0, -10 };
-        camera_transform.UpdateMatrices();
-        Camera& cam = registry.emplace<Camera>(camera);
-        camera_controller_.SetNewCamera(&cam, &camera_transform);
+        add_camera(registry, vec3{ 0, 0.95f, -3.6f });
+        update_floor(*scene);
 
         gen_cube(registry, vec3{ -2,1,0 }, vec3{ 2 }, vec3{ 1,0,0 });
         gen_cube(registry, vec3{ 0,-1,0 }, vec3{ 2 }, vec3{ 1 });
@@ -187,27 +193,27 @@ void Controller::InitScenes()
         UpdateTransform(registry, spot_light, vec3{ 0,1,0 }, vec3{ 0.01f });
         UpdateMaterial(AddSphereComponent(registry, spot_light).material, vec3{ 0 }, vec3{ 0.04f }, vec3{ 1.0f } *50, 1, 0, false);
         AddSpotLight(registry, spot_light, vec3{ 1.0f, 1.0f, 1.0f }, radians(45.0f), normalize(vec3{ -1,1,1 }), 5e5f);
-        camera_controller_.SetWorldOffset(vec3{ 0,0.95f,-3.6f });
     }
     { // scene #3
+        struct VisualisationSphere {};
         auto scene = std::make_shared<Scene>();
         scenes_.push_back(scene);
 
         entt::registry& registry = scene->registry;
 
-        entt::entity camera = registry.create();
-        Transform& camera_transform = registry.emplace<Transform>(camera);
-        camera_transform.position = vec3{ 0, 15, -5 };
-        camera_transform.UpdateMatrices();
-        Camera& cam = registry.emplace<Camera>(camera);
-        camera_controller_.SetNewCamera(&cam, &camera_transform);
-        
+        auto camera = add_camera(registry, vec3{ 0,15,-5 });
+        update_floor(*scene);
+
+        static const vec3 offset{ 0,10,0 };
         for (int i = 0; i < 100; i++)
         {
-            gen_sphere(registry, GetHemispherePoint(i, 100) * 5 + vec3{ 0,10,0 }, vec3{ 0.1f }, vec3{ 1 });
+            vec3 point = GetHemispherePoint(i, 100);
+            auto sphere = gen_sphere(registry, point * 5 + offset, vec3{ 0.1f }, vec3{ 1 });
+            registry.emplace<VisualisationSphere>(sphere);
         }
-        gen_cube(registry, vec3{ 0 }, vec3{ 20 }, vec3{ 1 });
-
+        auto cube = gen_cube(registry, offset, vec3{ 0.15f, 1.0f, 0.15f }, vec3{ 1 });
+        gen_sphere(registry, offset, vec3{ 0.2f }, vec3{ 1 });
+        
         entt::entity dir_light = registry.create();
         AddDirLight(registry, dir_light);
 
@@ -218,7 +224,37 @@ void Controller::InitScenes()
              {
                  spot.direction = camera_controller_.forward();
              }); 
+
+         update_callbacks_.emplace_back(
+             [&registry, cube](float)
+             {
+                 float time = Application::TimeFromStart();
+                 vec3 normal{ std::sinf(time / 5), std::sinf(std::cosf(time / 5) * 2 * std::numbers::pi), std::cosf(time / 5) };
+                 mat3 rotation_matrix{ 1 };
+                 rotation_matrix[2] = normal;
+                 render::branchlessONB(rotation_matrix[2], rotation_matrix[0], rotation_matrix[1]);
+                 
+                 std::stringstream s;
+                 s << rtranspose(rotation_matrix) * rotation_matrix - mat3{ 1 } << std::endl << std::endl;
+                 OutputDebugStringA(s.str().c_str());
+                 Transform& t = registry.get<Transform>(cube);
+                 t.rotation = QuaternionFromRotationMatrix(rotation_matrix);
+                 t.rotation = normalize(t.rotation);
+                 t.position = offset;
+                 t.UpdateMatrices();
+                 int i = 0;
+                 auto group = registry.group<Transform>(entt::get<SceneSphere, VisualisationSphere>);
+                 for (auto sphere : group)
+                 {
+                     Transform &t = group.get<Transform>(sphere);
+                     vec3 point = GetHemispherePoint(i++, 100) * rotation_matrix;
+                     t.position = point * 5 + offset;
+                     t.UpdateMatrices();
+                 }
+             });
     }
+
+
     SelectScene(0);
 
 /*     entt::entity main_light = registry.create();

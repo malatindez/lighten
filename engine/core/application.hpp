@@ -34,6 +34,7 @@ namespace engine::core
     template <class T>
     inline void AddLayer(std::shared_ptr<T> t) { layers_.push_back(std::static_pointer_cast<Layer>(t)); }
 
+    [[nodiscard]] static inline float TimeFromStart() { return from_start_.elapsed(); }
   private:
     static void Init();
 
@@ -48,14 +49,15 @@ namespace engine::core
 
     bool running_ = true;
 
-    SteadyTimer render;
-    SteadyTimer tick;
+    SteadyTimer render_;
+    SteadyTimer tick_;
 
     std::vector<std::shared_ptr<Layer>> layers_;
 
     EventCallbackFn event_function_;
 
     static std::unique_ptr<Application> application_;
+    static SteadyTimer from_start_;
     friend INT WINAPI ::wWinMain(HINSTANCE, HINSTANCE, PWSTR, int cmd_show);
   };
 } // namespace engine::core

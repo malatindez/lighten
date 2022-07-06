@@ -72,6 +72,16 @@ namespace engine::core::math
     return mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>>(right) *= left;
   }
 
+    template <AnyMat T, AnyMat U>
+    [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator-(T const left, U const &right) requires(T::size.x == U::size.x && T::size.y == U::size.y)
+    {
+      return mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>>(left) -= right;
+    }
+    template <AnyMat T, AnyMat U>
+    [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator+(T const &left, U const &right) requires(T::size.x == U::size.x && T::size.y == U::size.y)
+    {
+      return mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>>(left) += right;
+    }
   template <AnyMat T>
   constexpr mat<T::size.y, T::size.x, std::remove_const_t<typename T::type>> transpose(T const &matrix)
   {
@@ -80,7 +90,7 @@ namespace engine::core::math
     {
       for (int j = 0; j < T::size.y; j++)
       {
-        return_value[j][i] = matrix[i][j];
+        return_value.arr[j * T::size.x + i] = matrix[i][j];
       }
     }
     return return_value;
@@ -93,7 +103,7 @@ namespace engine::core::math
     {
       for (int j = 0; j < T::size.y; j++)
       {
-        return_value[j][i].set_ptr(matrix[i][j]);
+        return_value.arr[j * T::size.x + i].set_ptr(matrix[i][j]);
       }
     }
     return return_value;
@@ -106,7 +116,7 @@ namespace engine::core::math
     {
       for (int j = 0; j < T::size.y; j++)
       {
-        return_value[j][i].set_ptr(matrix[i][j]);
+        return_value.arr[j * T::size.x + i].set_ptr(matrix[i][j]);
       }
     }
     return return_value;

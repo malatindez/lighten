@@ -19,7 +19,6 @@ namespace engine::core::math
   template <size_t c, size_t d, Primitive P>
   constexpr rmat<a, b, T>::rmat(rmat<c, d, P> &p) requires(c >= a && d >= b)
   {
-    reset();
     for (size_t i = 0; i < a; i++)
     {
       for (size_t j = 0; j < b; j++)

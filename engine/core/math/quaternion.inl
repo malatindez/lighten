@@ -296,6 +296,51 @@ namespace engine::core::math
         return qua<T>(pitch, vec<3, T>{1, 0, 0}) * qua<T>(yaw, vec<3, T>{0, 1, 0}) *
                qua<T>(roll, vec<3, T>{0, 0, 1});
     }
+    template <AnyMat U>
+    [[nodiscard]] constexpr qua<typename U::type> QuaternionFromRotationMatrix(U const&m) noexcept requires(U::size.x == 3 && U::size.y == 3 && std::is_floating_point_v<typename U::type>)
+    {
+        using T = typename U::type;
+        T fourXSquaredMinus1 = m[0][0] - m[1][1] - m[2][2];
+        T fourYSquaredMinus1 = m[1][1] - m[0][0] - m[2][2];
+        T fourZSquaredMinus1 = m[2][2] - m[0][0] - m[1][1];
+        T fourWSquaredMinus1 = m[0][0] + m[1][1] + m[2][2];
+
+        int biggestIndex = 0;
+        T fourBiggestSquaredMinus1 = fourWSquaredMinus1;
+        if (fourXSquaredMinus1 > fourBiggestSquaredMinus1)
+        {
+            fourBiggestSquaredMinus1 = fourXSquaredMinus1;
+            biggestIndex = 1;
+        }
+        if (fourYSquaredMinus1 > fourBiggestSquaredMinus1)
+        {
+            fourBiggestSquaredMinus1 = fourYSquaredMinus1;
+            biggestIndex = 2;
+        }
+        if (fourZSquaredMinus1 > fourBiggestSquaredMinus1)
+        {
+            fourBiggestSquaredMinus1 = fourZSquaredMinus1;
+            biggestIndex = 3;
+        }
+
+        T biggestVal = std::sqrt(fourBiggestSquaredMinus1 + static_cast<T>(1)) * static_cast<T>(0.5);
+        T mult = static_cast<T>(0.25) / biggestVal;
+
+        switch (biggestIndex)
+        {
+        case 0:
+            return qua<T>(biggestVal, (m[1][2] - m[2][1]) * mult, (m[2][0] - m[0][2]) * mult, (m[0][1] - m[1][0]) * mult);
+        case 1:
+            return qua<T>((m[1][2] - m[2][1]) * mult, biggestVal, (m[0][1] + m[1][0]) * mult, (m[2][0] + m[0][2]) * mult);
+        case 2:
+            return qua<T>((m[2][0] - m[0][2]) * mult, (m[0][1] + m[1][0]) * mult, biggestVal, (m[1][2] + m[2][1]) * mult);
+        case 3:
+            return qua<T>((m[0][1] - m[1][0]) * mult, (m[2][0] + m[0][2]) * mult, (m[1][2] + m[2][1]) * mult, biggestVal);
+        default: // Silence a -Wswitch-default warning in GCC. Should never actually get here. Assert is just for sanity.
+            assert(false);
+            return qua<T>(1, 0, 0, 0);
+        }
+    }
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> operator*(qua<T> const &q, qua<T> const &p) noexcept
     {

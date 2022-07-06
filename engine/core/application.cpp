@@ -10,6 +10,7 @@ namespace engine::core
 {
   using namespace events;
   std::unique_ptr<Application> Application::application_;
+  SteadyTimer Application::from_start_;
 
   void Application::OnEvent(Event &e)
   {
@@ -41,31 +42,31 @@ namespace engine::core
 
   void Application::Run()
   {
-    render.reset();
-    tick.reset();
+    render_.reset();
+    tick_.reset();
     while (running_)
     {
       AppUpdateEvent update;
       Application::OnEvent(update);
       assert(!update.handled);
 
-      if (tick.elapsed() > kTickDuration)
+      if (tick_.elapsed() > kTickDuration)
       {
-        AppTickEvent tick_event(tick.elapsed());
-        tick.reset();
+        AppTickEvent tick_event(tick_.elapsed());
+        tick_.reset();
         Application::OnEvent(tick_event);
         assert(!tick_event.handled);
       }
 
-      if (render.elapsed() > kFrameDuration)
+      if (render_.elapsed() > kFrameDuration)
       {
         AppRenderEvent render_event;
-        render.reset();
+        render_.reset();
         Application::OnEvent(render_event);
         assert(!render_event.handled);
         static std::vector<float> last_100_frames(100);
         static int frame_num = 0;
-        last_100_frames[frame_num % 100] = render.elapsed();
+        last_100_frames[frame_num % 100] = render_.elapsed();
         frame_num++;
         OutputDebugStringA((std::to_string(100 / std::accumulate(last_100_frames.begin(), last_100_frames.end(), 0.0f)) + "\n").c_str());
       }

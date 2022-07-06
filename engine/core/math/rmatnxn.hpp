@@ -11,7 +11,7 @@ namespace engine::core::math
   {
     using type = T;
     static constexpr ivec2 size{a, b};
-
+    constexpr rmat() {}
     template <size_t c, size_t d, Primitive P>
     constexpr rmat(mat<c, d, P> &p) requires(c >= a && d >= b);
     template <size_t c, size_t d, Primitive P>

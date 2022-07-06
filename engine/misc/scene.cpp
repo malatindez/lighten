@@ -2,9 +2,9 @@
 #include "render/light-data.hpp"
 #include "render/material.hpp"
 #include <Windows.h>
-#include <string>
 #include <functional>
 #include <sstream>
+#include <string>
 #include <tuple>
 #include <vector>
 
@@ -54,10 +54,10 @@ namespace engine
             {
                 mat = floor.material;
             }
-            spheres.each([&nearest, &ray, &mat](auto const, auto const& sphere, auto const& transform) __lambda_force_inline
-                { if (sphere.CheckIntersection(transform, nearest, ray)) { mat = sphere.material; } });
-            meshes.each([&nearest, &ray, &mat](auto const, auto const& mesh, auto const& transform) __lambda_force_inline
-                { if (mesh.CheckIntersection(transform, nearest, ray)) { mat = mesh.material(); } });
+            spheres.each([&nearest, &ray, &mat](auto const, auto const &sphere, auto const &transform) __lambda_force_inline
+                         { if (sphere.CheckIntersection(transform, nearest, ray)) { mat = sphere.material; } });
+            meshes.each([&nearest, &ray, &mat](auto const, auto const &mesh, auto const &transform) __lambda_force_inline
+                        { if (mesh.CheckIntersection(transform, nearest, ray)) { mat = mesh.material(); } });
 
             vec3 const hdr = CalculatePointColor(spheres, meshes, directional_lights, point_lights, spot_lights, ray, nearest, mat);
 
@@ -326,7 +326,7 @@ namespace engine
                                  .view_dir = normalize(hs_ray.origin() - hs_nearest.point)};
             std::stringstream s;
             light_energy = Illuminate(spheres, meshes, directional_lights, point_lights, spot_lights, hs_mat, ld);
-            rv_color += dot(vec3{0,1,0}, ray_dir);
+            rv_color += light_energy;
         }
         return rv_color / hemisphere_ray_count;
     }
