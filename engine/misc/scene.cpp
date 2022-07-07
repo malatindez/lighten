@@ -304,7 +304,7 @@ namespace engine
         for (int i = 0; i < hemisphere_ray_count; i++)
         {
 
-            vec3 const ray_dir = normalize(GetHemispherePoint(i, hemisphere_ray_count));
+            vec3 const ray_dir = normalize(GetHemispherePoint(i, hemisphere_ray_count) * rotation_matrix);
             vec3 const ray_origin = nearest.point + nearest.normal * 0.001f;
 
             Ray const hs_ray(ray_origin, ray_dir);
@@ -326,8 +326,8 @@ namespace engine
                                  .view_dir = normalize(hs_ray.origin() - hs_nearest.point)};
             std::stringstream s;
             light_energy = Illuminate(spheres, meshes, directional_lights, point_lights, spot_lights, hs_mat, ld);
-            rv_color += light_energy;
+            rv_color += ambient * hs_mat.albedo + light_energy + hs_mat.emission;
         }
-        return rv_color / hemisphere_ray_count;
+        return std::numbers::pi * 2 * rv_color / hemisphere_ray_count;
     }
 } // namespace engine

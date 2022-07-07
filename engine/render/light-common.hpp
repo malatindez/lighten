@@ -76,34 +76,51 @@ namespace engine::render
             NoD = minNoD;
         }
     }
+    inline core::math::vec3 Lambert(render::Material const& mat, float const ndotl, float const attenuation)
+    {
+        core::math::vec3 diffuse = clamp(render::F_Schlick(ndotl, mat.F0), 0.0f, 1.0f);
+        diffuse = 1 - diffuse;
+        diffuse *= (1 - mat.metalness);
+        diffuse *= (mat.albedo / float(std::numbers::pi));
+        return diffuse * attenuation;
+    }
+    inline core::math::vec3 CookTorrance(render::Material const& mat,
+                                        render::LightData const &light_data,
+                                        core::math::vec3 const& specL,
+                                        float const attenuation)
+    {
+        core::math::vec3 const& N = light_data.normal;
 
-    inline core::math::vec3 Illuminate(core::math::vec3 const &L,
+        core::math::vec3 const V_norm = normalize(light_data.view_dir);
+        core::math::vec3 const H = normalize(specL + V_norm);
+
+        float const ndotl = dot(N, specL);
+        float const ndotv = dot(N, V_norm);
+        float const ndoth = dot(N, H);
+
+        float const rough2 = mat.roughness * mat.roughness; 
+
+        core::math::vec3 const F = render::F_Schlick(dot(specL, H), mat.F0);
+        float const G = render::Smith(rough2, ndotv, ndotl);
+        float const D = render::GGX(rough2, ndoth);
+        return F * G * core::math::clamp(D * attenuation / (4 * ndotv), 0.0f, 1.0f);
+    }
+
+    inline core::math::vec3 Illuminate(core::math::vec3 const& L,
+                                       core::math::vec3 const& specL,
                                        render::LightData &light_data,
                                        render::Material const &mat,
                                        float const attenuation,
                                        core::math::vec3 const &light_energy,
                                        float const power)
     {
-        core::math::vec3 const &N = light_data.normal;
-        core::math::vec3 const V = normalize(light_data.view_dir);
-        core::math::vec3 const H = core::math::normalize(L + V);
-        float ndotl = dot(N, L);
-        float ndotv = dot(N, V);
-        float ndoth = dot(N, H);
+        float const ndotl = dot(light_data.normal, L);
+        
+        core::math::vec3 const diffuse = Lambert(mat, ndotl, attenuation);
 
-        core::math::vec3 diffuse = clamp(render::F_Schlick(ndotl, mat.F0), 0.0f, 1.0f);
-        diffuse = 1 - diffuse;
-        diffuse *= (1 - mat.metalness);
-        diffuse *= (mat.albedo / float(std::numbers::pi));
+        core::math::vec3 const spec = CookTorrance(mat, light_data, specL, attenuation);
 
-        float const rough2 = mat.roughness * mat.roughness;
-
-        core::math::vec3 const F = render::F_Schlick(dot(L, H), mat.F0);
-        float const G = render::Smith(rough2, ndotv, ndotl);
-        float const D = render::GGX(rough2, ndoth);
-        core::math::vec3 spec = F * G * core::math::clamp(D * attenuation / (4 * ndotv * ndotl), 0.0f, 1.0f);
-
-        return (diffuse * attenuation + spec) * light_energy * power * ndotl;
+        return (diffuse * ndotl + spec) * light_energy * power;
     }
 
     inline core::math::vec4 UIntToRGBA(uint32_t value)

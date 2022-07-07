@@ -25,23 +25,20 @@ namespace engine::components
             float distance = length(sphereRelPos);
             core::math::vec3 const &N = light_data.normal;
             core::math::vec3 L = normalize(sphereRelPos);
-            float radius = length(transform.scale);
-            if (distance < radius)
-            {
-                std::swap(distance, radius);
-            }
+            float radius = length(transform.scale) / sqrtf(3);
+            distance = std::max(distance, radius);
             float cosa = sqrtf(1.0f - radius * radius / distance / distance);
             float attenuation = (1.0f - cosa); // solid_angle / 2.0f * float(std::numbers::pi)
            
                 
 
             bool intersects = false;
-            core::math::vec3 const R = core::math::reflect_normal_safe(-L, N);
+            core::math::vec3 const R = core::math::reflect_normal_safe(normalize(light_data.view_dir), N);
             core::math::vec3 D = render::approximateClosestSphereDir(intersects, R, cosa, sphereRelPos, L, distance, radius);
             float ndotl = dot(N, L);
             render::clampDirToHorizon(D, ndotl, N, 0.0f);
 
-            return render::Illuminate(D, light_data, mat, attenuation, color, power);
+            return render::Illuminate(L, D, light_data, mat, attenuation, color, power);
         }
     };
 } // namespace engine::components

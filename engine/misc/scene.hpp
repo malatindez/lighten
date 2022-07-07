@@ -78,7 +78,7 @@ namespace engine
         bool update_scene{true};
         bool reflections_on{true};
         bool global_illumination_on{false};
-        int hemisphere_ray_count = 100;
+        int hemisphere_ray_count = 1000;
         float exposure = 2.0f;
         float gamma = 2.2f;
         float reflection_roughness_threshold = 0.1f;
@@ -91,12 +91,12 @@ namespace engine
     {
         auto static const kDeltaPhi = float(2.0f * std::numbers::pi * (2.0f - std::numbers::phi));
         float const j = i + 0.5f;
-        float const y = 1.0f - j / size;
-        float const phi = std::acosf(y);
+        float const z = 1.0f - j / size;
+        float const phi = std::acosf(z);
         float const theta = fmodf(kDeltaPhi * i - kDeltaPhi / 2, float(2 * std::numbers::pi));
 
         float const x = std::sinf(phi) * std::cosf(theta);
-        float const z = std::sinf(phi) * std::sinf(theta);
+        float const y = std::sinf(phi) * std::sinf(theta);
         return core::math::vec3{ x,y,z };
     }
 } // namespace engine

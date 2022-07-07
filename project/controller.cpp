@@ -150,25 +150,25 @@ void Controller::InitScenes()
         for (int j = 0; j < 7; j++)
             for (int i = 0; i < 7; i++)
             {
-                float r = lerp(0.001f, 1.0f, float(i) / 7.0f);
+                float r = lerp(0.01f, 1.0f, float(i) / 7.0f);
                 float m = lerp(0.0f, 1.0f, float(j) / 7.0f);
                 gen_sphere(registry, vec3{ -7.0f / 2 + i, 1, -7.0f / 2 + j }, vec3{ 0.5f }, vec3{ 1,0,0 }, quat(), r, m);
             }
         {
             entt::entity main_light = registry.create();
             UpdateTransform(registry, main_light, vec3{ 3,10,0 }, vec3{ 1.0f });
-            AddPointLight(registry, main_light, vec3{ 1.0f, 1.0f, 1.0f }, 50);
-            UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{ 0 }, vec3{ 0.04f }, vec3{ 1.0f } *50, 1, 0, false);
+            AddPointLight(registry, main_light, vec3{ 1.0f, 1.0f, 1.0f }, 500);
+            UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{ 0 }, vec3{ 0.04f }, vec3{ 1.0f } *500, 1, 0, false);
         }
         {
             entt::entity main_light = registry.create();
             UpdateTransform(registry, main_light, vec3{ -3,10,0 }, vec3{ 1.0f });
-            AddPointLight(registry, main_light, vec3{ 1.0f, 1.0f, 1.0f }, 50);
-            UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{ 0 }, vec3{ 0.04f }, vec3{ 1.0f } *50, 1, 0, false);
+            AddPointLight(registry, main_light, vec3{ 1.0f, 1.0f, 1.0f }, 500);
+            UpdateMaterial(AddSphereComponent(registry, main_light).material, vec3{ 0 }, vec3{ 0.04f }, vec3{ 1.0f } *500, 1, 0, false);
         }
         entt::entity spot_light = registry.create();
         UpdateTransform(registry, spot_light, vec3{ 0,10,0 }, vec3{ 1.0f });
-        UpdateMaterial(AddSphereComponent(registry, spot_light).material, vec3{ 0 }, vec3{ 0.04f }, vec3{ 1.0f } *50, 1, 0, false);
+        UpdateMaterial(AddSphereComponent(registry, spot_light).material, vec3{ 0 }, vec3{ 0.04f }, vec3{ 1.0f } *500, 1, 0, false);
         AddSpotLight(registry, spot_light, vec3{ 1.0f, 1.0f, 1.0f }, radians(45.0f), normalize(vec3{ 0, -1, 0 }), 500);
 
     }
@@ -192,7 +192,7 @@ void Controller::InitScenes()
         entt::entity spot_light = registry.create();
         UpdateTransform(registry, spot_light, vec3{ 0,1,0 }, vec3{ 0.01f });
         UpdateMaterial(AddSphereComponent(registry, spot_light).material, vec3{ 0 }, vec3{ 0.04f }, vec3{ 1.0f } *50, 1, 0, false);
-        AddSpotLight(registry, spot_light, vec3{ 1.0f, 1.0f, 1.0f }, radians(45.0f), normalize(vec3{ -1,1,1 }), 5e5f);
+        AddSpotLight(registry, spot_light, vec3{ 1.0f, 1.0f, 1.0f }, radians(45.0f), normalize(vec3{ -1,1,1 }), 5e6f);
     }
     { // scene #3
         struct VisualisationSphere {};
