@@ -24,7 +24,7 @@ namespace engine::components
             {
                 return core::math::vec3{0, 0, 0};
             }
-            return render::Illuminate(L, L, light_data, mat, solid_angle/(2.0f * float(std::numbers::pi)), color, power);
+            return render::Illuminate(L, L, light_data, mat, solid_angle / (2.0f * float(std::numbers::pi)), color, power);
         }
     };
 } // namespace engine::components

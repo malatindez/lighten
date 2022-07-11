@@ -1,4 +1,5 @@
 #include "misc/scene.hpp"
+#include "components/transform.hpp"
 #include "render/light-data.hpp"
 #include "render/material.hpp"
 #include <Windows.h>

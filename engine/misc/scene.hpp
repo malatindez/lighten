@@ -97,6 +97,6 @@ namespace engine
 
         float const x = std::sinf(phi) * std::cosf(theta);
         float const y = std::sinf(phi) * std::sinf(theta);
-        return core::math::vec3{ x,y,z };
+        return core::math::vec3{x, y, z};
     }
 } // namespace engine

@@ -29,8 +29,6 @@ namespace engine::components
             distance = std::max(distance, radius);
             float cosa = sqrtf(1.0f - radius * radius / distance / distance);
             float attenuation = (1.0f - cosa); // solid_angle / 2.0f * float(std::numbers::pi)
-           
-                
 
             bool intersects = false;
             core::math::vec3 const R = core::math::reflect_normal_safe(normalize(light_data.view_dir), N);

@@ -97,11 +97,10 @@ namespace utils
         "0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`"
         "abcdefghijklmnopqrstuvwxyz{|}~";
 
-    [[nodiscard]] inline std::string ExcludeString(std::string const &a, std::string const &b)
+    [[nodiscard]] inline std::string ExcludeString(std::string const &a, std::string_view const b)
     {
         std::string return_value{a};
-        std::erase_if(return_value, [&b](char const &c)
-                      { return std::find(b.begin(), b.end(), c) != b.end(); });
+        std::erase_if(return_value, [&b](char const &c) { return std::ranges::find(b, c) != b.end(); });
         return return_value;
     }
 
@@ -110,7 +109,7 @@ namespace utils
     [[nodiscard]] std::string RandomUTF8String(size_t const &size = 32);
     [[nodiscard]] std::string RandomUTF8Filename(size_t const &size = 32);
     [[nodiscard]] std::string RandomBinaryString(size_t const &size = 32);
-    [[nodiscard]] std::string RandomString(size_t const &size = 32, std::string const &including = kAsciiCharacters);
+    [[nodiscard]] std::string RandomString(size_t const &size = 32, std::string_view const including = kAsciiCharacters);
     [[nodiscard]] std::string RandomFilename(size_t const &size = 32);
 
     void CreateFile(fs::path const &path, char const *data, const size_t size);

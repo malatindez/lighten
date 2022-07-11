@@ -236,7 +236,7 @@ void Controller::InitScenes()
                  
                  std::stringstream s;
                  s << rtranspose(rotation_matrix) * rotation_matrix - mat3{ 1 } << std::endl << std::endl;
-                 OutputDebugStringA(s.str().c_str());
+                 Application::logger().info(s.str());
                  Transform& t = registry.get<Transform>(cube);
                  t.rotation = QuaternionFromRotationMatrix(rotation_matrix);
                  t.rotation = normalize(t.rotation);
@@ -285,7 +285,7 @@ void Controller::InitInput()
     {
         float offset = ((seq[0] == Key::KEY_PLUS || seq[0] == Key::KEY_NUMPAD_PLUS)) ? 0.5f : -0.5f;
         selected_scene_->exposure += offset * dt;
-        OutputDebugStringA(("Exposure value: " + std::to_string(selected_scene_->exposure) + "\n").c_str());
+        Application::logger().info("Exposure value: " + std::to_string(selected_scene_->exposure) + "\n");
     };
     input_.AddTickKeyCallback({Key::KEY_PLUS}, adjust_exposure, true);
     input_.AddTickKeyCallback({Key::KEY_MINUS}, adjust_exposure, true);

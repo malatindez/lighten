@@ -76,7 +76,7 @@ namespace engine::render
             NoD = minNoD;
         }
     }
-    inline core::math::vec3 Lambert(render::Material const& mat, float const ndotl, float const attenuation)
+    inline core::math::vec3 Lambert(render::Material const &mat, float const ndotl, float const attenuation)
     {
         core::math::vec3 diffuse = clamp(render::F_Schlick(ndotl, mat.F0), 0.0f, 1.0f);
         diffuse = 1 - diffuse;
@@ -84,12 +84,12 @@ namespace engine::render
         diffuse *= (mat.albedo / float(std::numbers::pi));
         return diffuse * attenuation;
     }
-    inline core::math::vec3 CookTorrance(render::Material const& mat,
-                                        render::LightData const &light_data,
-                                        core::math::vec3 const& specL,
-                                        float const attenuation)
+    inline core::math::vec3 CookTorrance(render::Material const &mat,
+                                         render::LightData const &light_data,
+                                         core::math::vec3 const &specL,
+                                         float const attenuation)
     {
-        core::math::vec3 const& N = light_data.normal;
+        core::math::vec3 const &N = light_data.normal;
 
         core::math::vec3 const V_norm = normalize(light_data.view_dir);
         core::math::vec3 const H = normalize(specL + V_norm);
@@ -98,7 +98,7 @@ namespace engine::render
         float const ndotv = dot(N, V_norm);
         float const ndoth = dot(N, H);
 
-        float const rough2 = mat.roughness * mat.roughness; 
+        float const rough2 = mat.roughness * mat.roughness;
 
         core::math::vec3 const F = render::F_Schlick(dot(specL, H), mat.F0);
         float const G = render::Smith(rough2, ndotv, ndotl);
@@ -106,8 +106,8 @@ namespace engine::render
         return F * G * core::math::clamp(D * attenuation / (4 * ndotv), 0.0f, 1.0f);
     }
 
-    inline core::math::vec3 Illuminate(core::math::vec3 const& L,
-                                       core::math::vec3 const& specL,
+    inline core::math::vec3 Illuminate(core::math::vec3 const &L,
+                                       core::math::vec3 const &specL,
                                        render::LightData &light_data,
                                        render::Material const &mat,
                                        float const attenuation,
@@ -115,7 +115,7 @@ namespace engine::render
                                        float const power)
     {
         float const ndotl = dot(light_data.normal, L);
-        
+
         core::math::vec3 const diffuse = Lambert(mat, ndotl, attenuation);
 
         core::math::vec3 const spec = CookTorrance(mat, light_data, specL, attenuation);
