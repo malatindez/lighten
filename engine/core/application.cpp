@@ -100,6 +100,10 @@ namespace engine::core
         {
             target_folder = std::filesystem::current_path() / (*config_)["Logger"]["folder"].str();
         }
+        if (!std::filesystem::is_directory(target_folder) && !std::filesystem::exists(target_folder))
+        {
+            std::filesystem::create_directories(target_folder);
+        }
         for (auto const &file : std::filesystem::directory_iterator(target_folder))
         {
             if (file.path().filename() == "latest.log")

@@ -31,10 +31,10 @@ namespace engine::components
             float attenuation = (1.0f - cosa); // solid_angle / 2.0f * float(std::numbers::pi)
 
             bool intersects = false;
-            core::math::vec3 const R = core::math::reflect_normal_safe(normalize(light_data.view_dir), N);
+            core::math::vec3 const R = core::math::reflect_normal_safe(N, -normalize(light_data.view_dir));
             core::math::vec3 D = render::approximateClosestSphereDir(intersects, R, cosa, sphereRelPos, L, distance, radius);
             float ndotl = dot(N, L);
-            render::clampDirToHorizon(D, ndotl, N, 0.0f);
+            render::clampDirToHorizon(D, ndotl, N, 0.005f);
 
             return render::Illuminate(L, D, light_data, mat, attenuation, color, power);
         }

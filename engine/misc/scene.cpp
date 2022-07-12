@@ -326,7 +326,18 @@ namespace engine
                                  .normal = hs_nearest.normal,
                                  .view_dir = normalize(hs_ray.origin() - hs_nearest.point)};
             std::stringstream s;
-            light_energy = Illuminate(spheres, meshes, directional_lights, point_lights, spot_lights, hs_mat, ld);
+            
+
+
+            core::math::vec3 const &N = ld.normal;
+            core::math::vec3 const L = normalize(nearest.point - hs_nearest.point);
+            float const ndotl = dot(N, L);
+            
+            core::math::vec3 BRDF = 1 - clamp(render::F_Schlick(ndotl, hs_mat.F0), 0.0f, 1.0f);
+            BRDF *= (1 - hs_mat.metalness) / float(std::numbers::pi);
+
+
+            light_energy = BRDF * Illuminate(spheres, meshes, directional_lights, point_lights, spot_lights, hs_mat, ld) * dot(L, hs_nearest.normal);
             rv_color += ambient * hs_mat.albedo + light_energy + hs_mat.emission;
         }
         return std::numbers::pi * 2 * rv_color / hemisphere_ray_count;
