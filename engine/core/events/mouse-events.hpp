@@ -1,6 +1,6 @@
 #pragma once
+#include "core/math.hpp"
 #include "event.hpp"
-#include "math.hpp"
 namespace engine::core::events
 {
 

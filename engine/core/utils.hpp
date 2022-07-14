@@ -1,54 +1,56 @@
 #pragma once
 #include <stdexcept>
+#include <algorithm>
 #include <string>
 
 namespace engine::core::utils
 {
-    // trim from start (in place)
-    constexpr std::string_view ltrimview(std::string_view const &s)
+    inline std::string as_lowercase(std::string_view const &s) noexcept
     {
-        return std::string_view(
-            std::find_if(s.begin(), s.end(),
-                         [](unsigned char ch)
-                         { return !std::isspace(ch); }),
-            s.end());
+        std::string rv;
+        rv.reserve(s.size());
+        std::ranges::for_each(s, [&rv](char const& c) { rv += static_cast<char>(std::tolower(c)); });
+        return rv;
+    }
+    inline std::string as_uppercase(std::string_view const& s) noexcept
+    {
+        std::string rv;
+        rv.reserve(s.size());
+        std::ranges::for_each(s, [&rv](char const& c) { rv += static_cast<char>(std::toupper(c)); });
+        return rv;
+    }
+    // trim from start (in place)
+    constexpr std::string_view ltrimview(std::string_view const &s) noexcept
+    {
+        return std::string_view( std::ranges::find_if(s, [](unsigned char ch) { return !std::isspace(ch); }), s.end());
     }
 
     // trim from end (in place)
-    constexpr std::string_view rtrimview(std::string_view const &s)
+    constexpr std::string_view rtrimview(std::string_view const &s) noexcept
     {
-        return std::string_view(
-            s.begin(), std::find_if(s.rbegin(), s.rend(), [](unsigned char ch)
-                                    { return !std::isspace(ch); })
-                           .base());
+        return std::string_view(s.begin(), std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base());
     }
 
     // trim from both ends (in place)
-    constexpr std::string_view trimview(std::string_view const &s)
+    constexpr std::string_view trimview(std::string_view const &s) noexcept
     {
         return ltrimview(rtrimview(s));
     }
     // trim from start (in place)
-    inline std::string ltrim(std::string const &s)
+    inline std::string ltrim(std::string const &s) noexcept
     {
-        return std::string(
-            std::find_if(s.begin(), s.end(),
-                         [](unsigned char ch)
-                         { return !std::isspace(ch); }),
-            s.end());
+        return std::string(std::ranges::find_if(s, [](unsigned char ch) { return !std::isspace(ch); }), s.end());
     }
 
     // trim from end (in place)
-    inline std::string rtrim(std::string const &s)
+    inline std::string rtrim(std::string const &s) noexcept
     {
-        return std::string(s.begin(),
-                           std::find_if(s.rbegin(), s.rend(), [](unsigned char ch)
-                                        { return !std::isspace(ch); })
-                               .base());
+        return std::string(s.begin(), std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base());
     }
 
     // trim from both ends (in place)
-    inline std::string trim(std::string const &s) { return ltrim(rtrim(s)); }
+    inline std::string trim(std::string const &s) noexcept { return ltrim(rtrim(s)); }
+
     template <typename T>
     struct return_type;
 

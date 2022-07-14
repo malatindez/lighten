@@ -1,7 +1,7 @@
 #pragma once
 #include "core/events.hpp"
 #include "core/layer.hpp"
-#include "math.hpp"
+#include "core/math.hpp"
 #include <map>
 namespace Key
 {

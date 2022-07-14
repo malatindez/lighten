@@ -1,6 +1,5 @@
 #pragma once
 #include "components/transform.hpp"
-#include "math.hpp"
 namespace engine::components
 {
     class Camera

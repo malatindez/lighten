@@ -1,10 +1,9 @@
 #pragma once
 #include <string>
 
-
-#define EVENT_CLASS_TYPE(event_type)        \
-    static constexpr std::string_view event_name = #event_type;    \
-    [[nodiscard]] std::string_view name() const override { return event_name; } \
+#define EVENT_CLASS_TYPE(event_type)                            \
+    static constexpr std::string_view event_name = #event_type; \
+    [[nodiscard]] std::string_view name() const override { return event_name; }
 
 namespace engine::core::events
 {

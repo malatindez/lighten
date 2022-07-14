@@ -31,11 +31,6 @@ namespace engine::core::math
   }
 
   template <size_t size, Primitive T, Primitive U>
-  [[nodiscard]] constexpr vec<size, T> operator*(U const value, vec<size, T> const &vector)
-  {
-    return vec<size, T>(vector) *= value;
-  }
-  template <size_t size, Primitive T, Primitive U>
   [[nodiscard]] constexpr vec<size, T> operator+(vec<size, T> const &vector, U const value) noexcept
   {
     return vec<size, T>(vector) += value;
@@ -55,6 +50,22 @@ namespace engine::core::math
   {
     return vec<size, T>(vector) /= value;
   }
+  template <size_t size, Primitive T, Primitive U>
+  [[nodiscard]] constexpr vec<size, T> operator*(U const value, vec<size, T> const &vector) noexcept
+  {
+    return vec<size, T>(vector) *= value;
+  }
+  template <size_t size, Primitive T, Primitive U>
+  [[nodiscard]] constexpr vec<size, T> operator+(U const value, vec<size, T> const &vector) noexcept
+  {
+    return vec<size, T>(vector) += value;
+  }
+  template <size_t size, Primitive T, Primitive U>
+  [[nodiscard]] constexpr vec<size, T> operator-(U const value, vec<size, T> const &vector) noexcept
+  {
+    return vec<size, T>(-vector) += value;
+  }
+
   template <size_t size, Primitive T, Primitive U>
   [[nodiscard]] constexpr vec<size, T> operator+(vec<size, T> const &left, vec<size, U> const &right) noexcept
   {
@@ -87,9 +98,19 @@ namespace engine::core::math
   }
 
   template <size_t size, Primitive T, Primitive U>
-  [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator*(U const value, rvec<size, T> const &vector)
+  [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator*(U const value, rvec<size, T> const &vector) noexcept
   {
     return vec<size, std::remove_const_t<T>>(vector) *= value;
+  }
+  template <size_t size, Primitive T, Primitive U>
+  [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator+(U const value, rvec<size, T> const &vector) noexcept
+  {
+    return vec<size, std::remove_const_t<T>>(vector) += value;
+  }
+  template <size_t size, Primitive T, Primitive U>
+  [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator-(U const value, rvec<size, T> const &vector) noexcept
+  {
+    return vec<size, std::remove_const_t<T>>(-vector) += value;
   }
   template <size_t size, Primitive T, Primitive U>
   [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator+(rvec<size, T> const &vector, U const value) noexcept
@@ -195,7 +216,7 @@ namespace engine::core::math
   }
 
   template <AnyVec T, AnyVec U>
-  [[nodiscard]] constexpr bool operator==(T const &left, U const &right) requires(T::size == U::size)
+  [[nodiscard]] constexpr bool operator==(T const &left, U const &right) noexcept requires(T::size == U::size)
   {
     bool rv = true;
     for (size_t i = 0; i < T::size; i++)
@@ -206,7 +227,7 @@ namespace engine::core::math
   }
 
   template <AnyVec T, AnyVec U>
-  [[nodiscard]] constexpr bool operator!=(T const &left, U const &right) requires(T::size == U::size)
+  [[nodiscard]] constexpr bool operator!=(T const &left, U const &right) noexcept requires(T::size == U::size)
   {
     return !(left == right);
   }
@@ -223,7 +244,7 @@ namespace engine::core::math
   template <AnyVec T>
   [[nodiscard]] constexpr auto length(T const &vector) noexcept
   {
-    return math::sqrt(squared_length(vector));
+    return math::detail::sqrt(squared_length(vector));
   }
 
   template <AnyVec T>
@@ -238,7 +259,7 @@ namespace engine::core::math
   }
 
   template <AnyVec T, AnyVec U>
-  constexpr std::remove_const_t<typename T::type> dot(T const &left, U const &right) requires(T::size == U::size)
+  constexpr std::remove_const_t<typename T::type> dot(T const &left, U const &right) noexcept requires(T::size == U::size)
   {
     std::remove_const_t<typename T::type> return_value = 0;
     for (size_t i = 0; i < T::size; i++)
@@ -248,84 +269,94 @@ namespace engine::core::math
     return return_value;
   }
   template <AnyVec T, AnyVec U>
-  constexpr typename std::remove_const_t<typename T::type> angle(T const &left, U const &right) requires(T::size == U::size)
+  constexpr typename std::remove_const_t<typename T::type> angle(T const &left, U const &right) noexcept requires(T::size == U::size)
   {
-    return acos(dot(left, right) / length(left) / length(right));
+    return math::detail::acos(dot(left, right) / length(left) / length(right));
   }
 
   template <AnyVec T>
-  constexpr vec<T::size, std::remove_const_t<typename T::type>> cos(T const &vector)
+  constexpr vec<T::size, std::remove_const_t<typename T::type>> cos(T const &vector) noexcept
   {
     vec<T::size, std::remove_const_t<typename T::type>> return_value;
     for (size_t i = 0; i < T::size; i++)
     {
-      return_value[i] = cos(vector[i]);
+      return_value[i] = math::detail::cos(vector[i]);
     }
     return return_value;
   }
 
   template <AnyVec T>
-  constexpr vec<T::size, std::remove_const_t<typename T::type>> sin(T const &vector)
+  constexpr vec<T::size, std::remove_const_t<typename T::type>> sin(T const &vector) noexcept
   {
     vec<T::size, std::remove_const_t<typename T::type>> return_value;
     for (size_t i = 0; i < T::size; i++)
     {
-      return_value[i] = sin(vector[i]);
+      return_value[i] = math::detail::sin(vector[i]);
     }
     return return_value;
   }
 
   template <AnyVec T, Primitive U>
-  constexpr vec<T::size, std::remove_const_t<typename T::type>> pow(T const &vector, U const value)
+  constexpr vec<T::size, std::remove_const_t<typename T::type>> pow(T const &vector, U const value) noexcept
   {
     vec<T::size, std::remove_const_t<typename T::type>> return_value;
     for (size_t i = 0; i < T::size; i++)
     {
-      return_value[i] = pow(vector[i], value);
+      return_value[i] = math::detail::pow(vector[i], value);
     }
     return return_value;
   }
   template <AnyVec T, AnyVec U>
-  constexpr vec<T::size, std::remove_const_t<typename T::type>> pow(T const &vector1, U const &vector2)
+  constexpr vec<T::size, std::remove_const_t<typename T::type>> pow(T const &vector1, U const &vector2) noexcept
   {
     vec<T::size, std::remove_const_t<typename T::type>> return_value;
     for (size_t i = 0; i < T::size; i++)
     {
-      return_value[i] = pow(vector1[i], vector2[i]);
+      return_value[i] = math::detail::pow(vector1[i], vector2[i]);
     }
     return return_value;
   }
 
+  template <AnyVec T>
+  constexpr vec<T::size, std::remove_const_t<typename T::type>> exp(T const &vector2) noexcept
+  {
+    vec<T::size, std::remove_const_t<typename T::type>> return_value;
+    for (size_t i = 0; i < T::size; i++)
+    {
+      return_value[i] = math::detail::exp(vector2[i]);
+    }
+    return return_value;
+  }
   template <AnyVec T, Primitive U>
-  constexpr vec<T::size, std::remove_const_t<typename T::type>> sqrt(T const &vector)
+  constexpr vec<T::size, std::remove_const_t<typename T::type>> sqrt(T const &vector) noexcept
   {
     vec<T::size, std::remove_const_t<typename T::type>> return_value;
     for (size_t i = 0; i < T::size; i++)
     {
-      return_value[i] = sqrt(vector[i]);
+      return_value[i] = math::detail::sqrt(vector[i]);
     }
     return return_value;
   }
 
   template <AnyVec T, AnyVec U>
-  constexpr vec<3, std::remove_const_t<typename T::type>> cross(T const &left, U const &right) requires(T::size == U::size && T::size == 3)
+  constexpr vec<3, std::remove_const_t<typename T::type>> cross(T const &left, U const &right) noexcept requires(T::size == U::size && T::size == 3)
   {
     return vec<3, std::remove_const_t<typename T::type>>{left.y * right.z - left.z * right.y,
-                     left.x * right.z - left.z * right.x,
-                     left.x * right.y - left.y * right.x};
+                                                         left.x * right.z - left.z * right.x,
+                                                         left.x * right.y - left.y * right.x};
   }
 
   template <Primitive T, Primitive U>
-  constexpr void rclamp(T &left, U const min, U const max)
+  constexpr void rclamp(T &left, U const min, U const max) noexcept
   {
     if (left < min)
       left = static_cast<T>(min);
-    if (left > max)
+    else if (left > max)
       left = static_cast<T>(max);
   }
 
   template <AnyVec T, Primitive U>
-  constexpr void rclamp(T &left, U const min, U const max)
+  constexpr void rclamp(T &left, U const min, U const max) noexcept
   {
     for (size_t i = 0; i < T::size; i++)
     {
@@ -333,14 +364,14 @@ namespace engine::core::math
       {
         left[i] = min;
       }
-      if (left[i] > static_cast<typename T::type>(max))
+      else if (left[i] > static_cast<typename T::type>(max))
       {
         left[i] = max;
       }
     }
   }
   template <AnyVec T, AnyVec U>
-  constexpr void rclamp(T &left, U const min, U const max)
+  constexpr void rclamp(T &left, U const min, U const max) noexcept
   {
     for (size_t i = 0; i < T::size; i++)
     {
@@ -348,14 +379,14 @@ namespace engine::core::math
       {
         left[i] = min[i];
       }
-      if (left[i] > static_cast<typename T::type>(max[i]))
+      else if (left[i] > static_cast<typename T::type>(max[i]))
       {
         left[i] = max[i];
       }
     }
   }
   template <AnyVec T, Primitive U>
-  [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> clamp(T const &left, U const min, U const max)
+  [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> clamp(T const &left, U const min, U const max) noexcept
   {
     vec<T::size, std::remove_const_t<typename T::type>> rvec;
 
@@ -365,7 +396,7 @@ namespace engine::core::math
       {
         rvec[i] = static_cast<std::remove_const_t<typename T::type>>(min);
       }
-      if (left[i] > static_cast<std::remove_const_t<typename T::type>>(max))
+      else if (left[i] > static_cast<std::remove_const_t<typename T::type>>(max))
       {
         rvec[i] = static_cast<std::remove_const_t<typename T::type>>(max);
       }
@@ -376,8 +407,8 @@ namespace engine::core::math
     }
     return rvec;
   }
-  template <AnyVec T, Primitive U>
-  [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> clamp(T const &left, U const &min, U const &max)
+  template <AnyVec T, AnyVec U>
+  [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> clamp(T const &left, U const &min, U const &max) noexcept
   {
     vec<T::size, std::remove_const_t<typename T::type>> rvec;
     for (size_t i = 0; i < T::size; i++)
@@ -386,7 +417,7 @@ namespace engine::core::math
       {
         rvec[i] = static_cast<std::remove_const_t<typename T::type>>(min[i]);
       }
-      if (left[i] > static_cast<std::remove_const_t<typename T::type>>(max[i]))
+      else if (left[i] > static_cast<std::remove_const_t<typename T::type>>(max[i]))
       {
         rvec[i] = static_cast<std::remove_const_t<typename T::type>>(max[i]);
       }
@@ -398,12 +429,57 @@ namespace engine::core::math
     return rvec;
   }
   template <Primitive T, Primitive U>
-  [[nodiscard]] constexpr T clamp(T left, U const min, U const max)
+  [[nodiscard]] constexpr T clamp(T left, U const min, U const max) noexcept
   {
     if (left < min)
       return min;
     if (left > max)
       return max;
     return left;
+  }
+  template <typename T, Primitive U>
+  constexpr auto lerp(T const from, T const to, U const param) noexcept
+  {
+    return from * (1 - param) + to * param;
+  }
+
+  template <AnyVec T, Primitive U>
+  [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> min(T const &left, U const max) noexcept
+  {
+    vec<T::size, std::remove_const_t<typename T::type>> rv;
+    for (int i = 0; i < T::size; i++)
+    {
+      rv[i] = std::min(left[i], static_cast<T::type>(max));
+    }
+    return rv;
+  }
+
+  template <AnyVec T, Primitive U>
+  [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> max(T const &left, U const min) noexcept
+  {
+    vec<T::size, std::remove_const_t<typename T::type>> rv;
+    for (int i = 0; i < T::size; i++)
+    {
+      rv[i] = std::max(left[i], static_cast<T::type>(min));
+    }
+    return rv;
+  }
+
+  template <AnyVec T, Primitive U>
+  [[nodiscard]] constexpr void rmin(T &left, U const max) noexcept
+  {
+    for (int i = 0; i < T::size; i++)
+    {
+      left[i] = std::min(left[i], static_cast<T::type>(max));
+    }
+  }
+
+  template <AnyVec T, Primitive U>
+  [[nodiscard]] constexpr void rmax(T &left, U const min) noexcept
+  {
+    for (int i = 0; i < T::size; i++)
+    {
+      left[i] = std::max(left[i], static_cast<T::type>(min));
+    }
   }
 } // namespace engine::core::math

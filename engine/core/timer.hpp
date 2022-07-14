@@ -6,9 +6,12 @@ namespace engine::core
   class Timer
   {
   public:
-    Timer() { reset(); }
+    Timer() {
+        current_ = clock::now();
+        reset(); 
+    }
     void reset() { start_ = current_; }
-    float elapsed()
+    constexpr float elapsed() noexcept
     {
       current_ = clock::now();
       return std::chrono::duration_cast<std::chrono::duration<float>>(current_ - start_).count();

@@ -72,15 +72,25 @@ namespace engine::core::math
     return mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>>(right) *= left;
   }
 
+    template <AnyMat T, AnyMat U>
+    [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator-(T const left, U const &right) requires(T::size.x == U::size.x && T::size.y == U::size.y)
+    {
+      return mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>>(left) -= right;
+    }
+    template <AnyMat T, AnyMat U>
+    [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator+(T const &left, U const &right) requires(T::size.x == U::size.x && T::size.y == U::size.y)
+    {
+      return mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>>(left) += right;
+    }
   template <AnyMat T>
   constexpr mat<T::size.y, T::size.x, std::remove_const_t<typename T::type>> transpose(T const &matrix)
   {
-    rmat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> return_value;
+    mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> return_value;
     for (int i = 0; i < T::size.x; i++)
     {
       for (int j = 0; j < T::size.y; j++)
       {
-        return_value[j][i] = matrix[i][j];
+        return_value.arr[j * T::size.x + i] = matrix[i][j];
       }
     }
     return return_value;
@@ -93,7 +103,7 @@ namespace engine::core::math
     {
       for (int j = 0; j < T::size.y; j++)
       {
-        return_value[j][i].set_ptr(matrix[i][j]);
+        return_value.arr[j * T::size.x + i].set_ptr(matrix[i][j]);
       }
     }
     return return_value;
@@ -106,7 +116,7 @@ namespace engine::core::math
     {
       for (int j = 0; j < T::size.y; j++)
       {
-        return_value[j][i].set_ptr(matrix[i][j]);
+        return_value.arr[j * T::size.x + i].set_ptr(matrix[i][j]);
       }
     }
     return return_value;
@@ -120,9 +130,7 @@ namespace engine::core::math
   template <AnyMat T>
   constexpr typename T::type det_3(T const &m) requires(T::size.x == T::size.y && T::size.x == 3)
   {
-    return +m[0][0] * (m[1][1] * m[2][2] - m[2][1] * m[1][2]) -
-           m[1][0] * (m[0][1] * m[2][2] - m[2][1] * m[0][2]) +
-           m[2][0] * (m[0][1] * m[1][2] - m[1][1] * m[0][2]);
+    return +m[0][0] * (m[1][1] * m[2][2] - m[2][1] * m[1][2]) - m[1][0] * (m[0][1] * m[2][2] - m[2][1] * m[0][2]) + m[2][0] * (m[0][1] * m[1][2] - m[1][1] * m[0][2]);
   }
   template <AnyMat T>
   constexpr typename T::type det_4(T const &m) requires(T::size.x == T::size.y && T::size.x == 4)
@@ -161,16 +169,16 @@ namespace engine::core::math
     mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> return_value;
     mat<T::size.x - 1, T::size.y - 1, std::remove_const_t<typename T::type>> temp;
     int sign = 1;
-    for (int i = 0; i < T::size.x; i++)
+    for (size_t i = 0; i < T::size.x; i++)
     {
-      for (int j = 0; j < T::size.x; j++)
+      for (size_t j = 0; j < T::size.x; j++)
       {
         // create 3x3 matrix using m without column i and row j
-        for (int k = 0, s = 0; k < T::size.x; k++)
+        for (size_t k = 0, s = 0; k < T::size.x; k++)
         {
           if (k == j)
             continue;
-          for (int l = 0, t = 0; l < T::size.x; l++)
+          for (size_t l = 0, t = 0; l < T::size.x; l++)
           {
             if (l == i)
               continue;
@@ -323,12 +331,12 @@ namespace engine::core::math
     dst[2][1] = src[1][2];
 
     vec3 lengths{
-        std::sqrt(dst[0][0] * dst[0][0] + dst[0][1] * dst[0][1] +
-                  dst[0][2] * dst[0][2]),
-        std::sqrt(dst[1][0] * dst[1][0] + dst[1][1] * dst[1][1] +
-                  dst[1][2] * dst[1][2]),
-        std::sqrt(dst[2][0] * dst[2][0] + dst[2][1] * dst[2][1] +
-                  dst[2][2] * dst[2][2]),
+        core::math::detail::sqrt(dst[0][0] * dst[0][0] + dst[0][1] * dst[0][1] +
+                                 dst[0][2] * dst[0][2]),
+        core::math::detail::sqrt(dst[1][0] * dst[1][0] + dst[1][1] * dst[1][1] +
+                                 dst[1][2] * dst[1][2]),
+        core::math::detail::sqrt(dst[2][0] * dst[2][0] + dst[2][1] * dst[2][1] +
+                                 dst[2][2] * dst[2][2]),
     };
 
     dst[0][0] = 1.0f / (dst[0][0] * lengths[0]);

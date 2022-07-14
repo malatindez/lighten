@@ -1,5 +1,5 @@
 #pragma once
-#include "math/plane.hpp"
+#include "core/math/plane.hpp"
 #include "render/material.hpp"
 namespace engine::render
 {

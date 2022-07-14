@@ -1,16 +1,14 @@
-#include "mesh-renderer.hpp"
+#include "scene-mesh.hpp"
 namespace engine::components
 {
-    MeshRenderer::MeshRenderer(std::shared_ptr<const render::Mesh> value) : mesh_(value)
+    SceneMesh::SceneMesh(std::shared_ptr<const render::Mesh> value) : mesh_(value)
     {
         assert(value != nullptr);
     }
-    bool MeshRenderer::CheckIntersection(Transform const &transform, core::math::Intersection &i,
-                                         core::math::Ray const &ray) const
+    bool SceneMesh::CheckIntersection(Transform const &transform, core::math::Intersection &i,
+                                      core::math::Ray const &ray) const
     {
         core::math::Ray local = ray;
-        static const float t0 = 0;
-        static const float t1 = 1;
         local.direction() =
             (core::math::vec4{local.direction(), 0} * transform.inv_model).as_vec<3>();
         local.origin() =
@@ -35,13 +33,13 @@ namespace engine::components
         }
         return rv;
     }
-    void MeshRenderer::SetMesh(std::shared_ptr<const render::Mesh> mesh)
+    void SceneMesh::SetMesh(std::shared_ptr<const render::Mesh> mesh)
     {
         assert(mesh != nullptr);
         mesh_ = mesh;
     }
 
-    bool MeshRenderer::CheckTriangleIntersection(
+    bool SceneMesh::CheckTriangleIntersection(
         core::math::vec3 const &p0,
         core::math::vec3 const &p1,
         core::math::vec3 const &p2,

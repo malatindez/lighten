@@ -10,7 +10,7 @@ namespace engine::core::math
   struct mat
   {
     using type = T;
-    static constexpr ivec2 size{a, b};
+    static constexpr vec<2, size_t> size{a, b};
 
     constexpr mat() = default;
     template <Primitive P>
@@ -74,11 +74,11 @@ namespace engine::core::math
     static constexpr size_t get_parameter_pack_size();
 
     template <Primitive U>
-    constexpr void unpack_data(int offset, U u);
+    constexpr void unpack_data(size_t offset, U u);
     template <class V>
-    constexpr void unpack_data(int offset, V vec);
+    constexpr void unpack_data(size_t offset, V vec);
     template <typename A, typename B, typename... C>
-    constexpr void unpack_data(int offset, A, B, C...);
+    constexpr void unpack_data(size_t offset, A, B, C...);
   };
 } // namespace engine::core::math
 #pragma warning(pop)
