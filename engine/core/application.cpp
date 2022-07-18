@@ -1,5 +1,6 @@
 #include "application.hpp"
 
+#include "include/win_debug.hpp"
 #include "core/events.hpp"
 #include "direct3d/globals.hpp"
 #include <memory>
@@ -7,6 +8,7 @@
 #include <thread>
 #include <fstream>
 #include <filesystem>
+
 
 static std::string const kDefaultConfig =
     R"(
@@ -45,7 +47,9 @@ namespace engine::core
             return;
         }
         application_ = std::unique_ptr<Application>(new Application{});
+
         direct3d::Init();
+        RedirectOutputDebugString([&](std::string_view view) { application_->logger_->info(view); });
     }
 
     void Application::Exit() { application_->running_ = false; }

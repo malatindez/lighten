@@ -19,32 +19,42 @@ namespace engine::core
         initialize();
     }
     
-    void SwapchainWindow::OnSizeChangeEnd()
+    void SwapchainWindow::OnSizeChanged()
     {
         if (frame_buffer_.valid())
         {
+            direct3d::devcon4->OMSetRenderTargets(0, nullptr, nullptr);
             frame_buffer_.reset();
             frame_buffer_view_.reset();
             depth_buffer_.reset();
-            depth_buffer_view_.reset();
-            swapchain_->ResizeBuffers(0, window_size().x, window_size().y, DXGI_FORMAT_UNKNOWN, 0);
+            depth_buffer_view_.reset(); 
+            swapchain_->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
         }
         initializeFramebuffer();
         initializeDepthbuffer();
-
+        
+        // Set up the viewport.
+        D3D11_VIEWPORT vp;
+        vp.Width = window_size().x;
+        vp.Height = window_size().y;
+        vp.MinDepth = 0.0f;
+        vp.MaxDepth = 1.0f;
+        vp.TopLeftX = 0;
+        vp.TopLeftY = 0;
+        direct3d::devcon4->RSSetViewports(1, &vp);
     }
     direct3d::SwapChain1 initializeSwapchain(HWND hWnd)
     {
         DXGI_SWAP_CHAIN_DESC1 desc;
         ZeroMemory(&desc, sizeof(DXGI_SWAP_CHAIN_DESC1));
-        desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+        desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         desc.Stereo = FALSE;
         desc.SampleDesc.Count = 1;
         desc.SampleDesc.Quality = 0;
-        desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        desc.BufferUsage = DXGI_USAGE_BACK_BUFFER | DXGI_USAGE_RENDER_TARGET_OUTPUT;
         desc.BufferCount = 2;
-        desc.Scaling = DXGI_SCALING_STRETCH;
-        desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+        desc.Scaling = DXGI_SCALING_NONE;
+        desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
         desc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
         desc.Flags = 0;
 
@@ -104,8 +114,7 @@ namespace engine::core
     void SwapchainWindow::initialize()
     {
         swapchain_ = initializeSwapchain(handle());
-        initializeFramebuffer();
-        initializeDepthbuffer();
+        OnSizeChanged();
 
     }
 

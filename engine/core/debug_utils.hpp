@@ -23,8 +23,8 @@ namespace engine::core::debug_utils
     inline std::string CurrentSourceLocation(std::source_location location = std::source_location::current())
     {
         std::stringstream ss;
-        ss << "File " << location.file_name() << ":";
-        ss << location.function_name() << "(" << location.line() << ":" << location.column() << ")";
+        ss << "[" << location.file_name() << "] ";
+        ss << location.function_name() << "(line " << location.line() << ", column " << location.column() << ") ";
         return ss.str();
     }
 #endif

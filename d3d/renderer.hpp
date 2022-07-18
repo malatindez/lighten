@@ -33,6 +33,7 @@ private:
 
     void initialize();
 
+    bool skip_render_;
     std::shared_ptr<engine::core::SwapchainWindow> window_;
     Triangle triangle_;
     engine::direct3d::RasterizerState1 rasterizer_state_;

@@ -6,10 +6,8 @@ using namespace math;
 
 void Renderer::OnEvent(events::Event &event)
     {
-
         if (event.type() == events::EventType::AppRender)
         {
-            D3D11_VIEWPORT viewport = {0.0f, 0.0f, static_cast<float>(window_->window_size().x), static_cast<float>(window_->window_size().y), 0.0f, 1.0f};
             float time = Application::TimeFromStart();
 
             static vec4 const kSkyColor{vec3{0.25f}, 0.0f};
@@ -17,22 +15,23 @@ void Renderer::OnEvent(events::Event &event)
             ID3D11RenderTargetView *view = window_->frame_buffer_view();
             devcon4->OMSetRenderTargets(1, &view, nullptr);
 
+            devcon4->RSSetState(rasterizer_state_);
+            ID3D11SamplerState* sampler_state = sampler_state_;
+            devcon4->PSSetSamplers(0, 1, &sampler_state);
+            ID3D11RenderTargetView* frame_buffer_view = window_->frame_buffer_view();
+
+            devcon4->OMSetRenderTargets(1, &frame_buffer_view, window_->depth_buffer_view());
+            devcon4->OMSetDepthStencilState(depth_stencil_state_, 0);
+            devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
+
+            engine::core::Application::logger().info(core::debug_utils::CurrentSourceLocation() + "Failed to initialize framebuffer");
+
             // clear the back buffer to a deep blue
             devcon4->ClearRenderTargetView(window_->frame_buffer_view(), kSkyColor.data.data());
             devcon4->ClearDepthStencilView(window_->depth_buffer_view(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
             triangle_.shader.apply_shader();
             triangle_.mesh.render();
-
-            devcon4->RSSetViewports(1, &viewport);
-            devcon4->RSSetState(rasterizer_state_);
-            ID3D11SamplerState *sampler_state = sampler_state_;
-            devcon4->PSSetSamplers(0, 1, &sampler_state);
-            ID3D11RenderTargetView *frame_buffer_view = window_->frame_buffer_view();
-
-            devcon4->OMSetRenderTargets(1, &frame_buffer_view, window_->depth_buffer_view());
-            devcon4->OMSetDepthStencilState(depth_stencil_state_, 0);
-            devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 
             // switch the back buffer and the front buffer
             window_->swapchain()->Present(1, 0);

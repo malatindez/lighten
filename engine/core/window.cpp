@@ -111,6 +111,7 @@ namespace engine::core
     {
       auto window_pos = reinterpret_cast<LPWINDOWPOS>(l_param);
       position_ = core::math::ivec2{window_pos->x, window_pos->y};
+      OnSizeChangeEnd();
     }
     else if (message == WM_DESTROY)
     {
