@@ -19,7 +19,7 @@ namespace engine::core
         initialize();
     }
     
-    void SwapchainWindow::OnSizeChanged()
+    void SwapchainWindow::OnSizeChangeEnd()
     {
         if (frame_buffer_.valid())
         {
@@ -114,7 +114,7 @@ namespace engine::core
     void SwapchainWindow::initialize()
     {
         swapchain_ = initializeSwapchain(handle());
-        OnSizeChanged();
+        OnSizeChangeEnd();
 
     }
 

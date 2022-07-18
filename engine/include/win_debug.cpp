@@ -52,7 +52,8 @@ LONG NTAPI VexHandler(PEXCEPTION_POINTERS ExceptionInfo)
 
     return EXCEPTION_CONTINUE_SEARCH;
 }
-namespace engine
+
+namespace engine::debug
 {
 void RedirectOutputDebugString(std::function<void(std::string_view)> const &callback)
 {

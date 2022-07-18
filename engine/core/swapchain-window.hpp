@@ -35,7 +35,7 @@ namespace engine::core
         void initializeFramebuffer();
         void initializeDepthbuffer();
 
-        void OnSizeChanged() override;
+        void OnSizeChangeEnd() override;
 
         direct3d::SwapChain1 swapchain_;
         direct3d::Texture2D frame_buffer_;

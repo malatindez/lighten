@@ -53,20 +53,24 @@ namespace engine::direct3d
         {
             D3DCompileFromFile(vertex_path.wstring().c_str(), nullptr, nullptr, "main",
                                "vs_5_0", kD3DShaderCompileFlags, 0, &vertex_shader_blob, &errors);
+
+            // Create the vertex shader from the buffer.
+            direct3d::device5->CreateVertexShader(vertex_shader_blob->GetBufferPointer(), vertex_shader_blob->GetBufferSize(), nullptr, &vertex_shader);
+
         }
-        catch (std::exception e)
+        catch (...)
         {
-            auto *err_str = (const char *)errors->GetBufferPointer();
+            const char* err_str = "NO INFO";
+            if (errors != nullptr) {
+                err_str = (const char*)errors->GetBufferPointer();
+            }
             std::stringstream ss;
             ss << core::debug_utils::CurrentSourceLocation() << "[" << vertex_path << "] Vertex shader compilation error: " << std::string_view(err_str);
 
             throw CompilationError(ss.str());
         }
-
-        // Create the vertex shader from the buffer.
-        direct3d::device5->CreateVertexShader(vertex_shader_blob->GetBufferPointer(), vertex_shader_blob->GetBufferSize(), nullptr, &vertex_shader);
-
         ID3D11InputLayout *layout;
+
 
         direct3d::device5->CreateInputLayout(ied.data(), static_cast<uint32_t>(ied.size()), vertex_shader_blob->GetBufferPointer(), vertex_shader_blob->GetBufferSize(), &layout);
 
@@ -82,19 +86,24 @@ namespace engine::direct3d
         {
             D3DCompileFromFile(pixel_path.wstring().c_str(), nullptr, nullptr, "main",
                                "ps_5_0", kD3DShaderCompileFlags, 0, &pixel_shader_blob, &errors);
+            if (pixel_shader_blob == nullptr)
+            {
+                throw 1;
+            }
+            direct3d::device->CreatePixelShader(pixel_shader_blob->GetBufferPointer(), pixel_shader_blob->GetBufferSize(), nullptr, &pixel_shader);
         }
-        catch (std::exception e)
+        catch (...)
         {
-            auto *err_str = (const char *)errors->GetBufferPointer();
+            const char* err_str = "NO INFO";
+            if (errors != nullptr) {
+                err_str = (const char*)errors->GetBufferPointer();
+            }
             std::stringstream ss;
             ss << core::debug_utils::CurrentSourceLocation() << "[" << pixel_path << "] Pixel shader compilation error: " << std::string_view(err_str);
 
             throw CompilationError(ss.str());
         }
 
-        // Create the pixel shader from the buffer.
-        direct3d::device->CreatePixelShader(pixel_shader_blob->GetBufferPointer(),
-                                            pixel_shader_blob->GetBufferSize(), nullptr, &pixel_shader);
         return pixel_shader;
     }
     inline ID3D11Buffer *ShaderProgram::InitializeUniformBuffer(uint32_t uniform_buffer_size)

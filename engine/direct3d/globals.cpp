@@ -36,7 +36,7 @@ namespace engine::direct3d
                 std::wstring temp = desc.Description;
                 std::stringstream output;
                 output << "GPU #";
-                output << index;
+                output << index << " ";
                 output << std::string(temp.begin(), temp.end());
                 core::Application::logger().info(output.str());
             }

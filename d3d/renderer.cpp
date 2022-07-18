@@ -24,8 +24,6 @@ void Renderer::OnEvent(events::Event &event)
             devcon4->OMSetDepthStencilState(depth_stencil_state_, 0);
             devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 
-            engine::core::Application::logger().info(core::debug_utils::CurrentSourceLocation() + "Failed to initialize framebuffer");
-
             // clear the back buffer to a deep blue
             devcon4->ClearRenderTargetView(window_->frame_buffer_view(), kSkyColor.data.data());
             devcon4->ClearDepthStencilView(window_->depth_buffer_view(), D3D11_CLEAR_DEPTH, 1.0f, 0);
