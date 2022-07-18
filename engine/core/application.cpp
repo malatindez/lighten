@@ -1,10 +1,12 @@
 #include "application.hpp"
 
 #include "core/events.hpp"
-
+#include "direct3d/globals.hpp"
 #include <memory>
 #include <numeric>
 #include <thread>
+#include <fstream>
+#include <filesystem>
 
 static std::string const kDefaultConfig =
     R"(
@@ -43,6 +45,7 @@ namespace engine::core
             return;
         }
         application_ = std::unique_ptr<Application>(new Application{});
+        direct3d::Init();
     }
 
     void Application::Exit() { application_->running_ = false; }
@@ -75,7 +78,7 @@ namespace engine::core
                 static int frame_num = 0;
                 last_100_frames[frame_num % 100] = render_.elapsed();
                 frame_num++;
-                logger_->info((std::to_string(100 / std::accumulate(last_100_frames.begin(), last_100_frames.end(), 0.0f)) + "\n"));
+                logger_->info(std::to_string(100 / std::accumulate(last_100_frames.begin(), last_100_frames.end(), 0.0f)));
             }
             std::this_thread::yield();
         }
@@ -124,6 +127,8 @@ namespace engine::core
         auto t = (target_folder / "latest.log");
         auto y = t.string();
         logger_ = spdlog::basic_logger_mt<spdlog::async_factory>("async_file_logger", y);
+
+
     }
 
     Application::~Application()

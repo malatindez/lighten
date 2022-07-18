@@ -103,6 +103,10 @@ namespace engine::core
       window_size_ = core::math::ivec2{LOWORD(l_param), HIWORD(l_param)};
       OnSizeChanged();
     }
+    else if (message == WM_EXITSIZEMOVE)
+    {
+        OnSizeChangeEnd();
+    }
     else if (message == WM_WINDOWPOSCHANGED) // update window position if it has changed
     {
       auto window_pos = reinterpret_cast<LPWINDOWPOS>(l_param);

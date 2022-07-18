@@ -15,6 +15,10 @@ namespace engine::core::math
     [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator*(T const &left, U const right);
     template <AnyMat T, Primitive U>
     [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator*(U const left, T const &right);
+    template <AnyMat T, Primitive U>
+    [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator-(T const& left, U const right);
+    template <AnyMat T, Primitive U>
+    [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator+(U const left, T const& right);
     template <AnyMat T, AnyMat U>
     [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator-(T const left, U const &right) requires(T::size.x == U::size.x && T::size.y == U::size.y);
     template <AnyMat T, AnyMat U>
