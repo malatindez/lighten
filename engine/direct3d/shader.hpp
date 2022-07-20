@@ -35,23 +35,21 @@ namespace engine::direct3d
         };
         ShaderProgram(std::filesystem::path const &vertex_path,
                       std::filesystem::path const &pixel_path,
-                      uint32_t uniform_buffer_size,
                       std::vector<D3D11_INPUT_ELEMENT_DESC> const &ied) ENGINE_D3D_SHADER_NOEXCEPT;
 
         [[nodiscard]] inline direct3d::VertexShader vertex_shader() const noexcept { return vertex_shader_; }
         [[nodiscard]] inline direct3d::PixelShader pixel_shader() const noexcept { return pixel_shader_; }
-        [[nodiscard]] inline direct3d::Buffer uniform_buffer() const noexcept { return uniform_buffer_; }
         void apply_shader();
 
+        static direct3d::Buffer InitializeUniformBuffer(uint32_t uniform_buffer_size);
+        
     private:
-        inline std::pair<ID3D11VertexShader *, ID3D11InputLayout *> CompileVertexShader(std::filesystem::path const &vertex_path,
+        std::pair<ID3D11VertexShader *, ID3D11InputLayout *> CompileVertexShader(std::filesystem::path const &vertex_path,
                                                                                         std::vector<D3D11_INPUT_ELEMENT_DESC> const &ied) const;
-        inline ID3D11PixelShader *CompilePixelShader(std::filesystem::path const &pixel_path);
-        inline ID3D11Buffer *InitializeUniformBuffer(uint32_t uniform_buffer_size);
+        ID3D11PixelShader *CompilePixelShader(std::filesystem::path const &pixel_path);
 
         direct3d::VertexShader vertex_shader_;
         direct3d::PixelShader pixel_shader_;
-        direct3d::Buffer uniform_buffer_;
         direct3d::InputLayout input_layout_;
     };
 } // namespace engine::direct3d

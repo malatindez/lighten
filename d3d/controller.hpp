@@ -10,7 +10,8 @@
 class Controller : public engine::core::Layer
 {
 public:
-    Controller(engine::core::Window &window);
+    using UpdateCallback = std::function<void(float)>;
+    Controller(std::shared_ptr<engine::core::Window> window);
     void OnEvent(engine::core::events::Event &event) override;
 
     std::vector<std::function<void(float)>> &update_callbacks() { return update_callbacks_; }
@@ -18,9 +19,9 @@ public:
 private:
     void Tick(float delta_time);
 
-    engine::core::Window &window_;
+    std::shared_ptr<engine::core::Window> window_;
     engine::core::ParallelExecutor executor{
         static_cast<uint32_t>(std::max(1, std::max(int32_t(engine::core::ParallelExecutor::kMaxThreads) - 4, int32_t(engine::core::ParallelExecutor::kHalfThreads))))};
-    std::vector<std::function<void(float)>> update_callbacks_;
+    std::vector<UpdateCallback> update_callbacks_;
     long double time_from_start_ = 0;
 };

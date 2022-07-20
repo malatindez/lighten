@@ -10,7 +10,7 @@ void Renderer::OnEvent(events::Event &event)
         {
             float time = Application::TimeFromStart();
 
-            static vec4 const kSkyColor{vec3{0.25f}, 0.0f};
+            vec4 const kSkyColor{vec3{0.25f}, 0.0f};
 
             ID3D11RenderTargetView *view = window_->frame_buffer_view();
             devcon4->OMSetRenderTargets(1, &view, nullptr);
@@ -47,8 +47,12 @@ void Renderer::OnEvent(events::Event &event)
             {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
         };
 
-        return Triangle{.mesh = TriangleMesh(),
-                        .shader = ShaderProgram(vertex_path, pixel_path, sizeof(Triangle::ShaderInput), d3d_input_desc)};
+        
+        return Triangle{
+            .uniform_buffer = ShaderProgram::InitializeUniformBuffer(sizeof(Triangle::ShaderInput)), 
+            .mesh = TriangleMesh(),
+            .shader = ShaderProgram(vertex_path, pixel_path, d3d_input_desc)
+        };
     }
 
     void Renderer::initialize()
@@ -76,12 +80,11 @@ void Renderer::OnEvent(events::Event &event)
         D3D11_DEPTH_STENCIL_DESC depth_stencil_desc = {};
         depth_stencil_desc.DepthEnable = TRUE;
         depth_stencil_desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-        depth_stencil_desc.DepthFunc = D3D11_COMPARISON_LESS;
+        depth_stencil_desc.DepthFunc = D3D11_COMPARISON_GREATER_EQUAL;
 
         ID3D11DepthStencilState *depth_stencil_state;
 
-        device->CreateDepthStencilState(&depth_stencil_desc,
-                                                          &depth_stencil_state);
+        device->CreateDepthStencilState(&depth_stencil_desc, &depth_stencil_state);
 
         rasterizer_state_ = rasterizer_state;
         sampler_state_ = sampler_state;

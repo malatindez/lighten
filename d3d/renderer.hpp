@@ -18,6 +18,7 @@ public:
             engine::core::math::mat4 Projection;
             engine::core::math::vec3 LightVector;
         };
+        engine::direct3d::Buffer uniform_buffer;
         engine::direct3d::TriangleMesh mesh;
         engine::direct3d::ShaderProgram shader;
     };
@@ -39,4 +40,5 @@ private:
     engine::direct3d::RasterizerState1 rasterizer_state_;
     engine::direct3d::SamplerState sampler_state_;
     engine::direct3d::DepthStencilState depth_stencil_state_;
+
 };

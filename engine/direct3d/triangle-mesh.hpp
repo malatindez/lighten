@@ -16,9 +16,9 @@ public:
     { // create a triangle using the VERTEX struct
         static constexpr Vertex vertices[] =
         {
-            {core::math::vec3{0.0f, 0.5f, 0.0f}, core::math::vec4{1.0f, 0.0f, 0.0f, 1.0f}},
-            {core::math::vec3{0.45f, -0.5, 0.0f}, core::math::vec4{0.0f, 1.0f, 0.0f, 1.0f}},
-            {core::math::vec3{-0.45f, -0.5f, 0.0f}, core::math::vec4{0.0f, 0.0f, 1.0f, 1.0f}}
+            {core::math::vec3{0.0f, 0.5f, 1.0f}, core::math::vec4{1.0f, 0.0f, 0.0f, 1.0f}},
+            {core::math::vec3{0.45f, -0.5, 1.0f}, core::math::vec4{0.0f, 1.0f, 0.0f, 1.0f}},
+            {core::math::vec3{-0.45f, -0.5f, 1.0f}, core::math::vec4{0.0f, 0.0f, 1.0f, 1.0f}}
         };
         
         D3D11_BUFFER_DESC vertex_buffer_desc = {};

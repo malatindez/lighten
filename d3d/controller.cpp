@@ -5,7 +5,7 @@ using namespace core;
 using namespace events;
 using namespace math;
 
-Controller::Controller(Window &window) : window_(window)
+Controller::Controller(std::shared_ptr<engine::core::Window> window) : window_(window)
 {
 }
 
@@ -15,7 +15,7 @@ void Controller::OnEvent(Event &event)
     {
         if (event.type() == EventType::AppUpdate)
         {
-            window_.PeekOSMessages();
+            window_->PeekOSMessages();
         }
         else if (event.type() == EventType::AppTick)
         {

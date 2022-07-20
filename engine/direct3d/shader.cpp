@@ -3,7 +3,6 @@ namespace engine::direct3d
 {
     ShaderProgram::ShaderProgram(std::filesystem::path const &vertex_path,
                                  std::filesystem::path const &pixel_path,
-                                 uint32_t uniform_buffer_size,
                                  std::vector<D3D11_INPUT_ELEMENT_DESC> const &ied) ENGINE_D3D_SHADER_NOEXCEPT
     {
         try
@@ -14,8 +13,6 @@ namespace engine::direct3d
             input_layout_ = direct3d::InputLayout(layout);
 
             pixel_shader_ = direct3d::PixelShader(CompilePixelShader(pixel_path));
-            // round to 16 byte boundary
-            uniform_buffer_ = direct3d::Buffer(InitializeUniformBuffer(uniform_buffer_size + 0xf & 0xfffffff0));
         }
         catch (CompilationError const &e)
         {
@@ -106,8 +103,11 @@ namespace engine::direct3d
 
         return pixel_shader;
     }
-    inline ID3D11Buffer *ShaderProgram::InitializeUniformBuffer(uint32_t uniform_buffer_size)
+    direct3d::Buffer ShaderProgram::InitializeUniformBuffer(uint32_t uniform_buffer_size)
     {
+        constexpr auto RoundBufferSizeTo16Boundary = [](uint32_t x) -> uint32_t { return x + 0xf & 0xfffffff0; };
+        uniform_buffer_size = RoundBufferSizeTo16Boundary(uniform_buffer_size);
+
         // Setup the description of the dynamic matrix constant buffer that is in the
         // vertex shader.
         D3D11_BUFFER_DESC uniform_buffer_desc;
@@ -126,7 +126,9 @@ namespace engine::direct3d
         {
             throw RuntimeError("Error: Cannot initalize uniform buffer");
         }
-        return constant_buffer;
+        
+
+        return direct3d::Buffer { constant_buffer };
     }
 
 }

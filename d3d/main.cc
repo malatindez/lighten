@@ -43,7 +43,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int cmd_show)
 
     window->SetEventCallback(Application::event_function());
 
-    auto controller = std::make_shared<Controller>(*static_cast<Window *>(window.get()));
+    auto controller = std::make_shared<Controller>(std::static_pointer_cast<Window>(window));
 
     auto renderer = std::make_shared<Renderer>(window);
 
