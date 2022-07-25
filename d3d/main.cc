@@ -1,20 +1,19 @@
-#include "pch.hpp"
-#define NOMINMAX
-#include <Windows.h>
-
-#include "render/material.hpp"
-#include "components/scene-mesh.hpp"
 #include "controller.hpp"
 #include "core/application.hpp"
-#include "misc/camera-controller.hpp"
+#include "core/swapchain-window.hpp"
+#include "direct3d/common.hpp"
+#include "pch.hpp"
+#include "renderer.hpp"
+#include <filesystem>
 using namespace engine;
 using namespace core;
 using namespace math;
-using namespace components;
 
 // the entry point for any Windows program
 INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int cmd_show)
 {
+    Application::Init();
+
     WNDCLASSEXW wc;
     // clear out the window class for use
     ZeroMemory(&wc, sizeof(WNDCLASSEX));
@@ -27,7 +26,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int cmd_show)
     wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
 
     // create the window and use the result as the handle
-    auto bmwindow = std::make_shared<BitmapWindow>(
+    auto window = std::make_shared<SwapchainWindow>(
         wc, NULL,
         L"WindowClass1",                  // name of the window class
         L"Engine",                        // title of the window
@@ -38,19 +37,19 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int cmd_show)
         nullptr,                          // we aren't using menus, nullptr
         instance,                         // application handle
         nullptr);                         // used with multiple windows, nullptr
+
     // display the window on the screen
-    ShowWindow(bmwindow->handle(), cmd_show);
+    ShowWindow(window->handle(), cmd_show);
 
+    window->SetEventCallback(Application::event_function());
 
-    Application::Init();
+    auto controller = std::make_shared<Controller>(std::static_pointer_cast<Window>(window));
 
-    bmwindow->SetEventCallback(Application::event_function());
+    auto renderer = std::make_shared<Renderer>(window);
 
-    auto controller = std::make_shared<Controller>(*bmwindow);
+    Application::Get().AddLayer(controller);
+    Application::Get().AddLayer(renderer);
 
-    Application &application = Application::Get();
-    application.AddLayer(controller);
-    application.Run();
-    PostQuitMessage(0);
+    Application::Get().Run();
     return 0;
 }

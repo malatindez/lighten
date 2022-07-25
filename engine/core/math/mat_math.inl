@@ -72,6 +72,17 @@ namespace engine::core::math
     return mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>>(right) *= left;
   }
 
+  template <AnyMat T, Primitive U>
+  [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator-(T const& left, U const right)
+  {
+      return mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>>(left) -= right;
+  }
+  template <AnyMat T, Primitive U>
+  [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator+(U const left, T const& right)
+  {
+      return mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>>(left) += right;
+  }
+
     template <AnyMat T, AnyMat U>
     [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator-(T const left, U const &right) requires(T::size.x == U::size.x && T::size.y == U::size.y)
     {
@@ -215,10 +226,10 @@ namespace engine::core::math
   template <AnyMat T, Primitive U, AnyVec V>
   constexpr mat<4, 4, std::remove_const_t<typename T::type>> rotate(T const &matrix, U angle, V const &vector) requires(T::size.x == T::size.y && T::size.x == 4 && V::size == 3)
   {
-    typename T::type const c = core::math::cos(angle);
-    typename T::type const s = core::math::sin(angle);
+    typename T::type const c = std::cos(angle);
+    typename T::type const s = std::sin(angle);
     vec<3, typename T::type> axis = normalize(vector);
-    vec<3, typename T::type> temp = (T(1) - c) * axis;
+    vec<3, typename T::type> temp = (static_cast<typename T::type>(1) - c) * axis;
     mat<4, 4, typename T::type> rotate;
 
     rotate[0][0] = c + temp[0] * axis[0];

@@ -1,11 +1,9 @@
 #pragma once
-#include "core/bitmap-window.hpp"
 #include "core/timer.hpp"
 #include "core/utils.hpp"
 #include "events.hpp"
 #include "layer.hpp"
 #include "misc/ini.hpp"
-#include "misc/scene.hpp"
 #include "pch.hpp"
 #include <chrono>
 #include <spdlog/async.h>

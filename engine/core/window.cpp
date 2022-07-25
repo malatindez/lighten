@@ -1,4 +1,5 @@
 #include "core/window.hpp"
+#include "application.hpp"
 namespace engine::core
 {
   using namespace events;
@@ -103,6 +104,10 @@ namespace engine::core
       window_size_ = core::math::ivec2{LOWORD(l_param), HIWORD(l_param)};
       OnSizeChanged();
     }
+    else if (message == WM_EXITSIZEMOVE || message == WM_PAINT)
+    {
+        OnSizeChangeEnd();
+    }
     else if (message == WM_WINDOWPOSCHANGED) // update window position if it has changed
     {
       auto window_pos = reinterpret_cast<LPWINDOWPOS>(l_param);
@@ -113,7 +118,6 @@ namespace engine::core
       WindowCloseEvent event{handle_};
       event_callback_(event);
     }
-
     return DefWindowProcW(handle, message, w_param, l_param);
   }
 

@@ -1,16 +1,23 @@
 #include "application.hpp"
 
 #include "core/events.hpp"
-
+#include "direct3d/globals.hpp"
+#include "include/win_debug.hpp"
+#include <filesystem>
+#include <fstream>
 #include <memory>
 #include <numeric>
 #include <thread>
+#include "spdlog/sinks/stdout_color_sinks.h"
+#include "spdlog/sinks/ansicolor_sink.h"
 
 static std::string const kDefaultConfig =
     R"(
 [Logger]
 is_absolute = no
 folder = logs
+console_enabled = true
+log_level = trace
 )";
 
 namespace engine::core
@@ -25,6 +32,7 @@ namespace engine::core
         {
             return;
         }
+        
 
         for (auto const &layer : application_->layers_)
         {
@@ -43,9 +51,42 @@ namespace engine::core
             return;
         }
         application_ = std::unique_ptr<Application>(new Application{});
+        debug::RedirectOutputDebugString([&](std::string_view view)
+                                  { application_->logger_->info(view); });
+        if (config()["Logger"]["console_enabled"].as_boolean())
+        {
+            AllocConsole();
+            freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
+            freopen_s((FILE**)stderr, "CONOUT$", "w", stderr);
+            auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_st>();
+            stdout_sink->set_level(spdlog::level::trace);
+            logger().sinks().push_back(stdout_sink);
+            logger().set_level(spdlog::level::trace);
+        }
+        spdlog::set_default_logger(application_->logger_);
+
+        auto func = [](LPEXCEPTION_POINTERS) -> LONG
+        {
+            for (auto const& sink : logger().sinks())
+            {
+                sink->flush();
+            }
+            return EXCEPTION_EXECUTE_HANDLER;
+        };
+        // TODO: figure out how to flush log if the program is terminated.
+        // neither of this isn't working
+        SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)&func);
+        std::atexit([]() {application_->logger_->flush(); });
+        std::set_terminate([]() {application_->logger_->flush(); });
+
+        direct3d::Init();
     }
 
-    void Application::Exit() { application_->running_ = false; }
+    void Application::Exit() 
+    { 
+        application_->running_ = false; 
+        application_->logger_->flush();
+    }
 
     void Application::Run()
     {
@@ -73,9 +114,12 @@ namespace engine::core
                 assert(!render_event.handled);
                 static std::vector<float> last_100_frames(100);
                 static int frame_num = 0;
-                last_100_frames[frame_num % 100] = render_.elapsed();
+                last_100_frames[frame_num %= 100] = render_.elapsed();
                 frame_num++;
-                logger_->info((std::to_string(100 / std::accumulate(last_100_frames.begin(), last_100_frames.end(), 0.0f)) + "\n"));
+                float avg = 100 / std::accumulate(last_100_frames.begin(), last_100_frames.end(), 0.0f);
+                if (avg < 15 || frame_num == 100) {
+                    logger_->trace("Average fps based of last 100 frames: " + std::to_string(avg));
+                }
             }
             std::this_thread::yield();
         }
@@ -123,7 +167,9 @@ namespace engine::core
         }
         auto t = (target_folder / "latest.log");
         auto y = t.string();
-        logger_ = spdlog::basic_logger_mt<spdlog::async_factory>("async_file_logger", y);
+        logger_ = spdlog::basic_logger_mt<spdlog::async_factory>("Engine", y);
+        logger_->set_level(spdlog::level::debug);
+        logger_->sinks()[0]->set_level(spdlog::level::debug);
     }
 
     Application::~Application()

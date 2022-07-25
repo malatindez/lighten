@@ -449,7 +449,7 @@ namespace engine::core::math
     vec<T::size, std::remove_const_t<typename T::type>> rv;
     for (int i = 0; i < T::size; i++)
     {
-      rv[i] = std::min(left[i], static_cast<T::type>(max));
+      rv[i] = std::min(left[i], static_cast<typename T::type>(max));
     }
     return rv;
   }
@@ -460,26 +460,26 @@ namespace engine::core::math
     vec<T::size, std::remove_const_t<typename T::type>> rv;
     for (int i = 0; i < T::size; i++)
     {
-      rv[i] = std::max(left[i], static_cast<T::type>(min));
+      rv[i] = std::max(left[i], static_cast<typename T::type>(min));
     }
     return rv;
   }
 
   template <AnyVec T, Primitive U>
-  [[nodiscard]] constexpr void rmin(T &left, U const max) noexcept
+  constexpr void rmin(T &left, U const max) noexcept
   {
     for (int i = 0; i < T::size; i++)
     {
-      left[i] = std::min(left[i], static_cast<T::type>(max));
+      left[i] = std::min(left[i], static_cast<typename T::type>(max));
     }
   }
 
   template <AnyVec T, Primitive U>
-  [[nodiscard]] constexpr void rmax(T &left, U const min) noexcept
+  constexpr void rmax(T &left, U const min) noexcept
   {
     for (int i = 0; i < T::size; i++)
     {
-      left[i] = std::max(left[i], static_cast<T::type>(min));
+      left[i] = std::max(left[i], static_cast<typename T::type>(min));
     }
   }
 } // namespace engine::core::math

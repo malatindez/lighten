@@ -43,7 +43,8 @@ namespace engine::core
     virtual bool PeekOSMessages();
 
   protected:
-    virtual void OnSizeChanged() {}
+      virtual void OnSizeChanged() {}
+      virtual void OnSizeChangeEnd() {}
 
   private:
     LRESULT CALLBACK WindowProcCallback(HWND handle, UINT message, WPARAM w_param,
