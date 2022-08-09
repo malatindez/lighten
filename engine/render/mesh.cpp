@@ -1,5 +1,5 @@
 #include "mesh.hpp"
-#include "core/utils.hpp"
+#include "utils/utils.hpp"
 #include <cstdlib>
 #include <string_view>
 #include <system_error>

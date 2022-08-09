@@ -63,7 +63,7 @@ namespace engine::direct3d
                 err_str = (const char *) errors->GetBufferPointer();
             }
             std::stringstream ss;
-            ss << core::debug_utils::CurrentSourceLocation() << "[" << vertex_path << "] Vertex shader compilation error: " << std::string_view(err_str);
+            ss << utils::CurrentSourceLocation() << "[" << vertex_path << "] Vertex shader compilation error: " << std::string_view(err_str);
 
             throw CompilationError(ss.str());
         }
@@ -98,7 +98,7 @@ namespace engine::direct3d
                 err_str = (const char *) errors->GetBufferPointer();
             }
             std::stringstream ss;
-            ss << core::debug_utils::CurrentSourceLocation() << "[" << pixel_path << "] Pixel shader compilation error: " << std::string_view(err_str);
+            ss << utils::CurrentSourceLocation() << "[" << pixel_path << "] Pixel shader compilation error: " << std::string_view(err_str);
 
             throw CompilationError(ss.str());
         }

@@ -1,13 +1,11 @@
 #pragma once
-#include "core/timer.hpp"
-#include "core/utils.hpp"
+#include "utils/utils.hpp"
 #include "events.hpp"
-#include "layer.hpp"
 #include "misc/ini.hpp"
 #include "pch.hpp"
 #include <chrono>
 #include "include/spdlog.hpp"
-#include "layer-stack-threadsafe.hpp"
+#include "layers/layer-stack-threadsafe.hpp"
 
 namespace engine::core
 {
@@ -57,8 +55,8 @@ namespace engine::core
 
         bool running_ = true;
 
-        SteadyTimer render_;
-        SteadyTimer tick_;
+        utils::SteadyTimer render_;
+        utils::SteadyTimer tick_;
 
         EventCallbackFn event_function_;
 
@@ -66,7 +64,7 @@ namespace engine::core
         std::shared_ptr<spdlog::logger> logger_;
 
         static std::unique_ptr<Application> application_;
-        static SteadyTimer from_start_;
+        static utils::SteadyTimer from_start_;
         friend INT WINAPI::wWinMain(HINSTANCE, HINSTANCE, PWSTR, int cmd_show);
     };
 } // namespace engine::core

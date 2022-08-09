@@ -1,5 +1,8 @@
 #include "ini.hpp"
-using namespace engine::core;
+namespace
+{
+    using namespace engine::utils;
+}
 namespace engine::ini
 {
     template <typename T>

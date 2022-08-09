@@ -1,5 +1,5 @@
 #pragma once
-#include "core/utils.hpp"
+#include "utils/utils.hpp"
 #include <algorithm>
 #include <cstdlib>
 #include <map>
@@ -44,7 +44,7 @@ namespace engine::ini
             }
             else if (type_ == Type::kString)
             {
-                std::string temp = core::utils::as_lowercase(value_);
+                std::string temp = utils::as_lowercase(value_);
                 if (temp == "yes" || temp == "true" || temp == "on")
                 {
                     return true;
@@ -93,7 +93,7 @@ namespace engine::ini
         template <typename T>
         constexpr Entry &operator=(T t) requires(std::is_constructible_v<std::string, T>)
         {
-            if (core::utils::trim(t) != t)
+            if (utils::trim(t) != t)
             {
                 throw std::invalid_argument("The input string should be trimmed!");
             }

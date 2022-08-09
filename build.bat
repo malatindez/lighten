@@ -1,6 +1,6 @@
 @echo off
-echo "Updating submodules... "
-git submodule update --init -- recursive
+echo|set /p="Updating submodules... "
+git submodule update --init --recursive
 echo [32mDone![0m
 if not exist build mkdir build
 cd build
@@ -16,7 +16,7 @@ cmake --build . --config Release
 :open_folder
 set /P c=Open Solution[Y/N]?
 if /I "%c%" EQU "N" goto :end
-dle_internship.sln
+start dle_internship.sln
 :end
-explorer .
+cd ..
 pause

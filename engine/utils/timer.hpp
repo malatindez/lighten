@@ -1,6 +1,6 @@
 #pragma once
 #include <chrono>
-namespace engine::core
+namespace engine::utils
 {
     template <class clock>
     class Timer
@@ -13,7 +13,7 @@ namespace engine::core
         }
         void reset_to_now() { start_ = clock::now(); }
         void reset() { start_ = current_; }
-        
+
         constexpr float elapsed() noexcept
         {
             current_ = clock::now();

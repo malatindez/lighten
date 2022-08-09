@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "core/application.hpp"
-#include "core/debug_utils.hpp"
+#include "utils/debug.hpp"
 #include "globals.hpp"
 #include <filesystem>
 #include <optional>

@@ -30,7 +30,7 @@
 #endif
 
 #ifdef ENGINE_NO_SOURCE_LOCATION
-#include "detail/debug_with_source_location.hpp"
-#else
 #include "detail/debug_without_source_location.hpp"
+#else
+#include "detail/debug_with_source_location.hpp"
 #endif

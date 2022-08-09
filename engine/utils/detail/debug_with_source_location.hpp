@@ -15,7 +15,7 @@ namespace engine::utils
     // asserts only in debug
     inline void Assert(bool value, std::string_view message = "Assert failed", std::source_location location = std::source_location::current())
     {
-        if constexpr (!DEBUG_UTILS_DEBUG_ENABLED) 
+        if constexpr (!DEBUG_UTILS_DEBUG_ENABLED)
         {
             return;
         }
@@ -25,11 +25,11 @@ namespace engine::utils
             return;
         }
 
-        if constexpr (DEBUG_UTILS_ASSERT_LOGS)
-        {
-            spdlog::critical(CurrentSourceLocation(location) + std::basic_string(message));
-        }
-        
+            if constexpr (DEBUG_UTILS_ASSERT_LOGS)
+            {
+                spdlog::critical(CurrentSourceLocation(location) + std::basic_string(message));
+            }
+
         assert(value, message);
     }
 
@@ -40,14 +40,14 @@ namespace engine::utils
             return;
         }
 
-        if constexpr (DEBUG_UTILS_ASSERT_LOGS)
-        {
-            spdlog::critical(CurrentSourceLocation(location) + std::basic_string(message));
-        }
+            if constexpr (DEBUG_UTILS_ASSERT_LOGS)
+            {
+                spdlog::critical(CurrentSourceLocation(location) + std::basic_string(message));
+            }
 
         if constexpr (DEBUG_UTILS_DEBUG_ENABLED)
         {
-            assert(value, message);
+            assert(value);
         }
         else
         {

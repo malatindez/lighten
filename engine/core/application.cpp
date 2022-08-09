@@ -1,7 +1,7 @@
 #include "application.hpp"
 
 #include "core/events.hpp"
-#include "direct3d/globals.hpp"
+#include "direct3d11/globals.hpp"
 #include "include/win_debug.hpp"
 #include <filesystem>
 #include <fstream>
@@ -22,7 +22,7 @@ namespace engine::core
 {
     using namespace events;
     std::unique_ptr<Application> Application::application_;
-    SteadyTimer Application::from_start_;
+    utils::SteadyTimer Application::from_start_;
 
     void Application::Init()
     {
