@@ -1,4 +1,7 @@
-git submodule update --init
+@echo off
+echo "Updating submodules... "
+git submodule update --init -- recursive
+echo [32mDone![0m
 if not exist build mkdir build
 cd build
 cmake ..
@@ -11,8 +14,9 @@ goto :open_folder
 cmake --build . --config Release
 .\Release\runUnitTests.exe
 :open_folder
-set /P c=Open build folder[Y/N]?
+set /P c=Open Solution[Y/N]?
 if /I "%c%" EQU "N" goto :end
-explorer .
+dle_internship.sln
 :end
+explorer .
 pause

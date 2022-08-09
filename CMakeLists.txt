@@ -19,5 +19,5 @@ make_directory(${CMAKE_BINARY_DIR}/runtime_directory)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/third_party/CMakeLists.txt")
 include("${CMAKE_CURRENT_SOURCE_DIR}/engine/CMakeLists.txt")
-include("${CMAKE_CURRENT_SOURCE_DIR}/d3d/CMakeLists.txt")
+include("${CMAKE_CURRENT_SOURCE_DIR}/d3d_test/CMakeLists.txt")
 include("${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt")

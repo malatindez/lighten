@@ -1,9 +1,60 @@
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party")
 
+set(ASSIMP_DIR "${LIB_DIR}/assimp")
+set(IMGUI_DIR "${LIB_DIR}/imgui")
+set(IMGUIZMO_DIR "${LIB_DIR}/imguizmo")
+set(IMGUI_CONSOLE_DIR "${LIB_DIR}/imgui_console")
+set(DDS_TEXTURE_LOADER_DIR "${LIB_DIR}/microsoft/DDSTextureLoader")
 set(ENTT_DIR "${LIB_DIR}/entt")
 set(GTEST_DIR "${LIB_DIR}/google/google_test")
 set(BENCHMARK_DIR "${LIB_DIR}/google/google_benchmark")
 set(SPDLOG_DIR "${LIB_DIR}/spdlog")
+
+set(ZLIB_LIBRARIES zlibstatic)
+set(ENABLE_BOOST_WORKAROUND ON)
+set(BUILD_STATIC_LIB ON)
+set(BUILD_ASSIMP_TOOLS  ON)
+set(ASSIMP_BUILD_STATIC_LIB ON)
+# directx
+
+include("third_party/FindDirectX.cmake")
+
+# assimp
+add_subdirectory("${ASSIMP_DIR}")
+
+# imgui
+add_library(imgui STATIC "${IMGUI_DIR}/imgui.cpp"
+                         "${IMGUI_DIR}/imgui_widgets.cpp"
+                         "${IMGUI_DIR}/imgui_draw.cpp"
+                         "${IMGUI_DIR}/imgui_demo.cpp"
+                         "${IMGUI_DIR}/backends/imgui_impl_dx11.cpp"
+                         "${IMGUI_DIR}/backends/imgui_impl_win32.cpp")
+target_include_directories(imgui PUBLIC "${IMGUI_DIR}")
+target_compile_features(imgui PUBLIC cxx_std_17)
+
+# csys
+add_library(csys INTERFACE)
+target_include_directories(csys INTERFACE "${IMGUI_CONSOLE_DIR}/include")
+target_compile_features(csys INTERFACE cxx_std_17)
+
+# imgui_console
+add_library(imgui_console STATIC "${IMGUI_CONSOLE_DIR}/src/imgui_console.cpp" "${IMGUI_CONSOLE_DIR}/include/imgui_console/imgui_console.h")
+target_include_directories(imgui_console PUBLIC "${IMGUI_DIR}")
+target_include_directories(imgui_console PUBLIC "${IMGUI_CONSOLE_DIR}/include")
+target_include_directories(imgui_console PUBLIC "${IMGUI_CONSOLE_DIR}/include/imgui_console")
+target_compile_features(imgui_console PUBLIC cxx_std_17)
+target_link_libraries(imgui_console PUBLIC csys)
+target_link_libraries(imgui_console PUBLIC imgui)
+
+# imguizmo
+add_library(imguizmo STATIC "${IMGUIZMO_DIR}/GraphEditor.cpp"
+                         "${IMGUIZMO_DIR}/ImCurveEdit.cpp"
+                         "${IMGUIZMO_DIR}/ImGradient.cpp"
+                         "${IMGUIZMO_DIR}/ImGuizmo.cpp"
+                         "${IMGUIZMO_DIR}/ImSequencer.cpp")
+target_include_directories(imguizmo PUBLIC "${IMGUI_DIR}")
+target_include_directories(imguizmo PUBLIC "${IMGUIZMO_DIR}")
+target_link_libraries(imguizmo PUBLIC imgui)
 
 # entt
 add_subdirectory(third_party/entt)
@@ -17,6 +68,42 @@ add_subdirectory("${BENCHMARK_DIR}" EXCLUDE_FROM_ALL)
 
 # spdlog
 add_subdirectory("${SPDLOG_DIR}" EXCLUDE_FROM_ALL)
+
+
+
+function(target_add_direct3d TARGET)
+  target_link_directories("${TARGET}" PRIVATE ${DirectX_LIBRARY_DIR})
+  target_link_libraries("${TARGET}"  ${DirectX_LIBRARY_DIR}/d3d11.lib)
+  target_link_libraries("${TARGET}"  ${DirectX_LIBRARY_DIR}/d3d10.lib)
+  target_link_libraries("${TARGET}"  ${DirectX_LIBRARY_DIR}/dxguid.lib)
+  target_link_libraries("${TARGET}"  ${DirectX_LIBRARY_DIR}/dxgi.lib)
+  target_link_libraries("${TARGET}"  ${DirectX_LIBRARY_DIR}/d3dcompiler.lib)
+endfunction(target_add_direct3d)
+
+function(target_add_assimp TARGET)
+  target_link_libraries("${TARGET}" assimp)
+  target_include_directories(assimp PRIVATE "${ASSIMP_DIR}")
+endfunction(target_add_assimp)
+
+function(target_add_imgui TARGET)
+target_link_libraries("${TARGET}" imgui)
+target_include_directories(imguizmo PRIVATE "${IMGUI_DIR}")
+endfunction(target_add_imgui)
+
+function(target_add_imguizmo TARGET)
+  target_link_libraries("${TARGET}" imguizmo)
+  target_include_directories(imguizmo PRIVATE "${IMGUIZMO_DIR}")
+endfunction(target_add_imguizmo)
+
+function(target_add_imgui_console TARGET)
+  target_link_libraries("${TARGET}" imgui_console)
+  target_include_directories("${TARGET}" PRIVATE "${IMGUI_CONSOLE}/include")
+  target_include_directories(imgui_console PRIVATE "${IMGUI_CONSOLE}/include/imgui_console")
+endfunction(target_add_imgui_console)
+
+function(target_add_dds_texture_loader TARGET)
+  target_include_directories("${TARGET}" PRIVATE "${DDS_TEXTURE_LOADER_DIR}")
+endfunction(target_add_dds_texture_loader)
 
 function(target_add_entt TARGET)
   target_link_libraries("${TARGET}" EnTT::EnTT)
@@ -38,6 +125,28 @@ function(target_add_spdlog TARGET)
 endfunction(target_add_spdlog)
 
 function(target_add_libraries TARGET)
+
+    if("${ARGN}" MATCHES "[dD][iI][rR][eE][cC][tT][xX]")
+      target_add_direct3d(${TARGET})
+    endif()
+    if("${ARGN}" MATCHES "[dD][iI][rR][eE][cC][tT]3[dD]")
+      target_add_direct3d(${TARGET})
+    endif()
+    if("${ARGN}" MATCHES "[aA][sS][sS][iI][mM][pP]")
+      target_add_assimp(${TARGET})
+    endif()
+    if("${ARGN}" MATCHES "[iI][mM][gG][uU][iI]")
+      target_add_imgui(${TARGET})
+    endif()
+    if("${ARGN}" MATCHES "[iI][mM][gG][uU][iI][zZ][mM][oO]")
+      target_add_imguizmo(${TARGET})
+    endif()
+    if("${ARGN}" MATCHES "[iI][mM][gG][uU][iI]_[cC][oO][nN][sS][oO][lL][eE]")
+      target_add_imgui_console(${TARGET})
+    endif()
+    if("${ARGN}" MATCHES "[dD][dD][sS]_[tT][eE][xX][tT][uU][rR][eE]_[lL][oO][aA][dD][eE][rR]")
+      target_add_dds_texture_loader(${TARGET})
+    endif()
     if("${ARGN}" MATCHES "[eE][nN][tT][tT]")
     target_add_entt(${TARGET})
     endif()

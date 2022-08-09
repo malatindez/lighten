@@ -10,3 +10,15 @@
 [submodule "third_party/spdlog"]
 	path = third_party/spdlog
 	url = https://github.com/gabime/spdlog
+[submodule "third_party/assimp"]
+	path = third_party/assimp
+	url = https://github.com/assimp/assimp
+[submodule "third_party/imgui_console"]
+	path = third_party/imgui_console
+	url = https://github.com/malatindez/imgui-console
+[submodule "third_party/imgui"]
+	path = third_party/imgui
+	url = https://github.com/ocornut/imgui
+[submodule "third_party/imguizmo"]
+	path = third_party/imguizmo
+	url = https://github.com/CedricGuillemet/ImGuizmo

@@ -1,4 +1,5 @@
-set(D3D_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/d3d")
+set(D3D_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/d3d_test")
+
 file(GLOB_RECURSE D3D_SOURCES ${D3D_SOURCES_DIR} *.*)
 list(FILTER D3D_SOURCES INCLUDE REGEX ${D3D_SOURCES_DIR}/*)
 
@@ -14,19 +15,12 @@ foreach(_source IN ITEMS ${D3D_SOURCES})
     source_group("${_source_path_msvc}" FILES "${_source}")
 endforeach()
 
-add_executable(d3d_test WIN32 ${D3D_SOURCES} ${ENGINE_SOURCES})
+add_executable(d3d_test WIN32 ${D3D_SOURCES})
 target_include_directories(d3d_test PRIVATE ${D3D_SOURCES_DIR})
 target_include_directories(d3d_test PRIVATE ${ENGINE_SOURCES_DIR})
+target_link_libraries(d3d_test engine)
+target_add_libraries(d3d_test "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console" "dds_texture_loader")
 
-target_add_libraries(d3d_test "entt" "spdlog")
-
-include("third_party/FindDirectX.cmake")
-link_directories(${DirectX_LIBRARY_DIR})
-target_link_libraries(d3d_test ${DirectX_LIBRARY_DIR}/d3d11.lib)
-target_link_libraries(d3d_test ${DirectX_LIBRARY_DIR}/d3d10.lib)
-target_link_libraries(d3d_test ${DirectX_LIBRARY_DIR}/dxguid.lib)
-target_link_libraries(d3d_test ${DirectX_LIBRARY_DIR}/dxgi.lib)
-target_link_libraries(d3d_test ${DirectX_LIBRARY_DIR}/d3dcompiler.lib)
 
 
 

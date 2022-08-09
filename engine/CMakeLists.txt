@@ -13,3 +13,7 @@ foreach(_source IN ITEMS ${ENGINE_SOURCES})
     string(REPLACE "/" "\\" _source_path_msvc "${_source_path}")
     source_group("${_source_path_msvc}" FILES "${_source}")
 endforeach()
+
+add_library(engine STATIC "${ENGINE_SOURCES}")
+target_add_libraries(engine "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console" "dds_texture_loader")
+target_include_directories(engine PRIVATE ${ENGINE_SOURCES_DIR})
