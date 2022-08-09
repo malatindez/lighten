@@ -13,10 +13,6 @@ namespace engine::core::events
         WindowClose,
         WindowResize,
 
-        AppTick,
-        AppUpdate,
-        AppRender,
-
         KeyPressed,
         KeyReleased,
 

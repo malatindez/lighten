@@ -47,8 +47,8 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int cmd_show)
 
     auto renderer = std::make_shared<Renderer>(window);
 
-    Application::Get().AddLayer(controller);
-    Application::Get().AddLayer(renderer);
+    Application::Get().PushLayer(controller);
+    Application::Get().PushLayer(renderer);
 
     Application::Get().Run();
     return 0;

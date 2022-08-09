@@ -27,8 +27,7 @@ public:
     {
         initialize();
     }
-    void OnEvent(engine::core::events::Event &event) override;
-
+    void OnRender() override;
 private:
     static Triangle create_triangle();
 

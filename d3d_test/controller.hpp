@@ -12,12 +12,15 @@ class Controller : public engine::core::Layer
 public:
     using UpdateCallback = std::function<void(float)>;
     Controller(std::shared_ptr<engine::core::Window> window);
-    void OnEvent(engine::core::events::Event &event) override;
 
     std::vector<std::function<void(float)>> &update_callbacks() { return update_callbacks_; }
+    void OnTick(float delta_time) override;
+    void OnUpdate() override
+    {
+        window_->PeekOSMessages();
+    }
 
 private:
-    void Tick(float delta_time);
 
     std::shared_ptr<engine::core::Window> window_;
     engine::core::ParallelExecutor executor {

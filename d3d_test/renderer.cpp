@@ -4,36 +4,33 @@ using namespace core;
 using namespace direct3d;
 using namespace math;
 
-void Renderer::OnEvent(events::Event &event)
+void Renderer::OnRender()
 {
-    if (event.type() == events::EventType::AppRender)
-    {
-        float time = Application::TimeFromStart();
+    float time = Application::TimeFromStart();
 
-        vec4 const kSkyColor { vec3{0.25f}, 0.0f };
+    vec4 const kSkyColor { vec3{0.25f}, 0.0f };
 
-        ID3D11RenderTargetView *view = window_->frame_buffer_view();
-        devcon4->OMSetRenderTargets(1, &view, nullptr);
+    ID3D11RenderTargetView *view = window_->frame_buffer_view();
+    devcon4->OMSetRenderTargets(1, &view, nullptr);
 
-        devcon4->RSSetState(rasterizer_state_);
-        ID3D11SamplerState *sampler_state = sampler_state_;
-        devcon4->PSSetSamplers(0, 1, &sampler_state);
-        ID3D11RenderTargetView *frame_buffer_view = window_->frame_buffer_view();
+    devcon4->RSSetState(rasterizer_state_);
+    ID3D11SamplerState *sampler_state = sampler_state_;
+    devcon4->PSSetSamplers(0, 1, &sampler_state);
+    ID3D11RenderTargetView *frame_buffer_view = window_->frame_buffer_view();
 
-        devcon4->OMSetRenderTargets(1, &frame_buffer_view, window_->depth_buffer_view());
-        devcon4->OMSetDepthStencilState(depth_stencil_state_, 0);
-        devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
+    devcon4->OMSetRenderTargets(1, &frame_buffer_view, window_->depth_buffer_view());
+    devcon4->OMSetDepthStencilState(depth_stencil_state_, 0);
+    devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 
-        // clear the back buffer to a deep blue
-        devcon4->ClearRenderTargetView(window_->frame_buffer_view(), kSkyColor.data.data());
-        devcon4->ClearDepthStencilView(window_->depth_buffer_view(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+    // clear the back buffer to a deep blue
+    devcon4->ClearRenderTargetView(window_->frame_buffer_view(), kSkyColor.data.data());
+    devcon4->ClearDepthStencilView(window_->depth_buffer_view(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-        triangle_.shader.apply_shader();
-        triangle_.mesh.render();
+    triangle_.shader.apply_shader();
+    triangle_.mesh.render();
 
-        // switch the back buffer and the front buffer
-        window_->swapchain()->Present(1, 0);
-    }
+    // switch the back buffer and the front buffer
+    window_->swapchain()->Present(1, 0);
 }
 
 Renderer::Triangle Renderer::create_triangle()

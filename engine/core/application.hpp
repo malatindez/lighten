@@ -6,9 +6,8 @@
 #include "misc/ini.hpp"
 #include "pch.hpp"
 #include <chrono>
-#include <spdlog/async.h>
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/spdlog.h>
+#include "include/spdlog.hpp"
+#include "layer-stack-threadsafe.hpp"
 
 namespace engine::core
 {
@@ -25,43 +24,25 @@ namespace engine::core
     const core::math::vec3 kSphereCoords { 0, 0, -1 };
     const float kSphereRadius { 0.5f };
 
-    class Application final
+    class Application final : private LayerStackThreadsafe
     {
     public:
         ~Application();
+        using LayerStackThreadsafe::PushLayer;
+        using LayerStackThreadsafe::PushOverlay;
+        using LayerStackThreadsafe::PopLayer;
+        using LayerStackThreadsafe::PopOverlay;
+
+        [[nodiscard]] static inline Application &Get() noexcept { return *application_; }
+        [[nodiscard]] static inline EventCallbackFn const &event_function() { return application_->event_function_; }
+        [[nodiscard]] static inline spdlog::logger &logger() { return *application_->logger_; }
+        [[nodiscard]] static inline ini::Ini &config() { return *application_->config_; }
+        [[nodiscard]] static inline float TimeFromStart() { return from_start_.elapsed(); }
 
 
-        [[nodiscard]] static inline Application &Get() noexcept
-        {
-            return *application_;
-        }
-        [[nodiscard]] static inline EventCallbackFn const &event_function()
-        {
-            return application_->event_function_;
-        }
-        [[nodiscard]] static inline spdlog::logger &logger()
-        {
-            return *application_->logger_;
-        }
-        [[nodiscard]] static inline ini::Ini &config()
-        {
-            return *application_->config_;
-        }
         static void Exit();
 
-        static void OnEvent(events::Event &e);
-
-        template <class T>
-        inline void AddLayer(std::shared_ptr<T> t)
-        {
-            layers_.push_back(std::static_pointer_cast<Layer>(t));
-        }
-
-        [[nodiscard]] static inline float TimeFromStart()
-        {
-            return from_start_.elapsed();
-        }
-
+        static void OnEvent(events::Event &e) { application_->LayerStackThreadsafe::OnEvent(e); }
     private:
         static void Init();
 
@@ -78,8 +59,6 @@ namespace engine::core
 
         SteadyTimer render_;
         SteadyTimer tick_;
-
-        std::vector<std::shared_ptr<Layer>> layers_;
 
         EventCallbackFn event_function_;
 
