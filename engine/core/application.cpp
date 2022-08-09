@@ -12,7 +12,7 @@
 #include "spdlog/sinks/ansicolor_sink.h"
 
 static std::string const kDefaultConfig =
-    R"(
+R"(
 [Logger]
 is_absolute = no
 folder = logs
@@ -32,7 +32,7 @@ namespace engine::core
         {
             return;
         }
-        
+
 
         for (auto const &layer : application_->layers_)
         {
@@ -50,14 +50,14 @@ namespace engine::core
         {
             return;
         }
-        application_ = std::unique_ptr<Application>(new Application{});
-        debug::RedirectOutputDebugString([&](std::string_view view)
-                                  { application_->logger_->info(view); });
+        application_ = std::unique_ptr<Application>(new Application {});
+        debug::RedirectOutputDebugString([&] (std::string_view view)
+                                         { application_->logger_->info(view); });
         if (config()["Logger"]["console_enabled"].as_boolean())
         {
             AllocConsole();
-            freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
-            freopen_s((FILE**)stderr, "CONOUT$", "w", stderr);
+            freopen_s((FILE **) stdout, "CONOUT$", "w", stdout);
+            freopen_s((FILE **) stderr, "CONOUT$", "w", stderr);
             auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_st>();
             stdout_sink->set_level(spdlog::level::trace);
             logger().sinks().push_back(stdout_sink);
@@ -65,9 +65,9 @@ namespace engine::core
         }
         spdlog::set_default_logger(application_->logger_);
 
-        auto func = [](LPEXCEPTION_POINTERS) -> LONG
+        auto func = [] (LPEXCEPTION_POINTERS) -> LONG
         {
-            for (auto const& sink : logger().sinks())
+            for (auto const &sink : logger().sinks())
             {
                 sink->flush();
             }
@@ -75,16 +75,16 @@ namespace engine::core
         };
         // TODO: figure out how to flush log if the program is terminated.
         // neither of this isn't working
-        SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)&func);
-        std::atexit([]() {application_->logger_->flush(); });
-        std::set_terminate([]() {application_->logger_->flush(); });
+        SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER) &func);
+        std::atexit([] () { application_->logger_->flush(); });
+        std::set_terminate([] () { application_->logger_->flush(); });
 
         direct3d::Init();
     }
 
-    void Application::Exit() 
-    { 
-        application_->running_ = false; 
+    void Application::Exit()
+    {
+        application_->running_ = false;
         application_->logger_->flush();
     }
 
@@ -117,7 +117,8 @@ namespace engine::core
                 last_100_frames[frame_num %= 100] = render_.elapsed();
                 frame_num++;
                 float avg = 100 / std::accumulate(last_100_frames.begin(), last_100_frames.end(), 0.0f);
-                if (avg < 15 || frame_num == 100) {
+                if (avg < 15 || frame_num == 100)
+                {
                     logger_->trace("Average fps based of last 100 frames: " + std::to_string(avg));
                 }
             }

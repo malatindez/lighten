@@ -137,7 +137,7 @@ namespace engine::render
         }
     }
     std::shared_ptr<const Mesh>
-    LoadMeshFromObj(std::filesystem::path const &path)
+        LoadMeshFromObj(std::filesystem::path const &path)
     {
 
         ParserContext context;
@@ -150,13 +150,14 @@ namespace engine::render
 
             file.close();
             size_t begin = 0;
-            std::string_view view{data.begin(), data.begin() + data.size()};
+            std::string_view view { data.begin(), data.begin() + data.size() };
             do
             {
                 size_t found = data.find_first_of('\n', begin + 1);
                 ParseLine(view.substr(begin + 1, found - begin - 1), context);
                 begin = found;
-            } while (begin != std::string::npos);
+            }
+            while (begin != std::string::npos);
         }
 
         auto return_value = std::make_shared<Mesh>();
@@ -164,10 +165,10 @@ namespace engine::render
         {
             for (size_t i = 0; i < context.vertex_indices.size(); ++i)
             {
-                return_value->vertices.emplace_back(Vertex{
+                return_value->vertices.emplace_back(Vertex {
                     .position = context.temp_vertices[context.vertex_indices[i] - 1],
                     .normal = context.temp_normals[context.normal_indices[i] - 1],
-                    .tex_coords = context.temp_uvs[context.uv_indices[i] - 1]});
+                    .tex_coords = context.temp_uvs[context.uv_indices[i] - 1] });
             }
         }
 

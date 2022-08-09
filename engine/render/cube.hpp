@@ -2,7 +2,7 @@
 #include "mesh.hpp"
 namespace engine::render
 {
-    static inline const std::shared_ptr<Mesh> kCubeMesh = std::make_shared<Mesh>(Mesh{
+    static inline const std::shared_ptr<Mesh> kCubeMesh = std::make_shared<Mesh>(Mesh {
         {Vertex{core::math::vec3{0.5f, -0.5f, 0.5f}, core::math::vec3{0, -1, 0}, core::math::vec2{0}},
          Vertex{core::math::vec3{-0.5f, -0.5f, -0.5f}, core::math::vec3{0, -1, 0}, core::math::vec2{0}},
          Vertex{core::math::vec3{-0.5f, -0.5f, 0.5f}, core::math::vec3{0, -1, 0}, core::math::vec2{0}},
@@ -38,5 +38,5 @@ namespace engine::render
          Vertex{core::math::vec3{-0.5f, 0.5f, -0.5f}, core::math::vec3{1, 0, 0}, core::math::vec2{0}},
          Vertex{core::math::vec3{0.5f, -0.5f, 0.5f}, core::math::vec3{0, 0, -1}, core::math::vec2{0}},
          Vertex{core::math::vec3{-0.5f, -0.5f, 0.5f}, core::math::vec3{0, 0, -1}, core::math::vec2{0}},
-         Vertex{core::math::vec3{-0.5f, 0.5f, 0.5f}, core::math::vec3{0, 0, -1}, core::math::vec2{0}}}});
+         Vertex{core::math::vec3{-0.5f, 0.5f, 0.5f}, core::math::vec3{0, 0, -1}, core::math::vec2{0}}} });
 }

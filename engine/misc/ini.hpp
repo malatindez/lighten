@@ -79,7 +79,7 @@ namespace engine::ini
         {
             value_ = std::to_string(t);
             type_ = Type::kInt64;
-            data_ = (int64_t)t;
+            data_ = (int64_t) t;
             return *this;
         }
         template <std::floating_point T>
@@ -87,7 +87,7 @@ namespace engine::ini
         {
             value_ = std::to_string(t);
             type_ = Type::kLongDouble;
-            data_ = (long double)t;
+            data_ = (long double) t;
             return *this;
         }
         template <typename T>
@@ -99,7 +99,7 @@ namespace engine::ini
             }
             value_ = std::string(t);
             type_ = Type::kString;
-            data_ = std::monostate{};
+            data_ = std::monostate {};
             return *this;
         }
         template <typename T>

@@ -17,7 +17,7 @@ namespace engine::render
     public:
         std::vector<Vertex> vertices;
         constexpr Mesh() = default;
-        explicit constexpr Mesh(std::vector<Vertex> const &v) : vertices{v} {}
+        explicit constexpr Mesh(std::vector<Vertex> const &v) : vertices { v } {}
     };
     std::shared_ptr<const Mesh> LoadMeshFromObj(std::filesystem::path const &path);
 } // namespace engine::render

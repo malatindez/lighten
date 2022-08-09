@@ -60,10 +60,10 @@ namespace engine
         update_matrices_ = true;
         if (roll_enabled_)
         {
-            transform_->rotation = quat(roll, vec3{0.f, 0.f, 1.f});
+            transform_->rotation = quat(roll, vec3 { 0.f, 0.f, 1.f });
         }
-        transform_->rotation *= quat(pitch, vec3{1.f, 0.f, 0.f});
-        transform_->rotation *= quat(yaw, vec3{0.f, 1.f, 0.f});
+        transform_->rotation *= quat(pitch, vec3 { 1.f, 0.f, 0.f });
+        transform_->rotation *= quat(yaw, vec3 { 0.f, 1.f, 0.f });
         transform_->rotation = normalize(transform_->rotation);
     }
 
@@ -73,10 +73,10 @@ namespace engine
         update_matrices_ = true;
         if (roll_enabled_)
         {
-            transform_->rotation *= quat(roll, vec3{0.f, 0.f, 1.f});
+            transform_->rotation *= quat(roll, vec3 { 0.f, 0.f, 1.f });
         }
-        transform_->rotation *= quat(pitch, vec3{1.f, 0.f, 0.f});
-        transform_->rotation *= quat(yaw, vec3{0.f, 1.f, 0.f});
+        transform_->rotation *= quat(pitch, vec3 { 1.f, 0.f, 0.f });
+        transform_->rotation *= quat(yaw, vec3 { 0.f, 1.f, 0.f });
         transform_->rotation = normalize(transform_->rotation);
     }
 
@@ -93,7 +93,7 @@ namespace engine
         else
         {
             transform_->rotation *= quat(pitch, right().as_vec());
-            transform_->rotation *= quat(yaw, vec3{0, 1, 0});
+            transform_->rotation *= quat(yaw, vec3 { 0, 1, 0 });
         }
         transform_->rotation = normalize(transform_->rotation);
     }

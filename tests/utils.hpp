@@ -81,14 +81,14 @@ namespace utils
     template <std::integral T>
     [[nodiscard]] T Random(T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
     {
-        std::uniform_int_distribution dis{min, max};
+        std::uniform_int_distribution dis { min, max };
         return dis(gen);
     }
 
     template <std::floating_point T>
     [[nodiscard]] T Random(T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
     {
-        std::uniform_real_distribution dis{min, max};
+        std::uniform_real_distribution dis { min, max };
         return dis(gen);
     }
     const std::string kAsciiCharacters =
@@ -99,8 +99,8 @@ namespace utils
 
     [[nodiscard]] inline std::string ExcludeString(std::string const &a, std::string_view const b)
     {
-        std::string return_value{a};
-        std::erase_if(return_value, [&b](char const &c) { return std::ranges::find(b, c) != b.end(); });
+        std::string return_value { a };
+        std::erase_if(return_value, [&b] (char const &c) { return std::ranges::find(b, c) != b.end(); });
         return return_value;
     }
 

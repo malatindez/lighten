@@ -6,8 +6,7 @@ using namespace events;
 using namespace math;
 
 Controller::Controller(std::shared_ptr<engine::core::Window> window) : window_(window)
-{
-}
+{}
 
 void Controller::OnEvent(Event &event)
 {
@@ -38,5 +37,4 @@ void Controller::OnEvent(Event &event)
 }
 
 void Controller::Tick(float delta_time)
-{
-}
+{}

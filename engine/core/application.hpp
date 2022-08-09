@@ -13,8 +13,8 @@
 namespace engine::core
 {
 
-    const core::math::ivec2 kWindowPosition{0};
-    const core::math::ivec2 kWindowResolution{640, 360};
+    const core::math::ivec2 kWindowPosition { 0 };
+    const core::math::ivec2 kWindowResolution { 640, 360 };
 
     const float kFpsLimit = 60.0f;
     const float kFrameDuration = 1.0f / kFpsLimit;
@@ -22,8 +22,8 @@ namespace engine::core
     const float kTickrate = 120.0f;
     const float kTickDuration = 1.0f / kTickrate;
 
-    const core::math::vec3 kSphereCoords{0, 0, -1};
-    const float kSphereRadius{0.5f};
+    const core::math::vec3 kSphereCoords { 0, 0, -1 };
+    const float kSphereRadius { 0.5f };
 
     class Application final
     {
@@ -88,6 +88,6 @@ namespace engine::core
 
         static std::unique_ptr<Application> application_;
         static SteadyTimer from_start_;
-        friend INT WINAPI ::wWinMain(HINSTANCE, HINSTANCE, PWSTR, int cmd_show);
+        friend INT WINAPI::wWinMain(HINSTANCE, HINSTANCE, PWSTR, int cmd_show);
     };
 } // namespace engine::core

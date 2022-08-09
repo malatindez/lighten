@@ -42,10 +42,10 @@ namespace engine::direct3d
         void apply_shader();
 
         static direct3d::Buffer InitializeUniformBuffer(uint32_t uniform_buffer_size);
-        
+
     private:
         std::pair<ID3D11VertexShader *, ID3D11InputLayout *> CompileVertexShader(std::filesystem::path const &vertex_path,
-                                                                                        std::vector<D3D11_INPUT_ELEMENT_DESC> const &ied) const;
+                                                                                 std::vector<D3D11_INPUT_ELEMENT_DESC> const &ied) const;
         ID3D11PixelShader *CompilePixelShader(std::filesystem::path const &pixel_path);
 
         direct3d::VertexShader vertex_shader_;

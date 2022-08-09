@@ -100,7 +100,7 @@ namespace engine::core::math
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> QuaternionFromEuler(T roll, T pitch, T yaw) noexcept requires(std::is_floating_point_v<T>);
     template <AnyMat U>
-    [[nodiscard]] constexpr qua<typename U::type> QuaternionFromRotationMatrix(U const&mat) noexcept requires(U::size.x == 3 && U::size.y == 3 && std::is_floating_point_v<typename U::type>);
+    [[nodiscard]] constexpr qua<typename U::type> QuaternionFromRotationMatrix(U const &mat) noexcept requires(U::size.x == 3 && U::size.y == 3 && std::is_floating_point_v<typename U::type>);
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> operator*(qua<T> const &q, qua<T> const &p) noexcept;
     template <Primitive T>

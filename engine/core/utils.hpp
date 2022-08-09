@@ -9,26 +9,26 @@ namespace engine::core::utils
     {
         std::string rv;
         rv.reserve(s.size());
-        std::ranges::for_each(s, [&rv](char const& c) { rv += static_cast<char>(std::tolower(c)); });
+        std::ranges::for_each(s, [&rv] (char const &c) { rv += static_cast<char>(std::tolower(c)); });
         return rv;
     }
     inline std::string as_uppercase(std::string_view const s) noexcept
     {
         std::string rv;
         rv.reserve(s.size());
-        std::ranges::for_each(s, [&rv](char const& c) { rv += static_cast<char>(std::toupper(c)); });
+        std::ranges::for_each(s, [&rv] (char const &c) { rv += static_cast<char>(std::toupper(c)); });
         return rv;
     }
     // trim from start (in place)
     constexpr std::string_view ltrimview(std::string_view const s) noexcept
     {
-        return std::string_view( std::ranges::find_if(s, [](unsigned char ch) { return !std::isspace(ch); }), s.end());
+        return std::string_view(std::ranges::find_if(s, [] (unsigned char ch) { return !std::isspace(ch); }), s.end());
     }
 
     // trim from end (in place)
     constexpr std::string_view rtrimview(std::string_view const s) noexcept
     {
-        return std::string_view(s.begin(), std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base());
+        return std::string_view(s.begin(), std::find_if(s.rbegin(), s.rend(), [] (unsigned char ch) { return !std::isspace(ch); }).base());
     }
 
     // trim from both ends (in place)
@@ -55,7 +55,7 @@ namespace engine::core::utils
     {
         char *end;
         int64_t ll = strtoll(str.data(), &end, static_cast<int>(str.size()));
-        if(str.data() != end)
+        if (str.data() != end)
         {
             return ll;
         }
@@ -65,7 +65,7 @@ namespace engine::core::utils
     {
         char *end;
         long double ld = strtold(str.data(), &end);
-        if(str.data() != end)
+        if (str.data() != end)
         {
             return ld;
         }
@@ -82,79 +82,79 @@ namespace engine::core::utils
     };
 
     template <typename R, typename... Args>
-    struct return_type<R (*)(Args...)>
+    struct return_type<R(*)(Args...)>
     {
         using type = R;
     };
 
     template <typename R, typename C, typename... Args>
-    struct return_type<R (C::*)(Args...)>
+    struct return_type<R(C:: *)(Args...)>
     {
         using type = R;
     };
 
     template <typename R, typename C, typename... Args>
-    struct return_type<R (C::*)(Args...) &>
+    struct return_type<R(C:: *)(Args...) &>
     {
         using type = R;
     };
 
     template <typename R, typename C, typename... Args>
-    struct return_type<R (C::*)(Args...) &&>
+    struct return_type<R(C:: *)(Args...) &&>
     {
         using type = R;
     };
 
     template <typename R, typename C, typename... Args>
-    struct return_type<R (C::*)(Args...) const>
+    struct return_type<R(C:: *)(Args...) const>
     {
         using type = R;
     };
 
     template <typename R, typename C, typename... Args>
-    struct return_type<R (C::*)(Args...) const &>
+    struct return_type<R(C:: *)(Args...) const &>
     {
         using type = R;
     };
 
     template <typename R, typename C, typename... Args>
-    struct return_type<R (C::*)(Args...) const &&>
+    struct return_type<R(C:: *)(Args...) const &&>
     {
         using type = R;
     };
 
     template <typename R, typename C, typename... Args>
-    struct return_type<R (C::*)(Args...) volatile>
+    struct return_type<R(C:: *)(Args...) volatile>
     {
         using type = R;
     };
 
     template <typename R, typename C, typename... Args>
-    struct return_type<R (C::*)(Args...) volatile &>
+    struct return_type<R(C:: *)(Args...) volatile &>
     {
         using type = R;
     };
 
     template <typename R, typename C, typename... Args>
-    struct return_type<R (C::*)(Args...) volatile &&>
+    struct return_type<R(C:: *)(Args...) volatile &&>
     {
         using type = R;
     };
 
     template <typename R, typename C, typename... Args>
-    struct return_type<R (C::*)(Args...) const volatile>
+    struct return_type<R(C:: *)(Args...) const volatile>
     {
         using type = R;
     };
 
     template <typename R, typename C, typename... Args>
-    struct return_type<R (C::*)(Args...) const volatile &>
+    struct return_type<R(C:: *)(Args...) const volatile &>
     {
         using type = R;
     };
 
     template <typename R, typename C, typename... Args>
-    struct return_type<R (C::*)(Args...) const volatile &&>
+    struct return_type<R(C:: *)(Args...) const volatile &&>
     {
         using type = R;
     };

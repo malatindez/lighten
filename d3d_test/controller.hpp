@@ -20,8 +20,8 @@ private:
     void Tick(float delta_time);
 
     std::shared_ptr<engine::core::Window> window_;
-    engine::core::ParallelExecutor executor{
-        static_cast<uint32_t>(std::max(1, std::max(int32_t(engine::core::ParallelExecutor::kMaxThreads) - 4, int32_t(engine::core::ParallelExecutor::kHalfThreads))))};
+    engine::core::ParallelExecutor executor {
+        static_cast<uint32_t>(std::max(1, std::max(int32_t(engine::core::ParallelExecutor::kMaxThreads) - 4, int32_t(engine::core::ParallelExecutor::kHalfThreads)))) };
     std::vector<UpdateCallback> update_callbacks_;
     long double time_from_start_ = 0;
 };

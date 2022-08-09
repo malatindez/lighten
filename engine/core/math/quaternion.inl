@@ -287,17 +287,17 @@ namespace engine::core::math
     [[nodiscard]] constexpr qua<T> QuaternionFromEuler(vec<3, T> angles) noexcept
     {
         return qua<T>(angles.x, vec<3, T>{1, 0, 0}) *
-               qua<T>(angles.y, vec<3, T>{0, 1, 0}) *
-               qua<T>(angles.z, vec<3, T>{0, 0, 1});
+            qua<T>(angles.y, vec<3, T>{0, 1, 0}) *
+            qua<T>(angles.z, vec<3, T>{0, 0, 1});
     }
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> QuaternionFromEuler(T roll, T pitch, T yaw) noexcept requires(std::is_floating_point_v<T>)
     {
-        return qua<T>(pitch, vec<3, T>{1, 0, 0}) * qua<T>(yaw, vec<3, T>{0, 1, 0}) *
-               qua<T>(roll, vec<3, T>{0, 0, 1});
+        return qua<T>(pitch, vec<3, T>{1, 0, 0}) *qua<T>(yaw, vec<3, T>{0, 1, 0}) *
+            qua<T>(roll, vec<3, T>{0, 0, 1});
     }
     template <AnyMat U>
-    [[nodiscard]] constexpr qua<typename U::type> QuaternionFromRotationMatrix(U const&m) noexcept requires(U::size.x == 3 && U::size.y == 3 && std::is_floating_point_v<typename U::type>)
+    [[nodiscard]] constexpr qua<typename U::type> QuaternionFromRotationMatrix(U const &m) noexcept requires(U::size.x == 3 && U::size.y == 3 && std::is_floating_point_v<typename U::type>)
     {
         using T = typename U::type;
         T fourXSquaredMinus1 = m[0][0] - m[1][1] - m[2][2];
@@ -328,17 +328,17 @@ namespace engine::core::math
 
         switch (biggestIndex)
         {
-        case 0:
-            return qua<T>(biggestVal, (m[1][2] - m[2][1]) * mult, (m[2][0] - m[0][2]) * mult, (m[0][1] - m[1][0]) * mult);
-        case 1:
-            return qua<T>((m[1][2] - m[2][1]) * mult, biggestVal, (m[0][1] + m[1][0]) * mult, (m[2][0] + m[0][2]) * mult);
-        case 2:
-            return qua<T>((m[2][0] - m[0][2]) * mult, (m[0][1] + m[1][0]) * mult, biggestVal, (m[1][2] + m[2][1]) * mult);
-        case 3:
-            return qua<T>((m[0][1] - m[1][0]) * mult, (m[2][0] + m[0][2]) * mult, (m[1][2] + m[2][1]) * mult, biggestVal);
-        default: // Silence a -Wswitch-default warning in GCC. Should never actually get here. Assert is just for sanity.
-            assert(false);
-            return qua<T>(1, 0, 0, 0);
+            case 0:
+                return qua<T>(biggestVal, (m[1][2] - m[2][1]) * mult, (m[2][0] - m[0][2]) * mult, (m[0][1] - m[1][0]) * mult);
+            case 1:
+                return qua<T>((m[1][2] - m[2][1]) * mult, biggestVal, (m[0][1] + m[1][0]) * mult, (m[2][0] + m[0][2]) * mult);
+            case 2:
+                return qua<T>((m[2][0] - m[0][2]) * mult, (m[0][1] + m[1][0]) * mult, biggestVal, (m[1][2] + m[2][1]) * mult);
+            case 3:
+                return qua<T>((m[0][1] - m[1][0]) * mult, (m[2][0] + m[0][2]) * mult, (m[1][2] + m[2][1]) * mult, biggestVal);
+            default: // Silence a -Wswitch-default warning in GCC. Should never actually get here. Assert is just for sanity.
+                assert(false);
+                return qua<T>(1, 0, 0, 0);
         }
     }
     template <Primitive T>

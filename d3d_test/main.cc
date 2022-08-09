@@ -23,7 +23,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int cmd_show)
     wc.style = CS_HREDRAW | CS_VREDRAW;
     wc.hInstance = instance;
     wc.hCursor = LoadCursor(nullptr, IDC_CROSS);
-    wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
+    wc.hbrBackground = (HBRUSH) COLOR_WINDOW;
 
     // create the window and use the result as the handle
     auto window = std::make_shared<SwapchainWindow>(

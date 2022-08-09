@@ -10,15 +10,14 @@ set(GTEST_DIR "${LIB_DIR}/google/google_test")
 set(BENCHMARK_DIR "${LIB_DIR}/google/google_benchmark")
 set(SPDLOG_DIR "${LIB_DIR}/spdlog")
 
+# directx
+include("third_party/FindDirectX.cmake")
+
 set(ZLIB_LIBRARIES zlibstatic)
 set(ENABLE_BOOST_WORKAROUND ON)
 set(BUILD_STATIC_LIB ON)
 set(BUILD_ASSIMP_TOOLS  ON)
 set(ASSIMP_BUILD_STATIC_LIB ON)
-# directx
-
-include("third_party/FindDirectX.cmake")
-
 # assimp
 add_subdirectory("${ASSIMP_DIR}")
 

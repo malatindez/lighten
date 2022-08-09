@@ -57,9 +57,10 @@ namespace engine::direct3d
         }
         catch (...)
         {
-            const char* err_str = "NO INFO";
-            if (errors != nullptr) {
-                err_str = (const char*)errors->GetBufferPointer();
+            const char *err_str = "NO INFO";
+            if (errors != nullptr)
+            {
+                err_str = (const char *) errors->GetBufferPointer();
             }
             std::stringstream ss;
             ss << core::debug_utils::CurrentSourceLocation() << "[" << vertex_path << "] Vertex shader compilation error: " << std::string_view(err_str);
@@ -71,7 +72,7 @@ namespace engine::direct3d
 
         direct3d::device5->CreateInputLayout(ied.data(), static_cast<uint32_t>(ied.size()), vertex_shader_blob->GetBufferPointer(), vertex_shader_blob->GetBufferSize(), &layout);
 
-        return std::pair{vertex_shader, layout};
+        return std::pair { vertex_shader, layout };
     }
     inline ID3D11PixelShader *ShaderProgram::CompilePixelShader(std::filesystem::path const &pixel_path)
     {
@@ -91,9 +92,10 @@ namespace engine::direct3d
         }
         catch (...)
         {
-            const char* err_str = "NO INFO";
-            if (errors != nullptr) {
-                err_str = (const char*)errors->GetBufferPointer();
+            const char *err_str = "NO INFO";
+            if (errors != nullptr)
+            {
+                err_str = (const char *) errors->GetBufferPointer();
             }
             std::stringstream ss;
             ss << core::debug_utils::CurrentSourceLocation() << "[" << pixel_path << "] Pixel shader compilation error: " << std::string_view(err_str);
@@ -105,7 +107,7 @@ namespace engine::direct3d
     }
     direct3d::Buffer ShaderProgram::InitializeUniformBuffer(uint32_t uniform_buffer_size)
     {
-        constexpr auto RoundBufferSizeTo16Boundary = [](uint32_t x) -> uint32_t { return x + 0xf & 0xfffffff0; };
+        constexpr auto RoundBufferSizeTo16Boundary = [] (uint32_t x) -> uint32_t { return x + 0xf & 0xfffffff0; };
         uniform_buffer_size = RoundBufferSizeTo16Boundary(uniform_buffer_size);
 
         // Setup the description of the dynamic matrix constant buffer that is in the
@@ -126,7 +128,7 @@ namespace engine::direct3d
         {
             throw RuntimeError("Error: Cannot initalize uniform buffer");
         }
-        
+
 
         return direct3d::Buffer { constant_buffer };
     }

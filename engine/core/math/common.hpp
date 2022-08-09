@@ -33,7 +33,7 @@ namespace engine::core::math
         {
         public:
             using type = T;
-            explicit constexpr primitive_reference_wrapper(T &ref) : ptr_{std::addressof(ref)} {}
+            explicit constexpr primitive_reference_wrapper(T &ref) : ptr_ { std::addressof(ref) } {}
             constexpr void set_ptr(T &ref) noexcept
             {
                 ptr_ = std::addressof(ref);
@@ -70,13 +70,13 @@ namespace engine::core::math
             }
 
         private:
-            T *ptr_{};
+            T *ptr_ {};
 
         public:
             template <class... Types>
             constexpr auto operator()(Types &&...args) const
                 noexcept(noexcept(std::invoke(*ptr_, static_cast<Types &&>(args)...)))
-                    -> decltype(std::invoke(*ptr_, static_cast<Types &&>(args)...))
+                -> decltype(std::invoke(*ptr_, static_cast<Types &&>(args)...))
             {
                 return std::invoke(*ptr_, static_cast<Types &&>(args)...);
             }
@@ -84,33 +84,26 @@ namespace engine::core::math
 
         template <class T>
         struct is_mat : public std::false_type
-        {
-        };
+        {};
         template <size_t a, size_t b, Primitive T>
         struct is_mat<mat<a, b, T>> : public std::true_type
-        {
-        };
+        {};
         template <size_t a, size_t b, Primitive T>
         struct is_mat<rmat<a, b, T>> : public std::true_type
-        {
-        };
+        {};
 
         template <class T>
         struct is_reference_vec : public std::false_type
-        {
-        };
+        {};
         template <size_t size, Primitive T>
         struct is_reference_vec<rvec<size, T>> : public std::true_type
-        {
-        };
+        {};
         template <class T>
         struct is_default_vec : public std::false_type
-        {
-        };
+        {};
         template <size_t size, Primitive T>
         struct is_default_vec<vec<size, T>> : public std::true_type
-        {
-        };
+        {};
 
         template <class T>
         constexpr bool is_mat_v = is_mat<T>::value;
@@ -139,9 +132,9 @@ namespace engine::core::math
         // the machine epsilon has to be scaled to the magnitude of the values used
         // and multiplied by the desired precision in ULPs (units in the last place)
         return std::fabs(x - y) <=
-                   std::numeric_limits<T>::epsilon() * std::fabs(x + y) * ulp
-               // unless the result is subnormal
-               || std::fabs(x - y) < std::numeric_limits<T>::min();
+            std::numeric_limits<T>::epsilon() * std::fabs(x + y) * ulp
+            // unless the result is subnormal
+            || std::fabs(x - y) < std::numeric_limits<T>::min();
     }
     template <class T>
     [[nodiscard]] constexpr T radians(T x) noexcept requires(!std::numeric_limits<T>::is_integer)

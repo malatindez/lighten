@@ -163,7 +163,7 @@ namespace engine::core::math
     template <size_t n, Primitive U>
     [[nodiscard]] constexpr vec<n, U> vec<4, T>::as_vec() const noexcept requires(n >= 2 && n <= size)
     {
-        vec<n, U> rv{};
+        vec<n, U> rv {};
         for (size_t i = 0; i < n; i++)
         {
             rv.data[i] = static_cast<U>(data[i]);

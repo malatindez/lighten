@@ -10,7 +10,7 @@ namespace engine::core
         assert(thread_num > 0);
         threads_.reserve(thread_num);
         for (uint32_t i = 0; i < thread_num; ++i)
-            threads_.emplace_back([this, i]()
+            threads_.emplace_back([this, i] ()
                                   { loop(i); });
     }
     ParallelExecutor::~ParallelExecutor()
@@ -58,7 +58,7 @@ namespace engine::core
         uint32_t numBatches = (numTasks + tasksPerBatch - 1) / tasksPerBatch;
 
         tasks_to_execute = [this, func, numTasks, numBatches,
-                            tasksPerBatch](uint32_t threadIndex)
+            tasksPerBatch] (uint32_t threadIndex)
         {
             while (true)
             {

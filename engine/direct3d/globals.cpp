@@ -17,14 +17,14 @@ namespace engine::direct3d
         HRESULT result;
 
         IDXGIFactory *f = nullptr;
-        result = CreateDXGIFactory(__uuidof(IDXGIFactory), (void **)(&f));
-        factory = Factory{f};
+        result = CreateDXGIFactory(__uuidof(IDXGIFactory), (void **) (&f));
+        factory = Factory { f };
 
         assert(result >= 0 && "CreateDXGIFactory");
 
         IDXGIFactory5 *f5 = nullptr;
-        result = factory->QueryInterface(__uuidof(IDXGIFactory5), (void **)(&f5));
-        factory5 = Factory5{f5};
+        result = factory->QueryInterface(__uuidof(IDXGIFactory5), (void **) (&f5));
+        factory5 = Factory5 { f5 };
         assert(result >= 0 && "Query IDXGIFactory5");
         {
             uint32_t index = 0;
@@ -52,22 +52,22 @@ namespace engine::direct3d
                                    &kFeatureLevelRequested, 1, D3D11_SDK_VERSION, &dvc, &featureLevelInitialized, &dvccn);
         assert(result >= 0 && "D3D11CreateDevice");
         assert(kFeatureLevelRequested == featureLevelInitialized && "D3D_FEATURE_LEVEL_11_0");
-        device = Device{dvc};
-        devcon = DeviceContext{dvccn};
+        device = Device { dvc };
+        devcon = DeviceContext { dvccn };
 
         ID3D11Device5 *dvc5 = nullptr;
-        result = device->QueryInterface(__uuidof(ID3D11Device5), (void **)&dvc5);
+        result = device->QueryInterface(__uuidof(ID3D11Device5), (void **) &dvc5);
         assert(result >= 0 && "Query ID3D11Device5");
-        device5 = Device5{dvc5};
+        device5 = Device5 { dvc5 };
 
         ID3D11DeviceContext4 *dvccn4 = nullptr;
-        result = devcon->QueryInterface(__uuidof(ID3D11DeviceContext4), (void **)&dvccn4);
+        result = devcon->QueryInterface(__uuidof(ID3D11DeviceContext4), (void **) &dvccn4);
         assert(result >= 0 && "Query ID3D11DeviceContext4");
-        devcon4 = DeviceContext4{dvccn4};
+        devcon4 = DeviceContext4 { dvccn4 };
 
         ID3D11Debug *dbg = nullptr;
-        result = device->QueryInterface(__uuidof(ID3D11Debug), (void **)&dbg);
+        result = device->QueryInterface(__uuidof(ID3D11Debug), (void **) &dbg);
         assert(result >= 0 && "Query ID3D11Debug");
-        debug = Debug{dbg};
+        debug = Debug { dbg };
     }
 } // namespace engine::direct3d
