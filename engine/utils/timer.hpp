@@ -11,7 +11,9 @@ namespace engine::core
             current_ = clock::now();
             reset();
         }
+        void reset_to_now() { start_ = clock::now(); }
         void reset() { start_ = current_; }
+        
         constexpr float elapsed() noexcept
         {
             current_ = clock::now();
