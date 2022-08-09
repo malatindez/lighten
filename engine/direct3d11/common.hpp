@@ -10,13 +10,14 @@ namespace engine::direct3d
     class d3d_resource_wrapper
     {
     public:
+        using Type = T;
         constexpr operator T const *() const noexcept { return ptr_; }
         constexpr operator T *() noexcept { return ptr_; }
         constexpr T const *operator->() const noexcept { return ptr_; }
         constexpr T *operator->() noexcept { return ptr_; }
 
-        [[nodiscard]] constexpr T const *ptr() const noexcept { return ptr_; }
-        [[nodiscard]] constexpr T *ptr() noexcept { return ptr_; }
+        [[nodiscard]] constexpr T const *const &ptr() const noexcept { return ptr_; }
+        [[nodiscard]] constexpr T *&ptr() noexcept { return ptr_; }
 
         [[nodiscard]] constexpr bool valid() { return ptr_ != nullptr; }
 
@@ -105,4 +106,5 @@ namespace engine::direct3d
     using RasterizerState1 = d3d_resource_wrapper<ID3D11RasterizerState1>;
     using SamplerState = d3d_resource_wrapper<ID3D11SamplerState>;
     using DepthStencilState = d3d_resource_wrapper<ID3D11DepthStencilState>;
+    using Resource = d3d_resource_wrapper<ID3D11Resource>;
 } // namespace engine::direct3d
