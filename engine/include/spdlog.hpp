@@ -8,6 +8,7 @@
 #pragma warning(disable:4002)
 #pragma warning(disable:4189)
 #pragma warning(disable:4245)
+#pragma warning(disable:6285)
 #pragma warning(disable:26495)
 #endif
 #include <spdlog/async.h>

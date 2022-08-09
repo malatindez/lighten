@@ -1,62 +1,37 @@
 #pragma once
-#include <unordered_map>
-
-#include "pch.hpp"
-#define NOMINMAX
-#include <Windows.h>
-
-#include "events/mouse-events.hpp"
-#include "events.hpp"
+#include "core/events.hpp"
 #include "core/math.hpp"
+
+#include <string>
 
 namespace engine::core
 {
-    class Window;
-
-    using WindowCallback =
-        std::function<LRESULT(Window &, HWND, UINT, WPARAM, LPARAM)>;
-
-    // Simple WINAPI window wrapper
     class Window
     {
     public:
-        Window(WNDCLASSEXW const &window_class_template, DWORD extended_style,
-               std::wstring const &class_name, std::wstring const &window_name,
-               DWORD style, core::math::ivec2 position, core::math::ivec2 size,
-               HWND parent_window, HMENU menu, HINSTANCE instance, LPVOID lp_param);
-        // remove copy and move semantics because the callback system is bound to the
-        // address of the window
-        Window(Window &&Window) = delete;
-        Window &operator=(Window &&Window) = delete;
-        Window(Window const &Window) = delete;
-        Window &operator=(Window const &Window) = delete;
+        struct Props
+        {
+            std::wstring title;
+            math::ivec2 size;
+            math::ivec2 position;
+            Props(std::wstring const &title = L"Engine", math::ivec2 size = { 1600, 900 }, math::ivec2 position = { 100, 100 }) : title { title }, size { size }, position { position } {}
+        };
+        Window(Props const &props) : title_ { props.title }, size_ { props.size }, position_ { props.position } {}
+        virtual ~Window() = default;
 
-        virtual ~Window() { DestroyWindow(handle_); }
+        [[nodiscard]] math::ivec2 const &size() const noexcept { return size_; }
+        [[nodiscard]] math::ivec2 const &position() const noexcept { return position_; }
+        [[nodiscard]] std::wstring const &title() const noexcept { return title_; }
+        [[nodiscard]] bool const &alive() const noexcept { return alive_; }
 
-        void SetEventCallback(EventCallbackFn const &callback) noexcept { event_callback_ = callback; }
+        [[nodiscard]] virtual void *native() = 0;
 
-        [[nodiscard]] constexpr HWND handle() const noexcept { return handle_; }
-        [[nodiscard]] constexpr core::math::ivec2 const &window_size() const noexcept { return window_size_; }
-        [[nodiscard]] constexpr core::math::ivec2 const &position() const noexcept { return position_; }
-        [[nodiscard]] constexpr bool running() const noexcept { return running_; }
-
-        virtual bool PeekOSMessages();
-
+        void SetEventCallback(core::EventCallbackFn const &event_fn) noexcept { event_callback_ = event_fn; }
     protected:
-        virtual void OnSizeChanged() {}
-        virtual void OnSizeChangeEnd() {}
-
-    private:
-        LRESULT CALLBACK WindowProcCallback(HWND handle, UINT message, WPARAM w_param,
-                                            LPARAM l_param);
-        static LRESULT CALLBACK StaticWindowProc(HWND handle, UINT message,
-                                                 WPARAM w_param, LPARAM l_param);
-
-        EventCallbackFn event_callback_;
-
-        bool running_ = true;
-        HWND handle_;
-        core::math::ivec2 position_;
-        core::math::ivec2 window_size_;
+        core::EventCallbackFn event_callback_;
+        std::wstring title_;
+        math::ivec2 size_;
+        math::ivec2 position_;
+        bool alive_ = true;
     };
-}; // namespace engine::core
+} // namespace engine::core

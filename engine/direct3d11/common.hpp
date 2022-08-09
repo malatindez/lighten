@@ -6,61 +6,83 @@
 
 namespace engine::direct3d
 {
-    namespace _detail
-    {
-        template <typename T>
-        class ptr_wrapper
-        {
-        public:
-            using type = T;
-            explicit constexpr ptr_wrapper(std::shared_ptr<T> ptr) : ptr_ { ptr } {}
-            explicit constexpr ptr_wrapper(T *ptr, std::function<void(T *)> const &deleter) : ptr_ { std::shared_ptr<T>(ptr, deleter) } {}
-
-            constexpr operator T const *() const noexcept { return ptr_.get(); }
-            constexpr operator T *() noexcept { return ptr_.get(); }
-            constexpr T const *operator->() const noexcept { return ptr_.get(); }
-            constexpr T *operator->() noexcept { return ptr_.get(); }
-
-            [[nodiscard]] constexpr T const *ptr() const noexcept { return ptr_.get(); }
-            [[nodiscard]] constexpr T *ptr() noexcept { return ptr_.get(); }
-
-            [[nodiscard]] constexpr bool valid() { return ptr_ != nullptr; }
-
-            void reset(std::shared_ptr<T> ptr = std::shared_ptr<T> { nullptr }) { ptr_ = ptr; }
-
-        private:
-            std::shared_ptr<T> ptr_;
-
-        public:
-            template <class... Types>
-            constexpr auto operator()(Types &&...args) const
-                noexcept(noexcept(std::invoke(*ptr_, static_cast<Types &&>(args)...)))
-                -> decltype(std::invoke(*ptr_, static_cast<Types &&>(args)...))
-            {
-                return std::invoke(*ptr_, static_cast<Types &&>(args)...);
-            }
-        };
-    } // namespace
-
     template <typename T>
-    class d3d_resource_wrapper : public _detail::ptr_wrapper<T>
+    class d3d_resource_wrapper
     {
     public:
-        constexpr operator T const *() const noexcept { return this->ptr(); }
-        constexpr operator T *() noexcept { return this->ptr(); }
-        constexpr T const *operator->() const noexcept { return this->ptr(); }
-        constexpr T *operator->() noexcept { return this->ptr(); }
+        constexpr operator T const *() const noexcept { return ptr_; }
+        constexpr operator T *() noexcept { return ptr_; }
+        constexpr T const *operator->() const noexcept { return ptr_; }
+        constexpr T *operator->() noexcept { return ptr_; }
+
+        [[nodiscard]] constexpr T const *ptr() const noexcept { return ptr_; }
+        [[nodiscard]] constexpr T *ptr() noexcept { return ptr_; }
+
+        [[nodiscard]] constexpr bool valid() { return ptr_ != nullptr; }
+
+        inline void reset(T *ptr = nullptr)
+        {
+            int ref_amount = 0;
+            if (ptr_)
+            {
+                ref_amount = ptr_->Release();
+            }
+            ptr_ = ptr;
+            if (ptr_)
+            {
+                ptr_->AddRef();
+            }
+        }
 
         constexpr d3d_resource_wrapper<T> &operator=(T *ptr)
         {
-            this->reset(std::shared_ptr<T>(ptr, [] (T *p) { p->Release(); }));
+            this->reset(ptr);
+            ptr->Release();
             return *this;
         }
 
-        constexpr d3d_resource_wrapper() : _detail::ptr_wrapper<T> { std::shared_ptr<T>{nullptr} } {}
-        explicit constexpr d3d_resource_wrapper(std::shared_ptr<T> ptr) : _detail::ptr_wrapper<T> { ptr } {}
-        explicit constexpr d3d_resource_wrapper(T *ptr) : _detail::ptr_wrapper<T> { ptr, [] (T *p)
-                                                                                  { p->Release(); } } {}
+        ~d3d_resource_wrapper()
+        {
+            ptr_->Release();
+        }
+
+        d3d_resource_wrapper(d3d_resource_wrapper<T> &&other)
+        {
+            reset(other.ptr_);
+        }
+        d3d_resource_wrapper(d3d_resource_wrapper<T> const &other)
+        {
+            reset(other.ptr_);
+        }
+        d3d_resource_wrapper &operator=(d3d_resource_wrapper<T> &&other)
+        {
+            reset(other.ptr_);
+            return *this;
+        }
+        d3d_resource_wrapper &operator=(d3d_resource_wrapper<T> const &other)
+        {
+            reset(other.ptr_);
+            return *this;
+        }
+
+        constexpr d3d_resource_wrapper() = default;
+        explicit constexpr d3d_resource_wrapper(T *ptr)
+        {
+            reset(ptr);
+            ptr->Release();
+        }
+
+    private:
+        T *ptr_ = nullptr;
+
+    public:
+        template <class... Types>
+        constexpr auto operator()(Types &&...args) const
+            noexcept(noexcept(std::invoke(*ptr_, static_cast<Types &&>(args)...)))
+            -> decltype(std::invoke(*ptr_, static_cast<Types &&>(args)...))
+        {
+            return std::invoke(*ptr_, static_cast<Types &&>(args)...);
+        }
     };
 
     using Factory = d3d_resource_wrapper<IDXGIFactory>;

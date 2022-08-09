@@ -33,7 +33,7 @@ namespace engine::core::_detail
 } // namespace engine::core::_detail
 namespace engine::core
 {
-    class LayerStack : Layer
+    class LayerStack : public Layer
     {
     public:
         using Layer::Layer;

@@ -5,9 +5,6 @@ using namespace core;
 using namespace events;
 using namespace math;
 
-Controller::Controller(std::shared_ptr<engine::core::Window> window) : window_(window)
-{}
-
 void Controller::OnTick([[maybe_unused]] float delta_time)
 {
     for (auto const &func : update_callbacks_)

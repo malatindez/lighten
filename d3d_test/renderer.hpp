@@ -1,12 +1,12 @@
 #pragma once
 #pragma once
 #include "core/application.hpp"
-#include "core/layer.hpp"
-#include "core/swapchain-window.hpp"
-#include "direct3d/common.hpp"
-#include "direct3d/globals.hpp"
-#include "direct3d/shader.hpp"
-#include "direct3d/triangle-mesh.hpp"
+#include "core/layers/layer.hpp"
+#include "direct3d11/common.hpp"
+#include "direct3d11/globals.hpp"
+#include "direct3d11/shader.hpp"
+#include "direct3d11/triangle-mesh.hpp"
+#include "platform/windows/render-pipeline.hpp"
 class Renderer : public engine::core::Layer
 {
 public:
@@ -22,22 +22,11 @@ public:
         engine::direct3d::TriangleMesh mesh;
         engine::direct3d::ShaderProgram shader;
     };
-    explicit Renderer(std::shared_ptr<engine::core::SwapchainWindow> window)
-        : window_(window), triangle_(create_triangle())
-    {
-        initialize();
-    }
+
     void OnRender() override;
+    void OnGuiRender() override;
 private:
     static Triangle create_triangle();
 
-    void initialize();
-
-    bool skip_render_;
-    std::shared_ptr<engine::core::SwapchainWindow> window_;
-    Triangle triangle_;
-    engine::direct3d::RasterizerState1 rasterizer_state_;
-    engine::direct3d::SamplerState sampler_state_;
-    engine::direct3d::DepthStencilState depth_stencil_state_;
-
+    Triangle triangle_ = create_triangle();
 };

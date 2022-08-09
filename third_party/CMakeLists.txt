@@ -23,11 +23,10 @@ add_subdirectory("${ASSIMP_DIR}")
 
 # imgui
 add_library(imgui STATIC "${IMGUI_DIR}/imgui.cpp"
-                         "${IMGUI_DIR}/imgui_widgets.cpp"
                          "${IMGUI_DIR}/imgui_draw.cpp"
                          "${IMGUI_DIR}/imgui_demo.cpp"
-                         "${IMGUI_DIR}/backends/imgui_impl_dx11.cpp"
-                         "${IMGUI_DIR}/backends/imgui_impl_win32.cpp")
+                         "${IMGUI_DIR}/imgui_widgets.cpp"
+                         "${IMGUI_DIR}/imgui_tables.cpp")
 target_include_directories(imgui PUBLIC "${IMGUI_DIR}")
 target_compile_features(imgui PUBLIC cxx_std_17)
 
@@ -87,6 +86,8 @@ endfunction(target_add_assimp)
 function(target_add_imgui TARGET)
 target_link_libraries("${TARGET}" imgui)
 target_include_directories(imguizmo PRIVATE "${IMGUI_DIR}")
+target_sources("${TARGET}" PUBLIC "${IMGUI_DIR}/backends/imgui_impl_dx11.cpp"
+                          "${IMGUI_DIR}/backends/imgui_impl_win32.cpp")
 endfunction(target_add_imgui)
 
 function(target_add_imguizmo TARGET)

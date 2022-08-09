@@ -1,55 +1,28 @@
 #include "controller.hpp"
 #include "core/application.hpp"
-#include "core/swapchain-window.hpp"
-#include "direct3d/common.hpp"
+#include "direct3d11/common.hpp"
 #include "pch.hpp"
 #include "renderer.hpp"
 #include <filesystem>
+#include "platform/windows/render-pipeline.hpp"
 using namespace engine;
 using namespace core;
 using namespace math;
+using namespace platform;
 
 // the entry point for any Windows program
-INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int cmd_show)
+INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 {
     Application::Init();
 
-    WNDCLASSEXW wc;
-    // clear out the window class for use
-    ZeroMemory(&wc, sizeof(WNDCLASSEX));
+    auto render_pipeline = std::make_shared<windows::RenderPipeline>();
+    render_pipeline->PushLayer(std::make_shared<Renderer>());
 
-    // fill in the struct with the needed information
-    wc.cbSize = sizeof(WNDCLASSEX);
-    wc.style = CS_HREDRAW | CS_VREDRAW;
-    wc.hInstance = instance;
-    wc.hCursor = LoadCursor(nullptr, IDC_CROSS);
-    wc.hbrBackground = (HBRUSH) COLOR_WINDOW;
+    Application &app = Application::Get();
 
-    // create the window and use the result as the handle
-    auto window = std::make_shared<SwapchainWindow>(
-        wc, NULL,
-        L"WindowClass1",                  // name of the window class
-        L"Engine",                        // title of the window
-        WS_OVERLAPPEDWINDOW | WS_VISIBLE, // window style
-        kWindowPosition,                  // position of the window
-        kWindowResolution,                // window size
-        nullptr,                          // we have no parent window, nullptr
-        nullptr,                          // we aren't using menus, nullptr
-        instance,                         // application handle
-        nullptr);                         // used with multiple windows, nullptr
+    app.PushLayer(std::make_shared<Controller>());
+    app.PushLayer(render_pipeline);
 
-    // display the window on the screen
-    ShowWindow(window->handle(), cmd_show);
-
-    window->SetEventCallback(Application::event_function());
-
-    auto controller = std::make_shared<Controller>(std::static_pointer_cast<Window>(window));
-
-    auto renderer = std::make_shared<Renderer>(window);
-
-    Application::Get().PushLayer(controller);
-    Application::Get().PushLayer(renderer);
-
-    Application::Get().Run();
+    app.Run();
     return 0;
 }

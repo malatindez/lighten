@@ -87,18 +87,6 @@ namespace engine::core
             {
                 render_.reset();
                 OnRender();
-
-                {
-                    static std::vector<float> last_100_frames(100);
-                    static int frame_num = 0;
-                    last_100_frames[frame_num %= 100] = render_.elapsed();
-                    frame_num++;
-                    float avg = 100 / std::accumulate(last_100_frames.begin(), last_100_frames.end(), 0.0f);
-                    if (avg < 15 || frame_num == 100)
-                    {
-                        logger_->trace("Average fps based of last 100 frames: " + std::to_string(avg));
-                    }
-                }
             }
             std::this_thread::yield();
         }

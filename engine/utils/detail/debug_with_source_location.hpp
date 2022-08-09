@@ -30,7 +30,7 @@ namespace engine::utils
                 spdlog::critical(CurrentSourceLocation(location) + std::basic_string(message));
             }
 
-        assert(value, message);
+        assert(value);
     }
 
     inline void AlwaysAssert(bool value, std::string_view message = "Assert failed", std::source_location location = std::source_location::current())
