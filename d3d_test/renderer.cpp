@@ -3,11 +3,10 @@ using namespace engine;
 using namespace core;
 using namespace direct3d;
 using namespace math;
-
+using namespace ShaderCompiler;
 void Renderer::OnRender()
 {
-    float time = Application::TimeFromStart();
-    triangle_.shader.apply_shader();
+    triangle_.shader.Bind();
     triangle_.mesh.render();
 }
 
@@ -28,9 +27,11 @@ Renderer::Triangle Renderer::create_triangle()
         {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
         {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
     };
-
+    auto vs = CompileVertexShader(vertex_path);
+    auto ps = CompilePixelShader(pixel_path);
+    auto il = std::make_shared<render::InputLayout>(vs->blob(), d3d_input_desc);
     return Triangle {
-        .uniform_buffer = ShaderProgram::InitializeUniformBuffer(sizeof(Triangle::ShaderInput)),
+        //.uniform_buffer = ShaderProgram::InitializeUniformBuffer(sizeof(Triangle::ShaderInput)),
         .mesh = TriangleMesh(),
-        .shader = ShaderProgram(vertex_path, pixel_path, d3d_input_desc) };
+        .shader = render::GraphicsShaderProgram().SetVertexShader(vs).SetPixelShader(ps).SetInputLayout(il) };
 }

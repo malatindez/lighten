@@ -21,8 +21,8 @@ namespace engine::core
 
         void BlockEvents(bool block = true) { block_events_ = block; }
 
-
         void ResetTheme();
+
     private:
         std::shared_ptr<Window> window_;
         bool block_events_ = true;

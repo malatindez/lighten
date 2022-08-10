@@ -36,7 +36,6 @@ namespace engine::platform::windows
         [[nodiscard]] ID3D11DepthStencilView *depth_buffer_view() noexcept { return depth_buffer_view_.ptr(); }
         [[nodiscard]] D3D11_TEXTURE2D_DESC depth_buffer_desc() const noexcept { return depth_buffer_desc_; }
 
-
         [[nodiscard]] void *native() override { return handle(); };
         // TODO(malatindez) make this method private and handle events using GetMessage
         // save main-thread dependant events in event pool and pass them if Window->OnUpdate is called

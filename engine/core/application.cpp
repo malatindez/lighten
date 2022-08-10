@@ -2,8 +2,8 @@
 #include "direct3d11/direct3d11.hpp"
 #include "include/win-debug.hpp"
 
-#include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/ansicolor_sink.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
 
 static std::string const kDefaultConfig =
 R"(

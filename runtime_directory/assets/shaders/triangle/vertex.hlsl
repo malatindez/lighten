@@ -4,7 +4,7 @@ struct VOut
     float4 color : COLOR;
 };
 
-VOut main(float4 position : POSITION, float4 color : COLOR)
+VOut vs_main(float4 position : POSITION, float4 color : COLOR)
 {
     VOut output;
 

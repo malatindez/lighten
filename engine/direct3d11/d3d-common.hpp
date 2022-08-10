@@ -1,6 +1,6 @@
 #pragma once
-#include "include/pch.hpp"
 #include "include/d3d.hpp"
+#include "include/pch.hpp"
 
 namespace engine::direct3d
 {
@@ -114,4 +114,5 @@ namespace engine::direct3d
     using GeometryShader = d3d_resource_wrapper<ID3D11GeometryShader>;
     using ComputeShader = d3d_resource_wrapper<ID3D11ComputeShader>;
     using Blob = d3d_resource_wrapper<ID3D10Blob>;
+    using Buffer = d3d_resource_wrapper<ID3D11Buffer>;
 } // namespace engine::direct3d

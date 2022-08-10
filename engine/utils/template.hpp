@@ -1,6 +1,37 @@
 #pragma once
 namespace engine::utils
 {
+    namespace _template_detail
+    {
+
+        template <typename A>
+        constexpr size_t CalculateSize()
+        {
+            return sizeof(A);
+        }
+        template <typename A, typename B, typename... Args>
+        constexpr size_t CalculateSize()
+        {
+            return sizeof(A) + CalculateSize<B, Args...>();
+        }
+        template <typename A>
+        constexpr size_t CalculateAmount()
+        {
+            return 1;
+        }
+        template <typename A, typename B, typename... Args>
+        constexpr size_t CalculateAmount()
+        {
+            return 1 + CalculateAmount<B, Args...>();
+        }
+    }
+    template <typename... Args>
+    struct parameter_pack_info
+    {
+        static constexpr size_t size = _template_detail::CalculateSize();
+        static constexpr size_t amount = _template_detail::CalculateAmount();
+    };
+
     template <typename T>
     struct return_type;
 

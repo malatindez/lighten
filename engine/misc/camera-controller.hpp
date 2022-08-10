@@ -62,6 +62,7 @@ namespace engine
             transform_ = transform;
             Init();
         }
+
     private:
         components::Camera *camera_;
         components::Transform *transform_;

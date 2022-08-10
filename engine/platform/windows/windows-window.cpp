@@ -1,6 +1,6 @@
 #include "windows-window.hpp"
-#include "utils/utils.hpp"
 #include "include/imgui.hpp"
+#include "utils/utils.hpp"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace engine::platform::windows
@@ -42,7 +42,6 @@ namespace engine::platform::windows
 
         // display the window on the screen
         ShowWindow(handle(), 10);
-
 
         initialize_d3d();
     }
@@ -224,7 +223,6 @@ namespace engine::platform::windows
 
         ID3D11Texture2D *depth_buffer;
 
-
         if (FAILED(direct3d::device->CreateTexture2D(&depth_buffer_desc_, nullptr, &depth_buffer)))
         {
             throw Window::WindowError(utils::CurrentSourceLocation() + "Failed to initialize depthbuffer");
@@ -239,7 +237,6 @@ namespace engine::platform::windows
         depth_buffer_ = depth_buffer;
         depth_buffer_view_ = depth_buffer_view;
     }
-
 
     void Window::initialize_d3d()
     {

@@ -23,6 +23,7 @@ namespace engine::core
         void OnGuiRender() override;
         void OnEvent(events::Event &e) override;
         void OnTick(float delta_time) override;
+
     private:
         std::shared_mutex mutex;
     };

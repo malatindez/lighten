@@ -1,7 +1,6 @@
 #pragma once
 #include "core/events.hpp"
 
-
 namespace engine::core
 {
     class Window
@@ -25,6 +24,7 @@ namespace engine::core
         [[nodiscard]] virtual void *native() = 0;
 
         void SetEventCallback(core::EventCallbackFn const &event_fn) noexcept { event_callback_ = event_fn; }
+
     protected:
         core::EventCallbackFn event_callback_;
         std::wstring title_;

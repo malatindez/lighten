@@ -45,7 +45,6 @@ LONG NTAPI VexHandler(PEXCEPTION_POINTERS ExceptionInfo)
                     _freea((void *)(psz));
                 }
 
-
                 OutputDebugStringCallback(psz);
             }
             return EXCEPTION_CONTINUE_EXECUTION;

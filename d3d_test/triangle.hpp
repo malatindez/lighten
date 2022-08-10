@@ -18,8 +18,7 @@ namespace engine::direct3d
             {
                 {core::math::vec3{0.0f, 0.5f, 1.0f}, core::math::vec4{1.0f, 0.0f, 0.0f, 1.0f}},
                 {core::math::vec3{0.45f, -0.5, 1.0f}, core::math::vec4{0.0f, 1.0f, 0.0f, 1.0f}},
-                {core::math::vec3{-0.45f, -0.5f, 1.0f}, core::math::vec4{0.0f, 0.0f, 1.0f, 1.0f}}
-            };
+                {core::math::vec3{-0.45f, -0.5f, 1.0f}, core::math::vec4{0.0f, 0.0f, 1.0f, 1.0f}} };
 
             D3D11_BUFFER_DESC vertex_buffer_desc = {};
             vertex_buffer_desc.ByteWidth = sizeof(vertices);
@@ -37,7 +36,7 @@ namespace engine::direct3d
         void render()
         {
             // do 3D rendering on the back buffer here
-             // select which vertex buffer to display
+            // select which vertex buffer to display
             UINT stride = sizeof(Vertex);
             UINT offset = 0;
 

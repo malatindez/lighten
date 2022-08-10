@@ -1,8 +1,8 @@
 #pragma once
-#include "include/pch.hpp"
 #include "converter.hpp"
+#include "debug.hpp"
+#include "include/pch.hpp"
+#include "measurer.hpp"
 #include "string.hpp"
 #include "template.hpp"
-#include "debug.hpp"
 #include "timer.hpp"
-#include "measurer.hpp"

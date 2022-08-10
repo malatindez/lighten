@@ -12,6 +12,7 @@ namespace engine::platform::windows
         [[nodiscard]] std::shared_ptr<Window> window() const noexcept { return window_; }
         void OnRender() override;
         void OnUpdate() override;
+
     private:
         void FrameBegin();
         void FrameEnd();

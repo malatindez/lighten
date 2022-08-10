@@ -4,15 +4,15 @@ file(GLOB_RECURSE D3D_SOURCES ${D3D_SOURCES_DIR} *.*)
 list(FILTER D3D_SOURCES INCLUDE REGEX ${D3D_SOURCES_DIR}/*)
 
 foreach(_source IN ITEMS ${D3D_SOURCES})
-    if(IS_ABSOLUTE "${_source}")
-        file(RELATIVE_PATH _source_rel "${CMAKE_CURRENT_SOURCE_DIR}" "${_source}")
-    else()
-        set(_source_rel "${_source}")
-    endif()
+  if(IS_ABSOLUTE "${_source}")
+    file(RELATIVE_PATH _source_rel "${CMAKE_CURRENT_SOURCE_DIR}" "${_source}")
+  else()
+    set(_source_rel "${_source}")
+  endif()
 
-    get_filename_component(_source_path "${_source_rel}" PATH)
-    string(REPLACE "/" "\\" _source_path_msvc "${_source_path}")
-    source_group("${_source_path_msvc}" FILES "${_source}")
+  get_filename_component(_source_path "${_source_rel}" PATH)
+  string(REPLACE "/" "\\" _source_path_msvc "${_source_path}")
+  source_group("${_source_path_msvc}" FILES "${_source}")
 endforeach()
 
 add_executable(d3d_test WIN32 ${D3D_SOURCES})
@@ -20,9 +20,6 @@ target_include_directories(d3d_test PRIVATE ${D3D_SOURCES_DIR})
 target_include_directories(d3d_test PRIVATE ${ENGINE_SOURCES_DIR})
 target_link_libraries(d3d_test engine)
 target_add_libraries(d3d_test "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console" "dds_texture_loader")
-
-
-
 
 file(GLOB RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/resources/*")
 file(COPY ${RESOURCES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

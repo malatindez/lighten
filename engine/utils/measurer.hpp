@@ -1,9 +1,9 @@
 #pragma once
-#include "timer.hpp"
 #include "debug.hpp"
+#include "timer.hpp"
 namespace engine::utils
 {
-    template<class clock>
+    template <class clock>
     struct Measurer
     {
     public:
@@ -55,7 +55,6 @@ namespace engine::utils
             out << std::setprecision(7) << avg_over_the_flush * 1000 << " milliseconds" << std::endl;
         }
 
-
         float avg(size_t last_n_entries = std::numeric_limits<size_t>::max())
         {
             float rv = 0;
@@ -72,6 +71,7 @@ namespace engine::utils
         float time_to_flush = 1; // every second
         size_t maximum_entries = std::numeric_limits<size_t>::max();
         bool log_automatically = true;
+
     private:
         std::string output;
         std::vector<float> entries;

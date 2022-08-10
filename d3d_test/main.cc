@@ -1,7 +1,7 @@
 #include "controller.hpp"
 #include "core/application.hpp"
-#include "renderer.hpp"
 #include "platform/windows/windows-render-pipeline.hpp"
+#include "renderer.hpp"
 
 using namespace engine;
 using namespace core;

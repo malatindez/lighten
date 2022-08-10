@@ -1,7 +1,7 @@
 #pragma once
-#include "layer-stack.hpp"
 #include "imgui-layer.hpp"
 #include "include/pch.hpp"
+#include "layer-stack.hpp"
 namespace engine::core
 {
     class RenderPipeline : public LayerStack
@@ -9,6 +9,7 @@ namespace engine::core
     public:
         RenderPipeline() : LayerStack("RenderPipeline") {}
         void OnRender() = 0;
+
     protected:
         void InitImGuiLayer(std::shared_ptr<core::Window> window)
         {

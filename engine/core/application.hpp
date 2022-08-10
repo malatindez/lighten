@@ -1,10 +1,9 @@
 #pragma once
-#include "include/pch.hpp"
-#include "utils/utils.hpp"
 #include "events.hpp"
-#include "misc/ini.hpp"
+#include "include/pch.hpp"
 #include "layers/layer-stack-threadsafe.hpp"
-
+#include "misc/ini.hpp"
+#include "utils/utils.hpp"
 
 namespace engine::core
 {
@@ -25,10 +24,10 @@ namespace engine::core
     {
     public:
         ~Application();
-        using LayerStackThreadsafe::PushLayer;
-        using LayerStackThreadsafe::PushOverlay;
         using LayerStackThreadsafe::PopLayer;
         using LayerStackThreadsafe::PopOverlay;
+        using LayerStackThreadsafe::PushLayer;
+        using LayerStackThreadsafe::PushOverlay;
 
         [[nodiscard]] static inline Application &Get() noexcept { return *application_; }
         [[nodiscard]] static inline EventCallbackFn const &event_function() { return application_->event_function_; }
@@ -36,10 +35,10 @@ namespace engine::core
         [[nodiscard]] static inline ini::Ini &config() { return *application_->config_; }
         [[nodiscard]] static inline float TimeFromStart() { return from_start_.elapsed(); }
 
-
         static void Exit();
 
         static void OnEvent(events::Event &e) { application_->LayerStackThreadsafe::OnEvent(e); }
+
     private:
         static void Init();
         static void Deinit();

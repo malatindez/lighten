@@ -52,6 +52,7 @@ namespace engine::core
         void OnGuiRender() override;
         void OnEvent(events::Event &e) override;
         void OnTick(float delta_time) override;
+
     private:
         std::vector<std::shared_ptr<Layer>> all_;
         _detail::UnderlyingStack update_;
