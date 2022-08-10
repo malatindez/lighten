@@ -24,13 +24,13 @@ Renderer::Triangle Renderer::create_triangle()
     auto vertex_path = path / "assets/shaders/triangle/vertex.hlsl";
     auto pixel_path = path / "assets/shaders/triangle/pixel.hlsl";
 
-    std::vector<D3D11_INPUT_ELEMENT_DESC> d3d_input_desc{
+    std::vector<D3D11_INPUT_ELEMENT_DESC> d3d_input_desc {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
         {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
     };
 
-    return Triangle{
+    return Triangle {
         .uniform_buffer = ShaderProgram::InitializeUniformBuffer(sizeof(Triangle::ShaderInput)),
         .mesh = TriangleMesh(),
-        .shader = ShaderProgram(vertex_path, pixel_path, d3d_input_desc)};
+        .shader = ShaderProgram(vertex_path, pixel_path, d3d_input_desc) };
 }

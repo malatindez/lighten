@@ -1,5 +1,4 @@
 #pragma once
-#include "include/spdlog.hpp"
 #include "../debug.hpp"
 namespace engine::utils
 {
@@ -7,7 +6,7 @@ namespace engine::utils
     // asserts only in debug
     inline void Assert(bool value, std::string_view message = "Assert failed")
     {
-        if constexpr (!DEBUG_UTILS_DEBUG_ENABLED) 
+        if constexpr (!DEBUG_UTILS_DEBUG_ENABLED)
         {
             return;
         }
@@ -17,11 +16,11 @@ namespace engine::utils
             return;
         }
 
-        if constexpr (DEBUG_UTILS_ASSERT_LOGS)
-        {
-            spdlog::critical(std::basic_string(message));
-        }
-        
+            if constexpr (DEBUG_UTILS_ASSERT_LOGS)
+            {
+                spdlog::critical(std::basic_string(message));
+            }
+
         assert(value, message);
     }
 
@@ -32,10 +31,10 @@ namespace engine::utils
             return;
         }
 
-        if constexpr (DEBUG_UTILS_ASSERT_LOGS)
-        {
-            spdlog::critical(std::basic_string(message));
-        }
+            if constexpr (DEBUG_UTILS_ASSERT_LOGS)
+            {
+                spdlog::critical(std::basic_string(message));
+            }
 
         if constexpr (DEBUG_UTILS_DEBUG_ENABLED)
         {

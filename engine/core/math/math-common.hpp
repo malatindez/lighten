@@ -1,14 +1,5 @@
 #pragma once
-#include <algorithm>
-#include <array>
-#include <assert.h>
-#include <concepts>
-#include <cstdint>
-#include <istream>
-#include <limits>
-#include <math.h>
-#include <numbers>
-#include <ostream>
+#include "include/pch.hpp"
 #include <type_traits>
 
 namespace engine::core::math

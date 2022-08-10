@@ -1,5 +1,4 @@
 #include "controller.hpp"
-#include "core/application.hpp"
 using namespace engine;
 using namespace core;
 using namespace events;

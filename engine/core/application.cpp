@@ -1,13 +1,9 @@
 #include "application.hpp"
+#include "direct3d11/direct3d11.hpp"
+#include "include/win-debug.hpp"
 
-#include "core/events.hpp"
-#include "direct3d11/globals.hpp"
-#include "include/win_debug.hpp"
-#include <filesystem>
-#include <fstream>
-#include <memory>
-#include <numeric>
-#include <thread>
+#include "spdlog/sinks/stdout_color_sinks.h"
+#include "spdlog/sinks/ansicolor_sink.h"
 
 static std::string const kDefaultConfig =
 R"(
@@ -36,8 +32,8 @@ namespace engine::core
         if (config()["Logger"]["console_enabled"].as_boolean())
         {
             AllocConsole();
-            freopen_s((FILE **) stdout, "CONOUT$", "w", stdout);
-            freopen_s((FILE **) stderr, "CONOUT$", "w", stderr);
+            freopen_s((FILE **)stdout, "CONOUT$", "w", stdout);
+            freopen_s((FILE **)stderr, "CONOUT$", "w", stderr);
             auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_st>();
             stdout_sink->set_level(spdlog::level::trace);
             logger().sinks().push_back(stdout_sink);
@@ -53,21 +49,21 @@ namespace engine::core
             }
             return EXCEPTION_EXECUTE_HANDLER;
         };
-        // TODO: figure out how to flush log if the program is terminated.
-        // neither of this isn't working
-        SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER) &func);
-        std::atexit([] () { application_->logger_->flush(); });
-        std::set_terminate([] () { application_->logger_->flush(); });
 
         direct3d::Init();
     }
 
+    void Application::Deinit()
+    {
+        application_->logger_->flush();
+        application_ = nullptr;
+        direct3d::Deinit();
+    }
     void Application::Exit()
     {
         application_->running_ = false;
         application_->logger_->flush();
     }
-
     void Application::Run()
     {
         render_.reset();

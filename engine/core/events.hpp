@@ -1,9 +1,9 @@
 #pragma once
+#include "include/pch.hpp"
 #include "events/key-events.hpp"
 #include "events/mouse-events.hpp"
 #include "events/window-events.hpp"
 
-#include <functional>
 
 namespace engine::core
 {

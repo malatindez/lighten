@@ -1,5 +1,5 @@
 #include "imgui-layer.hpp"
-#include "direct3d11/globals.hpp"
+#include "direct3d11/direct3d11.hpp"
 namespace engine::core
 {
     void ImGuiLayer::OnAttach()
@@ -59,7 +59,7 @@ namespace engine::core
     void ImGuiLayer::End()
     {
         ImGuiIO &io = ImGui::GetIO();
-        io.DisplaySize = ImVec2((float) window_->size().x, (float) window_->size().y);
+        io.DisplaySize = ImVec2((float)window_->size().x, (float)window_->size().y);
 
         // Rendering
         ImGui::Render();

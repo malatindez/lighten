@@ -1,7 +1,6 @@
 #pragma once
 #include "core/math.hpp"
-#include "direct3d11/globals.hpp"
-#include <assert.h>
+#include "direct3d11/direct3d11.hpp"
 
 namespace engine::direct3d
 {

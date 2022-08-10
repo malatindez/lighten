@@ -1,8 +1,6 @@
 #pragma once
-#include "../include/d3d.hpp"
-
-#include <functional>
-#include <memory>
+#include "include/pch.hpp"
+#include "include/d3d.hpp"
 
 namespace engine::direct3d
 {
@@ -23,10 +21,9 @@ namespace engine::direct3d
 
         inline void reset(T *ptr = nullptr)
         {
-            int ref_amount = 0;
             if (ptr_)
             {
-                ref_amount = ptr_->Release();
+                ptr_->Release();
             }
             ptr_ = ptr;
             if (ptr_)
@@ -38,13 +35,16 @@ namespace engine::direct3d
         constexpr d3d_resource_wrapper<T> &operator=(T *ptr)
         {
             this->reset(ptr);
-            ptr->Release();
+            if (ptr)
+            {
+                ptr->Release();
+            }
             return *this;
         }
 
         ~d3d_resource_wrapper()
         {
-            ptr_->Release();
+            reset();
         }
 
         d3d_resource_wrapper(d3d_resource_wrapper<T> &&other)
@@ -67,10 +67,13 @@ namespace engine::direct3d
         }
 
         constexpr d3d_resource_wrapper() = default;
-        explicit constexpr d3d_resource_wrapper(T *ptr)
+        constexpr d3d_resource_wrapper(T *ptr)
         {
             reset(ptr);
-            ptr->Release();
+            if (ptr)
+            {
+                ptr->Release();
+            }
         }
 
     private:
@@ -99,12 +102,16 @@ namespace engine::direct3d
     using DepthStencilView = d3d_resource_wrapper<ID3D11DepthStencilView>;
     using Texture2D = d3d_resource_wrapper<ID3D11Texture2D>;
     using Buffer = d3d_resource_wrapper<ID3D11Buffer>;
-    using GeometryShader = d3d_resource_wrapper<ID3D11GeometryShader>;
-    using VertexShader = d3d_resource_wrapper<ID3D11VertexShader>;
-    using PixelShader = d3d_resource_wrapper<ID3D11PixelShader>;
     using InputLayout = d3d_resource_wrapper<ID3D11InputLayout>;
     using RasterizerState1 = d3d_resource_wrapper<ID3D11RasterizerState1>;
     using SamplerState = d3d_resource_wrapper<ID3D11SamplerState>;
     using DepthStencilState = d3d_resource_wrapper<ID3D11DepthStencilState>;
     using Resource = d3d_resource_wrapper<ID3D11Resource>;
+    using VertexShader = d3d_resource_wrapper<ID3D11VertexShader>;
+    using PixelShader = d3d_resource_wrapper<ID3D11PixelShader>;
+    using HullShader = d3d_resource_wrapper<ID3D11HullShader>;
+    using DomainShader = d3d_resource_wrapper<ID3D11DomainShader>;
+    using GeometryShader = d3d_resource_wrapper<ID3D11GeometryShader>;
+    using ComputeShader = d3d_resource_wrapper<ID3D11ComputeShader>;
+    using Blob = d3d_resource_wrapper<ID3D10Blob>;
 } // namespace engine::direct3d

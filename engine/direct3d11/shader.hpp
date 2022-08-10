@@ -1,9 +1,6 @@
 ﻿#pragma once
-#include "core/application.hpp"
 #include "utils/debug.hpp"
-#include "globals.hpp"
-#include <filesystem>
-#include <optional>
+#include "direct3d11.hpp"
 
 #if defined(_DEBUG)
 #define ENGINE_D3D_SHADER_THROWS true
@@ -35,7 +32,7 @@ namespace engine::direct3d
         };
         ShaderProgram(std::filesystem::path const &vertex_path,
                       std::filesystem::path const &pixel_path,
-                      std::vector<D3D11_INPUT_ELEMENT_DESC> const &ied) ENGINE_D3D_SHADER_NOEXCEPT;
+                      std::vector<D3D11_INPUT_ELEMENT_DESC> const &ied) DEBUG_UTILS_ASSERT_NOEXCEPT;
 
         [[nodiscard]] inline direct3d::VertexShader vertex_shader() const noexcept { return vertex_shader_; }
         [[nodiscard]] inline direct3d::PixelShader pixel_shader() const noexcept { return pixel_shader_; }

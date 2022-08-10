@@ -1,5 +1,5 @@
 #pragma once
-#include "common.hpp"
+#include "d3d-common.hpp"
 namespace engine::direct3d
 {
     // global pointers to most used D3D11 objects for convenience:
@@ -11,4 +11,5 @@ namespace engine::direct3d
     extern DeviceContext4 devcon4;
     extern Debug debug;
     void Init();
+    void Deinit();
 } // namespace engine::direct3d

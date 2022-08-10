@@ -1,10 +1,8 @@
 #include "controller.hpp"
 #include "core/application.hpp"
-#include "direct3d11/common.hpp"
-#include "pch.hpp"
 #include "renderer.hpp"
-#include <filesystem>
-#include "platform/windows/render-pipeline.hpp"
+#include "platform/windows/windows-render-pipeline.hpp"
+
 using namespace engine;
 using namespace core;
 using namespace math;
@@ -17,6 +15,7 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 
     auto render_pipeline = std::make_shared<windows::RenderPipeline>();
     render_pipeline->PushLayer(std::make_shared<Renderer>());
+    render_pipeline->window()->SetEventCallback(Application::event_function());
 
     Application &app = Application::Get();
 
@@ -24,5 +23,7 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
     app.PushLayer(render_pipeline);
 
     app.Run();
+
+    Application::Deinit();
     return 0;
 }

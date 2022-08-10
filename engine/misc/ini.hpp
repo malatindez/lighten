@@ -1,12 +1,5 @@
 #pragma once
 #include "utils/utils.hpp"
-#include <algorithm>
-#include <cstdlib>
-#include <map>
-#include <memory>
-#include <stdexcept>
-#include <string>
-#include <variant>
 namespace engine::ini
 {
     class InvalidSyntaxException : public std::invalid_argument
@@ -79,7 +72,7 @@ namespace engine::ini
         {
             value_ = std::to_string(t);
             type_ = Type::kInt64;
-            data_ = (int64_t) t;
+            data_ = (int64_t)t;
             return *this;
         }
         template <std::floating_point T>
@@ -87,7 +80,7 @@ namespace engine::ini
         {
             value_ = std::to_string(t);
             type_ = Type::kLongDouble;
-            data_ = (long double) t;
+            data_ = (long double)t;
             return *this;
         }
         template <typename T>

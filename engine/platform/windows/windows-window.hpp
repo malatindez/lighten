@@ -1,15 +1,14 @@
 #pragma once
 #include <unordered_map>
 
-#include "pch.hpp"
-#define NOMINMAX
-#include <Windows.h>
+#include "include/pch.hpp"
+#include "include/win.hpp"
+
+#include "direct3d11/direct3d11.hpp"
 
 #include "core/events.hpp"
-#include "core/events/mouse-events.hpp"
 #include "core/math.hpp"
 #include "core/window.hpp"
-#include "direct3d11/common.hpp"
 
 namespace engine::platform::windows
 {
@@ -39,7 +38,8 @@ namespace engine::platform::windows
 
 
         [[nodiscard]] void *native() override { return handle(); };
-
+        // TODO(malatindez) make this method private and handle events using GetMessage
+        // save main-thread dependant events in event pool and pass them if Window->OnUpdate is called
         bool OnUpdate();
 
     private:

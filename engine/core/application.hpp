@@ -1,11 +1,10 @@
 #pragma once
+#include "include/pch.hpp"
 #include "utils/utils.hpp"
 #include "events.hpp"
 #include "misc/ini.hpp"
-#include "pch.hpp"
-#include <chrono>
-#include "include/spdlog.hpp"
 #include "layers/layer-stack-threadsafe.hpp"
+
 
 namespace engine::core
 {
@@ -43,6 +42,7 @@ namespace engine::core
         static void OnEvent(events::Event &e) { application_->LayerStackThreadsafe::OnEvent(e); }
     private:
         static void Init();
+        static void Deinit();
 
         void Run();
 

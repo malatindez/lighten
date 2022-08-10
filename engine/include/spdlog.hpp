@@ -1,4 +1,12 @@
 #pragma once
+
+#include "win-def.hpp"
+#define NOMINMAX
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+
+
 #if defined(__clang__)
 // TODO
 #elif defined(__GNUC__) || defined(__GNUG__)
@@ -14,8 +22,6 @@
 #include <spdlog/async.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
-#include "spdlog/sinks/stdout_color_sinks.h"
-#include "spdlog/sinks/ansicolor_sink.h"
 #if defined(__clang__)
 // TODO
 #elif defined(__GNUC__) || defined(__GNUG__)
@@ -23,3 +29,5 @@
 #elif defined(_MSC_VER)
 #pragma warning(pop)
 #endif
+
+#include "win-undef.hpp"

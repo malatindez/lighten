@@ -1,8 +1,5 @@
 #pragma once
 #include "layer.hpp"
-#include "include/spdlog.hpp"
-#include <memory>
-#include <vector>
 
 namespace engine::core::_detail
 {

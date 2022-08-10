@@ -1,13 +1,11 @@
-#include "render-pipeline.hpp"
-#include "direct3d11/globals.hpp"
-#include "core/application.hpp"
+#include "windows-render-pipeline.hpp"
+#include "direct3d11/direct3d11.hpp"
 using namespace engine::direct3d;
 namespace engine::platform::windows
 {
     RenderPipeline::RenderPipeline() : core::RenderPipeline()
     {
         window_ = std::make_shared<Window>();
-        window_->SetEventCallback(core::Application::event_function());
         D3D11_RASTERIZER_DESC1 rasterizer_desc = {};
         rasterizer_desc.FillMode = D3D11_FILL_SOLID;
         rasterizer_desc.CullMode = D3D11_CULL_BACK;

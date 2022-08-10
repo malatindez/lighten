@@ -1,7 +1,5 @@
 #pragma once
 #include "../debug.hpp"
-#include "include/source_location.hpp"
-#include "include/spdlog.hpp"
 namespace engine::utils
 {
 

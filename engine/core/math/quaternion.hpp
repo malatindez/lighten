@@ -1,6 +1,5 @@
 #pragma once
-#include "matnxn.hpp"
-#include "vec_math.hpp"
+#include "mat.hpp"
 #pragma warning(push)
 #pragma warning(disable : 4201)
 

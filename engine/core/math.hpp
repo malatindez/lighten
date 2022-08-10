@@ -1,10 +1,6 @@
 #pragma once
-#include "math/common.hpp"
 #include "math/mat.hpp"
-#include "math/mat_math.hpp"
 #include "math/quaternion.hpp"
-#include "math/vec.hpp"
-#include "math/vec_math.hpp"
 
 namespace engine::core::math
 {

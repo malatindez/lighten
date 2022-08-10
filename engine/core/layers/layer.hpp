@@ -1,8 +1,5 @@
 #pragma once
-
-#include "core/events/event.hpp"
-
-#include <string>
+#include "core/events.hpp"
 
 namespace engine::core
 {

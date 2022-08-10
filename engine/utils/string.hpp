@@ -1,9 +1,8 @@
 #pragma once
-#include <algorithm>
-#include <string>
+#include "include/pch.hpp"
 namespace engine::utils
 {
-    
+
     inline std::string as_lowercase(std::string_view const s) noexcept
     {
         std::string rv;
@@ -49,4 +48,5 @@ namespace engine::utils
 
     // trim from both ends (in place)
     inline std::string trim(std::string const &s) noexcept { return std::string(trimview(s)); }
+
 }

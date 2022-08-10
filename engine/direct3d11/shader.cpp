@@ -3,7 +3,7 @@ namespace engine::direct3d
 {
     ShaderProgram::ShaderProgram(std::filesystem::path const &vertex_path,
                                  std::filesystem::path const &pixel_path,
-                                 std::vector<D3D11_INPUT_ELEMENT_DESC> const &ied) ENGINE_D3D_SHADER_NOEXCEPT
+                                 std::vector<D3D11_INPUT_ELEMENT_DESC> const &ied) DEBUG_UTILS_ASSERT_NOEXCEPT
     {
         try
         {
@@ -16,17 +16,11 @@ namespace engine::direct3d
         }
         catch (CompilationError const &e)
         {
-            core::Application::logger().error(e.what());
-#if ENGINE_D3D_SHADER_THROWS
-            throw;
-#endif
+            utils::AlwaysAssert(false, e.what());
         }
         catch (RuntimeError const &e)
         {
-            core::Application::logger().error(e.what());
-#if ENGINE_D3D_SHADER_THROWS
-            throw;
-#endif
+            utils::AlwaysAssert(false, e.what());
         }
     }
 
@@ -60,7 +54,7 @@ namespace engine::direct3d
             const char *err_str = "NO INFO";
             if (errors != nullptr)
             {
-                err_str = (const char *) errors->GetBufferPointer();
+                err_str = (const char *)errors->GetBufferPointer();
             }
             std::stringstream ss;
             ss << utils::CurrentSourceLocation() << "[" << vertex_path << "] Vertex shader compilation error: " << std::string_view(err_str);
@@ -95,7 +89,7 @@ namespace engine::direct3d
             const char *err_str = "NO INFO";
             if (errors != nullptr)
             {
-                err_str = (const char *) errors->GetBufferPointer();
+                err_str = (const char *)errors->GetBufferPointer();
             }
             std::stringstream ss;
             ss << utils::CurrentSourceLocation() << "[" << pixel_path << "] Pixel shader compilation error: " << std::string_view(err_str);

@@ -1,6 +1,5 @@
 #pragma once
 #include "layer-stack.hpp"
-#include <shared_mutex>
 namespace engine::core
 {
     class LayerStackThreadsafe : private LayerStack

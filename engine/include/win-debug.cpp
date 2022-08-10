@@ -1,4 +1,4 @@
-#include "win_debug.hpp"
+#include "win-debug.hpp"
 static std::function<void(std::string_view)> OutputDebugStringCallback;
 LONG NTAPI VexHandler(PEXCEPTION_POINTERS ExceptionInfo)
 {
@@ -12,7 +12,7 @@ LONG NTAPI VexHandler(PEXCEPTION_POINTERS ExceptionInfo)
             if (ExceptionRecord->NumberParameters >= 2)
             {
                 bool call_free = false;
-                ULONG len = (ULONG) ExceptionRecord->ExceptionInformation[0];
+                ULONG len = (ULONG)ExceptionRecord->ExceptionInformation[0];
 
                 union
                 {
@@ -27,7 +27,7 @@ LONG NTAPI VexHandler(PEXCEPTION_POINTERS ExceptionInfo)
                 {
                     if (ULONG n = WideCharToMultiByte(CP_UTF8, 0, pwz, len, nullptr, 0, nullptr, nullptr))
                     {
-                        PSTR sz = (PSTR) _malloca(n * sizeof(CHAR));
+                        PSTR sz = (PSTR)_malloca(n * sizeof(CHAR));
 
                         if (len = WideCharToMultiByte(CP_UTF8, 0, pwz, len, sz, n, nullptr, nullptr))
                         {
@@ -36,13 +36,13 @@ LONG NTAPI VexHandler(PEXCEPTION_POINTERS ExceptionInfo)
                         }
                         else
                         {
-                            _freea((void *) (psz));
+                            _freea((void *)(psz));
                         }
                     }
                 }
                 if (call_free)
                 {
-                    _freea((void *) (psz));
+                    _freea((void *)(psz));
                 }
 
 

@@ -1,11 +1,4 @@
 #pragma once
-#include "core/layers/layer.hpp"
-#include "core/parallel-executor.hpp"
-#include "core/window.hpp"
-#include "platform/windows/window.hpp"
-#include <functional>
-#include <memory>
-#include <vector>
 #include "core/application.hpp"
 
 class Controller : public engine::core::Layer

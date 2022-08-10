@@ -1,12 +1,10 @@
 #pragma once
 #pragma once
 #include "core/application.hpp"
-#include "core/layers/layer.hpp"
-#include "direct3d11/common.hpp"
-#include "direct3d11/globals.hpp"
+#include "direct3d11/direct3d11.hpp"
 #include "direct3d11/shader.hpp"
 #include "direct3d11/triangle-mesh.hpp"
-#include "platform/windows/render-pipeline.hpp"
+#include "platform/windows/windows-render-pipeline.hpp"
 class Renderer : public engine::core::Layer
 {
 public:

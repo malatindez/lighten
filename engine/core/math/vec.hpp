@@ -1,5 +1,5 @@
 #pragma once
-#include "common.hpp"
+#include "math-common.hpp"
 #include "rvec2.hpp"
 #include "rvec3.hpp"
 #include "rvec4.hpp"

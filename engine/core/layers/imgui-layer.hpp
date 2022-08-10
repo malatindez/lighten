@@ -1,12 +1,8 @@
 #pragma once
-#include "core/events.hpp"
 #include "layer.hpp"
 
-#include <imgui.h>
-#include <imguizmo.h>
-#include <backends/imgui_impl_dx11.h>
-#include <backends/imgui_impl_win32.h>
 #include "core/window.hpp"
+#include "include/imgui.hpp"
 
 namespace engine::core
 {

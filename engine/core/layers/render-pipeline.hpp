@@ -1,10 +1,7 @@
 #pragma once
 #include "layer-stack.hpp"
-#include "window.hpp"
 #include "imgui-layer.hpp"
-
-#include <memory>
-
+#include "include/pch.hpp"
 namespace engine::core
 {
     class RenderPipeline : public LayerStack

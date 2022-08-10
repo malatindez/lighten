@@ -1,12 +1,6 @@
-#include "window.hpp"
-#include "core/application.hpp"
-#include "core/events.hpp"
-#include "direct3d11/globals.hpp"
+#include "windows-window.hpp"
 #include "utils/utils.hpp"
-#include <imgui.h>
-#include <backends/imgui_impl_dx11.h>
-#include <backends/imgui_impl_win32.h>
-
+#include "include/imgui.hpp"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace engine::platform::windows
@@ -23,7 +17,7 @@ namespace engine::platform::windows
         wc.style = CS_HREDRAW | CS_VREDRAW;
         wc.hInstance = GetModuleHandle(NULL);
         wc.hCursor = LoadCursor(nullptr, IDC_CROSS);
-        wc.hbrBackground = (HBRUSH) COLOR_WINDOW;
+        wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
         wc.lpszClassName = L"WindowClass1";
         wc.lpfnWndProc = Window::StaticWindowProc;
         wc.cbSize = sizeof(WNDCLASSEXW);
