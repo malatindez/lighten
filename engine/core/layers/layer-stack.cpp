@@ -6,20 +6,17 @@ namespace engine::core::_detail
     void UnderlyingStack::PushLayer(std::shared_ptr<Layer> layer)
     {
         layers_.emplace(layers_.begin() + layer_insert_index_, layer);
-        layer->OnAttach();
         layer_insert_index_++;
     }
     void UnderlyingStack::PushOverlay(std::shared_ptr<Layer> overlay)
     {
         layers_.emplace_back(overlay);
-        overlay->OnAttach();
     }
     void UnderlyingStack::PopLayer(std::shared_ptr<Layer> layer)
     {
         auto it = std::find(layers_.begin(), layers_.begin() + layer_insert_index_, layer);
         if (it != layers_.begin() + layer_insert_index_) [[likely]]
         {
-            layer->OnDetach();
             layers_.erase(it);
             layer_insert_index_--;
         }
@@ -29,7 +26,6 @@ namespace engine::core::_detail
         auto it = std::find(layers_.begin() + layer_insert_index_, layers_.end(), overlay);
         if (it != layers_.end()) [[likely]]
         {
-            overlay->OnDetach();
             layers_.erase(it);
         }
     }

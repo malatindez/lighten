@@ -1,5 +1,5 @@
 #pragma once
-#include "core/application.hpp"
+#include "core/engine.hpp"
 
 class Controller : public engine::core::Layer
 {
@@ -13,7 +13,7 @@ public:
     {
         if (e.type() == engine::core::events::EventType::WindowClose) [[unlikely]]
         {
-            engine::core::Application::Exit();
+            engine::core::Engine::Exit();
         }
     }
 

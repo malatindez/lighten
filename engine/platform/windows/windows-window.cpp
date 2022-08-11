@@ -152,7 +152,7 @@ namespace engine::platform::windows
     {
         if (frame_buffer_.valid())
         {
-            direct3d::devcon4->OMSetRenderTargets(0, nullptr, nullptr);
+            direct3d::api::devcon4->OMSetRenderTargets(0, nullptr, nullptr);
             frame_buffer_.reset();
             frame_buffer_view_.reset();
             depth_buffer_.reset();
@@ -170,7 +170,7 @@ namespace engine::platform::windows
         vp.MaxDepth = 1.0f;
         vp.TopLeftX = 0;
         vp.TopLeftY = 0;
-        direct3d::devcon4->RSSetViewports(1, &vp);
+        direct3d::api::devcon4->RSSetViewports(1, &vp);
     }
     direct3d::SwapChain1 initializeSwapchain(HWND hWnd)
     {
@@ -188,7 +188,7 @@ namespace engine::platform::windows
         desc.Flags = 0;
 
         IDXGISwapChain1 *swapchain;
-        if (FAILED(direct3d::factory5->CreateSwapChainForHwnd(direct3d::device5, hWnd, &desc, nullptr, nullptr, &swapchain)))
+        if (FAILED(direct3d::api::factory5->CreateSwapChainForHwnd(direct3d::api::device5, hWnd, &desc, nullptr, nullptr, &swapchain)))
         {
             throw Window::WindowError(utils::CurrentSourceLocation() + "Failed to initialize swapchain for hwnd");
         }
@@ -206,7 +206,7 @@ namespace engine::platform::windows
 
         ID3D11RenderTargetView *frame_buffer_view = nullptr;
 
-        if (FAILED(direct3d::device->CreateRenderTargetView(frame_buffer, nullptr, &frame_buffer_view)))
+        if (FAILED(direct3d::api::device->CreateRenderTargetView(frame_buffer, nullptr, &frame_buffer_view)))
         {
             throw Window::WindowError(utils::CurrentSourceLocation() + "Failed to initialize framebuffer");
         }
@@ -223,14 +223,14 @@ namespace engine::platform::windows
 
         ID3D11Texture2D *depth_buffer;
 
-        if (FAILED(direct3d::device->CreateTexture2D(&depth_buffer_desc_, nullptr, &depth_buffer)))
+        if (FAILED(direct3d::api::device->CreateTexture2D(&depth_buffer_desc_, nullptr, &depth_buffer)))
         {
             throw Window::WindowError(utils::CurrentSourceLocation() + "Failed to initialize depthbuffer");
         }
 
         ID3D11DepthStencilView *depth_buffer_view;
 
-        if (FAILED(direct3d::device->CreateDepthStencilView(depth_buffer, nullptr, &depth_buffer_view)))
+        if (FAILED(direct3d::api::device->CreateDepthStencilView(depth_buffer, nullptr, &depth_buffer_view)))
         {
             throw Window::WindowError(utils::CurrentSourceLocation() + "Failed to initialize depthbuffer");
         }

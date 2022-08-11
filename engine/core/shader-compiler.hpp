@@ -32,18 +32,16 @@ namespace engine::core
     struct ShaderCompileOutput
     {
         render::ShaderBlob blob;
-        std::vector<std::filesystem::path> dependent_files;
+        std::unordered_set<std::filesystem::path> dependent_files;
     };
 
     namespace ShaderCompiler
     {
+        struct CompilerException : public std::runtime_error
+        {
+            using std::runtime_error::runtime_error;
+        };
         void CompileShader(ShaderCompileInput const &input, ShaderCompileOutput &output);
         void GetBlobFromCompiledShader(std::filesystem::path const &filename, render::ShaderBlob &blob);
-        std::shared_ptr<render::VertexShader> CompileVertexShader(std::filesystem::path const &input);
-        std::shared_ptr<render::PixelShader> CompilePixelShader(std::filesystem::path const &input);
-        std::shared_ptr<render::HullShader> CompileHullShader(std::filesystem::path const &input);
-        std::shared_ptr<render::DomainShader> CompileDomainShader(std::filesystem::path const &input);
-        std::shared_ptr<render::GeometryShader> CompileGeometryShader(std::filesystem::path const &input);
-        std::shared_ptr<render::ComputeShader> CompileComputeShader(std::filesystem::path const &input);
     }
 }

@@ -24,13 +24,25 @@ namespace engine::utils
         {
             return 1 + CalculateAmount<B, Args...>();
         }
-    }
+    } // namespace _template_detail
     template <typename... Args>
     struct parameter_pack_info
     {
         static constexpr size_t size = _template_detail::CalculateSize<Args...>();
         static constexpr size_t amount = _template_detail::CalculateAmount<Args...>();
     };
+
+    template <class iterator, class F>
+    constexpr bool for_each_true(iterator begin, iterator const &end, F &&f)
+    {
+        bool rv = true;
+        for (; begin != end;)
+        {
+            rv &= f(begin++);
+        }
+        return rv;
+    }
+
 
     template <typename T>
     struct return_type;

@@ -20,16 +20,16 @@ namespace engine::core
     const core::math::vec3 kSphereCoords { 0, 0, -1 };
     const float kSphereRadius { 0.5f };
 
-    class Application final : private LayerStackThreadsafe
+    class Engine final : private LayerStackThreadsafe
     {
     public:
-        ~Application();
+        ~Engine();
         using LayerStackThreadsafe::PopLayer;
         using LayerStackThreadsafe::PopOverlay;
         using LayerStackThreadsafe::PushLayer;
         using LayerStackThreadsafe::PushOverlay;
 
-        [[nodiscard]] static inline Application &Get() noexcept { return *application_; }
+        [[nodiscard]] static inline Engine &Get() noexcept { return *application_; }
         [[nodiscard]] static inline EventCallbackFn const &event_function() { return application_->event_function_; }
         [[nodiscard]] static inline spdlog::logger &logger() { return *application_->logger_; }
         [[nodiscard]] static inline ini::Ini &config() { return *application_->config_; }
@@ -45,12 +45,12 @@ namespace engine::core
 
         void Run();
 
-        Application();
+        Engine();
         // delete move & copy semantics
-        Application(Application &&Application) = delete;
-        Application(Application const &Application) = delete;
-        Application &operator=(Application &&Application) = delete;
-        Application &operator=(Application const &Application) = delete;
+        Engine(Engine &&) = delete;
+        Engine(Engine const &) = delete;
+        Engine &operator=(Engine &&) = delete;
+        Engine &operator=(Engine const &) = delete;
 
         bool running_ = true;
 
@@ -62,7 +62,7 @@ namespace engine::core
         std::unique_ptr<ini::Ini> config_;
         std::shared_ptr<spdlog::logger> logger_;
 
-        static std::unique_ptr<Application> application_;
+        static std::unique_ptr<Engine> application_;
         static utils::SteadyTimer from_start_;
         friend INT WINAPI::wWinMain(HINSTANCE, HINSTANCE, PWSTR, int cmd_show);
     };

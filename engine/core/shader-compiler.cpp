@@ -31,7 +31,7 @@ namespace engine::core
                     default:
                         utils::AlwaysAssert(false);
                 }
-                includes_.emplace_back(final_path);
+                includes_.emplace(std::filesystem::absolute(final_path));
                 std::ifstream file_stream(final_path.string());
                 if (file_stream)
                 {
@@ -59,17 +59,16 @@ namespace engine::core
                 return S_OK;
             }
 
-            std::vector<std::filesystem::path> const &includes() const { return includes_; }
+            std::unordered_set<std::filesystem::path> const &includes() const { return includes_; }
 
         private:
             std::string shader_dir_;
-            std::vector<std::filesystem::path> includes_;
+            std::unordered_set<std::filesystem::path> includes_;
         };
     }
 
     namespace ShaderCompiler
     {
-
         void GetBlobFromCompiledShader(std::filesystem::path const &filename, ShaderBlob &blob)
         {
             direct3d::Blob pBytecodeBlob = nullptr;
@@ -136,14 +135,22 @@ namespace engine::core
                                             input.flags, 0, &bytecode_blob.ptr(), &error_blob.ptr());
             auto const &includes = includer.includes();
 
-            if (FAILED(hr) && error_blob != nullptr)
+            if (FAILED(hr))
             {
-                utils::AlwaysAssert(false, std::string(reinterpret_cast<const char *>(error_blob->GetBufferPointer())));
+                if (error_blob != nullptr)
+                {
+                    std::string err(reinterpret_cast<const char *>(error_blob->GetBufferPointer()));
+                    throw CompilerException(err.substr(0, err.size() - 1 /* Remove \n */));
+                }
+                else
+                {
+                    throw CompilerException(std::system_category().message(hr));
+                }
             }
             output.blob.bytecode.resize(bytecode_blob->GetBufferSize());
             std::memcpy(output.blob.ptr(), bytecode_blob->GetBufferPointer(), bytecode_blob->GetBufferSize());
             output.dependent_files = includes;
-            output.dependent_files.push_back(input.source_file);
+            output.dependent_files.emplace(input.source_file);
         }
         std::shared_ptr<VertexShader> CompileVertexShader(std::filesystem::path const &input)
         {

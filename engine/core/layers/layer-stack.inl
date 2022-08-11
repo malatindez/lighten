@@ -44,6 +44,7 @@ namespace engine::core
         {
             tick_.PushLayer(static_pointer_cast<Layer>(layer));
         }
+        layer->OnAttach();
     }
     template <typename T>
     void LayerStack::PushOverlay(std::shared_ptr<T> layer)
@@ -75,6 +76,7 @@ namespace engine::core
         {
             tick_.PushOverlay(static_pointer_cast<Layer>(layer));
         }
+        layer->OnAttach();
     }
     template <typename T>
     void LayerStack::PopLayer(std::shared_ptr<T> layer)
@@ -110,6 +112,7 @@ namespace engine::core
         {
             tick_.PopLayer(static_pointer_cast<Layer>(layer));
         }
+            layer->OnDetach();
     }
     template <typename T>
     void LayerStack::PopOverlay(std::shared_ptr<T> layer)
@@ -145,6 +148,7 @@ namespace engine::core
         {
             tick_.PopOverlay(static_pointer_cast<Layer>(layer));
         }
+            layer->OnDetach();
     }
     template <typename T>
     bool LayerStack::HasLayer(std::shared_ptr<T> layer)

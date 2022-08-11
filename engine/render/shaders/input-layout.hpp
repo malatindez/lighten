@@ -8,17 +8,17 @@ namespace engine::render
 
         InputLayout(ShaderBlob const &vs_blob, std::vector<D3D11_INPUT_ELEMENT_DESC> const &desc = {})
         {
-            direct3d::device->CreateInputLayout(desc.data(), (UINT)desc.size(), vs_blob.ptr(), vs_blob.size(),
+            direct3d::api::device->CreateInputLayout(desc.data(), (UINT)desc.size(), vs_blob.ptr(), vs_blob.size(),
                                                 &layout.ptr());
         }
 
         void Bind()
         {
-            direct3d::devcon->IASetInputLayout(layout.ptr());
+            direct3d::api::devcon->IASetInputLayout(layout.ptr());
         }
         void Unbind()
         {
-            direct3d::devcon->IASetInputLayout(nullptr);
+            direct3d::api::devcon->IASetInputLayout(nullptr);
         }
 
     private:

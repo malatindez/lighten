@@ -146,4 +146,40 @@ namespace utils
         ofs.write(data, size);
         ofs.close();
     }
+    std::vector<fs::path> CreateRandomFiles(fs::path const &path, 
+                                            size_t file_size, 
+                                            size_t amount)
+    {
+        std::vector<fs::path> rv;
+        fs::create_directories({ path.parent_path() });
+        for (int i = 0; i < amount; i++)
+        {
+            fs::path temp = path / RandomFilename(Random<size_t>(5, 32));
+            std::string random_string = RandomBinaryString(file_size);
+            CreateFile(temp, random_string.c_str(), random_string.size());
+            rv.emplace_back(temp);
+        }
+        return rv;
+    }
+    std::vector<fs::path> CreateRandomFilesRecursive(fs::path const &path,
+                                                     int depth, 
+                                                     size_t folder_amount, 
+                                                     size_t file_amount_per_folder)
+    {
+        if (depth == -1)
+        {
+            return {};
+        }
+        std::vector<fs::path> rv;
+        fs::create_directories({ path.parent_path() });
+        for (int i = 0; i < folder_amount; i++)
+        {
+            fs::path temp = path / RandomFilename(Random<size_t>(5, 32)) / "";
+            auto t = CreateRandomFilesRecursive(temp, depth - 1, folder_amount);
+            rv.insert(rv.begin(), t.begin(), t.end());
+        }
+        auto t = CreateRandomFiles(path, 1024, file_amount_per_folder);
+        rv.insert(rv.begin(), t.begin(), t.end());
+        return rv;
+    }
 }

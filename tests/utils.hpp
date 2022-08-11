@@ -6,6 +6,7 @@
 #include <fstream>
 #include <limits>
 #include <random>
+#undef CreateFile
 namespace utils
 {
     static std::random_device rd;
@@ -111,6 +112,9 @@ namespace utils
     [[nodiscard]] std::string RandomBinaryString(size_t const &size = 32);
     [[nodiscard]] std::string RandomString(size_t const &size = 32, std::string_view const including = kAsciiCharacters);
     [[nodiscard]] std::string RandomFilename(size_t const &size = 32);
+
+    std::vector<fs::path> CreateRandomFiles(fs::path const &path, size_t file_size = 1024, size_t amount = 16);
+    std::vector<fs::path> CreateRandomFilesRecursive(fs::path const &path, int depth = 3, size_t folder_amount = 4, size_t file_amount_per_folder = 4);
 
     void CreateFile(fs::path const &path, char const *data, const size_t size);
 

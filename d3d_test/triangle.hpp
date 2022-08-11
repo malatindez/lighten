@@ -29,7 +29,7 @@ namespace engine::direct3d
 
             ID3D11Buffer *vertex_buffer;
 
-            device->CreateBuffer(&vertex_buffer_desc, &vertex_data, &vertex_buffer);
+            api::device->CreateBuffer(&vertex_buffer_desc, &vertex_data, &vertex_buffer);
             buffer = vertex_buffer;
         }
 
@@ -40,13 +40,13 @@ namespace engine::direct3d
             UINT stride = sizeof(Vertex);
             UINT offset = 0;
 
-            engine::direct3d::devcon4->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+            engine::direct3d::api::devcon4->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
             ID3D11Buffer *p_buffer = buffer.ptr();
-            engine::direct3d::devcon4->IASetVertexBuffers(0, 1, &p_buffer, &stride, &offset);
+            engine::direct3d::api::devcon4->IASetVertexBuffers(0, 1, &p_buffer, &stride, &offset);
 
             // draw the vertex buffer to the back buffer
-            devcon4->Draw(3, 0);
+            api::devcon4->Draw(3, 0);
         }
 
         Buffer buffer;

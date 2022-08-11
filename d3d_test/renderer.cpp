@@ -17,7 +17,7 @@ void Renderer::OnGuiRender()
     ImGui::End();
 }
 
-Renderer::Triangle Renderer::create_triangle()
+Renderer::Triangle Renderer::create_triangle(std::shared_ptr<engine::core::ShaderManager> manager)
 {
     auto path = std::filesystem::current_path();
     auto vertex_path = path / "assets/shaders/triangle/vertex.hlsl";
@@ -27,8 +27,8 @@ Renderer::Triangle Renderer::create_triangle()
         {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
         {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
     };
-    auto vs = CompileVertexShader(vertex_path);
-    auto ps = CompilePixelShader(pixel_path);
+    auto vs = manager->CompileVertexShader(vertex_path);
+    auto ps = manager->CompilePixelShader(pixel_path);
     auto il = std::make_shared<render::InputLayout>(vs->blob(), d3d_input_desc);
     return Triangle {
         //.uniform_buffer = ShaderProgram::InitializeUniformBuffer(sizeof(Triangle::ShaderInput)),

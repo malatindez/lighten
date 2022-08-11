@@ -1,17 +1,17 @@
-#include "globals.hpp"
+#include "api.hpp"
 #include "utils/utils.hpp"
 namespace engine::direct3d
 {
     // global pointers to most used D3D11 objects for convenience:
-    Factory factory;
-    Factory5 factory5;
-    Device device;
-    Device5 device5;
-    DeviceContext devcon;
-    DeviceContext4 devcon4;
-    Debug debug;
+    Factory api::factory;
+    Factory5 api::factory5;
+    Device api::device;
+    Device5 api::device5;
+    DeviceContext api::devcon;
+    DeviceContext4 api::devcon4;
+    Debug api::debug;
 
-    void Init()
+    void api::Init()
     {
         HRESULT result;
 
@@ -69,7 +69,7 @@ namespace engine::direct3d
         assert(result >= 0 && "Query ID3D11Debug");
         debug = Debug { dbg };
     }
-    void Deinit()
+    void api::Deinit()
     {
         factory = nullptr;
         factory5 = nullptr;

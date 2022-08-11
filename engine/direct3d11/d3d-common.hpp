@@ -88,14 +88,6 @@ namespace engine::direct3d
             return std::invoke(*ptr_, static_cast<Types &&>(args)...);
         }
     };
-
-    using Factory = d3d_resource_wrapper<IDXGIFactory>;
-    using Factory5 = d3d_resource_wrapper<IDXGIFactory5>;
-    using Device = d3d_resource_wrapper<ID3D11Device>;
-    using Device5 = d3d_resource_wrapper<ID3D11Device5>;
-    using DeviceContext = d3d_resource_wrapper<ID3D11DeviceContext>;
-    using DeviceContext4 = d3d_resource_wrapper<ID3D11DeviceContext4>;
-    using Debug = d3d_resource_wrapper<ID3D11Debug>;
     using SwapChain1 = d3d_resource_wrapper<IDXGISwapChain1>;
     using RenderTargetView1 = d3d_resource_wrapper<ID3D11RenderTargetView1>;
     using RenderTargetView = d3d_resource_wrapper<ID3D11RenderTargetView>;

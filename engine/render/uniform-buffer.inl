@@ -12,7 +12,7 @@ namespace engine::render
         bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
         bd.CPUAccessFlags = dynamic ? D3D11_CPU_ACCESS_WRITE : 0;
 
-        utils::Assert(direct3d::device->CreateBuffer(&bd, nullptr, &buffer_.ptr()) >= 0,
+        utils::Assert(direct3d::api::device->CreateBuffer(&bd, nullptr, &buffer_.ptr()) >= 0,
                       "Failed to create uniform buffer");
     }
 
@@ -65,7 +65,7 @@ namespace engine::render
             _uniform_buffer_detail::FillData(data, initial_data...);
         }
         sd.pSysMem = data;
-        utils::Assert(direct3d::device->CreateBuffer(&bd, &sd, &buffer_.ptr()) >= 0,
+        utils::Assert(direct3d::api::device->CreateBuffer(&bd, &sd, &buffer_.ptr()) >= 0,
                       "Failed to create uniform buffer");
         if constexpr (utils::parameter_pack_info<Args...>::amount != 1)
         {
@@ -82,13 +82,13 @@ namespace engine::render
         {
             D3D11_MAPPED_SUBRESOURCE mapped_buffer = {};
             ZeroMemory(&mapped_buffer, sizeof(D3D11_MAPPED_SUBRESOURCE));
-            utils::Assert(direct3d::devcon->Map(buffer_.ptr(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mapped_buffer) >= 0,
+            utils::Assert(direct3d::api::devcon->Map(buffer_.ptr(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mapped_buffer) >= 0,
                           "Failed to map data to uniform buffer");
             memcpy(mapped_buffer.pData, data, data_size);
-            direct3d::devcon->Unmap(buffer_.ptr(), 0);
+            direct3d::api::devcon->Unmap(buffer_.ptr(), 0);
         }
         else
-            direct3d::devcon->UpdateSubresource(buffer_.ptr(), 0, nullptr, &data, 0, 0);
+            direct3d::api::devcon->UpdateSubresource(buffer_.ptr(), 0, nullptr, &data, 0, 0);
     }
     template <typename... Args>
     void UniformBuffer<Args...>::Update(Args const &...args)
@@ -106,17 +106,17 @@ namespace engine::render
             {
                 D3D11_MAPPED_SUBRESOURCE mapped_buffer = {};
                 ZeroMemory(&mapped_buffer, sizeof(D3D11_MAPPED_SUBRESOURCE));
-                utils::Assert(direct3d::devcon->Map(buffer_.ptr(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mapped_buffer) >= 0,
+                utils::Assert(direct3d::api::devcon->Map(buffer_.ptr(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mapped_buffer) >= 0,
                               "Failed to map data to uniform buffer");
                 _uniform_buffer_detail::FillData(mapped_buffer.pData, args...);
-                direct3d::devcon->Unmap(buffer_.ptr(), 0);
+                direct3d::api::devcon->Unmap(buffer_.ptr(), 0);
             }
             else
             {
                 void *data = nullptr;
                 data = malloc(kSize);
                 _uniform_buffer_detail::FillData(data, args...);
-                direct3d::devcon->UpdateSubresource(buffer_.ptr(), 0, nullptr, &data, 0, 0);
+                direct3d::api::devcon->UpdateSubresource(buffer_.ptr(), 0, nullptr, &data, 0, 0);
                 free(data);
             }
         }
@@ -127,22 +127,22 @@ namespace engine::render
         switch (type)
         {
             case ShaderType::VertexShader:
-                direct3d::devcon->VSSetConstantBuffers(slot, 1, buffer_.ptr());
+                direct3d::api::devcon->VSSetConstantBuffers(slot, 1, buffer_.ptr());
                 break;
             case ShaderType::PixelShader:
-                direct3d::devcon->PSSetConstantBuffers(slot, 1, buffer_.ptr());
+                direct3d::api::devcon->PSSetConstantBuffers(slot, 1, buffer_.ptr());
                 break;
             case ShaderType::HullShader:
-                direct3d::devcon->HSSetConstantBuffers(slot, 1, buffer_.ptr());
+                direct3d::api::devcon->HSSetConstantBuffers(slot, 1, buffer_.ptr());
                 break;
             case ShaderType::DomainShader:
-                direct3d::devcon->DSSetConstantBuffers(slot, 1, buffer_.ptr());
+                direct3d::api::devcon->DSSetConstantBuffers(slot, 1, buffer_.ptr());
                 break;
             case ShaderType::GeometryShader:
-                direct3d::devcon->GSSetConstantBuffers(slot, 1, buffer_.ptr());
+                direct3d::api::devcon->GSSetConstantBuffers(slot, 1, buffer_.ptr());
                 break;
             case ShaderType::ComputeShader:
-                direct3d::devcon->CSSetConstantBuffers(slot, 1, buffer_.ptr());
+                direct3d::api::devcon->CSSetConstantBuffers(slot, 1, buffer_.ptr());
                 break;
             default:
                 break;

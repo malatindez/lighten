@@ -35,7 +35,7 @@ namespace engine::core
 
         // Setup Platform/Renderer bindings
         ImGui_ImplWin32_Init(window_->native());
-        ImGui_ImplDX11_Init(direct3d::device, direct3d::devcon);
+        ImGui_ImplDX11_Init(direct3d::api::device, direct3d::api::devcon);
     }
 
     void ImGuiLayer::OnEvent(events::Event &e)

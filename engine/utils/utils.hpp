@@ -6,3 +6,4 @@
 #include "string.hpp"
 #include "template.hpp"
 #include "timer.hpp"
+#include "file-watcher.hpp"

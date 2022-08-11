@@ -1,9 +1,10 @@
-#include "application.hpp"
+#include "engine.hpp"
 #include "direct3d11/direct3d11.hpp"
 #include "include/win-debug.hpp"
 
 #include "spdlog/sinks/ansicolor_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
+#include "layers/shader-manager.hpp"
 
 static std::string const kDefaultConfig =
 R"(
@@ -17,16 +18,16 @@ log_level = trace
 namespace engine::core
 {
     using namespace events;
-    std::unique_ptr<Application> Application::application_;
-    utils::SteadyTimer Application::from_start_;
+    std::unique_ptr<Engine> Engine::application_;
+    utils::SteadyTimer Engine::from_start_;
 
-    void Application::Init()
+    void Engine::Init()
     {
         if (application_)
         {
             return;
         }
-        application_ = std::unique_ptr<Application>(new Application {});
+        application_ = std::unique_ptr<Engine>(new Engine {});
         debug::RedirectOutputDebugString([&] (std::string_view view)
                                          { application_->logger_->info(view); });
         if (config()["Logger"]["console_enabled"].as_boolean())
@@ -50,21 +51,23 @@ namespace engine::core
             return EXCEPTION_EXECUTE_HANDLER;
         };
 
-        direct3d::Init();
+        direct3d::api::Init();
+        ShaderManager::Init();
     }
 
-    void Application::Deinit()
+    void Engine::Deinit()
     {
         application_->logger_->flush();
         application_ = nullptr;
-        direct3d::Deinit();
+        direct3d::api::Deinit();
+        ShaderManager::Deinit();
     }
-    void Application::Exit()
+    void Engine::Exit()
     {
         application_->running_ = false;
         application_->logger_->flush();
     }
-    void Application::Run()
+    void Engine::Run()
     {
         render_.reset();
         tick_.reset();
@@ -87,9 +90,9 @@ namespace engine::core
             std::this_thread::yield();
         }
     }
-    Application::Application()
+    Engine::Engine()
     {
-        event_function_ = std::bind_front(&Application::OnEvent);
+        event_function_ = std::bind_front(&Engine::OnEvent);
         std::ifstream config("config.ini");
         std::stringstream data;
         if (config.is_open())
@@ -135,7 +138,7 @@ namespace engine::core
         logger_->sinks()[0]->set_level(spdlog::level::debug);
     }
 
-    Application::~Application()
+    Engine::~Engine()
     {
         if (config_)
         {
