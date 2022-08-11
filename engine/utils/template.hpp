@@ -28,8 +28,8 @@ namespace engine::utils
     template <typename... Args>
     struct parameter_pack_info
     {
-        static constexpr size_t size = _template_detail::CalculateSize();
-        static constexpr size_t amount = _template_detail::CalculateAmount();
+        static constexpr size_t size = _template_detail::CalculateSize<Args...>();
+        static constexpr size_t amount = _template_detail::CalculateAmount<Args...>();
     };
 
     template <typename T>

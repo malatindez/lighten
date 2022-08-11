@@ -7,8 +7,9 @@
 
 #include "pch.h"
 #include "utils.hpp"
-using namespace engine::core::utils;
+#include "utils/utils.hpp"
 using namespace engine;
+using namespace engine::utils;
 using namespace ::utils;
 
 namespace fs = std::filesystem;

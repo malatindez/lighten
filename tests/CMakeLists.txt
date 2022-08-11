@@ -30,11 +30,39 @@ if(test)
   target_include_directories(runUnitTests PRIVATE ${ENGINE_SOURCES_DIR})
 
   target_compile_options(runUnitTests PRIVATE /bigobj)
-  target_add_libraries(runUnitTests "entt" "spdlog" "benchmark" "gtest")
+  target_add_libraries(runUnitTests "benchmark" "gtest" "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console" "dds_texture_loader")
 
   add_test(NAME TEST COMMAND runUnitTests)
 
   set_target_properties(runUnitTests PROPERTIES LINKER_LANGUAGE CXX)
+  add_custom_target(
+    runUnitTestsPostDebugBuild
+    COMMAND
+    "${CMAKE_COMMAND}" -E copy_if_different
+    "${CMAKE_BINARY_DIR}/bin/Debug/gtestd.dll"
+    "${CMAKE_CURRENT_SOURCE_DIR}/runtime_directory/gtestd.dll"
+    COMMAND
+    "${CMAKE_COMMAND}" -E copy_if_different
+    "${CMAKE_BINARY_DIR}/bin/Debug/gtest_maind.dll"
+    "${CMAKE_CURRENT_SOURCE_DIR}/runtime_directory/gtest_maind.dll"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT
+    "Copying gtest dlls"
+    DEPENDS runUnitTests)
+  add_custom_target(
+    runUnitTestsPostReleaseBuild
+    COMMAND
+    "${CMAKE_COMMAND}" -E copy_if_different
+    "${CMAKE_BINARY_DIR}/bin/Release/gtest.dll"
+    "${CMAKE_CURRENT_SOURCE_DIR}/runtime_directory/gtest.dll"
+    COMMAND
+    "${CMAKE_COMMAND}" -E copy_if_different
+    "${CMAKE_BINARY_DIR}/bin/Release/gtest_main.dll"
+    "${CMAKE_CURRENT_SOURCE_DIR}/runtime_directory/gtest_main.dll"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT
+    "Copying gtest dlls"
+    DEPENDS runUnitTests)
   file(WRITE "${CMAKE_BINARY_DIR}/runUnitTests.vcxproj.user" "\
 <?xml version=\"1.0\" encoding=\"utf-8\"?> \ 
 <Project ToolsVersion=\"Current\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"> \ 

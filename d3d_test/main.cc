@@ -2,6 +2,7 @@
 #include "core/application.hpp"
 #include "platform/windows/windows-render-pipeline.hpp"
 #include "renderer.hpp"
+#include "render/uniform-buffer.hpp"
 
 using namespace engine;
 using namespace core;
@@ -18,7 +19,6 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
     render_pipeline->window()->SetEventCallback(Application::event_function());
 
     Application &app = Application::Get();
-
     app.PushLayer(std::make_shared<Controller>());
     app.PushLayer(render_pipeline);
 
