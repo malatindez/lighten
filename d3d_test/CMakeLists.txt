@@ -19,7 +19,7 @@ add_executable(d3d_test WIN32 ${D3D_SOURCES})
 target_include_directories(d3d_test PRIVATE ${D3D_SOURCES_DIR})
 target_include_directories(d3d_test PRIVATE ${ENGINE_SOURCES_DIR})
 target_link_libraries(d3d_test engine)
-target_add_libraries(d3d_test "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console" "dds_texture_loader")
+target_add_libraries(d3d_test "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console" "directxtex")
 
 file(GLOB RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/resources/*")
 file(COPY ${RESOURCES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
@@ -48,3 +48,5 @@ file(WRITE "${CMAKE_BINARY_DIR}/d3d_test.vcxproj.user" "\
   </PropertyGroup> \ 
 </Project> \ 
 ")
+
+set_target_properties(d3d_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIR})

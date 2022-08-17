@@ -1,7 +1,5 @@
 set(ENGINE_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/engine")
-file(GLOB_RECURSE ENGINE_SOURCES ${SRC_DIR} *.*)
-list(FILTER ENGINE_SOURCES INCLUDE REGEX ${ENGINE_SOURCES_DIR}/*)
-
+file(GLOB_RECURSE ENGINE_SOURCES ${ENGINE_SOURCES_DIR}/*.*)
 foreach(_source IN ITEMS ${ENGINE_SOURCES})
     if(IS_ABSOLUTE "${_source}")
         file(RELATIVE_PATH _source_rel "${CMAKE_CURRENT_SOURCE_DIR}" "${_source}")
@@ -15,5 +13,8 @@ foreach(_source IN ITEMS ${ENGINE_SOURCES})
 endforeach()
 
 add_library(engine STATIC "${ENGINE_SOURCES}")
-target_add_libraries(engine "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console" "dds_texture_loader")
+target_add_libraries(engine "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console" "dds_texture_loader_d3d11" "directxtex")
 target_include_directories(engine PRIVATE ${ENGINE_SOURCES_DIR})
+
+set_target_properties(engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIR})
+set_target_properties(engine PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIR})
