@@ -13,12 +13,6 @@
 [submodule "third_party/assimp"]
 	path = third_party/assimp
 	url = https://github.com/assimp/assimp
-[submodule "third_party/imgui_console"]
-	path = third_party/imgui_console
-	url = https://github.com/malatindez/imgui-console
-[submodule "third_party/imguizmo"]
-	path = third_party/imguizmo
-	url = https://github.com/CedricGuillemet/ImGuizmo
 [submodule "third_party/tools/C-include-2-dot"]
 	path = third_party/tools/C-include-2-dot
 	url = https://github.com/Leedehai/C-include-2-dot
@@ -26,3 +20,9 @@
 	path = third_party/imgui
 	url = https://github.com/ocornut/imgui
 	branch = docking
+[submodule "third_party/imguizmo"]
+	path = third_party/imguizmo
+	url = https://github.com/CedricGuillemet/imguizmo
+[submodule "third_party/imgui_console"]
+	path = third_party/imgui_console
+	url = https://github.com/malatindez/imgui-console

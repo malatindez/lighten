@@ -30,7 +30,7 @@ if(test)
   target_include_directories(runUnitTests PRIVATE ${ENGINE_SOURCES_DIR})
 
   target_compile_options(runUnitTests PRIVATE /bigobj)
-  target_add_libraries(runUnitTests "benchmark" "gtest" "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console" "dds_texture_loader11" "directxtex")
+  target_add_libraries(runUnitTests "benchmark" "gtest" "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console" "dds_texture_loader11" "wic_texture_loader11" "directxtex")
 
   add_test(NAME TEST COMMAND runUnitTests)
 

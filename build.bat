@@ -1,6 +1,7 @@
 @echo off
 echo|set /p="Updating submodules... "
 git submodule update --init --recursive
+git submodule foreach --recursive git checkout .
 echo [32mDone![0m
 if not exist build mkdir build
 cd build
