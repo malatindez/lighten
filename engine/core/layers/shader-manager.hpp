@@ -1,5 +1,5 @@
 #pragma once
-#include "layer-stack.hpp"
+#include "layer.hpp"
 #include "utils/utils.hpp"
 #include "core/shader-compiler.hpp"
 
@@ -50,7 +50,7 @@ namespace engine::core
 
         static void Init() { utils::Assert(instance_ == nullptr); instance_ = std::shared_ptr<ShaderManager>(new ShaderManager()); }
         static void Deinit() { instance_ = nullptr; }
-    protected:
+    private:
         ShaderManager() : watcher_ { [this] (events::Event &e) __lambda_force_inline
                                         { OnEvent(e); } }
         {}

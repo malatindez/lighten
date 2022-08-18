@@ -13,7 +13,7 @@ foreach(_source IN ITEMS ${ENGINE_SOURCES})
 endforeach()
 
 add_library(engine STATIC "${ENGINE_SOURCES}")
-target_add_libraries(engine "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console" "dds_texture_loader_d3d11" "directxtex")
+target_add_libraries(engine "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console"  "dds_texture_loader11" "wic_texture_loader11" "directxtex")
 target_include_directories(engine PRIVATE ${ENGINE_SOURCES_DIR})
 
 set_target_properties(engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIR})

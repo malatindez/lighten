@@ -164,8 +164,8 @@ namespace engine::platform::windows
 
         // Set up the viewport.
         D3D11_VIEWPORT vp;
-        vp.Width = size().x;
-        vp.Height = size().y;
+        vp.Width = (float)size().x;
+        vp.Height = (float)size().y;
         vp.MinDepth = 0.0f;
         vp.MaxDepth = 1.0f;
         vp.TopLeftX = 0;

@@ -2,9 +2,8 @@
 #include "direct3d11/direct3d11.hpp"
 #include "include/win-debug.hpp"
 
-#include "spdlog/sinks/ansicolor_sink.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
 #include "layers/shader-manager.hpp"
+#include "layers/texture-manager.hpp"
 
 static std::string const kDefaultConfig =
 R"(
@@ -53,14 +52,16 @@ namespace engine::core
 
         direct3d::api::Init();
         ShaderManager::Init();
+        TextureManager::Init();
     }
 
     void Engine::Deinit()
     {
         application_->logger_->flush();
         application_ = nullptr;
-        direct3d::api::Deinit();
         ShaderManager::Deinit();
+        TextureManager::Deinit();
+        direct3d::api::Deinit();
     }
     void Engine::Exit()
     {

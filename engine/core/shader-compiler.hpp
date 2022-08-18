@@ -23,9 +23,9 @@ namespace engine::core
         std::string entrypoint = "";
         std::vector<ShaderMacro> macros;
 #if defined(_DEBUG)
-        uint64_t flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_SKIP_OPTIMIZATION | D3DCOMPILE_DEBUG;
+        uint32_t flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_SKIP_OPTIMIZATION | D3DCOMPILE_DEBUG;
 #else
-        uint64_t flags = D3DCOMPILE_ENABLE_STRICTNESS;
+        uint32_t flags = D3DCOMPILE_ENABLE_STRICTNESS;
 #endif
     };
 

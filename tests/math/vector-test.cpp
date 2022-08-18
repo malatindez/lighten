@@ -324,25 +324,32 @@ TEST(TEST_REFERENCE_VECTORS, DefaultTest)
 
 TEST(TEST_VECTORS, DefaultMathTest)
 {
-    vec4 vec1;
-    rvec4 rvec1 { vec1 };
-    crvec4 rcvec1 { rvec1 };
-    vec4 vec2;
-    rvec4 rvec2 { vec2 };
-    crvec4 rcvec2 { rvec2 };
-    for (int i = 0; i < 4; ++i)
+    for (int j = 0; j < 1000; j++)
     {
-        vec1[i] = utils::Random<float>(-1.0e9f, 1.0e9f);
-        vec2[i] = utils::Random<float>(-1.0e9f, 1.0e9f);
+        vec4 vec1 { -4.01542568, -0.347009659, 6.97055626, -9.18363762 };
+        rvec4 rvec1 { vec1 };
+        crvec4 rcvec1 { rvec1 };
+        vec4 vec2 { -9.63412666,-0.568608284,4.52160454,-0.382324219 };
+        rvec4 rvec2 { vec2 };
+        crvec4 rcvec2 { rvec2 };
+        /* for (int i = 0; i < 4; ++i)
+         {
+             vec1[i] = utils::Random<float>(-1.0e1f, 1.0e1f);
+             vec2[i] = utils::Random<float>(-1.0e1f, 1.0e1f);
+         }*/
+        ASSERT_TRUE(squared_length(vec1) == squared_length(rvec1) && squared_length(rvec1) == squared_length(rcvec1));
+        ASSERT_TRUE(squared_length(vec2) == squared_length(rvec2) && squared_length(rvec2) == squared_length(rcvec2));
+        ASSERT_TRUE(squared_length(vec2) == vec2.x * vec2.x + vec2.y * vec2.y + vec2.z * vec2.z + vec2.w * vec2.w);
+        ASSERT_TRUE(length(vec1) == length(rvec1) && length(rvec1) == length(rcvec1));
+        ASSERT_TRUE(length(vec2) == length(rvec2) && length(rvec2) == length(rcvec2));
+        ASSERT_TRUE(length(vec1) == sqrt(squared_length(vec1)) && length(vec2) == sqrt(squared_length(vec2)));
+        ASSERT_TRUE(normalize(vec2) == normalize(rvec2) && normalize(rvec2) == normalize(rcvec2) && almost_equal(length(normalize(rcvec2)), 1.0f));
+        ASSERT_TRUE(normalize(vec2) == normalize(rvec2) && normalize(rvec2) == normalize(rcvec2) && almost_equal(length(normalize(rcvec2)), 1.0f));
+        ASSERT_TRUE(dot(vec1, rcvec2) == dot(vec2, rcvec1) && dot(rvec2, rvec1) == dot(vec2, vec1) && dot(rcvec1, rcvec2) == dot(rvec1, rvec2) && dot(vec1, rcvec2) == dot(rvec2, rvec1));
+        float a = angle(vec1, rcvec2);
+        float b = angle(vec2, rcvec1);
+        float g = angle(vec1, rcvec2);
+        float h = angle(rvec2, rvec1);
+        ASSERT_TRUE(angle(vec1, rcvec2) == angle(vec2, rcvec1) && angle(rvec2, rvec1) == angle(vec2, vec1) && angle(rcvec1, rcvec2) == angle(rvec1, rvec2) && angle(vec1, rcvec2) == angle(rvec2, rvec1));
     }
-    ASSERT_TRUE(squared_length(vec1) == squared_length(rvec1) && squared_length(rvec1) == squared_length(rcvec1));
-    ASSERT_TRUE(squared_length(vec2) == squared_length(rvec2) && squared_length(rvec2) == squared_length(rcvec2));
-    ASSERT_TRUE(squared_length(vec2) == vec2.x * vec2.x + vec2.y * vec2.y + vec2.z * vec2.z + vec2.w * vec2.w);
-    ASSERT_TRUE(length(vec1) == length(rvec1) && length(rvec1) == length(rcvec1));
-    ASSERT_TRUE(length(vec2) == length(rvec2) && length(rvec2) == length(rcvec2));
-    ASSERT_TRUE(length(vec1) == sqrt(squared_length(vec1)) && length(vec2) == sqrt(squared_length(vec2)));
-    ASSERT_TRUE(normalize(vec2) == normalize(rvec2) && normalize(rvec2) == normalize(rcvec2) && almost_equal(length(normalize(rcvec2)), 1.0f));
-    ASSERT_TRUE(normalize(vec2) == normalize(rvec2) && normalize(rvec2) == normalize(rcvec2) && almost_equal(length(normalize(rcvec2)), 1.0f));
-    ASSERT_TRUE(dot(vec1, rcvec2) == dot(vec2, rcvec1) && dot(rvec2, rvec1) == dot(vec2, vec1) && dot(rcvec1, rcvec2) == dot(rvec1, rvec2) && dot(vec1, rcvec2) == dot(rvec2, rvec1));
-    ASSERT_TRUE(angle(vec1, rcvec2) == angle(vec2, rcvec1) && angle(rvec2, rvec1) == angle(vec2, vec1) && angle(rcvec1, rcvec2) == angle(rvec1, rvec2) && angle(vec1, rcvec2) == angle(rvec2, rvec1));
 }

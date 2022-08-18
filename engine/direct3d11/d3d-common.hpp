@@ -8,7 +8,7 @@ namespace engine::direct3d
     class d3d_resource_wrapper
     {
     public:
-        using Type = T;
+        using type = T;
         constexpr operator T const *() const noexcept { return ptr_; }
         constexpr operator T *() noexcept { return ptr_; }
         constexpr T const *operator->() const noexcept { return ptr_; }
@@ -19,7 +19,7 @@ namespace engine::direct3d
 
         [[nodiscard]] constexpr bool valid() { return ptr_ != nullptr; }
 
-        inline void reset(T *ptr = nullptr)
+        inline T *&reset(T *ptr = nullptr)
         {
             if (ptr_)
             {
@@ -30,6 +30,7 @@ namespace engine::direct3d
             {
                 ptr_->AddRef();
             }
+            return ptr_;
         }
 
         constexpr d3d_resource_wrapper<T> &operator=(T *ptr)
@@ -107,4 +108,6 @@ namespace engine::direct3d
     using ComputeShader = d3d_resource_wrapper<ID3D11ComputeShader>;
     using Blob = d3d_resource_wrapper<ID3D10Blob>;
     using Buffer = d3d_resource_wrapper<ID3D11Buffer>;
+    using ShaderResourceView = d3d_resource_wrapper<ID3D11ShaderResourceView>;
+    using Resource = d3d_resource_wrapper<ID3D11Resource>;
 } // namespace engine::direct3d

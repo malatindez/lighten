@@ -15,7 +15,7 @@ namespace engine::core
             HRESULT __stdcall Open(
                 D3D_INCLUDE_TYPE include_type,
                 LPCSTR file_name,
-                LPCVOID parent_data,
+                [[maybe_unused]] LPCVOID parent_data,
                 LPCVOID *data_ptr,
                 UINT *bytes)
             {
@@ -42,7 +42,7 @@ namespace engine::core
                     char *buf = new char[contents.size()];
                     contents.copy(buf, contents.size());
                     *data_ptr = buf;
-                    *bytes = contents.size();
+                    *bytes = (UINT)contents.size();
                 }
                 else
                 {

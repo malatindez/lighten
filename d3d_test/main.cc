@@ -4,6 +4,7 @@
 #include "renderer.hpp"
 #include "render/uniform-buffer.hpp"
 #include "core/layers/shader-manager.hpp"
+#include "core/layers/model-loader.hpp"
 using namespace engine;
 using namespace core;
 using namespace math;
@@ -13,6 +14,7 @@ using namespace platform;
 INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 {
     Engine::Init();
+    ModelLoader::instance()->Load("C:\\Users\\malatindez\\Downloads\\models\\models\\Knight\\Knight.fbx");
 
     auto shader_manager = ShaderManager::instance();
 

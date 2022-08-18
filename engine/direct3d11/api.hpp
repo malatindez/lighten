@@ -20,6 +20,7 @@ namespace engine::direct3d
             constexpr T const *operator->() const noexcept { return d3d_resource_wrapper<T>::ptr(); }
             constexpr T *operator->() noexcept { return d3d_resource_wrapper<T>::ptr(); }
 
+            [[nodiscard]] constexpr T *const &ptr() noexcept { return d3d_resource_wrapper<T>::ptr(); }
             [[nodiscard]] constexpr T const *const &ptr() const noexcept { return d3d_resource_wrapper<T>::ptr(); }
 
             using d3d_resource_wrapper<T>::valid;
@@ -54,8 +55,8 @@ namespace engine::direct3d
         static Debug debug;
 
 #if defined(ENGINE_TEST)
-        static void public_init() {Init();}
-        static void public_deinit(){Deinit();}
+        static void public_init() { Init(); }
+        static void public_deinit() { Deinit(); }
 #endif
 
     private:
