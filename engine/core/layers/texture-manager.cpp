@@ -7,7 +7,7 @@ namespace engine::core
     {
         utils::AlwaysAssert(path.is_absolute(), "Paths provided to texture manager should be absolute!");
         utils::Assert(path.has_extension(), "Path to texture should have an extension");
-        if (auto it = textures_.find(path);
+        if (auto it = textures_.find(std::filesystem::hash_value(path));
             it != textures_.end())
         {
             return it->second.shader_resorce_view;
@@ -75,7 +75,7 @@ namespace engine::core
                                                   &texture.shader_resorce_view.reset()),
                 "Failed to load wic texture from file @" + path.string());
         }
-        textures_.emplace(std::make_pair(path, texture));
+        textures_.emplace(std::make_pair(std::filesystem::hash_value(path), texture));
         return texture.shader_resorce_view;
     }
 

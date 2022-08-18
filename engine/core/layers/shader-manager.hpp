@@ -2,7 +2,6 @@
 #include "layer.hpp"
 #include "utils/utils.hpp"
 #include "core/shader-compiler.hpp"
-
 namespace engine::core
 {
     class Engine;
@@ -15,7 +14,7 @@ namespace engine::core
         template<typename T>
         void AddShaderForUpdate(std::shared_ptr<T> const &shader_ptr,
                                 ShaderCompileInput const &input,
-                                std::unordered_set<std::filesystem::path> const &dependent_files);
+                                std::vector<std::filesystem::path> const &dependent_files);
 
         template<typename T>
         std::shared_ptr<T> CompileShader(ShaderCompileInput const &input);
@@ -66,7 +65,7 @@ namespace engine::core
 
     private:
         bool attached_ = false;
-        std::unordered_map<std::filesystem::path, std::unordered_set<std::shared_ptr<render::Shader>>> dependent_shaders_map_ {};
+        std::unordered_map<size_t, std::unordered_set<std::shared_ptr<render::Shader>>> dependent_shaders_map_ {};
         std::unordered_map<std::shared_ptr<render::Shader>, ShaderCompileInput> shader_inputs_ {};
         utils::FileWatcher watcher_;
     };

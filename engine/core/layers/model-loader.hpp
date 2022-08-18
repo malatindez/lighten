@@ -32,7 +32,7 @@ namespace engine::core
         static std::shared_ptr<ModelLoader> instance_;
 
     private:
-        std::unordered_map<std::filesystem::path, std::shared_ptr<render::Model>> models_;
+        std::unordered_map<size_t, std::shared_ptr<render::Model>> models_;
 
         bool attached_ = false;
     };

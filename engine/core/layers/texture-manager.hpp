@@ -46,7 +46,7 @@ namespace engine::core
         static std::shared_ptr<TextureManager> instance_;
 
     private:
-        std::unordered_map<std::filesystem::path, Texture> textures_;
+        std::unordered_map<size_t, Texture> textures_;
 
         bool attached_ = false;
     };

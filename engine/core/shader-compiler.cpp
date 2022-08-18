@@ -31,7 +31,7 @@ namespace engine::core
                     default:
                         utils::AlwaysAssert(false);
                 }
-                includes_.emplace(std::filesystem::absolute(final_path));
+                includes_.push_back(std::filesystem::absolute(final_path));
                 std::ifstream file_stream(final_path.string());
                 if (file_stream)
                 {
@@ -59,11 +59,11 @@ namespace engine::core
                 return S_OK;
             }
 
-            std::unordered_set<std::filesystem::path> const &includes() const { return includes_; }
+            std::vector<std::filesystem::path> const &includes() const { return includes_; }
 
         private:
             std::string shader_dir_;
-            std::unordered_set<std::filesystem::path> includes_;
+            std::vector<std::filesystem::path> includes_;
         };
     }
 
@@ -150,7 +150,7 @@ namespace engine::core
             output.blob.bytecode.resize(bytecode_blob->GetBufferSize());
             std::memcpy(output.blob.ptr(), bytecode_blob->GetBufferPointer(), bytecode_blob->GetBufferSize());
             output.dependent_files = includes;
-            output.dependent_files.emplace(input.source_file);
+            output.dependent_files.push_back(input.source_file);
         }
         std::shared_ptr<VertexShader> CompileVertexShader(std::filesystem::path const &input)
         {

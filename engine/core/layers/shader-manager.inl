@@ -5,7 +5,7 @@ namespace engine::core
         template<typename T>
         void ShaderManager::AddShaderForUpdate(std::shared_ptr<T> const &shader_ptr,
                                 ShaderCompileInput const &input,
-                                std::unordered_set<std::filesystem::path> const &dependent_files)
+                                std::vector<std::filesystem::path> const &dependent_files)
         {
             utils::Assert(utils::for_each_true(
                 dependent_files.cbegin(),
@@ -17,11 +17,11 @@ namespace engine::core
 
             for (auto &path : dependent_files)
             {
-                if (dependent_shaders_map_.find(path) == dependent_shaders_map_.end())
+                if (dependent_shaders_map_.find(std::filesystem::hash_value(path)) == dependent_shaders_map_.end())
                 {
-                    dependent_shaders_map_[path] = std::unordered_set<std::shared_ptr<render::Shader>> {};
+                    dependent_shaders_map_[std::filesystem::hash_value(path)] = std::unordered_set<std::shared_ptr<render::Shader>> {};
                 }
-                dependent_shaders_map_[path].emplace(std::static_pointer_cast<render::Shader>(shader_ptr));
+                dependent_shaders_map_[std::filesystem::hash_value(path)].emplace(std::static_pointer_cast<render::Shader>(shader_ptr));
                 watcher_.AddPathToWatch(path);
             }
             shader_inputs_[std::static_pointer_cast<render::Shader>(shader_ptr)] = input;

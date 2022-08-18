@@ -32,7 +32,7 @@ namespace engine::core
     struct ShaderCompileOutput
     {
         render::ShaderBlob blob;
-        std::unordered_set<std::filesystem::path> dependent_files;
+        std::vector<std::filesystem::path> dependent_files;
     };
 
     namespace ShaderCompiler
