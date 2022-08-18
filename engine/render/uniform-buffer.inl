@@ -127,22 +127,22 @@ namespace engine::render
         switch (type)
         {
             case ShaderType::VertexShader:
-                direct3d::api::devcon->VSSetConstantBuffers(slot, 1, buffer_.ptr());
+                direct3d::api::devcon->VSSetConstantBuffers(slot, 1, &buffer_.ptr());
                 break;
             case ShaderType::PixelShader:
-                direct3d::api::devcon->PSSetConstantBuffers(slot, 1, buffer_.ptr());
+                direct3d::api::devcon->PSSetConstantBuffers(slot, 1, &buffer_.ptr());
                 break;
             case ShaderType::HullShader:
-                direct3d::api::devcon->HSSetConstantBuffers(slot, 1, buffer_.ptr());
+                direct3d::api::devcon->HSSetConstantBuffers(slot, 1, &buffer_.ptr());
                 break;
             case ShaderType::DomainShader:
-                direct3d::api::devcon->DSSetConstantBuffers(slot, 1, buffer_.ptr());
+                direct3d::api::devcon->DSSetConstantBuffers(slot, 1, &buffer_.ptr());
                 break;
             case ShaderType::GeometryShader:
-                direct3d::api::devcon->GSSetConstantBuffers(slot, 1, buffer_.ptr());
+                direct3d::api::devcon->GSSetConstantBuffers(slot, 1, &buffer_.ptr());
                 break;
             case ShaderType::ComputeShader:
-                direct3d::api::devcon->CSSetConstantBuffers(slot, 1, buffer_.ptr());
+                direct3d::api::devcon->CSSetConstantBuffers(slot, 1, &buffer_.ptr());
                 break;
             default:
                 break;

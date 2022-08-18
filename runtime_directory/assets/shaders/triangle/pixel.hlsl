@@ -1,5 +1,9 @@
+Texture2D diffTexture;
+SamplerState SampleType;
 
-float4 ps_main(float4 position : SV_POSITION, float4 color : COLOR) : SV_TARGET
+float4 ps_main(float4 pos : SV_POSITION, float2 texcoord : TEXCOORD) : SV_TARGET
 {
-    return color;
+	float4 textureColor = diffTexture.Sample(SampleType, texcoord);
+
+	return textureColor;
 }

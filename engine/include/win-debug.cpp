@@ -29,7 +29,8 @@ LONG NTAPI VexHandler(PEXCEPTION_POINTERS ExceptionInfo)
                     {
                         PSTR sz = (PSTR)_malloca(n * sizeof(CHAR));
 
-                        if (len = WideCharToMultiByte(CP_UTF8, 0, pwz, len, sz, n, nullptr, nullptr))
+                        if (len = WideCharToMultiByte(CP_UTF8, 0, pwz, len, sz, n, nullptr, nullptr);
+                            len)
                         {
                             psz = sz;
                             call_free = true;

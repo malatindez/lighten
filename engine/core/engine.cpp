@@ -4,6 +4,7 @@
 
 #include "layers/shader-manager.hpp"
 #include "layers/texture-manager.hpp"
+#include "layers/input-layer.hpp"
 
 static std::string const kDefaultConfig =
 R"(
@@ -51,6 +52,7 @@ namespace engine::core
         };
 
         direct3d::api::Init();
+        InputLayer::Init();
         ShaderManager::Init();
         TextureManager::Init();
     }
@@ -59,6 +61,7 @@ namespace engine::core
     {
         application_->logger_->flush();
         application_ = nullptr;
+        InputLayer::Deinit();
         ShaderManager::Deinit();
         TextureManager::Deinit();
         direct3d::api::Deinit();

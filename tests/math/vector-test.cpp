@@ -346,10 +346,6 @@ TEST(TEST_VECTORS, DefaultMathTest)
         ASSERT_TRUE(normalize(vec2) == normalize(rvec2) && normalize(rvec2) == normalize(rcvec2) && almost_equal(length(normalize(rcvec2)), 1.0f));
         ASSERT_TRUE(normalize(vec2) == normalize(rvec2) && normalize(rvec2) == normalize(rcvec2) && almost_equal(length(normalize(rcvec2)), 1.0f));
         ASSERT_TRUE(dot(vec1, rcvec2) == dot(vec2, rcvec1) && dot(rvec2, rvec1) == dot(vec2, vec1) && dot(rcvec1, rcvec2) == dot(rvec1, rvec2) && dot(vec1, rcvec2) == dot(rvec2, rvec1));
-        float a = angle(vec1, rcvec2);
-        float b = angle(vec2, rcvec1);
-        float g = angle(vec1, rcvec2);
-        float h = angle(rvec2, rvec1);
         ASSERT_TRUE(angle(vec1, rcvec2) == angle(vec2, rcvec1) && angle(rvec2, rvec1) == angle(vec2, vec1) && angle(rcvec1, rcvec2) == angle(rvec1, rvec2) && angle(vec1, rcvec2) == angle(rvec2, rvec1));
     }
 }

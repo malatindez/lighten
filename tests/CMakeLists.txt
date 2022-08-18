@@ -56,5 +56,5 @@ if(test)
   </PropertyGroup> \ 
 </Project> \ 
 ")
-  set_target_properties(runUnitTests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIR})
+  set_target_properties(runUnitTests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
 endif()

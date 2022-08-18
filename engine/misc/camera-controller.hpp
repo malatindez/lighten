@@ -1,13 +1,26 @@
 #pragma once
-#include "components/camera.hpp"
-#include "components/transform.hpp"
+#include "components/components.hpp"
 #include "core/math/ray.hpp"
 #include "entt/entt.hpp"
 namespace engine
 {
+
     class CameraController
     {
     public:
+        enum Flags
+        {
+            None = 0,
+            MoveForward = 1 << 0,
+            MoveBackwards = 1 << 1,
+            MoveRight = 1 << 2,
+            MoveLeft = 1 << 3,
+            MoveUp = 1 << 4,
+            MoveDown = 1 << 5,
+            RotateLeft = 1 << 6,
+            RotateRight = 1 << 7,
+            Accelerate = 1 << 8
+        };
         CameraController(components::Camera *camera, components::Transform *transform,
                          core::math::ivec2 const &window_size);
         void Init();
@@ -55,17 +68,34 @@ namespace engine
         [[nodiscard]] constexpr float z_near() const noexcept { return camera_->z_near_; }
         [[nodiscard]] constexpr float z_far() const noexcept { return camera_->z_far_; }
 
+        [[nodiscard]] constexpr uint32_t &flags() noexcept { return flags_; }
+
+        [[nodiscard]] float &sensivity() noexcept { return sensivity_; }
+        [[nodiscard]] float const &sensivity() const noexcept { return sensivity_; }
+        [[nodiscard]] float &move_speed() noexcept { return move_speed_; }
+        [[nodiscard]] float const &move_speed() const noexcept { return move_speed_; }
+        [[nodiscard]] float &accelerated_speed() noexcept { return accelerated_speed_; }
+        [[nodiscard]] float const &accelerated_speed() const noexcept { return accelerated_speed_; }
+        [[nodiscard]] float &roll_speed() noexcept { return roll_speed_; }
+        [[nodiscard]] float const &roll_speed() const noexcept { return roll_speed_; }
         void SetNewCamera(components::Camera *camera, components::Transform *transform) noexcept
         {
             camera_ = camera;
             transform_ = transform;
             Init();
         }
-
+        void OnTick(float delta_time, core::math::ivec2 const &pixel_mouse_delta);
+    private:
+        uint32_t flags_ = None;
+        float sensivity_ = 8.0f;
+        float move_speed_ = 2.0f;
+        float accelerated_speed_ = 10.0f;
+        float roll_speed_ = engine::core::math::radians(60.0f);
     private:
         components::Camera *camera_;
         components::Transform *transform_;
         core::math::ivec2 const &window_size_;
+
 
         bool update_matrices_ = true;
         bool update_basis_ = true;

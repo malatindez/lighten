@@ -42,6 +42,7 @@ namespace engine::core
             {
                 .vertices = vb,
                 .indices = ib,
+                .indices_size = (uint32_t)indices.size(),
                 .textures = textures,
                 .mesh_to_model = math::mat4(transformation.a1,transformation.a2,transformation.a3,transformation.a4,
                                             transformation.b1,transformation.b2,transformation.b3,transformation.b4,
@@ -100,7 +101,7 @@ namespace engine::core
         }
     } // namespace 
 
-    std::shared_ptr<const Model> ModelLoader::Load(std::filesystem::path const &path)
+    std::shared_ptr<Model> ModelLoader::Load(std::filesystem::path const &path)
     {
         Assimp::Importer importer;
         aiScene const *scene_ptr = importer.ReadFile(path.string().c_str(),
@@ -115,11 +116,9 @@ namespace engine::core
             return nullptr;
         }
         auto rv = std::make_shared<Model>();
-        rv->meshes.resize(scene_ptr->mNumMeshes);
-        rv->mesh_ranges.resize(scene_ptr->mNumMeshes);
 
         processNode(std::filesystem::absolute(path.parent_path()), rv, scene_ptr->mRootNode, scene_ptr);
-        return std::static_pointer_cast<const Model>(rv);
+        return rv;
     }
 
     std::shared_ptr<ModelLoader> ModelLoader::instance_;

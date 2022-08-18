@@ -30,25 +30,25 @@ namespace engine::core
             DirectX::TexMetadata metadata;
             auto image = std::make_unique<DirectX::ScratchImage>();
             direct3d::AlwaysAssert(DirectX::LoadFromTGAFile(path.wstring().c_str(),
-                                                                   DirectX::TGA_FLAGS_NONE,
-                                                                   &metadata, *image),
-                                "Failed to load TGA texture from file @ " + path.string());
+                                                            DirectX::TGA_FLAGS_NONE,
+                                                            &metadata, *image),
+                                   "Failed to load TGA texture from file @ " + path.string());
             D3D11_TEXTURE2D_DESC tdesc;
             ZeroMemory(&tdesc, sizeof(D3D11_TEXTURE2D_DESC));
             tdesc.Format = image->GetImage(0, 0, 0)->format;
             tdesc.SampleDesc.Count = 1;
             tdesc.SampleDesc.Quality = 0;
-            tdesc.ArraySize = metadata.arraySize;
-            tdesc.MipLevels = metadata.mipLevels;
-            tdesc.Width = metadata.width;
-            tdesc.Height = metadata.height;
+            tdesc.ArraySize = (uint32_t)metadata.arraySize;
+            tdesc.MipLevels = (uint32_t)metadata.mipLevels;
+            tdesc.Width = (uint32_t)metadata.width;
+            tdesc.Height = (uint32_t)metadata.height;
             tdesc.Usage = D3D11_USAGE_IMMUTABLE;
             tdesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
             tdesc.CPUAccessFlags = 0;
             tdesc.MiscFlags = metadata.miscFlags;
 
             D3D11_SUBRESOURCE_DATA srd;
-            srd = D3D11_SUBRESOURCE_DATA{};
+            srd = D3D11_SUBRESOURCE_DATA {};
             srd.pSysMem = image->GetImage(0, 0, 0)->pixels;
             srd.SysMemPitch = image->GetImage(0, 0, 0)->rowPitch;
             srd.SysMemSlicePitch = 0;
@@ -74,7 +74,7 @@ namespace engine::core
                                                   &texture.texture_resource.reset(),
                                                   &texture.shader_resorce_view.reset()),
                 "Failed to load wic texture from file @" + path.string());
-        }   
+        }
         textures_.emplace(std::make_pair(path, texture));
         return texture.shader_resorce_view;
     }

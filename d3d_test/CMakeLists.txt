@@ -49,4 +49,4 @@ file(WRITE "${CMAKE_BINARY_DIR}/d3d_test.vcxproj.user" "\
 </Project> \ 
 ")
 
-set_target_properties(d3d_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIR})
+set_target_properties(d3d_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})

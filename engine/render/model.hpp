@@ -17,6 +17,7 @@ namespace engine::render
     {
         VertexBuffer vertices;
         IndexBuffer indices;
+        uint32_t indices_size;
         std::vector<direct3d::ShaderResourceView> textures;
         core::math::mat4 mesh_to_model;
     };

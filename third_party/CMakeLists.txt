@@ -37,8 +37,8 @@ function(target_add_assimp TARGET)
   target_include_directories(assimp PRIVATE "${ASSIMP_DIR}")
 endfunction(target_add_assimp)
 
-set_target_properties(assimp PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIR})
-set_target_properties(assimp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIR})
+set_target_properties(assimp PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
+set_target_properties(assimp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
 
 # imgui
 add_library(imgui STATIC "${IMGUI_DIR}/imgui.cpp"
@@ -126,8 +126,8 @@ endfunction(target_add_spdlog)
 # DDS texture loader
 add_library(dds_texture_loader11 STATIC "${DDS_TEXTURE_LOADER_DIR}/DDSTextureLoader11.cpp")
 target_include_directories(dds_texture_loader11 PUBLIC "${DDS_TEXTURE_LOADER_DIR}")
-set_target_properties(dds_texture_loader11 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIR})
-set_target_properties(dds_texture_loader11 PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIR})
+set_target_properties(dds_texture_loader11 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
+set_target_properties(dds_texture_loader11 PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
 target_compile_features(dds_texture_loader11 PUBLIC cxx_std_17)
 target_add_direct3d(dds_texture_loader11)
 
@@ -140,8 +140,8 @@ endfunction(target_add_dds_texture_loader)
 # WIC texture loader
 add_library(wic_texture_loader11 STATIC "${WIC_TEXTURE_LOADER_DIR}/WICTextureLoader11.cpp")
 target_include_directories(wic_texture_loader11 PUBLIC "${WIC_TEXTURE_LOADER_DIR}")
-set_target_properties(wic_texture_loader11 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIR})
-set_target_properties(wic_texture_loader11 PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIR})
+set_target_properties(wic_texture_loader11 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
+set_target_properties(wic_texture_loader11 PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
 target_compile_features(wic_texture_loader11 PUBLIC cxx_std_17)
 target_add_direct3d(wic_texture_loader11)
 
@@ -154,8 +154,8 @@ endfunction(target_add_wic_texture_loader)
 file(GLOB_RECURSE DIRECTXTEX_SOURCES ${DIRECTXTEX_DIR}/*.cpp ${DIRECTXTEX_DIR}/*.hpp ${DIRECTXTEX_DIR}/*.h)
 add_library(DirectXTex STATIC "${DIRECTXTEX_SOURCES}")
 target_include_directories(DirectXTex PUBLIC "${DIRECTXTEX_DIR}/include" "${DIRECTXTEX_DIR}/src" "${DIRECTXTEX_DIR}/src/Shaders/Compiled")
-set_target_properties(DirectXTex PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIR})
-set_target_properties(DirectXTex PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIR})
+set_target_properties(DirectXTex PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
+set_target_properties(DirectXTex PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
 target_compile_features(DirectXTex PUBLIC cxx_std_17)
 target_add_direct3d(DirectXTex)
 

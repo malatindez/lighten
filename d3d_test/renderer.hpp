@@ -1,33 +1,30 @@
 #pragma once
 #pragma once
 #include "core/engine.hpp"
+#include "core/layers/shader-manager.hpp"
 #include "core/shader-compiler.hpp"
 #include "direct3d11/direct3d11.hpp"
 #include "platform/windows/windows-render-pipeline.hpp"
-#include "triangle.hpp"
-#include "core/layers/shader-manager.hpp"
+#include "render/model.hpp"
+#include "render/uniform-buffer.hpp"
 class Renderer : public engine::core::Layer
 {
 public:
-    Renderer(std::shared_ptr<engine::core::ShaderManager> manager) : triangle_ { create_triangle(manager) } {}
-    struct Triangle
+    Renderer();
+    struct PerFrame
     {
-        struct ShaderInput
-        {
-            engine::core::math::mat4 Transform;
-            engine::core::math::mat4 Projection;
-            engine::core::math::vec3 LightVector;
-        };
-        // engine::direct3d::Buffer uniform_buffer;
-        engine::direct3d::TriangleMesh mesh;
-        engine::render::GraphicsShaderProgram shader;
-    };
+        engine::core::math::mat4 model { 1 };
+        engine::core::math::mat4 projection;
+        engine::core::math::mat4 view;
+    } per_frame;
 
     void OnRender() override;
     void OnGuiRender() override;
 
 private:
-    static Triangle create_triangle(std::shared_ptr<engine::core::ShaderManager> manager);
-
-    Triangle triangle_;
+    engine::render::UniformBuffer<PerFrame> per_frame_buffer {};
+    engine::render::UniformBuffer<engine::core::math::mat4> per_model_buffer {};
+    engine::render::UniformBuffer<engine::core::math::mat4> per_mesh_buffer {};
+    std::shared_ptr<engine::render::Model> model;
+    engine::render::GraphicsShaderProgram shader;
 };

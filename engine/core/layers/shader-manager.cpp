@@ -38,6 +38,7 @@ namespace engine::core
                         continue;
                     }
                     shader->Recreate(out.blob);
+                    spdlog::info("Successfully recompiled shader @ " + path.string());
                     for (auto &subpath : out.dependent_files)
                     {
                         dependent_shaders_map_[subpath].emplace(shader);

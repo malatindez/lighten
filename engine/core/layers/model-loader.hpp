@@ -8,7 +8,7 @@ namespace engine::core
     class ModelLoader final : public Layer
     {
     public:
-        std::shared_ptr<const render::Model> Load(std::filesystem::path const &path);
+        std::shared_ptr<render::Model> Load(std::filesystem::path const &path);
         [[nodiscard]] static std::shared_ptr<ModelLoader> instance() noexcept { return instance_; }
 
         void OnAttach() override { utils::Assert(!attached_); attached_ = true; }
