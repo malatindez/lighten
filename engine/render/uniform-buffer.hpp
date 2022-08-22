@@ -3,18 +3,18 @@
 #include "utils/utils.hpp"
 namespace engine::render
 {
-    template <typename... Args>
+    template <typename Type>
     class UniformBuffer
     {
         static constexpr auto RoundBufferSizeTo16Boundary(size_t x) { return x + 0xf & 0xfffffff0; };
 
     public:
-        static constexpr size_t kSize = RoundBufferSizeTo16Boundary(utils::parameter_pack_info<Args...>::size);
+        static constexpr size_t kSize = RoundBufferSizeTo16Boundary(sizeof(Type));
         UniformBuffer(bool dynamic = true);
-        UniformBuffer(Args const &... initial_data, bool dynamic = true);
+        UniformBuffer(Type const &initial_data, bool dynamic = true);
 
         void Update(void const *data, uint32_t data_size);
-        void Update(Args const &...args);
+        void Update(Type const &value);
 
         void Bind(ShaderType type, uint32_t slot);
 

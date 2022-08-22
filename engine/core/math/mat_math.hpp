@@ -56,6 +56,9 @@ namespace engine::core::math
     constexpr mat<4, 4, T> perspective(T fov_y, T aspect_ratio, T z_near, T z_far);
 
     template <Primitive T>
+    constexpr mat<4, 4, T> ortho(T left, T right, T bottom, T top, T zNear, T zFar);
+
+    template <Primitive T>
     constexpr void invert_orthonormal(mat<4, 4, T> const &src, mat<4, 4, T> &dst);
     template <Primitive T>
     constexpr void invert_orthogonal(mat<4, 4, T> const &src, mat<4, 4, T> &dst);

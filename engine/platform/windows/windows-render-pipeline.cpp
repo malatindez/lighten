@@ -33,6 +33,7 @@ namespace engine::platform::windows
 
         ID3D11DepthStencilState *depth_stencil_state;
 
+
         api::device->CreateDepthStencilState(&depth_stencil_desc, &depth_stencil_state);
 
         rasterizer_state_ = rasterizer_state;
@@ -77,7 +78,7 @@ namespace engine::platform::windows
 
         // clear the back buffer to a deep blue
         api::devcon4->ClearRenderTargetView(window_->frame_buffer_view(), sky_color_.data.data());
-        api::devcon4->ClearDepthStencilView(window_->depth_buffer_view(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+        api::devcon4->ClearDepthStencilView(window_->depth_buffer_view(), D3D11_CLEAR_DEPTH, 0.0f, 0);
     }
     void RenderPipeline::FrameEnd()
     {

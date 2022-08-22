@@ -21,8 +21,10 @@ namespace engine
             RotateRight = 1 << 7,
             Accelerate = 1 << 8
         };
+
         CameraController(components::Camera *camera, components::Transform *transform,
                          core::math::ivec2 const &window_size);
+        
         void Init();
         void UpdateProjectionMatrix();
 
@@ -40,7 +42,7 @@ namespace engine
 
         void UpdateMatrices();
 
-        // nfc in range from -1 to 1
+        // ndc in range from -1 to 1
         // returns a projected ray from camera
         [[nodiscard]] inline core::math::Ray Raycast(core::math::vec2 const &ndc) const noexcept
         {

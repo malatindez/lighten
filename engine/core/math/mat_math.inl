@@ -304,24 +304,36 @@ namespace engine::core::math
     }
 
     template <Primitive T>
+    constexpr mat<4, 4, T> ortho(T left, T right, T bottom, T top, T zNear, T zFar)
+    {
+        mat<4, 4, T> Result(1);
+        Result[0][0] = static_cast<T>(2) / (right - left);
+        Result[1][1] = static_cast<T>(2) / (top - bottom);
+        Result[2][2] = static_cast<T>(1) / (zFar - zNear);
+        Result[3][0] = -(right + left) / (right - left);
+        Result[3][1] = -(top + bottom) / (top - bottom);
+        Result[3][2] = -zNear / (zFar - zNear);
+        return Result;
+    }
+
+
+    template <Primitive T>
     constexpr void invert_orthonormal(mat<4, 4, T> const &src, mat<4, 4, T> &dst)
     {
         assert(&src != &dst);
-        dst[0][0] = src[2][2];
+        dst[0][0] = src[0][0];
         dst[1][1] = src[1][1];
-        dst[2][2] = src[0][0];
+        dst[2][2] = src[2][2];
         dst[0][1] = src[1][0];
         dst[1][0] = src[0][1];
         dst[0][2] = src[2][0];
         dst[2][0] = src[0][2];
         dst[1][2] = src[2][1];
         dst[2][1] = src[1][2];
-        dst[3][0] = -src[3].x * dst.data[0][0] - src[3].x * dst.data[0][1] -
-            src[3].x * dst.data[0][2];
-        dst[3][1] = -src[3].y * dst.data[1][0] - src[3].y * dst.data[1][1] -
-            src[3].y * dst.data[1][2];
-        dst[3][2] = -src[3].z * dst.data[2][0] - src[3].z * dst.data[2][1] -
-            src[3].z * dst.data[2][2];
+        dst[3].as_rvec<3>() =
+            -src[3].x * dst.data[0].as_vec<3>()
+            - src[3].y * dst.data[1].as_vec<3>()
+            - src[3].z * dst.data[2].as_vec<3>();
         dst[0][3] = 0;
         dst[1][3] = 0;
         dst[2][3] = 0;
@@ -331,9 +343,9 @@ namespace engine::core::math
     constexpr void invert_orthogonal(mat<4, 4, T> const &src, mat<4, 4, T> &dst)
     {
         assert(&src != &dst);
-        dst[0][0] = src[2][2];
+        dst[0][0] = src[0][0];
         dst[1][1] = src[1][1];
-        dst[2][2] = src[0][0];
+        dst[2][2] = src[2][2];
         dst[0][1] = src[1][0];
         dst[1][0] = src[0][1];
         dst[0][2] = src[2][0];

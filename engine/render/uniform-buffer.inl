@@ -2,8 +2,8 @@
 #include "uniform-buffer.hpp"
 namespace engine::render
 {
-    template <typename... Args>
-    UniformBuffer<Args...>::UniformBuffer(bool dynamic) : kDynamic(dynamic)
+    template <typename Type>
+    UniformBuffer<Type>::UniformBuffer(bool dynamic) : kDynamic(dynamic)
     {
         D3D11_BUFFER_DESC bd;
         ZeroMemory(&bd, sizeof(bd));
@@ -16,34 +16,8 @@ namespace engine::render
                       "Failed to create uniform buffer");
     }
 
-    namespace _uniform_buffer_detail
-    {
-        template <typename A>
-        void FillData(void *data, A const &a)
-        {
-            memcpy(data, &a, sizeof(A));
-        }
-        template <typename A, typename B, typename... Args>
-        void FillData(void *data, A const &a, B const &b, Args const &...initial_data)
-        {
-            FillData(data, a);
-            FillData(((char *)data) + sizeof(A), b, initial_data...);
-        }
-        template <typename A>
-        void *GetPtr(A const &a)
-        {
-            return (void *)&a;
-        }
-        template <typename A, typename B, typename... Args>
-        void *GetPtr(A const &a, B const &b, Args const &... args)
-        {
-            utils::AlwaysAssert(false, "Something with templates went critically wrong.");
-            return nullptr;
-        }
-    }
-
-    template <typename... Args>
-    UniformBuffer<Args...>::UniformBuffer(Args const &...initial_data, bool dynamic) : kDynamic(dynamic)
+    template <typename Type>
+    UniformBuffer<Type>::UniformBuffer(Type const &initial_data, bool dynamic) : kDynamic(dynamic)
     {
         D3D11_BUFFER_DESC bd;
         ZeroMemory(&bd, sizeof(bd));
@@ -54,26 +28,12 @@ namespace engine::render
 
         D3D11_SUBRESOURCE_DATA sd;
         ZeroMemory(&sd, sizeof(sd));
-        void *data = nullptr;
-        if constexpr (utils::parameter_pack_info<Args...>::amount == 1)
-        {
-            data = _uniform_buffer_detail::GetPtr(initial_data...);
-        }
-        else
-        {
-            data = malloc(kSize);
-            _uniform_buffer_detail::FillData(data, initial_data...);
-        }
-        sd.pSysMem = data;
+        sd.pSysMem = (void *)&initial_data;
         utils::Assert(direct3d::api::device->CreateBuffer(&bd, &sd, &buffer_.ptr()) >= 0,
                       "Failed to create uniform buffer");
-        if constexpr (utils::parameter_pack_info<Args...>::amount != 1)
-        {
-            free(data);
-        }
     }
-    template <typename... Args>
-    void UniformBuffer<Args...>::Update(void const *data, uint32_t data_size)
+    template <typename Type>
+    void UniformBuffer<Type>::Update(void const *data, uint32_t data_size)
     {
         D3D11_BUFFER_DESC desc {};
         buffer_->GetDesc(&desc);
@@ -90,39 +50,15 @@ namespace engine::render
         else
             direct3d::api::devcon->UpdateSubresource(buffer_.ptr(), 0, nullptr, &data, 0, 0);
     }
-    template <typename... Args>
-    void UniformBuffer<Args...>::Update(Args const &...args)
+    template <typename Type>
+    void UniformBuffer<Type>::Update(Type const &value)
     {
         D3D11_BUFFER_DESC desc {};
         buffer_->GetDesc(&desc);
-
-        if constexpr (utils::parameter_pack_info<Args...>::amount == 1)
-        {
-            Update(_uniform_buffer_detail::GetPtr(args...), kSize);
-        }
-        else
-        {
-            if (desc.Usage == D3D11_USAGE_DYNAMIC)
-            {
-                D3D11_MAPPED_SUBRESOURCE mapped_buffer = {};
-                ZeroMemory(&mapped_buffer, sizeof(D3D11_MAPPED_SUBRESOURCE));
-                utils::Assert(direct3d::api::devcon->Map(buffer_.ptr(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mapped_buffer) >= 0,
-                              "Failed to map data to uniform buffer");
-                _uniform_buffer_detail::FillData(mapped_buffer.pData, args...);
-                direct3d::api::devcon->Unmap(buffer_.ptr(), 0);
-            }
-            else
-            {
-                void *data = nullptr;
-                data = malloc(kSize);
-                _uniform_buffer_detail::FillData(data, args...);
-                direct3d::api::devcon->UpdateSubresource(buffer_.ptr(), 0, nullptr, &data, 0, 0);
-                free(data);
-            }
-        }
+        Update(&value, sizeof(Type));
     }
-    template <typename... Args>
-    void UniformBuffer<Args...>::Bind(ShaderType type, uint32_t slot)
+    template <typename Type>
+    void UniformBuffer<Type>::Bind(ShaderType type, uint32_t slot)
     {
         switch (type)
         {

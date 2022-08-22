@@ -13,18 +13,16 @@ public:
     Renderer();
     struct PerFrame
     {
-        engine::core::math::mat4 model { 1 };
-        engine::core::math::mat4 projection;
-        engine::core::math::mat4 view;
+        engine::core::math::mat4 view_projection;
     } per_frame;
 
     void OnRender() override;
-    void OnGuiRender() override;
 
 private:
     engine::render::UniformBuffer<PerFrame> per_frame_buffer {};
     engine::render::UniformBuffer<engine::core::math::mat4> per_model_buffer {};
     engine::render::UniformBuffer<engine::core::math::mat4> per_mesh_buffer {};
     std::shared_ptr<engine::render::Model> model;
+    std::shared_ptr<engine::render::Model> cube;
     engine::render::GraphicsShaderProgram shader;
 };

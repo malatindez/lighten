@@ -66,8 +66,8 @@ void Controller::OnTick([[maybe_unused]] float delta_time)
         previous_mouse_position = core::math::vec2 { -1, -1 };
     }
     camera_controller_->OnTick(delta_time, pixel_delta);
-    renderer_->per_frame.projection = camera_.projection;
-    renderer_->per_frame.view = camera_.view;
+
+    renderer_->per_frame.view_projection = camera_.view_projection;
     /*if (input_.rbutton_down() && selected_object_)
     {
         Ray a = PixelRaycast(vec2{rb_saved_mouse_position_});

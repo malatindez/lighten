@@ -60,15 +60,17 @@ namespace engine::utils
     inline std::string FormatToString(Vector vec, uint32_t precision = 3)
     {
         std::stringstream ss;
-        typename Vector::type max;
+        size_t max = 0;
         for (int i = 0; i < Vector::size; i++)
         {
-            max = std::max(max, std::abs(std::log10f(vec[i])) + (max < 0 ? 1 : 0));
+            std::stringstream ss2;
+            ss2 << std::setprecision(precision) << vec[i];
+            max = std::max(max, ss2.str().size());
         }
         uint32_t size = max + 1 + precision;
         for (int i = 0; i < Vector::size; i++)
         {
-            ss << std::setw(size) << std::setprecision(precision) << vec[i];
+            ss << std::left << std::setw(size) << std::setprecision(precision) << vec[i];
             ss << " ";
         }
         return ss.str();
@@ -78,17 +80,19 @@ namespace engine::utils
     inline std::string FormatToString(Matrix mat, uint32_t precision = 3)
     {
         std::stringstream ss;
-        typename Matrix::type max = std::numeric_limits<typename Matrix::type>::min();
+        size_t max = 0;
         for (int i = 0; i < Matrix::size.x * Matrix::size.y; i++)
         {
-            max = std::max((float)max, std::abs(std::ceil(std::log10f((float)mat.arr[i]))) + (max < 0 ? 1 : 0));
+            std::stringstream ss2;
+            ss2 << std::setprecision(precision) << mat.arr[i];
+            max = std::max(max, ss2.str().size());
         }
-        uint32_t size = (uint32_t)max + 1 + precision;
+        uint32_t size = (uint32_t)max;
         for (int column = 0; column < Matrix::size.y; column++)
         {
             for (int row = 0; row < Matrix::size.x; row++)
             {
-                ss << std::setw(size) << std::setprecision(precision) << mat[column][row];
+                ss << std::left << std::setw(size) << std::setprecision(precision) << mat[column][row];
                 ss << " ";
             }
             ss << std::endl;

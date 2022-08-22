@@ -23,7 +23,7 @@ namespace engine
         SetProjectionMatrix(perspective(
             camera_->fovy_,
             float(window_size_.x) / float(window_size_.y),
-            camera_->z_far_, camera_->z_near_));
+            camera_->z_near_, camera_->z_far_));
         update_matrices_ = true;
     }
 
@@ -190,7 +190,7 @@ namespace engine
             }
         }
         vec2 t { pixel_mouse_delta };
-        t = t / window_size_;
+        t = -t / window_size_;
         t *= sensivity_ * camera().fovy_;
         yaw = t.x;
         pitch = t.y;

@@ -8,8 +8,8 @@ namespace engine::render
 
         InputLayout(ShaderBlob const &vs_blob, std::vector<D3D11_INPUT_ELEMENT_DESC> const &desc = {})
         {
-            direct3d::api::device->CreateInputLayout(desc.data(), (UINT)desc.size(), vs_blob.ptr(), vs_blob.size(),
-                                                &layout.ptr());
+            direct3d::Assert(direct3d::api::device->CreateInputLayout(desc.data(), (UINT)desc.size(), vs_blob.ptr(), vs_blob.size(),
+                                                                      &layout.ptr()), "Failed to create the input layout!");
         }
 
         void Bind()
