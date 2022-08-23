@@ -1,5 +1,5 @@
 #pragma once
-#include "core/math/ray.hpp"
+#include "ray.hpp"
 namespace engine::core::math
 {
     struct Sphere

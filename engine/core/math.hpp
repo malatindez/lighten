@@ -1,7 +1,9 @@
 #pragma once
 #include "math/mat.hpp"
+#include "math/aabb.hpp"
+#include "math/plane.hpp"
 #include "math/quaternion.hpp"
-
+#include "math/sphere.hpp"
 namespace engine::core::math
 {
     template <class T>

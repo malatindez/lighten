@@ -316,7 +316,6 @@ namespace engine::core::math
         return Result;
     }
 
-
     template <Primitive T>
     constexpr void invert_orthonormal(mat<4, 4, T> const &src, mat<4, 4, T> &dst)
     {
@@ -330,10 +329,8 @@ namespace engine::core::math
         dst[2][0] = src[0][2];
         dst[1][2] = src[2][1];
         dst[2][1] = src[1][2];
-        dst[3].as_rvec<3>() =
-            -src[3].x * dst.data[0].as_vec<3>()
-            - src[3].y * dst.data[1].as_vec<3>()
-            - src[3].z * dst.data[2].as_vec<3>();
+        as_rvec<3>(dst[3]) =
+            -src[3].x * as_rvec<3>(dst.data[0]) - src[3].y * as_rvec<3>(dst.data[1]) - src[3].z * as_rvec<3>(dst.data[2]);
         dst[0][3] = 0;
         dst[1][3] = 0;
         dst[2][3] = 0;

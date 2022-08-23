@@ -12,8 +12,8 @@ namespace engine::core::events
 
         FilesChangedEvent(FilesChangedEvent &&) = default;
         FilesChangedEvent(FilesChangedEvent const &) = default;
-        FilesChangedEvent &operator=(FilesChangedEvent &&) = default;
-        FilesChangedEvent &operator=(FilesChangedEvent const &) = default;
+        FilesChangedEvent &operator=(FilesChangedEvent &&) = delete;
+        FilesChangedEvent &operator=(FilesChangedEvent const &) = delete;
 
         [[nodiscard]] inline std::vector<std::filesystem::path> const &files_changed() { return files_; }
         EVENT_CLASS_TYPE(FilesChanged)

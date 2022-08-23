@@ -8,9 +8,13 @@
 // this option is ignored in _DEBUG (implicitly calls builtin assert)
 // if false, it will check for ASSERT_THROWS
 
-#if !defined(DEBUG_UTILS_ASSERT_ABORTS) || defined(_DEBUG)
+#if !defined(DEBUG_UTILS_ASSERT_ABORTS)
+#if defined(_DEBUG)
 #define DEBUG_UTILS_ASSERT_ABORTS 1
 #define DEBUG_UTILS_ASSERT_THROWS 0
+#else
+#define DEBUG_UTILS_ASSERT_ABORTS 0
+#endif
 #endif
 
 #ifndef DEBUG_UTILS_ASSERT_THROWS

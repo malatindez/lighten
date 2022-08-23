@@ -31,6 +31,10 @@ namespace engine::utils
         std::vector<std::filesystem::path> paths;
         for (auto const &[file, ft] : file_map_)
         {
+            if (!std::filesystem::exists(file))
+            {
+                continue;
+            }
             auto current_file_last_write_time = std::filesystem::last_write_time(file);
             if (file_map_[file] != current_file_last_write_time) [[unlikely]]
             {

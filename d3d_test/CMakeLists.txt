@@ -15,11 +15,12 @@ foreach(_source IN ITEMS ${D3D_SOURCES})
   source_group("${_source_path_msvc}" FILES "${_source}")
 endforeach()
 
-add_executable(d3d_test WIN32 ${D3D_SOURCES})
+add_executable(d3d_test WIN32 ${D3D_SOURCES} ${ENGINE_SOURCES})
 target_include_directories(d3d_test PRIVATE ${D3D_SOURCES_DIR})
 target_include_directories(d3d_test PRIVATE ${ENGINE_SOURCES_DIR})
-target_link_libraries(d3d_test engine)
-target_add_libraries(d3d_test "entt" "spdlog" "directx" "assimp" "glm" "imgui" "imguizmo" "imgui_console" "directxtex" "dds_texture_loader11" "wic_texture_loader11" "glm")
+
+# target_link_libraries(d3d_test engine)
+target_add_libraries(d3d_test "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console" "directxtex" "dds_texture_loader11" "wic_texture_loader11")
 
 file(GLOB RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/resources/*")
 file(COPY ${RESOURCES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

@@ -4,7 +4,7 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4201)
-namespace engine::core::math
+namespace engine::core::math::_detail
 {
 
     template <Primitive T>

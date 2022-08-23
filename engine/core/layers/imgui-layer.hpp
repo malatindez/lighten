@@ -6,7 +6,9 @@
 
 namespace engine::core
 {
-    class ImGuiLayer final : public Layer
+    class ImGuiLayer final
+        : public Layer,
+        public Layer::HandleEvent
     {
     public:
         ImGuiLayer(std::shared_ptr<Window> window) : Layer("ImGuiLayer"), window_ { window } {}

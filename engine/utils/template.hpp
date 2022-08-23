@@ -43,7 +43,6 @@ namespace engine::utils
         return rv;
     }
 
-
     template <typename T>
     struct return_type;
 

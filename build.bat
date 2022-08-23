@@ -13,7 +13,7 @@ if /I "%c%" EQU "N" goto :open_folder
 goto :open_folder
 :tests
 cmake --build . --config Release
-.\Release\runUnitTests.exe
+.\binary\Release\runUnitTests.exe
 :open_folder
 set /P c=Open Solution[Y/N]?
 if /I "%c%" EQU "N" goto :end

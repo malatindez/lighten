@@ -1,39 +1,5 @@
 #include "layer-stack.hpp"
 #include "include/pch.hpp"
-namespace engine::core::_detail
-{
-
-    void UnderlyingStack::PushLayer(std::shared_ptr<Layer> layer)
-    {
-        layers_.emplace(layers_.begin() + layer_insert_index_, layer);
-        layer_insert_index_++;
-    }
-    void UnderlyingStack::PushOverlay(std::shared_ptr<Layer> overlay)
-    {
-        layers_.emplace_back(overlay);
-    }
-    void UnderlyingStack::PopLayer(std::shared_ptr<Layer> layer)
-    {
-        auto it = std::find(layers_.begin(), layers_.begin() + layer_insert_index_, layer);
-        if (it != layers_.begin() + layer_insert_index_) [[likely]]
-        {
-            layers_.erase(it);
-            layer_insert_index_--;
-        }
-    }
-    void UnderlyingStack::PopOverlay(std::shared_ptr<Layer> overlay)
-    {
-        auto it = std::find(layers_.begin() + layer_insert_index_, layers_.end(), overlay);
-        if (it != layers_.end()) [[likely]]
-        {
-            layers_.erase(it);
-        }
-    }
-    bool UnderlyingStack::HasLayer(std::shared_ptr<Layer> layer)
-    {
-        return layers_.end() != std::find(layers_.begin(), layers_.end(), layer);
-    }
-} // namespace engine::core::_detail
 namespace engine::core
 {
     LayerStack::~LayerStack()

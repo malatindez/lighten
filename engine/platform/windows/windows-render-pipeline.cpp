@@ -33,7 +33,6 @@ namespace engine::platform::windows
 
         ID3D11DepthStencilState *depth_stencil_state;
 
-
         api::device->CreateDepthStencilState(&depth_stencil_desc, &depth_stencil_state);
 
         rasterizer_state_ = rasterizer_state;

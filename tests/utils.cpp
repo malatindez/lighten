@@ -146,8 +146,8 @@ namespace utils
         ofs.write(data, size);
         ofs.close();
     }
-    std::vector<fs::path> CreateRandomFiles(fs::path const &path, 
-                                            size_t file_size, 
+    std::vector<fs::path> CreateRandomFiles(fs::path const &path,
+                                            size_t file_size,
                                             size_t amount)
     {
         std::vector<fs::path> rv;
@@ -162,8 +162,8 @@ namespace utils
         return rv;
     }
     std::vector<fs::path> CreateRandomFilesRecursive(fs::path const &path,
-                                                     int depth, 
-                                                     size_t folder_amount, 
+                                                     int depth,
+                                                     size_t folder_amount,
                                                      size_t file_amount_per_folder)
     {
         if (depth == -1)

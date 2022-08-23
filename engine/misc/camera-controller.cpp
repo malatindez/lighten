@@ -4,7 +4,7 @@ namespace engine
     using namespace core;
     using namespace math;
 
-    CameraController::CameraController(components::Camera *camera, components::Transform *transform,
+    CameraController::CameraController(components::CameraComponent *camera, components::TransformComponent *transform,
                                        ivec2 const &window_size)
         : camera_(camera), transform_(transform), window_size_(window_size)
     {
@@ -86,13 +86,13 @@ namespace engine
         update_matrices_ = true;
         if (roll_enabled_)
         {
-            transform_->rotation *= quat(roll, forward().as_vec());
-            transform_->rotation *= quat(pitch, right().as_vec());
-            transform_->rotation *= quat(yaw, up().as_vec());
+            transform_->rotation *= quat(roll, as_vec(forward()));
+            transform_->rotation *= quat(pitch, as_vec(right()));
+            transform_->rotation *= quat(yaw, as_vec(up()));
         }
         else
         {
-            transform_->rotation *= quat(pitch, right().as_vec());
+            transform_->rotation *= quat(pitch, as_vec(right()));
             transform_->rotation *= quat(yaw, vec3 { 0, 1, 0 });
         }
         transform_->rotation = normalize(transform_->rotation);
@@ -118,7 +118,7 @@ namespace engine
         update_matrices_ = false;
 
         UpdateBasis();
-        camera_->inv_view[3].as_rvec<3>() = transform_->position;
+        as_rvec<3>(camera_->inv_view[3]) = transform_->position;
 
         camera_->view = invert_orthonormal(camera_->inv_view);
         camera_->view_projection = camera_->view * camera_->projection;

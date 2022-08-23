@@ -31,9 +31,9 @@
 #include <stdint.h>
 #include <string>
 #include <thread>
+#include <unordered_set>
 #include <variant>
 #include <vector>
-#include <unordered_set>
 
 #ifdef __clang__
 #define __lambda_force_inline __attribute__((always_inline))

@@ -101,7 +101,8 @@ namespace utils
     [[nodiscard]] inline std::string ExcludeString(std::string const &a, std::string_view const b)
     {
         std::string return_value { a };
-        std::erase_if(return_value, [&b] (char const &c) { return std::ranges::find(b, c) != b.end(); });
+        std::erase_if(return_value, [&b] (char const &c)
+                      { return std::ranges::find(b, c) != b.end(); });
         return return_value;
     }
 

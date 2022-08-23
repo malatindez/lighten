@@ -8,8 +8,11 @@ namespace engine::core::math
     concept Primitive = std::floating_point<T> || std::integral<T>;
     template <size_t L, Primitive T>
     struct vec;
-    template <size_t L, Primitive T>
-    struct rvec;
+    namespace _detail
+    {
+        template <size_t L, Primitive T>
+        struct rvec;
+    } // namespace _detail
     template <size_t rows, size_t columns, Primitive T>
     struct mat;
     template <size_t rows, size_t columns, Primitive T>
@@ -87,7 +90,7 @@ namespace engine::core::math
         struct is_reference_vec : public std::false_type
         {};
         template <size_t size, Primitive T>
-        struct is_reference_vec<rvec<size, T>> : public std::true_type
+        struct is_reference_vec<_detail::rvec<size, T>> : public std::true_type
         {};
         template <class T>
         struct is_default_vec : public std::false_type

@@ -37,8 +37,6 @@ namespace engine::core
 
         static void Exit();
 
-        static void OnEvent(events::Event &e) { application_->LayerStackThreadsafe::OnEvent(e); }
-
     private:
         static void Init();
         static void Deinit();

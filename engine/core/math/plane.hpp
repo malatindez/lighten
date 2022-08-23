@@ -1,6 +1,6 @@
 #pragma once
-#include "core/math/intersection.hpp"
-#include "core/math/ray.hpp"
+#include "intersection.hpp"
+#include "ray.hpp"
 namespace engine::core::math
 {
     struct Plane

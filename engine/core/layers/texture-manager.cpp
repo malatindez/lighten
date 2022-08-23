@@ -50,17 +50,18 @@ namespace engine::core
             D3D11_SUBRESOURCE_DATA srd;
             srd = D3D11_SUBRESOURCE_DATA {};
             srd.pSysMem = image->GetImage(0, 0, 0)->pixels;
-            srd.SysMemPitch = image->GetImage(0, 0, 0)->rowPitch;
+            srd.SysMemPitch = (uint32_t)image->GetImage(0, 0, 0)->rowPitch;
             srd.SysMemSlicePitch = 0;
 
             ID3D11Texture2D *texture_ = nullptr;
             direct3d::AlwaysAssert(direct3d::api::device5->CreateTexture2D(&tdesc, &srd, &texture_),
                                    "Failed to create 2d texture: ");
+            utils::AlwaysAssert(texture_ != nullptr);
             texture.texture_resource = texture_;
             D3D11_SHADER_RESOURCE_VIEW_DESC srvd;
             srvd.Format = metadata.format;
             srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-            srvd.Texture2D.MipLevels = metadata.mipLevels;
+            srvd.Texture2D.MipLevels = (uint32_t)metadata.mipLevels;
             srvd.Texture2D.MostDetailedMip = 0;
             direct3d::AlwaysAssert(direct3d::api::device5->CreateShaderResourceView(texture_, &srvd, &texture.shader_resorce_view.reset()),
                                    "Failed to create shader resource view: ");

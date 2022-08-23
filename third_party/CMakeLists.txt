@@ -11,7 +11,6 @@ set(ENTT_DIR "${LIB_DIR}/entt")
 set(GTEST_DIR "${LIB_DIR}/google/google_test")
 set(BENCHMARK_DIR "${LIB_DIR}/google/google_benchmark")
 set(SPDLOG_DIR "${LIB_DIR}/spdlog")
-set(GLM_DIR "${LIB_DIR}/glm")
 
 # directx
 include("third_party/FindDirectX.cmake")
@@ -103,6 +102,12 @@ endfunction(target_add_entt)
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 add_subdirectory("${GTEST_DIR}" EXCLUDE_FROM_ALL)
 
+set_target_properties(gtest PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
+set_target_properties(gtest PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
+
+set_target_properties(gtest_main PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
+set_target_properties(gtest_main PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
+
 function(target_add_gtest TARGET)
   enable_testing()
   include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
@@ -125,12 +130,6 @@ function(target_add_spdlog TARGET)
 endfunction(target_add_spdlog)
 
 
-# glm
-add_subdirectory("${GLM_DIR}" EXCLUDE_FROM_ALL)
-
-function(target_add_glm TARGET)
-  target_include_directories("${TARGET}" PRIVATE "${GLM_DIR}")
-endfunction(target_add_glm)
 
 # DDS texture loader
 add_library(dds_texture_loader11 STATIC "${DDS_TEXTURE_LOADER_DIR}/DDSTextureLoader11.cpp")
@@ -224,9 +223,6 @@ function(target_add_libraries TARGET)
 
   if("${ARGN}" MATCHES "[wW][iI][cC]_[tT][eE][xX][tT][uU][rR][eE]_[lL][oO][aA][dD][eE][rR]11")
     target_add_wic_texture_loader(${TARGET})
-  endif()
-  if("${ARGN}" MATCHES "[gG][lL][mM]")
-    target_add_glm(${TARGET})
   endif()
 endfunction(target_add_libraries)
 

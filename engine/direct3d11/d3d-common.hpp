@@ -48,20 +48,20 @@ namespace engine::direct3d
             reset();
         }
 
-        d3d_resource_wrapper(d3d_resource_wrapper<T> &&other)
+        d3d_resource_wrapper(d3d_resource_wrapper<T> &&other) noexcept
         {
             reset(other.ptr_);
         }
-        d3d_resource_wrapper(d3d_resource_wrapper<T> const &other)
+        d3d_resource_wrapper(d3d_resource_wrapper<T> const &other) noexcept
         {
             reset(other.ptr_);
         }
-        d3d_resource_wrapper &operator=(d3d_resource_wrapper<T> &&other)
+        d3d_resource_wrapper &operator=(d3d_resource_wrapper<T> &&other) noexcept
         {
             reset(other.ptr_);
             return *this;
         }
-        d3d_resource_wrapper &operator=(d3d_resource_wrapper<T> const &other)
+        d3d_resource_wrapper &operator=(d3d_resource_wrapper<T> const &other) noexcept
         {
             reset(other.ptr_);
             return *this;

@@ -1,6 +1,6 @@
 #pragma once
-#include "include/pch.hpp"
 #include "core/math.hpp"
+#include "include/pch.hpp"
 namespace engine::utils
 {
 
@@ -56,19 +56,19 @@ namespace engine::utils
     // trim from both ends (in place)
     inline std::string trim(std::string const &s) noexcept { return std::string(trimview(s)); }
 
-    template<core::math::AnyVec Vector>
+    template <core::math::AnyVec Vector>
     inline std::string FormatToString(Vector vec, uint32_t precision = 3)
     {
         std::stringstream ss;
         size_t max = 0;
-        for (int i = 0; i < Vector::size; i++)
+        for (size_t i = 0; i < Vector::size; i++)
         {
             std::stringstream ss2;
             ss2 << std::setprecision(precision) << vec[i];
             max = std::max(max, ss2.str().size());
         }
-        uint32_t size = max + 1 + precision;
-        for (int i = 0; i < Vector::size; i++)
+        size_t size = max + 1 + precision;
+        for (size_t i = 0; i < Vector::size; i++)
         {
             ss << std::left << std::setw(size) << std::setprecision(precision) << vec[i];
             ss << " ";
@@ -76,21 +76,21 @@ namespace engine::utils
         return ss.str();
     }
 
-    template<core::math::AnyMat Matrix>
+    template <core::math::AnyMat Matrix>
     inline std::string FormatToString(Matrix mat, uint32_t precision = 3)
     {
         std::stringstream ss;
         size_t max = 0;
-        for (int i = 0; i < Matrix::size.x * Matrix::size.y; i++)
+        for (size_t i = 0; i < Matrix::size.x * Matrix::size.y; i++)
         {
             std::stringstream ss2;
             ss2 << std::setprecision(precision) << mat.arr[i];
             max = std::max(max, ss2.str().size());
         }
         uint32_t size = (uint32_t)max;
-        for (int column = 0; column < Matrix::size.y; column++)
+        for (size_t column = 0; column < Matrix::size.y; column++)
         {
-            for (int row = 0; row < Matrix::size.x; row++)
+            for (size_t row = 0; row < Matrix::size.x; row++)
             {
                 ss << std::left << std::setw(size) << std::setprecision(precision) << mat[column][row];
                 ss << " ";

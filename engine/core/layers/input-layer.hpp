@@ -148,7 +148,11 @@ namespace engine::core
         };
     }
     class Engine;
-    class InputLayer : public engine::core::Layer
+    class InputLayer
+        : public Layer,
+        public Layer::HandleEvent,
+        public Layer::HandleTick,
+        public Layer::HandleUpdate
     {
     public:
         virtual ~InputLayer() = default;
@@ -167,7 +171,7 @@ namespace engine::core
 
         void OnTick(float dt) override;
         void OnUpdate() override;
-        void OnEvent(engine::core::events::Event &event) override;
+        void OnEvent(events::Event &event) override;
 
         void flush() noexcept
         {
@@ -192,13 +196,21 @@ namespace engine::core
         }
         [[nodiscard]] inline bool lbutton_down() const noexcept { return key_state(Key::KEY_LBUTTON); }
         [[nodiscard]] inline bool rbutton_down() const noexcept { return key_state(Key::KEY_RBUTTON); }
-        [[nodiscard]] constexpr engine::core::math::ivec2 const &mouse_position() const noexcept { return mouse_position_; }
+        [[nodiscard]] constexpr math::ivec2 const &mouse_position() const noexcept { return mouse_position_; }
         [[nodiscard]] constexpr bool mouse_scrolled() const noexcept { return mouse_scrolled_; }
         [[nodiscard]] constexpr int16_t scroll_delta() const noexcept { return scroll_delta_; }
 
         static std::shared_ptr<InputLayer> instance() { return instance_; }
-        void OnAttach() override { utils::Assert(!attached_); attached_ = true; }
-        void OnDetach() override { utils::Assert(attached_); attached_ = false; }
+        void OnAttach() override
+        {
+            utils::Assert(!attached_);
+            attached_ = true;
+        }
+        void OnDetach() override
+        {
+            utils::Assert(attached_);
+            attached_ = false;
+        }
 
     private:
         friend class ::engine::core::Engine;
@@ -225,7 +237,7 @@ namespace engine::core
         std::unordered_map<uint32_t, bool> key_states_;
         bool mouse_scrolled_ = false;
         int16_t scroll_delta_ = 0;
-        engine::core::math::ivec2 mouse_position_ { 0 };
+        math::ivec2 mouse_position_ { 0 };
         std::map<KeySeq, std::tuple<bool, uint32_t, OnTickKeyCallbackFn>> on_tick_callbacks_;
         std::map<KeySeq, std::tuple<bool, uint32_t, OnUpdateKeyCallbackFn>> on_update_callbacks_;
         // TODO(add binds by name + description so we can bind them in the console)

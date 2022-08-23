@@ -21,7 +21,7 @@ namespace engine::utils
                 spdlog::critical(std::basic_string(message));
             }
 
-        assert(value, message);
+        assert(value);
     }
 
     inline void AlwaysAssert(bool value, std::string_view message = "Assert failed")
@@ -38,7 +38,7 @@ namespace engine::utils
 
         if constexpr (DEBUG_UTILS_DEBUG_ENABLED)
         {
-            assert(value, message);
+            assert(value);
         }
         else
         {

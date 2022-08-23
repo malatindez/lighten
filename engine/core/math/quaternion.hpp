@@ -16,7 +16,7 @@ namespace engine::core::math
         constexpr explicit qua(T radians, vec<3, T> axis);
         [[nodiscard]] constexpr mat<3, 3, T> as_mat3() const noexcept;
         [[nodiscard]] constexpr mat<4, 4, T> as_mat4() const noexcept;
-        [[nodiscard]] constexpr rvec<3, const T> axis() const noexcept;
+        [[nodiscard]] constexpr vec<3, T> const &axis() const noexcept;
         [[nodiscard]] constexpr T radians() const noexcept;
 
         [[nodiscard]] constexpr qua<T> const &operator+() const noexcept;

@@ -25,10 +25,10 @@
 #pragma warning(disable : 26800)
 #endif
 #include <spdlog/async.h>
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/spdlog.h>
 #include <spdlog/sinks/ansicolor_sink.h>
+#include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 #if defined(__clang__)
 // TODO
 #elif defined(__GNUC__) || defined(__GNUG__)

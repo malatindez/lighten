@@ -42,13 +42,13 @@ namespace engine::core::math
     }
 
     template <size_t a, size_t b, Primitive T>
-    [[nodiscard]] constexpr rvec<b, T> &rmat<a, b, T>::operator[](size_t i)
+    [[nodiscard]] constexpr _detail::rvec<b, T> &rmat<a, b, T>::operator[](size_t i)
     {
         assert(i < size.x);
         return data[i];
     }
     template <size_t a, size_t b, Primitive T>
-    [[nodiscard]] constexpr rvec<b, T> const &rmat<a, b, T>::operator[](size_t i) const
+    [[nodiscard]] constexpr _detail::rvec<b, T> const &rmat<a, b, T>::operator[](size_t i) const
     {
         assert(i < size.x);
         return data[i];

@@ -11,7 +11,7 @@ namespace engine::direct3d
     namespace _detail
     {
         // class protected from accidental pointer overwriting
-        template<typename T>
+        template <typename T>
         class global_d3d_resource_wrapper : protected d3d_resource_wrapper<T>
         {
         public:
@@ -40,7 +40,10 @@ namespace engine::direct3d
     using Device5 = _detail::global_d3d_resource_wrapper<ID3D11Device5>;
     using DeviceContext = _detail::global_d3d_resource_wrapper<ID3D11DeviceContext>;
     using DeviceContext4 = _detail::global_d3d_resource_wrapper<ID3D11DeviceContext4>;
+#if defined(_DEBUG)
     using Debug = _detail::global_d3d_resource_wrapper<ID3D11Debug>;
+    using DebugInfoQueue = _detail::global_d3d_resource_wrapper<ID3D11InfoQueue>;
+#endif
 
     class api final
     {
@@ -52,10 +55,16 @@ namespace engine::direct3d
         static Device5 device5;
         static DeviceContext devcon;
         static DeviceContext4 devcon4;
+#if defined(_DEBUG)
         static Debug debug;
+        static DebugInfoQueue debug_info_queue;
+#endif
 
 #if defined(ENGINE_TEST)
-        static void public_init() { Init(); }
+        static void public_init()
+        {
+            Init();
+        }
         static void public_deinit() { Deinit(); }
 #endif
 

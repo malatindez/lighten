@@ -4,33 +4,41 @@
 namespace engine::core::_detail
 {
     using LayerPtrVec = std::vector<std::shared_ptr<Layer>>;
+    template <typename T>
     class UnderlyingStack
     {
     public:
-        void PushLayer(std::shared_ptr<Layer> layer);
-        void PopLayer(std::shared_ptr<Layer> layer);
-        void PushOverlay(std::shared_ptr<Layer> overlay);
-        void PopOverlay(std::shared_ptr<Layer> overlay);
-        bool HasLayer(std::shared_ptr<Layer> layer);
+        using Vector = std::vector<T *>;
+        void PushLayer(T *layer);
+        void PopLayer(T *layer);
+        void PushOverlay(T *overlay);
+        void PopOverlay(T *overlay);
+        bool HasLayer(T *layer);
 
-        LayerPtrVec::iterator begin() { return layers_.begin(); }
-        LayerPtrVec::iterator end() { return layers_.end(); }
-        LayerPtrVec::reverse_iterator rbegin() { return layers_.rbegin(); }
-        LayerPtrVec::reverse_iterator rend() { return layers_.rend(); }
+        typename Vector::iterator begin() { return layers_.begin(); }
+        typename Vector::iterator end() { return layers_.end(); }
+        typename Vector::reverse_iterator rbegin() { return layers_.rbegin(); }
+        typename Vector::reverse_iterator rend() { return layers_.rend(); }
 
-        LayerPtrVec::const_iterator begin() const { return layers_.begin(); }
-        LayerPtrVec::const_iterator end() const { return layers_.end(); }
-        LayerPtrVec::const_reverse_iterator rbegin() const { return layers_.rbegin(); }
-        LayerPtrVec::const_reverse_iterator rend() const { return layers_.rend(); }
+        typename Vector::const_iterator begin() const { return layers_.begin(); }
+        typename Vector::const_iterator end() const { return layers_.end(); }
+        typename Vector::const_reverse_iterator rbegin() const { return layers_.rbegin(); }
+        typename Vector::const_reverse_iterator rend() const { return layers_.rend(); }
 
     private:
-        LayerPtrVec layers_;
+        Vector layers_;
         uint32_t layer_insert_index_ = 0;
     };
 } // namespace engine::core::_detail
 namespace engine::core
 {
-    class LayerStack : public Layer
+    class LayerStack
+        : public Layer,
+        public Layer::HandleEvent,
+        public Layer::HandleUpdate,
+        public Layer::HandleRender,
+        public Layer::HandleGuiRender,
+        public Layer::HandleTick
     {
     public:
         using Layer::Layer;
@@ -55,11 +63,11 @@ namespace engine::core
 
     private:
         std::vector<std::shared_ptr<Layer>> all_;
-        _detail::UnderlyingStack update_;
-        _detail::UnderlyingStack render_;
-        _detail::UnderlyingStack gui_render_;
-        _detail::UnderlyingStack event_;
-        _detail::UnderlyingStack tick_;
+        _detail::UnderlyingStack<Layer::HandleUpdate> update_;
+        _detail::UnderlyingStack<Layer::HandleRender> render_;
+        _detail::UnderlyingStack<Layer::HandleGuiRender> gui_render_;
+        _detail::UnderlyingStack<Layer::HandleEvent> event_;
+        _detail::UnderlyingStack<Layer::HandleTick> tick_;
     };
 } // namespace engine::core
 #include "layer-stack.inl"

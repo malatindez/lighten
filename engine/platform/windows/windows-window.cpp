@@ -172,26 +172,29 @@ namespace engine::platform::windows
         vp.TopLeftY = 0;
         direct3d::api::devcon4->RSSetViewports(1, &vp);
     }
-    direct3d::SwapChain1 initializeSwapchain(HWND hWnd)
+    direct3d::SwapChain1 initializeSwapchain(HWND hWnd, core::math::ivec2 const &window_size)
     {
         DXGI_SWAP_CHAIN_DESC1 desc;
         ZeroMemory(&desc, sizeof(DXGI_SWAP_CHAIN_DESC1));
+        desc.Width = window_size.x;
+        desc.Height = window_size.y;
         desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         desc.Stereo = FALSE;
         desc.SampleDesc.Count = 1;
         desc.SampleDesc.Quality = 0;
-        desc.BufferUsage = DXGI_USAGE_BACK_BUFFER | DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         desc.BufferCount = 2;
         desc.Scaling = DXGI_SCALING_NONE;
         desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
         desc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
         desc.Flags = 0;
 
-        IDXGISwapChain1 *swapchain;
-        if (FAILED(direct3d::api::factory5->CreateSwapChainForHwnd(direct3d::api::device5, hWnd, &desc, nullptr, nullptr, &swapchain)))
-        {
-            throw Window::WindowError(utils::CurrentSourceLocation() + "Failed to initialize swapchain for hwnd");
-        }
+        IDXGISwapChain1 *swapchain = nullptr;
+        spdlog::info(std::to_string(reinterpret_cast<uint64_t>(&direct3d::api::device)));
+        spdlog::info(std::to_string(reinterpret_cast<uint64_t>(hWnd)));
+        SetLastError(0);
+        direct3d::AlwaysAssert(direct3d::api::factory5->CreateSwapChainForHwnd(direct3d::api::device, hWnd, &desc, nullptr, nullptr, &swapchain),
+                               "Failed to create the swapchain");
         return direct3d::SwapChain1 { swapchain };
     }
 
@@ -199,17 +202,13 @@ namespace engine::platform::windows
     {
         ID3D11Texture2D *frame_buffer = nullptr;
 
-        if (FAILED(swapchain_->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void **>(&frame_buffer))))
-        {
-            throw Window::WindowError(utils::CurrentSourceLocation() + "Failed to initialize framebuffer");
-        }
+        direct3d::AlwaysAssert(swapchain_->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void **>(&frame_buffer)),
+                               "Failed to get frame buffer");
 
         ID3D11RenderTargetView *frame_buffer_view = nullptr;
 
-        if (FAILED(direct3d::api::device->CreateRenderTargetView(frame_buffer, nullptr, &frame_buffer_view)))
-        {
-            throw Window::WindowError(utils::CurrentSourceLocation() + "Failed to initialize framebuffer");
-        }
+        direct3d::AlwaysAssert(direct3d::api::device->CreateRenderTargetView(frame_buffer, nullptr, &frame_buffer_view),
+                               "Failed to initialize framebuffer");
         frame_buffer_ = frame_buffer;
         frame_buffer_view_ = frame_buffer_view;
     }
@@ -223,24 +222,21 @@ namespace engine::platform::windows
 
         ID3D11Texture2D *depth_buffer;
 
-        if (FAILED(direct3d::api::device->CreateTexture2D(&depth_buffer_desc_, nullptr, &depth_buffer)))
-        {
-            throw Window::WindowError(utils::CurrentSourceLocation() + "Failed to initialize depthbuffer");
-        }
+        direct3d::AlwaysAssert(direct3d::api::device->CreateTexture2D(&depth_buffer_desc_, nullptr, &depth_buffer),
+                               "Failed to initialize depthbuffer");
 
         ID3D11DepthStencilView *depth_buffer_view;
 
-        if (FAILED(direct3d::api::device->CreateDepthStencilView(depth_buffer, nullptr, &depth_buffer_view)))
-        {
-            throw Window::WindowError(utils::CurrentSourceLocation() + "Failed to initialize depthbuffer");
-        }
+        direct3d::AlwaysAssert(direct3d::api::device->CreateDepthStencilView(depth_buffer, nullptr, &depth_buffer_view),
+                               "Failed to initialize depthbuffer");
+
         depth_buffer_ = depth_buffer;
         depth_buffer_view_ = depth_buffer_view;
     }
 
     void Window::initialize_d3d()
     {
-        swapchain_ = initializeSwapchain(handle());
+        swapchain_ = initializeSwapchain(handle(), size_);
         OnSizeChangeEnd();
     }
 } // namespace engine::platform::windows

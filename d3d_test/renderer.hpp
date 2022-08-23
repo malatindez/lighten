@@ -7,7 +7,9 @@
 #include "platform/windows/windows-render-pipeline.hpp"
 #include "render/model.hpp"
 #include "render/uniform-buffer.hpp"
-class Renderer : public engine::core::Layer
+class Renderer
+    : public engine::core::Layer,
+    public engine::core::Layer::HandleRender
 {
 public:
     Renderer();

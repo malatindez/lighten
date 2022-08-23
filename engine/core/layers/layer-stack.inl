@@ -2,16 +2,54 @@
 #include "layer-stack.hpp"
 namespace engine::core
 {
+    namespace _detail
+    {
+        template <typename T>
+        void UnderlyingStack<T>::PushLayer(T *layer)
+        {
+            layers_.emplace(layers_.begin() + layer_insert_index_, layer);
+            layer_insert_index_++;
+        }
+        template <typename T>
+        void UnderlyingStack<T>::PushOverlay(T *overlay)
+        {
+            layers_.emplace_back(overlay);
+        }
+        template <typename T>
+        void UnderlyingStack<T>::PopLayer(T *layer)
+        {
+            auto it = std::find(layers_.begin(), layers_.begin() + layer_insert_index_, layer);
+            if (it != layers_.begin() + layer_insert_index_) [[likely]]
+            {
+                layers_.erase(it);
+                layer_insert_index_--;
+            }
+        }
+        template <typename T>
+        void UnderlyingStack<T>::PopOverlay(T *overlay)
+        {
+            auto it = std::find(layers_.begin() + layer_insert_index_, layers_.end(), overlay);
+            if (it != layers_.end()) [[likely]]
+            {
+                layers_.erase(it);
+            }
+        }
+        template <typename T>
+        bool UnderlyingStack<T>::HasLayer(T *layer)
+        {
+            return layers_.end() != std::find(layers_.begin(), layers_.end(), layer);
+        }
+    } // namespace _detail
     namespace _layer_stack_detail
     {
         template <typename T>
         constexpr bool StaticCheck()
         {
-            return &T::OnUpdate != &Layer::OnUpdate ||
-                &T::OnRender != &Layer::OnRender ||
-                &T::OnGuiRender != &Layer::OnGuiRender ||
-                &T::OnEvent != &Layer::OnEvent ||
-                &T::OnTick != &Layer::OnTick;
+            return std::is_base_of_v<Layer::HandleEvent, T> ||
+                std::is_base_of_v<Layer::HandleUpdate, T> ||
+                std::is_base_of_v<Layer::HandleRender, T> ||
+                std::is_base_of_v<Layer::HandleGuiRender, T> ||
+                std::is_base_of_v<Layer::HandleTick, T>;
         }
     }
     template <typename T>
@@ -24,25 +62,25 @@ namespace engine::core
             return;
         }
         all_.push_back(static_pointer_cast<Layer>(layer));
-        if constexpr (&T::OnUpdate != &Layer::OnUpdate)
+        if constexpr (std::is_base_of_v<Layer::HandleUpdate, T>)
         {
-            update_.PushLayer(static_pointer_cast<Layer>(layer));
+            update_.PushLayer(static_cast<Layer::HandleUpdate *>(layer.get()));
         }
-        if constexpr (&T::OnRender != &Layer::OnRender)
+        if constexpr (std::is_base_of_v<Layer::HandleRender, T>)
         {
-            render_.PushLayer(static_pointer_cast<Layer>(layer));
+            render_.PushLayer(static_cast<Layer::HandleRender *>(layer.get()));
         }
-        if constexpr (&T::OnGuiRender != &Layer::OnGuiRender)
+        if constexpr (std::is_base_of_v<Layer::HandleGuiRender, T>)
         {
-            gui_render_.PushLayer(static_pointer_cast<Layer>(layer));
+            gui_render_.PushLayer(static_cast<Layer::HandleGuiRender *>(layer.get()));
         }
-        if constexpr (&T::OnEvent != &Layer::OnEvent)
+        if constexpr (std::is_base_of_v<Layer::HandleEvent, T>)
         {
-            event_.PushLayer(static_pointer_cast<Layer>(layer));
+            event_.PushLayer(static_cast<Layer::HandleEvent *>(layer.get()));
         }
-        if constexpr (&T::OnTick != &Layer::OnTick)
+        if constexpr (std::is_base_of_v<Layer::HandleTick, T>)
         {
-            tick_.PushLayer(static_pointer_cast<Layer>(layer));
+            tick_.PushLayer(static_cast<Layer::HandleTick *>(layer.get()));
         }
         layer->OnAttach();
     }
@@ -56,25 +94,25 @@ namespace engine::core
             return;
         }
         all_.push_back(static_pointer_cast<Layer>(layer));
-        if constexpr (&T::OnUpdate != &Layer::OnUpdate)
+        if constexpr (std::is_base_of_v<Layer::HandleUpdate, T>)
         {
-            update_.PushOverlay(static_pointer_cast<Layer>(layer));
+            update_.PushOverlay(static_cast<Layer::HandleUpdate *>(layer.get()));
         }
-        if constexpr (&T::OnRender != &Layer::OnRender)
+        if constexpr (std::is_base_of_v<Layer::HandleRender, T>)
         {
-            render_.PushOverlay(static_pointer_cast<Layer>(layer));
+            render_.PushOverlay(static_cast<Layer::HandleRender *>(layer.get()));
         }
-        if constexpr (&T::OnGuiRender != &Layer::OnGuiRender)
+        if constexpr (std::is_base_of_v<Layer::HandleGuiRender, T>)
         {
-            gui_render_.PushOverlay(static_pointer_cast<Layer>(layer));
+            gui_render_.PushOverlay(static_cast<Layer::HandleGuiRender *>(layer.get()));
         }
-        if constexpr (&T::OnEvent != &Layer::OnEvent)
+        if constexpr (std::is_base_of_v<Layer::HandleEvent, T>)
         {
-            event_.PushOverlay(static_pointer_cast<Layer>(layer));
+            event_.PushOverlay(static_cast<Layer::HandleEvent *>(layer.get()));
         }
-        if constexpr (&T::OnTick != &Layer::OnTick)
+        if constexpr (std::is_base_of_v<Layer::HandleTick, T>)
         {
-            tick_.PushOverlay(static_pointer_cast<Layer>(layer));
+            tick_.PushOverlay(static_cast<Layer::HandleTick *>(layer.get()));
         }
         layer->OnAttach();
     }
@@ -92,27 +130,27 @@ namespace engine::core
             spdlog::warn("Warning: trying to pop layer that doesnt exist. Skipping");
             return;
         }
-        if constexpr (&T::OnUpdate != &Layer::OnUpdate)
+        if constexpr (std::is_base_of_v<Layer::HandleUpdate, T>)
         {
-            update_.PopLayer(static_pointer_cast<Layer>(layer));
+            update_.PopLayer(static_cast<Layer::HandleUpdate *>(layer.get()));
         }
-        if constexpr (&T::OnRender != &Layer::OnRender)
+        if constexpr (std::is_base_of_v<Layer::HandleRender, T>)
         {
-            render_.PopLayer(static_pointer_cast<Layer>(layer));
+            render_.PopLayer(static_cast<Layer::HandleRender *>(layer.get()));
         }
-        if constexpr (&T::OnGuiRender != &Layer::OnGuiRender)
+        if constexpr (std::is_base_of_v<Layer::HandleGuiRender, T>)
         {
-            gui_render_.PopLayer(static_pointer_cast<Layer>(layer));
+            gui_render_.PopLayer(static_cast<Layer::HandleGuiRender *>(layer.get()));
         }
-        if constexpr (&T::OnEvent != &Layer::OnEvent)
+        if constexpr (std::is_base_of_v<Layer::HandleEvent, T>)
         {
-            event_.PopLayer(static_pointer_cast<Layer>(layer));
+            event_.PopLayer(static_cast<Layer::HandleEvent *>(layer.get()));
         }
-        if constexpr (&T::OnTick != &Layer::OnTick)
+        if constexpr (std::is_base_of_v<Layer::HandleTick, T>)
         {
-            tick_.PopLayer(static_pointer_cast<Layer>(layer));
+            tick_.PopLayer(static_cast<Layer::HandleTick *>(layer.get()));
         }
-            layer->OnDetach();
+        layer->OnDetach();
     }
     template <typename T>
     void LayerStack::PopOverlay(std::shared_ptr<T> layer)
@@ -128,27 +166,27 @@ namespace engine::core
             spdlog::warn("Warning: trying to pop overlay that doesnt exist. Skipping");
             return;
         }
-        if constexpr (&T::OnUpdate != &Layer::OnUpdate)
+        if constexpr (std::is_base_of_v<Layer::HandleUpdate, T>)
         {
-            update_.PopOverlay(static_pointer_cast<Layer>(layer));
+            update_.PopOverlay(static_cast<Layer::HandleUpdate *>(layer.get()));
         }
-        if constexpr (&T::OnRender != &Layer::OnRender)
+        if constexpr (std::is_base_of_v<Layer::HandleRender, T>)
         {
-            render_.PopOverlay(static_pointer_cast<Layer>(layer));
+            render_.PopOverlay(static_cast<Layer::HandleRender *>(layer.get()));
         }
-        if constexpr (&T::OnGuiRender != &Layer::OnGuiRender)
+        if constexpr (std::is_base_of_v<Layer::HandleGuiRender, T>)
         {
-            gui_render_.PopOverlay(static_pointer_cast<Layer>(layer));
+            gui_render_.PopOverlay(static_cast<Layer::HandleGuiRender *>(layer.get()));
         }
-        if constexpr (&T::OnEvent != &Layer::OnEvent)
+        if constexpr (std::is_base_of_v<Layer::HandleEvent, T>)
         {
-            event_.PopOverlay(static_pointer_cast<Layer>(layer));
+            event_.PopOverlay(static_cast<Layer::HandleEvent *>(layer.get()));
         }
-        if constexpr (&T::OnTick != &Layer::OnTick)
+        if constexpr (std::is_base_of_v<Layer::HandleTick, T>)
         {
-            tick_.PopOverlay(static_pointer_cast<Layer>(layer));
+            tick_.PopOverlay(static_cast<Layer::HandleTick *>(layer.get()));
         }
-            layer->OnDetach();
+        layer->OnDetach();
     }
     template <typename T>
     bool LayerStack::HasLayer(std::shared_ptr<T> layer)

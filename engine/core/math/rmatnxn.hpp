@@ -38,8 +38,8 @@ namespace engine::core::math
         // sets all values to zero
         constexpr void reset() noexcept;
 
-        [[nodiscard]] constexpr rvec<b, T> &operator[](size_t i);
-        [[nodiscard]] constexpr rvec<b, T> const &operator[](size_t i) const;
+        [[nodiscard]] constexpr _detail::rvec<b, T> &operator[](size_t i);
+        [[nodiscard]] constexpr _detail::rvec<b, T> const &operator[](size_t i) const;
         [[nodiscard]] constexpr rmat<a, b, T> const &operator+() const noexcept;
         [[nodiscard]] constexpr mat<a, b, T> operator-() const noexcept;
 
@@ -67,7 +67,7 @@ namespace engine::core::math
         union
         {
             std::array<_detail::primitive_reference_wrapper<T>, size.x *size.y> arr;
-            std::array<rvec<size.y, T>, size.x> data;
+            std::array<_detail::rvec<size.y, T>, size.x> data;
         };
         static_assert(sizeof(arr) == sizeof(data));
     };

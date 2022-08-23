@@ -1,24 +1,26 @@
 #pragma once
 #include "layer.hpp"
-#include "utils/utils.hpp"
 #include "render/model.hpp"
+#include "utils/utils.hpp"
 namespace engine::core
 {
     class Engine;
-    class ModelLoader final : public Layer
+    class ModelLoader final
     {
     public:
         std::shared_ptr<render::Model> Load(std::filesystem::path const &path);
         [[nodiscard]] static std::shared_ptr<ModelLoader> instance() noexcept { return instance_; }
 
-        void OnAttach() override { utils::Assert(!attached_); attached_ = true; }
-        void OnDetach() override { utils::Assert(attached_); attached_ = false; }
-
     private:
         friend class ::engine::core::Engine;
 
-        static void Init() { utils::Assert(instance_ == nullptr); instance_ = std::shared_ptr<ModelLoader>(new ModelLoader()); }
+        static void Init()
+        {
+            utils::Assert(instance_ == nullptr);
+            instance_ = std::shared_ptr<ModelLoader>(new ModelLoader());
+        }
         static void Deinit() { instance_ = nullptr; }
+
     private:
         ModelLoader() {}
 

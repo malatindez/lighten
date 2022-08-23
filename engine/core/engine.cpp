@@ -2,9 +2,9 @@
 #include "direct3d11/direct3d11.hpp"
 #include "include/win-debug.hpp"
 
+#include "layers/input-layer.hpp"
 #include "layers/shader-manager.hpp"
 #include "layers/texture-manager.hpp"
-#include "layers/input-layer.hpp"
 
 static std::string const kDefaultConfig =
 R"(
@@ -75,28 +75,40 @@ namespace engine::core
     {
         render_.reset();
         tick_.reset();
-        while (running_)
+        try
         {
-            OnUpdate();
-
-            if (tick_.elapsed() > kTickDuration)
+            while (running_)
             {
-                float dt = tick_.elapsed();
-                tick_.reset();
-                OnTick(dt);
-            }
+                OnUpdate();
 
-            if (render_.elapsed() > kFrameDuration)
-            {
-                render_.reset();
-                OnRender();
+                if (tick_.elapsed() > kTickDuration)
+                {
+                    float dt = tick_.elapsed();
+                    tick_.reset();
+                    OnTick(dt);
+                }
+
+                if (render_.elapsed() > kFrameDuration)
+                {
+                    render_.reset();
+                    OnRender();
+                }
+                
+                direct3d::LogDebugInfoQueue();
+
+                std::this_thread::yield();
             }
-            std::this_thread::yield();
+        }
+        catch (...)
+        {
+            spdlog::critical("Exception occurred within the engine layers. Shutting down.");
+            Exit();
         }
     }
     Engine::Engine()
     {
-        event_function_ = std::bind_front(&Engine::OnEvent);
+        event_function_ = std::bind_front([this](Event &e) __lambda_force_inline
+                                          { OnEvent(e); });
         std::ifstream config("config.ini");
         std::stringstream data;
         if (config.is_open())

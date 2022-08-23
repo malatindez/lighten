@@ -1,7 +1,4 @@
-cbuffer PerFrame : register(b0)
-{
-	row_major matrix view_projection;
-}
+#include "../globals/vs.hlsli"
 cbuffer PerModel : register(b1)
 {
     row_major matrix world_transform;

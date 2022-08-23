@@ -63,7 +63,7 @@ void Controller::OnTick([[maybe_unused]] float delta_time)
     }
     else
     {
-        previous_mouse_position = core::math::vec2 { -1, -1 };
+        previous_mouse_position = core::math::ivec2 { -1, -1 };
     }
     camera_controller_->OnTick(delta_time, pixel_delta);
 

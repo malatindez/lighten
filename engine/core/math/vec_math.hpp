@@ -10,6 +10,23 @@ namespace engine::core::math
     template <AnyVec U>
     constexpr std::ostream &operator<<(std::ostream &os, U &vec);
 
+    template <size_t n, AnyVec Vector>
+    [[nodiscard]] constexpr vec<n, typename Vector::type> &as_rvec(Vector &v) noexcept requires(n >= 2 && n <= Vector::size);
+    template <AnyVec Vector>
+    [[nodiscard]] constexpr vec<Vector::size, typename Vector::type> &as_rvec(Vector &v) noexcept;
+
+    template <size_t n, Primitive U, AnyVec Vector>
+    [[nodiscard]] constexpr vec<n, U> as_vec(Vector const &v) noexcept requires(n >= 2 && n <= Vector::size);
+    template <size_t n, AnyVec Vector>
+    [[nodiscard]] constexpr vec<n, std::remove_const_t<typename Vector::type>> as_vec(Vector const &v) noexcept requires(n >= 2 && n <= Vector::size);
+    template <AnyVec Vector>
+    [[nodiscard]] constexpr vec<Vector::size, std::remove_const_t<typename Vector::type>> as_vec(Vector const &v) noexcept;
+
+    template <size_t n, AnyVec Vector>
+    [[nodiscard]] constexpr vec<n, typename Vector::type> const &as_crvec(Vector const &v) noexcept requires(n >= 2 && n <= Vector::size);
+    template <AnyVec Vector>
+    [[nodiscard]] constexpr vec<Vector::size, typename Vector::type> const &as_crvec(Vector const &v) noexcept;
+
     template <size_t size, Primitive T, Primitive U>
     [[nodiscard]] constexpr vec<size, T> operator+(vec<size, T> const &vector, U const value) noexcept;
     template <size_t size, Primitive T, Primitive U>
@@ -22,22 +39,24 @@ namespace engine::core::math
     template <size_t size, Primitive T, Primitive U>
     [[nodiscard]] constexpr vec<size, T> operator*(U const value, vec<size, T> const &vector) noexcept;
     template <size_t size, Primitive T, Primitive U>
+    [[nodiscard]] constexpr vec<size, T> operator/(U const value, vec<size, T> const &vector) noexcept;
+    template <size_t size, Primitive T, Primitive U>
     [[nodiscard]] constexpr vec<size, T> operator+(U const value, vec<size, T> const &vector) noexcept;
     template <size_t size, Primitive T, Primitive U>
     [[nodiscard]] constexpr vec<size, T> operator-(U const value, vec<size, T> const &vector) noexcept;
 
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator*(U const value, rvec<size, T> const &vector) noexcept;
+    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator*(U const value, _detail::rvec<size, T> const &vector) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator+(rvec<size, T> const &vector, U const value) noexcept;
+    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator+(_detail::rvec<size, T> const &vector, U const value) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator-(rvec<size, T> const &vector, U const value) noexcept;
+    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator-(_detail::rvec<size, T> const &vector, U const value) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator*(rvec<size, T> const &vector, U const value) noexcept;
+    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator*(_detail::rvec<size, T> const &vector, U const value) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator/(rvec<size, T> const &vector, U const value) noexcept;
+    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator/(_detail::rvec<size, T> const &vector, U const value) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator%(rvec<size, T> const &left, U const value) noexcept;
+    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator%(_detail::rvec<size, T> const &left, U const value) noexcept;
 
     template <size_t size, Primitive T, Primitive U>
     [[nodiscard]] constexpr vec<size, T> operator+(vec<size, T> const &left, vec<size, U> const &right) noexcept;
@@ -53,37 +72,37 @@ namespace engine::core::math
     [[nodiscard]] constexpr vec<size, T> operator%(vec<size, T> const &left, vec<size, U> const &right) noexcept;
 
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator+(rvec<size, T> const &left, vec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator+(_detail::rvec<size, T> const &left, vec<size, U> const &right) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator-(rvec<size, T> const &left, vec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator-(_detail::rvec<size, T> const &left, vec<size, U> const &right) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator*(rvec<size, T> const &left, vec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator*(_detail::rvec<size, T> const &left, vec<size, U> const &right) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator/(rvec<size, T> const &left, vec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator/(_detail::rvec<size, T> const &left, vec<size, U> const &right) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator%(rvec<size, T> const &left, vec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator%(_detail::rvec<size, T> const &left, vec<size, U> const &right) noexcept;
 
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator+(rvec<size, T> const &left, rvec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator+(_detail::rvec<size, T> const &left, _detail::rvec<size, U> const &right) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator-(rvec<size, T> const &left, rvec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator-(_detail::rvec<size, T> const &left, _detail::rvec<size, U> const &right) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator*(rvec<size, T> const &left, rvec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator*(_detail::rvec<size, T> const &left, _detail::rvec<size, U> const &right) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator/(rvec<size, T> const &left, rvec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator/(_detail::rvec<size, T> const &left, _detail::rvec<size, U> const &right) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator%(rvec<size, T> const &left, rvec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, std::remove_const_t<T>> operator%(_detail::rvec<size, T> const &left, _detail::rvec<size, U> const &right) noexcept;
 
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T> operator+(vec<size, T> const &left, rvec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, T> operator+(vec<size, T> const &left, _detail::rvec<size, U> const &right) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T> operator-(vec<size, T> const &left, rvec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, T> operator-(vec<size, T> const &left, _detail::rvec<size, U> const &right) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T> operator*(vec<size, T> const &left, rvec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, T> operator*(vec<size, T> const &left, _detail::rvec<size, U> const &right) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T> operator/(vec<size, T> const &left, rvec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, T> operator/(vec<size, T> const &left, _detail::rvec<size, U> const &right) noexcept;
     template <size_t size, Primitive T, Primitive U>
-    [[nodiscard]] constexpr vec<size, T> operator%(vec<size, T> const &left, rvec<size, U> const &right) noexcept;
+    [[nodiscard]] constexpr vec<size, T> operator%(vec<size, T> const &left, _detail::rvec<size, U> const &right) noexcept;
 
     template <AnyVec T, AnyVec U>
     [[nodiscard]] constexpr bool operator==(T const &left, U const &right) noexcept requires(T::size == U::size);
