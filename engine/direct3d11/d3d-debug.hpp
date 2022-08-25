@@ -12,6 +12,34 @@ namespace engine::direct3d
             return std::system_category().message(hr) + ". Last error: " + utils::FormatErrorAsString(last_error) + " or " + std::to_string(last_error);
         }
     }
+    inline void LogDebugInfoQueue()
+    {
+#if !defined(_DEBUG)
+        return;
+#else
+        UINT64 message_count = api::debug_info_queue->GetNumStoredMessages();
+
+        for (UINT64 i = 0; i < message_count; i++)
+        {
+            SIZE_T message_size = 0;
+            api::debug_info_queue->GetMessage(i, nullptr, &message_size); //get the size of the message
+
+            D3D11_MESSAGE *message = (D3D11_MESSAGE *)malloc(message_size); //allocate enough space
+            if (message == nullptr || FAILED(api::debug_info_queue->GetMessage(i, message, &message_size)))
+            {
+                free(message);
+                continue;
+            }
+
+            spdlog::debug("[DirectX11] " + std::string(message->pDescription, message->pDescription + message->DescriptionByteLength));
+
+            free(message);
+        }
+
+        api::debug_info_queue->ClearStoredMessages();
+#endif
+    }
+
 #ifdef ENGINE_NO_SOURCE_LOCATION
     inline void Assert(HRESULT hr, std::string_view message = "")
     {
@@ -35,32 +63,6 @@ namespace engine::direct3d
         utils::Assert(SUCCEEDED(hr), std::basic_string(message) + " " + _detail::GetLastErrorInfo(hr));
     }
 #else
-    inline void LogDebugInfoQueue()
-    {
-#if !defined(_DEBUG)
-        return;
-#else
-        UINT64 message_count = api::debug_info_queue->GetNumStoredMessages();
-
-        for (UINT64 i = 0; i < message_count; i++)
-        {
-            SIZE_T message_size = 0;
-            api::debug_info_queue->GetMessage(i, nullptr, &message_size); //get the size of the message
-
-            D3D11_MESSAGE *message = (D3D11_MESSAGE *)malloc(message_size); //allocate enough space
-            if (FAILED(api::debug_info_queue->GetMessage(i, message, &message_size)))
-            {
-                continue;
-            }
-
-            spdlog::debug("[DirectX11] " + std::string(message->pDescription, message->pDescription + message->DescriptionByteLength));
-
-            free(message);
-        }
-
-        api::debug_info_queue->ClearStoredMessages();
-#endif
-    }
     inline void Assert(HRESULT hr, std::string_view message = "", std::source_location location = std::source_location::current())
     {
         if constexpr (!DEBUG_UTILS_DEBUG_ENABLED)

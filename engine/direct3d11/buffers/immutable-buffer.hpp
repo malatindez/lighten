@@ -20,4 +20,4 @@ namespace engine::direct3d
             BufferBase<T>::Init(std::move(desc), ptr, size);
         }
     };
-} // namespace engine::direct3d11
+} // namespace engine::direct3d
