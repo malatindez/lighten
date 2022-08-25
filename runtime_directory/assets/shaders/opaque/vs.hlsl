@@ -1,25 +1,33 @@
 #include "../globals/vs.hlsli"
-cbuffer PerModel : register(b1)
-{
-    row_major matrix world_transform;
-}
-cbuffer PerMesh : register(b2)
+cbuffer PerMesh : register(b1)
 {
     row_major matrix mesh_transform;
 }
 
-struct VOut {
+struct VS_OUT {
 	float4 pos : SV_POSITION;
 	float2 texcoord : TEXCOORD;
 };
 
-VOut vs_main(float4 pos : POSITION, float2 texcoord : TEXCOORD)
+struct VS_INPUT
 {
-	VOut output;
-	output.pos = mul(pos, mesh_transform);
-	output.pos = mul(pos, world_transform);
+	float4 pos : POSITION;
+	float2 texcoord : TEXCOORD;
+	float4 RowX : ROWX;
+	float4 RowY : ROWY;
+	float4 RowZ : ROWZ;
+	float4 RowW : ROWW;
+};
+
+VS_OUT vs_main(VS_INPUT input)
+{
+	VS_OUT output;
+	float4x4 world_transform = float4x4(input.RowX, input.RowY, input.RowZ, input.RowW);
+	input.pos.w = 1;
+	output.pos = mul(input.pos, mesh_transform);
+	output.pos = mul(output.pos, world_transform);
 	output.pos = mul(output.pos, view_projection);
-	output.texcoord = texcoord;
+	output.texcoord = input.texcoord;
 	
 	return output;
 }

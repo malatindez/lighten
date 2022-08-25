@@ -3,48 +3,74 @@ using namespace engine;
 using namespace core;
 using namespace events;
 using namespace math;
-
-Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &window_size) : current_mouse_position_(InputLayer::instance()->mouse_position()), renderer_ { renderer }
+using namespace components;
+Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &window_size) : current_mouse_position_(InputLayer::instance()->mouse_position()), renderer_{ renderer }
 {
-    camera_controller_ = std::make_unique<CameraController>(
-        &camera_, &camera_transform_, window_size);
+    first_scene = std::make_shared<Scene>();
+
+    auto &registry = first_scene->registry;
+    auto main_camera = registry.create();
+    auto &camera = registry.emplace<CameraComponent>(main_camera, CameraComponent());
+    auto &camera_transform = registry.emplace<TransformComponent>(main_camera, TransformComponent());
+    registry.emplace<TagComponent>(main_camera, TagComponent{ .tag = "Main Camera" });
+    first_scene->main_camera = std::make_unique<CameraController>(&registry, main_camera, window_size);
+    Engine::SetScene(first_scene);
+    int amount = 22;
+    for (int i = 0; i < amount; i++)
+    {
+        auto knight = registry.create();
+        auto &transform = registry.emplace<TransformComponent>(knight);
+        registry.emplace<OpaqueComponent>(knight);
+        registry.emplace<ModelComponent>(knight).model_id = renderer->knight_model_id;
+        transform.position = vec3
+        {
+            std::sin(float(i) / amount * 2 * (float)std::numbers::pi),
+            0,
+            std::cos(float(i) / amount * 2 * (float)std::numbers::pi)
+        } *(amount / std::sqrtf(amount));
+        transform.rotation = QuaternionFromEuler(radians(180.0f), 0.0f, radians(180.0f));
+        transform.rotation *= QuaternionFromRotationMatrix(lookAt(transform.position, vec3{ 0,0,0 }, vec3{ 0,1,0 }).as_rmat<3, 3>());
+        transform.UpdateMatrices();
+    }
+    render::ModelSystem::instance()->OnInstancesUpdated(registry);
     auto input = InputLayer::instance();
+
     input->AddUpdateKeyCallback(
-        InputLayer::KeySeq { engine::core::Key::KEY_W },
-        [this] (InputLayer::KeySeq const &, uint32_t)
-        { camera_controller_->flags() |= CameraController::MoveForward; });
+        InputLayer::KeySeq{ engine::core::Key::KEY_W },
+        [this](InputLayer::KeySeq const &, uint32_t)
+        { first_scene->main_camera->flags() |= CameraController::MoveForward; });
     input->AddUpdateKeyCallback(
-        InputLayer::KeySeq { engine::core::Key::KEY_S },
-        [this] (InputLayer::KeySeq const &, uint32_t)
-        { camera_controller_->flags() |= CameraController::MoveBackwards; });
+        InputLayer::KeySeq{ engine::core::Key::KEY_S },
+        [this](InputLayer::KeySeq const &, uint32_t)
+        { first_scene->main_camera->flags() |= CameraController::MoveBackwards; });
     input->AddUpdateKeyCallback(
-        InputLayer::KeySeq { engine::core::Key::KEY_A },
-        [this] (InputLayer::KeySeq const &, uint32_t)
-        { camera_controller_->flags() |= CameraController::MoveLeft; });
+        InputLayer::KeySeq{ engine::core::Key::KEY_A },
+        [this](InputLayer::KeySeq const &, uint32_t)
+        { first_scene->main_camera->flags() |= CameraController::MoveLeft; });
     input->AddUpdateKeyCallback(
-        InputLayer::KeySeq { engine::core::Key::KEY_D },
-        [this] (InputLayer::KeySeq const &, uint32_t)
-        { camera_controller_->flags() |= CameraController::MoveRight; });
+        InputLayer::KeySeq{ engine::core::Key::KEY_D },
+        [this](InputLayer::KeySeq const &, uint32_t)
+        { first_scene->main_camera->flags() |= CameraController::MoveRight; });
     input->AddUpdateKeyCallback(
-        InputLayer::KeySeq { engine::core::Key::KEY_SPACE },
-        [this] (InputLayer::KeySeq const &, uint32_t)
-        { camera_controller_->flags() |= CameraController::MoveUp; });
+        InputLayer::KeySeq{ engine::core::Key::KEY_SPACE },
+        [this](InputLayer::KeySeq const &, uint32_t)
+        { first_scene->main_camera->flags() |= CameraController::MoveUp; });
     input->AddUpdateKeyCallback(
-        InputLayer::KeySeq { engine::core::Key::KEY_CONTROL },
-        [this] (InputLayer::KeySeq const &, uint32_t)
-        { camera_controller_->flags() |= CameraController::MoveDown; });
+        InputLayer::KeySeq{ engine::core::Key::KEY_CONTROL },
+        [this](InputLayer::KeySeq const &, uint32_t)
+        { first_scene->main_camera->flags() |= CameraController::MoveDown; });
     input->AddUpdateKeyCallback(
-        InputLayer::KeySeq { engine::core::Key::KEY_Q },
-        [this] (InputLayer::KeySeq const &, uint32_t)
-        { camera_controller_->flags() |= CameraController::RotateLeft; });
+        InputLayer::KeySeq{ engine::core::Key::KEY_Q },
+        [this](InputLayer::KeySeq const &, uint32_t)
+        { first_scene->main_camera->flags() |= CameraController::RotateLeft; });
     input->AddUpdateKeyCallback(
-        InputLayer::KeySeq { engine::core::Key::KEY_E },
-        [this] (InputLayer::KeySeq const &, uint32_t)
-        { camera_controller_->flags() |= CameraController::RotateRight; });
+        InputLayer::KeySeq{ engine::core::Key::KEY_E },
+        [this](InputLayer::KeySeq const &, uint32_t)
+        { first_scene->main_camera->flags() |= CameraController::RotateRight; });
     input->AddUpdateKeyCallback(
-        InputLayer::KeySeq { engine::core::Key::KEY_SHIFT },
-        [this] (InputLayer::KeySeq const &, uint32_t)
-        { camera_controller_->flags() |= CameraController::Accelerate; });
+        InputLayer::KeySeq{ engine::core::Key::KEY_SHIFT },
+        [this](InputLayer::KeySeq const &, uint32_t)
+        { first_scene->main_camera->flags() |= CameraController::Accelerate; });
 }
 void Controller::OnTick([[maybe_unused]] float delta_time)
 {
@@ -52,10 +78,10 @@ void Controller::OnTick([[maybe_unused]] float delta_time)
     {
         func(delta_time);
     }
-    ivec2 pixel_delta { 0 };
+    ivec2 pixel_delta{ 0 };
     if (InputLayer::instance()->lbutton_down())
     {
-        if (previous_mouse_position == core::math::vec2 { -1, -1 })
+        if (previous_mouse_position == core::math::vec2{ -1, -1 })
         {
             previous_mouse_position = current_mouse_position_;
         }
@@ -63,11 +89,11 @@ void Controller::OnTick([[maybe_unused]] float delta_time)
     }
     else
     {
-        previous_mouse_position = core::math::ivec2 { -1, -1 };
+        previous_mouse_position = core::math::ivec2{ -1, -1 };
     }
-    camera_controller_->OnTick(delta_time, pixel_delta);
+    first_scene->main_camera->OnTick(delta_time, pixel_delta);
 
-    renderer_->per_frame.view_projection = camera_.view_projection;
+    renderer_->per_frame.view_projection = first_scene->main_camera->camera().view_projection;
     /*if (input_.rbutton_down() && selected_object_)
     {
         Ray a = PixelRaycast(vec2{rb_saved_mouse_position_});

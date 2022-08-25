@@ -1,11 +1,5 @@
 #include "controller.hpp"
-#include "core/engine.hpp"
-#include "core/layers/input-layer.hpp"
-#include "core/layers/model-loader.hpp"
-#include "core/layers/shader-manager.hpp"
 #include "platform/windows/windows-render-pipeline.hpp"
-#include "render/uniform-buffer.hpp"
-#include "renderer.hpp"
 using namespace engine;
 using namespace core;
 using namespace math;
@@ -45,7 +39,8 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
         spdlog::critical("Exception occurred within the engine. Shutting down.");
         app.Exit();
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(250));
     Engine::Deinit();
+    std::this_thread::sleep_for(std::chrono::milliseconds(250));
     return 0;
 }

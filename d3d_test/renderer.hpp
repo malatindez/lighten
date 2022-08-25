@@ -1,30 +1,16 @@
 #pragma once
 #pragma once
 #include "core/engine.hpp"
-#include "core/layers/shader-manager.hpp"
-#include "core/shader-compiler.hpp"
-#include "direct3d11/direct3d11.hpp"
-#include "platform/windows/windows-render-pipeline.hpp"
-#include "render/model.hpp"
-#include "render/uniform-buffer.hpp"
+#include "render/render.hpp"
 class Renderer
     : public engine::core::Layer,
     public engine::core::Layer::HandleRender
 {
 public:
     Renderer();
-    struct PerFrame
-    {
-        engine::core::math::mat4 view_projection;
-    } per_frame;
-
     void OnRender() override;
 
-private:
-    engine::render::UniformBuffer<PerFrame> per_frame_buffer {};
-    engine::render::UniformBuffer<engine::core::math::mat4> per_model_buffer {};
-    engine::render::UniformBuffer<engine::core::math::mat4> per_mesh_buffer {};
-    std::shared_ptr<engine::render::Model> model;
-    std::shared_ptr<engine::render::Model> cube;
-    engine::render::GraphicsShaderProgram shader;
+    engine::render::PerFrame per_frame;
+    engine::direct3d::DynamicUniformBuffer<engine::render::PerFrame> per_frame_buffer{};
+    uint32_t knight_model_id;
 };

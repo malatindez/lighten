@@ -21,8 +21,7 @@ namespace engine
             Accelerate = 1 << 8
         };
 
-        CameraController(components::CameraComponent *camera, components::TransformComponent *transform,
-                         core::math::ivec2 const &window_size);
+        CameraController(entt::registry *registry, entt::entity camera, core::math::ivec2 const &window_size);
 
         void Init();
         void UpdateProjectionMatrix();
@@ -45,44 +44,45 @@ namespace engine
         // returns a projected ray from camera
         [[nodiscard]] inline core::math::Ray Raycast(core::math::vec2 const &ndc) const noexcept
         {
-            core::math::vec4 direction = core::math::vec4(ndc.x, ndc.y, 1, 1) * camera_->inv_view_projection;
-            return core::math::Ray(camera_->position(), core::math::normalize(as_vec<3>(direction) / direction.w - camera_->position()));
+            auto const &cam = camera();
+            core::math::vec4 direction = core::math::vec4(ndc.x, ndc.y, 1, 1) * cam.inv_view_projection;
+            return core::math::Ray(cam.position(), core::math::normalize(as_vec<3>(direction) / direction.w - cam.position()));
         }
 
-        [[nodiscard]] constexpr bool &roll_enabled() noexcept { return roll_enabled_; }
-        [[nodiscard]] constexpr bool const &roll_enabled() const noexcept { return roll_enabled_; }
 
-        [[nodiscard]] constexpr components::CameraComponent const &camera() const noexcept { return *camera_; }
-        [[nodiscard]] constexpr components::TransformComponent const &transform() const noexcept { return *transform_; }
-        [[nodiscard]] constexpr components::CameraComponent &camera() noexcept { return *camera_; }
-        [[nodiscard]] constexpr components::TransformComponent &transform() noexcept { return *transform_; }
+        [[nodiscard]] inline components::CameraComponent const &camera() const noexcept { return registry_->get<components::CameraComponent>(camera_); }
+        [[nodiscard]] inline components::TransformComponent const &transform() const noexcept { registry_->get<components::TransformComponent>(camera_); }
+        [[nodiscard]] inline components::CameraComponent &camera() noexcept { return registry_->get<components::CameraComponent>(camera_); }
+        [[nodiscard]] inline components::TransformComponent &transform() noexcept { return registry_->get<components::TransformComponent>(camera_); }
 
         [[nodiscard]] constexpr core::math::ivec2 const &window_size() const noexcept { return window_size_; }
-        [[nodiscard]] constexpr core::math::vec3 const &position() const noexcept { return transform_->position; }
-        [[nodiscard]] constexpr core::math::quat const &rotation() const noexcept { return transform_->rotation; }
+        [[nodiscard]] inline core::math::vec3 const &position() const noexcept { return transform().position; }
+        [[nodiscard]] inline core::math::quat const &rotation() const noexcept { return transform().rotation; }
 
-        [[nodiscard]] constexpr core::math::vec3 const &right() const noexcept { return core::math::as_crvec<3>(camera_->inv_view[0]); }
-        [[nodiscard]] constexpr core::math::vec3 const &up() const noexcept { return core::math::as_crvec<3>(camera_->inv_view[1]); }
-        [[nodiscard]] constexpr core::math::vec3 const &forward() const noexcept { return core::math::as_crvec<3>(camera_->inv_view[2]); }
+        [[nodiscard]] inline core::math::vec3 const &right() const noexcept { return core::math::as_crvec<3>(camera().inv_view[0]); }
+        [[nodiscard]] inline core::math::vec3 const &up() const noexcept { return core::math::as_crvec<3>(camera().inv_view[1]); }
+        [[nodiscard]] inline core::math::vec3 const &forward() const noexcept { return core::math::as_crvec<3>(camera().inv_view[2]); }
 
-        [[nodiscard]] constexpr float fovy() const noexcept { return camera_->fovy_; }
-        [[nodiscard]] constexpr float z_near() const noexcept { return camera_->z_near_; }
-        [[nodiscard]] constexpr float z_far() const noexcept { return camera_->z_far_; }
+        [[nodiscard]] inline float fovy() const noexcept { return camera().fovy_; }
+        [[nodiscard]] inline float z_near() const noexcept { return camera().z_near_; }
+        [[nodiscard]] inline float z_far() const noexcept { return camera().z_far_; }
 
         [[nodiscard]] constexpr uint32_t &flags() noexcept { return flags_; }
 
-        [[nodiscard]] float &sensivity() noexcept { return sensivity_; }
-        [[nodiscard]] float const &sensivity() const noexcept { return sensivity_; }
-        [[nodiscard]] float &move_speed() noexcept { return move_speed_; }
-        [[nodiscard]] float const &move_speed() const noexcept { return move_speed_; }
-        [[nodiscard]] float &accelerated_speed() noexcept { return accelerated_speed_; }
-        [[nodiscard]] float const &accelerated_speed() const noexcept { return accelerated_speed_; }
-        [[nodiscard]] float &roll_speed() noexcept { return roll_speed_; }
-        [[nodiscard]] float const &roll_speed() const noexcept { return roll_speed_; }
-        void SetNewCamera(components::CameraComponent *camera, components::TransformComponent *transform) noexcept
+        [[nodiscard]] constexpr bool &roll_enabled() noexcept { return roll_enabled_; }
+        [[nodiscard]] constexpr bool const &roll_enabled() const noexcept { return roll_enabled_; }
+        [[nodiscard]] constexpr float &sensivity() noexcept { return sensivity_; }
+        [[nodiscard]] constexpr float const &sensivity() const noexcept { return sensivity_; }
+        [[nodiscard]] constexpr float &move_speed() noexcept { return move_speed_; }
+        [[nodiscard]] constexpr float const &move_speed() const noexcept { return move_speed_; }
+        [[nodiscard]] constexpr float &accelerated_speed() noexcept { return accelerated_speed_; }
+        [[nodiscard]] constexpr float const &accelerated_speed() const noexcept { return accelerated_speed_; }
+        [[nodiscard]] constexpr float &roll_speed() noexcept { return roll_speed_; }
+        [[nodiscard]] constexpr float const &roll_speed() const noexcept { return roll_speed_; }
+        void SetNewCamera(entt::registry *registry, entt::entity new_camera) noexcept
         {
-            camera_ = camera;
-            transform_ = transform;
+            registry_ = registry;
+            camera_ = new_camera;
             Init();
         }
         void OnTick(float delta_time, core::math::ivec2 const &pixel_mouse_delta);
@@ -95,8 +95,8 @@ namespace engine
         float roll_speed_ = engine::core::math::radians(60.0f);
 
     private:
-        components::CameraComponent *camera_;
-        components::TransformComponent *transform_;
+        entt::registry *registry_;
+        entt::entity camera_;
         core::math::ivec2 const &window_size_;
 
         bool update_matrices_ = true;
