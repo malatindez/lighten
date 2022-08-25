@@ -69,7 +69,7 @@ namespace engine::core
                 key_states_[k] = 0;
             }
         }
-        on_update_callbacks_[sequence] = std::tuple { on_hold, 0u, fn };
+        on_update_callbacks_[sequence] = std::tuple{ on_hold, 0u, fn };
     }
     // if on_hold is true then the function will be called each tick/update that the KeySeq is being held
     void InputLayer::AddTickKeyCallback(KeySeq const &sequence, OnTickKeyCallbackFn const &fn, bool on_hold)
@@ -81,7 +81,7 @@ namespace engine::core
                 key_states_[k] = 0;
             }
         }
-        on_tick_callbacks_[sequence] = std::tuple { on_hold, 0u, fn };
+        on_tick_callbacks_[sequence] = std::tuple{ on_hold, 0u, fn };
     }
     void InputLayer::OnTick(float dt)
     {

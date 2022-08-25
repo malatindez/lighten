@@ -6,49 +6,51 @@ LONG NTAPI VexHandler(PEXCEPTION_POINTERS ExceptionInfo)
 
     switch (ExceptionRecord->ExceptionCode)
     {
-        case DBG_PRINTEXCEPTION_WIDE_C:
-        case DBG_PRINTEXCEPTION_C:
+    case DBG_PRINTEXCEPTION_WIDE_C:
+    case DBG_PRINTEXCEPTION_C:
 
-            if (ExceptionRecord->NumberParameters >= 2)
+        if (ExceptionRecord->NumberParameters >= 2)
+        {
+            bool call_free = false;
+            ULONG len = (ULONG)ExceptionRecord->ExceptionInformation[0];
+
+            union
             {
-                bool call_free = false;
-                ULONG len = (ULONG)ExceptionRecord->ExceptionInformation[0];
+                ULONG_PTR up;
+                PCWSTR pwz;
+                PCSTR psz;
+            };
 
-                union
+            up = ExceptionRecord->ExceptionInformation[1];
+
+            if (ExceptionRecord->ExceptionCode == DBG_PRINTEXCEPTION_WIDE_C)
+            {
+                if (ULONG n = WideCharToMultiByte(CP_UTF8, 0, pwz, len, nullptr, 0, nullptr, nullptr))
                 {
-                    ULONG_PTR up;
-                    PCWSTR pwz;
-                    PCSTR psz;
-                };
+                    PSTR sz = (PSTR)_malloca(n * sizeof(CHAR));
 
-                up = ExceptionRecord->ExceptionInformation[1];
-
-                if (ExceptionRecord->ExceptionCode == DBG_PRINTEXCEPTION_WIDE_C)
-                {
-                    if (ULONG n = WideCharToMultiByte(CP_UTF8, 0, pwz, len, nullptr, 0, nullptr, nullptr))
+                    if (len = WideCharToMultiByte(CP_UTF8, 0, pwz, len, sz, n, nullptr, nullptr);
+                        len)
                     {
-                        PSTR sz = (PSTR)_malloca(n * sizeof(CHAR));
-
-                        if (len = WideCharToMultiByte(CP_UTF8, 0, pwz, len, sz, n, nullptr, nullptr);
-                            len)
-                        {
-                            psz = sz;
-                            call_free = true;
-                        }
-                        else
-                        {
-                            _freea((void *)(psz));
-                        }
+                        psz = sz;
+                        call_free = true;
+                    }
+                    else
+                    {
+                        _freea((void *)(psz));
                     }
                 }
-                if (call_free)
-                {
-                    _freea((void *)(psz));
-                }
-
+            }
+            if (psz)
+            {
                 OutputDebugStringCallback(psz);
             }
-            return EXCEPTION_CONTINUE_EXECUTION;
+            if (call_free)
+            {
+                _freea((void *)(psz));
+            }
+        }
+        return EXCEPTION_CONTINUE_EXECUTION;
     }
 
     return EXCEPTION_CONTINUE_SEARCH;

@@ -1,5 +1,5 @@
 #pragma once
-#include "include/pch.hpp"
+#include "include/library-pch.hpp"
 #include <type_traits>
 
 namespace engine::core::math
@@ -27,7 +27,7 @@ namespace engine::core::math
         {
         public:
             using type = T;
-            explicit constexpr primitive_reference_wrapper(T &ref) : ptr_ { std::addressof(ref) } {}
+            explicit constexpr primitive_reference_wrapper(T &ref) : ptr_{ std::addressof(ref) } {}
             constexpr void set_ptr(T &ref) noexcept
             {
                 ptr_ = std::addressof(ref);
@@ -64,7 +64,7 @@ namespace engine::core::math
             }
 
         private:
-            T *ptr_ {};
+            T *ptr_{};
 
         public:
             template <class... Types>

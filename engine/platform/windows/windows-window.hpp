@@ -1,13 +1,7 @@
 #pragma once
-#include <unordered_map>
-
-#include "include/pch.hpp"
+#include "include/engine-pch.hpp"
 #include "include/win.hpp"
 
-#include "direct3d11/direct3d11.hpp"
-
-#include "core/events.hpp"
-#include "core/math.hpp"
 #include "core/window.hpp"
 
 namespace engine::platform::windows
@@ -55,9 +49,9 @@ namespace engine::platform::windows
         Window &operator=(Window const &Window) = delete;
 
         LRESULT CALLBACK WindowProcCallback(HWND handle, UINT message, WPARAM w_param,
-                                            LPARAM l_param);
+            LPARAM l_param);
         static LRESULT CALLBACK StaticWindowProc(HWND handle, UINT message,
-                                                 WPARAM w_param, LPARAM l_param);
+            WPARAM w_param, LPARAM l_param);
 
         HWND handle_;
 

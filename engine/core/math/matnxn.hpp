@@ -9,7 +9,7 @@ namespace engine::core::math
     struct mat
     {
         using type = T;
-        static constexpr vec<2, size_t> size { a, b };
+        static constexpr vec<2, size_t> size{ a, b };
 
         constexpr mat() = default;
         template <Primitive P>

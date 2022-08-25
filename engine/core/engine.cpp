@@ -1,10 +1,6 @@
 #include "engine.hpp"
-#include "direct3d11/direct3d11.hpp"
 #include "include/win-debug.hpp"
-
-#include "layers/input-layer.hpp"
-#include "layers/shader-manager.hpp"
-#include "layers/texture-manager.hpp"
+#include "render/model-system.hpp"
 
 static std::string const kDefaultConfig =
 R"(
@@ -27,9 +23,9 @@ namespace engine::core
         {
             return;
         }
-        application_ = std::unique_ptr<Engine>(new Engine {});
-        debug::RedirectOutputDebugString([&] (std::string_view view)
-                                         { application_->logger_->info(view); });
+        application_ = std::unique_ptr<Engine>(new Engine{});
+        debug::RedirectOutputDebugString([&](std::string_view view)
+            { application_->logger_->info(view); });
         if (config()["Logger"]["console_enabled"].as_boolean())
         {
             AllocConsole();
@@ -42,19 +38,12 @@ namespace engine::core
         }
         spdlog::set_default_logger(application_->logger_);
 
-        auto func = [] (LPEXCEPTION_POINTERS) -> LONG
-        {
-            for (auto const &sink : logger().sinks())
-            {
-                sink->flush();
-            }
-            return EXCEPTION_EXECUTE_HANDLER;
-        };
-
         direct3d::api::Init();
         InputLayer::Init();
         ShaderManager::Init();
         TextureManager::Init();
+        ModelLoader::Init();
+        render::ModelSystem::Init();
     }
 
     void Engine::Deinit()
@@ -64,6 +53,8 @@ namespace engine::core
         InputLayer::Deinit();
         ShaderManager::Deinit();
         TextureManager::Deinit();
+        ModelLoader::Deinit();
+        render::ModelSystem::Deinit();
         direct3d::api::Deinit();
     }
     void Engine::Exit()
@@ -93,7 +84,7 @@ namespace engine::core
                     render_.reset();
                     OnRender();
                 }
-                
+
                 direct3d::LogDebugInfoQueue();
 
                 std::this_thread::yield();
@@ -108,7 +99,7 @@ namespace engine::core
     Engine::Engine()
     {
         event_function_ = std::bind_front([this](Event &e) __lambda_force_inline
-                                          { OnEvent(e); });
+            { OnEvent(e); });
         std::ifstream config("config.ini");
         std::stringstream data;
         if (config.is_open())

@@ -1,5 +1,4 @@
 #pragma once
-#include "include/pch.hpp"
 namespace engine::utils
 {
     template <class clock>

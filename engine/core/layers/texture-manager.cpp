@@ -30,9 +30,9 @@ namespace engine::core
             DirectX::TexMetadata metadata;
             auto image = std::make_unique<DirectX::ScratchImage>();
             direct3d::AlwaysAssert(DirectX::LoadFromTGAFile(path.wstring().c_str(),
-                                                            DirectX::TGA_FLAGS_NONE,
-                                                            &metadata, *image),
-                                   "Failed to load TGA texture from file @ " + path.string());
+                DirectX::TGA_FLAGS_NONE,
+                &metadata, *image),
+                "Failed to load TGA texture from file @ " + path.string());
             D3D11_TEXTURE2D_DESC tdesc;
             ZeroMemory(&tdesc, sizeof(D3D11_TEXTURE2D_DESC));
             tdesc.Format = image->GetImage(0, 0, 0)->format;
@@ -48,14 +48,14 @@ namespace engine::core
             tdesc.MiscFlags = metadata.miscFlags;
 
             D3D11_SUBRESOURCE_DATA srd;
-            srd = D3D11_SUBRESOURCE_DATA {};
+            srd = D3D11_SUBRESOURCE_DATA{};
             srd.pSysMem = image->GetImage(0, 0, 0)->pixels;
             srd.SysMemPitch = (uint32_t)image->GetImage(0, 0, 0)->rowPitch;
             srd.SysMemSlicePitch = 0;
 
             ID3D11Texture2D *texture_ = nullptr;
             direct3d::AlwaysAssert(direct3d::api::device5->CreateTexture2D(&tdesc, &srd, &texture_),
-                                   "Failed to create 2d texture: ");
+                "Failed to create 2d texture: ");
             utils::AlwaysAssert(texture_ != nullptr);
             texture.texture_resource = texture_;
             D3D11_SHADER_RESOURCE_VIEW_DESC srvd;
@@ -64,16 +64,16 @@ namespace engine::core
             srvd.Texture2D.MipLevels = (uint32_t)metadata.mipLevels;
             srvd.Texture2D.MostDetailedMip = 0;
             direct3d::AlwaysAssert(direct3d::api::device5->CreateShaderResourceView(texture_, &srvd, &texture.shader_resorce_view.reset()),
-                                   "Failed to create shader resource view: ");
+                "Failed to create shader resource view: ");
         }
         else
         {
             direct3d::AlwaysAssert(
                 DirectX::CreateWICTextureFromFile(direct3d::api::device5,
-                                                  direct3d::api::devcon4,
-                                                  path.wstring().c_str(),
-                                                  &texture.texture_resource.reset(),
-                                                  &texture.shader_resorce_view.reset()),
+                    direct3d::api::devcon4,
+                    path.wstring().c_str(),
+                    &texture.texture_resource.reset(),
+                    &texture.shader_resorce_view.reset()),
                 "Failed to load wic texture from file @" + path.string());
         }
         textures_.emplace(std::make_pair(std::filesystem::hash_value(path), texture));

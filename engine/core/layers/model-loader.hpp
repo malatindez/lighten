@@ -1,14 +1,13 @@
 #pragma once
-#include "layer.hpp"
 #include "render/model.hpp"
-#include "utils/utils.hpp"
 namespace engine::core
 {
     class Engine;
     class ModelLoader final
     {
     public:
-        std::shared_ptr<render::Model> Load(std::filesystem::path const &path);
+        // Returns id of the model stored in ModelSystem
+        std::optional<uint32_t> Load(std::filesystem::path const &path);
         [[nodiscard]] static std::shared_ptr<ModelLoader> instance() noexcept { return instance_; }
 
     private:
@@ -34,7 +33,7 @@ namespace engine::core
         static std::shared_ptr<ModelLoader> instance_;
 
     private:
-        std::unordered_map<size_t, std::shared_ptr<render::Model>> models_;
+        std::unordered_map<size_t, uint32_t> models_;
 
         bool attached_ = false;
     };

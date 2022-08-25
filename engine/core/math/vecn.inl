@@ -16,7 +16,7 @@ namespace engine::core::math
     constexpr vec<L, T>::vec(U... data)
     {
         static_assert(get_parameter_pack_size<U...>() == size,
-                      "You have provided wrong amount of data");
+            "You have provided wrong amount of data");
         unpack_data(0, data...);
     }
     template <size_t L, Primitive T>

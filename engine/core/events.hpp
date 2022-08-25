@@ -3,7 +3,7 @@
 #include "events/mouse-events.hpp"
 #include "events/util-events.hpp"
 #include "events/window-events.hpp"
-#include "include/pch.hpp"
+#include "include/library-pch.hpp"
 
 namespace engine::core
 {

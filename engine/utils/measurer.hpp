@@ -60,8 +60,8 @@ namespace engine::utils
             float rv = 0;
             size_t counter = 0;
             for (size_t i = entries.size() - 1;
-                 counter < last_n_entries && i >= 0;
-                 ++counter, --i)
+                counter < last_n_entries && i >= 0;
+                ++counter, --i)
             {
                 rv += entries[i];
             }

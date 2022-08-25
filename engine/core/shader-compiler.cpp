@@ -17,19 +17,19 @@ namespace engine::core
                 LPCSTR file_name,
                 [[maybe_unused]] LPCVOID parent_data,
                 LPCVOID *data_ptr,
-                UINT *bytes)
+                UINT *bytes) noexcept
             {
                 std::filesystem::path final_path;
                 switch (include_type)
                 {
-                    case D3D_INCLUDE_LOCAL:
-                        final_path = std::filesystem::path(shader_dir_) / std::filesystem::path(file_name);
-                        break;
-                    case D3D_INCLUDE_SYSTEM:
-                        final_path = file_name;
-                        break;
-                    default:
-                        utils::AlwaysAssert(false);
+                case D3D_INCLUDE_LOCAL:
+                    final_path = std::filesystem::path(shader_dir_) / std::filesystem::path(file_name);
+                    break;
+                case D3D_INCLUDE_SYSTEM:
+                    final_path = file_name;
+                    break;
+                default:
+                    utils::AlwaysAssert(false);
                 }
                 includes_.push_back(std::filesystem::absolute(final_path));
                 std::ifstream file_stream(final_path.string());
@@ -37,7 +37,7 @@ namespace engine::core
                 {
                     std::string contents;
                     contents.assign(std::istreambuf_iterator<char>(file_stream),
-                                    std::istreambuf_iterator<char>());
+                        std::istreambuf_iterator<char>());
 
                     char *buf = new char[contents.size()];
                     contents.copy(buf, contents.size());
@@ -52,7 +52,7 @@ namespace engine::core
                 return S_OK;
             }
 
-            HRESULT __stdcall Close(LPCVOID pData)
+            HRESULT __stdcall Close(LPCVOID pData) noexcept
             {
                 char *buf = (char *)pData;
                 delete[] buf;
@@ -81,41 +81,41 @@ namespace engine::core
 
         void CompileShader(ShaderCompileInput const &input, ShaderCompileOutput &output)
         {
-            output = ShaderCompileOutput {};
+            output = ShaderCompileOutput{};
             std::string entrypoint, model;
             switch (input.type)
             {
-                case ShaderType::VertexShader:
-                    entrypoint = "vs_main";
-                    model = "vs_5_0";
-                    break;
-                case ShaderType::PixelShader:
-                    entrypoint = "ps_main";
-                    model = "ps_5_0";
-                    break;
-                case ShaderType::HullShader:
-                    entrypoint = "hs_main";
-                    model = "hs_5_0";
-                    break;
-                case ShaderType::DomainShader:
-                    entrypoint = "ds_main";
-                    model = "ds_5_0";
-                    break;
-                case ShaderType::GeometryShader:
-                    entrypoint = "gs_main";
-                    model = "gs_5_0";
-                    break;
-                case ShaderType::ComputeShader:
-                    entrypoint = "cs_main";
-                    model = "cs_5_0";
-                    break;
-                default:
-                    utils::Assert(false, "Unknown shader type");
+            case direct3d::ShaderType::VertexShader:
+                entrypoint = "vs_main";
+                model = "vs_5_0";
+                break;
+            case direct3d::ShaderType::PixelShader:
+                entrypoint = "ps_main";
+                model = "ps_5_0";
+                break;
+            case direct3d::ShaderType::HullShader:
+                entrypoint = "hs_main";
+                model = "hs_5_0";
+                break;
+            case direct3d::ShaderType::DomainShader:
+                entrypoint = "ds_main";
+                model = "ds_5_0";
+                break;
+            case direct3d::ShaderType::GeometryShader:
+                entrypoint = "gs_main";
+                model = "gs_5_0";
+                break;
+            case direct3d::ShaderType::ComputeShader:
+                entrypoint = "cs_main";
+                model = "cs_5_0";
+                break;
+            default:
+                utils::Assert(false, "Unknown shader type");
             }
 
             entrypoint = input.entrypoint.empty() ? entrypoint : input.entrypoint;
 
-            std::vector<D3D_SHADER_MACRO> defines {};
+            std::vector<D3D_SHADER_MACRO> defines{};
             defines.resize(input.macros.size());
 
             for (uint32_t i = 0; i < input.macros.size(); ++i)
@@ -130,9 +130,9 @@ namespace engine::core
 
             CShaderInclude includer(input.source_file.parent_path().string().c_str());
             HRESULT hr = D3DCompileFromFile(input.source_file.wstring().c_str(),
-                                            defines.data(),
-                                            &includer, entrypoint.c_str(), model.c_str(),
-                                            input.flags, 0, &bytecode_blob.ptr(), &error_blob.ptr());
+                defines.data(),
+                &includer, entrypoint.c_str(), model.c_str(),
+                input.flags, 0, &bytecode_blob.ptr(), &error_blob.ptr());
             auto const &includes = includer.includes();
 
             if (FAILED(hr))
@@ -155,7 +155,7 @@ namespace engine::core
         std::shared_ptr<VertexShader> CompileVertexShader(std::filesystem::path const &input)
         {
             ShaderCompileInput compile_input;
-            compile_input.type = ShaderType::VertexShader;
+            compile_input.type = direct3d::ShaderType::VertexShader;
             compile_input.source_file = input;
             ShaderCompileOutput out;
             CompileShader(compile_input, out);
@@ -164,7 +164,7 @@ namespace engine::core
         std::shared_ptr<PixelShader> CompilePixelShader(std::filesystem::path const &input)
         {
             ShaderCompileInput compile_input;
-            compile_input.type = ShaderType::PixelShader;
+            compile_input.type = direct3d::ShaderType::PixelShader;
             compile_input.source_file = input;
             ShaderCompileOutput out;
             CompileShader(compile_input, out);
@@ -173,7 +173,7 @@ namespace engine::core
         std::shared_ptr<HullShader> CompileHullShader(std::filesystem::path const &input)
         {
             ShaderCompileInput compile_input;
-            compile_input.type = ShaderType::HullShader;
+            compile_input.type = direct3d::ShaderType::HullShader;
             compile_input.source_file = input;
             ShaderCompileOutput out;
             CompileShader(compile_input, out);
@@ -182,7 +182,7 @@ namespace engine::core
         std::shared_ptr<DomainShader> CompileDomainShader(std::filesystem::path const &input)
         {
             ShaderCompileInput compile_input;
-            compile_input.type = ShaderType::DomainShader;
+            compile_input.type = direct3d::ShaderType::DomainShader;
             compile_input.source_file = input;
             ShaderCompileOutput out;
             CompileShader(compile_input, out);
@@ -191,7 +191,7 @@ namespace engine::core
         std::shared_ptr<GeometryShader> CompileGeometryShader(std::filesystem::path const &input)
         {
             ShaderCompileInput compile_input;
-            compile_input.type = ShaderType::GeometryShader;
+            compile_input.type = direct3d::ShaderType::GeometryShader;
             compile_input.source_file = input;
             ShaderCompileOutput out;
             CompileShader(compile_input, out);
@@ -200,7 +200,7 @@ namespace engine::core
         std::shared_ptr<ComputeShader> CompileComputeShader(std::filesystem::path const &input)
         {
             ShaderCompileInput compile_input;
-            compile_input.type = ShaderType::ComputeShader;
+            compile_input.type = direct3d::ShaderType::ComputeShader;
             compile_input.source_file = input;
             ShaderCompileOutput out;
             CompileShader(compile_input, out);

@@ -2,10 +2,7 @@
 #include "DDSTextureLoader11.h"
 #include "DirectXTex.h"
 #include "WICTextureLoader11.h"
-#include "direct3d11/direct3d11.hpp"
-#include "layer.hpp"
-#include "utils/utils.hpp"
-#include <filesystem>
+#include "include/engine-pch.hpp"
 
 namespace engine::core
 {

@@ -5,12 +5,12 @@ namespace engine::render
     class Shader
     {
     public:
-        Shader(ShaderBlob const &blob, ShaderType type)
+        Shader(ShaderBlob const &blob, direct3d::ShaderType type)
             : blob_(blob), kType(type)
         {}
 
         ShaderBlob &blob() { return blob_; }
-        ShaderType type() const { return kType; }
+        direct3d::ShaderType type() const { return kType; }
 
         virtual ~Shader() = default;
         virtual void Bind() = 0;
@@ -19,6 +19,6 @@ namespace engine::render
 
     private:
         ShaderBlob blob_;
-        ShaderType const kType;
+        direct3d::ShaderType const kType;
     };
 }

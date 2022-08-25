@@ -12,11 +12,11 @@ namespace engine::core::math::_detail
     {
         using type = T;
         static constexpr size_t size = 2;
-        explicit constexpr rvec(T a, T b) : x { a }, y { b } {}
+        explicit constexpr rvec(T a, T b) : x{ a }, y{ b } {}
         template <AnyVec V>
-        explicit constexpr rvec(V &other) requires(V::size >= size) : x { other.x }, y { other.y } {}
+        explicit constexpr rvec(V &other) requires(V::size >= size) : x{ other.x }, y{ other.y } {}
         template <AnyVec V>
-        explicit constexpr rvec(V const &other) requires(V::size >= size && std::is_const_v<typename V::type>) : x { other.x }, y { other.y } {}
+        explicit constexpr rvec(V const &other) requires(V::size >= size && std::is_const_v<typename V::type>) : x{ other.x }, y{ other.y } {}
         template <AnyVec U>
         static constexpr rvec<2, T> from_vec(U &other) requires(U::size >= 2) { return rvec<2, T>{other.x, other.y}; }
         template <AnyVec U>

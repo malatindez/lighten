@@ -1,5 +1,4 @@
 #pragma once
-#include "direct3d11/direct3d11.hpp"
 #include "render/shader-program.hpp"
 
 namespace engine::core
@@ -18,7 +17,7 @@ namespace engine::core
             FlagDebug = 1 << 0,
             FlagDisableOptimization = 1 << 1,
         };
-        render::ShaderType type = render::ShaderType::None;
+        direct3d::ShaderType type = direct3d::ShaderType::None;
         std::filesystem::path source_file;
         std::string entrypoint = "";
         std::vector<ShaderMacro> macros;

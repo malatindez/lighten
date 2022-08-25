@@ -63,7 +63,7 @@ namespace engine::core::math
     template <size_t a, size_t b, Primitive T>
     [[nodiscard]] constexpr mat<a, b, T> rmat<a, b, T>::operator-() const noexcept
     {
-        mat<a, b, T> return_value {};
+        mat<a, b, T> return_value{};
         for (size_t i = 0; i < size.x; i++)
         {
             return_value.data[i] = -data[i];

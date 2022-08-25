@@ -1,10 +1,5 @@
-#include "core/events.hpp"
-#include "core/math.hpp"
-#include "include/pch.hpp"
-#include "pch.h"
-#include "utils.hpp"
-#include "utils/utils.hpp"
-#include <filesystem>
+#include "include/engine-pch.hpp"
+
 using namespace engine::core::events;
 
 TEST(FILE_WATCHER_TEST, BasicTest)

@@ -44,7 +44,7 @@ namespace engine::core::math
             return true;
         }
 
-        core::math::vec3 position { 0 };
-        float radius { 1 };
+        core::math::vec3 position{ 0 };
+        float radius{ 1 };
     };
 }

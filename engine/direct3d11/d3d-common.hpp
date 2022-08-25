@@ -1,6 +1,6 @@
 #pragma once
 #include "include/d3d.hpp"
-#include "include/pch.hpp"
+#include "include/library-pch.hpp"
 
 namespace engine::direct3d
 {
@@ -89,6 +89,18 @@ namespace engine::direct3d
             return std::invoke(*ptr_, static_cast<Types &&>(args)...);
         }
     };
+
+    enum class ShaderType : uint8_t
+    {
+        VertexShader = 0,
+        PixelShader = 1,
+        HullShader = 2,
+        DomainShader = 3,
+        GeometryShader = 4,
+        ComputeShader = 5,
+        None = 6
+    };
+
     using SwapChain1 = d3d_resource_wrapper<IDXGISwapChain1>;
     using RenderTargetView1 = d3d_resource_wrapper<ID3D11RenderTargetView1>;
     using RenderTargetView = d3d_resource_wrapper<ID3D11RenderTargetView>;

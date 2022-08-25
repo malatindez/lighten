@@ -1,6 +1,5 @@
 #include "windows-window.hpp"
 #include "include/imgui.hpp"
-#include "utils/utils.hpp"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace engine::platform::windows
@@ -26,9 +25,9 @@ namespace engine::platform::windows
         RegisterClassExW(&wc);
 
         handle_ = CreateWindowExW(NULL, wc.lpszClassName, title_.c_str(),
-                                  WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-                                  position_.x, position_.y, size_.x, size_.y,
-                                  nullptr, nullptr, GetModuleHandle(NULL), nullptr);
+            WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+            position_.x, position_.y, size_.x, size_.y,
+            nullptr, nullptr, GetModuleHandle(NULL), nullptr);
 
         // save window handle in the window class
         SetWindowLongPtrW(handle_, 0, reinterpret_cast<LONG_PTR>(this));
@@ -64,61 +63,61 @@ namespace engine::platform::windows
         if (!IsWindow(handle())) // temporary workaround
         {
             alive_ = false;
-            core::events::WindowCloseEvent wce { handle() };
+            core::events::WindowCloseEvent wce{ handle() };
             event_callback_(wce);
         }
         return true;
     }
     LRESULT CALLBACK Window::WindowProcCallback(HWND handle, UINT message,
-                                                WPARAM w_param, LPARAM l_param)
+        WPARAM w_param, LPARAM l_param)
     {
         if (ImGui_ImplWin32_WndProcHandler(handle, message, w_param, l_param))
             return true;
         if (message == WM_KEYDOWN)
         {
-            KeyPressedEvent event { uint32_t(w_param), LOWORD(l_param) };
+            KeyPressedEvent event{ uint32_t(w_param), LOWORD(l_param) };
             event_callback_(event);
         }
         else if (message == WM_KEYUP)
         {
-            KeyReleasedEvent event { uint32_t(w_param) };
+            KeyReleasedEvent event{ uint32_t(w_param) };
             event_callback_(event);
         }
         else if (message == WM_MOUSEMOVE)
         {
-            MouseMovedEvent event { core::math::ivec2{LOWORD(l_param), HIWORD(l_param)} };
+            MouseMovedEvent event{ core::math::ivec2{LOWORD(l_param), HIWORD(l_param)} };
             event_callback_(event);
         }
         else if (message == WM_LBUTTONDOWN)
         {
-            MouseButtonPressedEvent event { 0, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)} };
+            MouseButtonPressedEvent event{ 0, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)} };
             event_callback_(event);
         }
         else if (message == WM_LBUTTONUP)
         {
-            MouseButtonReleasedEvent event { 0, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)} };
+            MouseButtonReleasedEvent event{ 0, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)} };
             event_callback_(event);
         }
         else if (message == WM_RBUTTONDOWN)
         {
-            MouseButtonPressedEvent event { 1, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)} };
+            MouseButtonPressedEvent event{ 1, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)} };
             event_callback_(event);
         }
         else if (message == WM_RBUTTONUP)
         {
-            MouseButtonReleasedEvent event { 1, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)} };
+            MouseButtonReleasedEvent event{ 1, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)} };
             event_callback_(event);
         }
         else if (message == WM_MOUSEWHEEL)
         {
-            MouseScrollEvent event { GET_WHEEL_DELTA_WPARAM(w_param), core::math::ivec2{LOWORD(l_param), HIWORD(l_param)} };
+            MouseScrollEvent event{ GET_WHEEL_DELTA_WPARAM(w_param), core::math::ivec2{LOWORD(l_param), HIWORD(l_param)} };
             event_callback_(event);
         }
         else if (message == WM_SIZE) // update the window size if it has changed
         {
-            WindowResizeEvent event { LOWORD(l_param), HIWORD(l_param) };
+            WindowResizeEvent event{ LOWORD(l_param), HIWORD(l_param) };
             event_callback_(event);
-            size_ = core::math::ivec2 { LOWORD(l_param), HIWORD(l_param) };
+            size_ = core::math::ivec2{ LOWORD(l_param), HIWORD(l_param) };
         }
         else if (message == WM_EXITSIZEMOVE || message == WM_PAINT)
         {
@@ -127,18 +126,18 @@ namespace engine::platform::windows
         else if (message == WM_WINDOWPOSCHANGED) // update window position if it has changed
         {
             auto window_pos = reinterpret_cast<LPWINDOWPOS>(l_param);
-            position_ = core::math::ivec2 { window_pos->x, window_pos->y };
+            position_ = core::math::ivec2{ window_pos->x, window_pos->y };
         }
         else if (message == WM_DESTROY)
         {
-            WindowCloseEvent event { handle_ };
+            WindowCloseEvent event{ handle_ };
             event_callback_(event);
         }
         return DefWindowProcW(handle, message, w_param, l_param);
     }
 
     LRESULT CALLBACK Window::StaticWindowProc(HWND handle, UINT message,
-                                              WPARAM w_param, LPARAM l_param)
+        WPARAM w_param, LPARAM l_param)
     {
         if (auto ptr = reinterpret_cast<Window *>(GetWindowLongPtrW(handle, 0));
             ptr != nullptr)
@@ -190,12 +189,10 @@ namespace engine::platform::windows
         desc.Flags = 0;
 
         IDXGISwapChain1 *swapchain = nullptr;
-        spdlog::info(std::to_string(reinterpret_cast<uint64_t>(&direct3d::api::device)));
-        spdlog::info(std::to_string(reinterpret_cast<uint64_t>(hWnd)));
         SetLastError(0);
         direct3d::AlwaysAssert(direct3d::api::factory5->CreateSwapChainForHwnd(direct3d::api::device, hWnd, &desc, nullptr, nullptr, &swapchain),
-                               "Failed to create the swapchain");
-        return direct3d::SwapChain1 { swapchain };
+            "Failed to create the swapchain");
+        return direct3d::SwapChain1{ swapchain };
     }
 
     void Window::initializeFramebuffer()
@@ -203,12 +200,12 @@ namespace engine::platform::windows
         ID3D11Texture2D *frame_buffer = nullptr;
 
         direct3d::AlwaysAssert(swapchain_->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void **>(&frame_buffer)),
-                               "Failed to get frame buffer");
+            "Failed to get frame buffer");
 
         ID3D11RenderTargetView *frame_buffer_view = nullptr;
 
         direct3d::AlwaysAssert(direct3d::api::device->CreateRenderTargetView(frame_buffer, nullptr, &frame_buffer_view),
-                               "Failed to initialize framebuffer");
+            "Failed to initialize framebuffer");
         frame_buffer_ = frame_buffer;
         frame_buffer_view_ = frame_buffer_view;
     }
@@ -223,12 +220,12 @@ namespace engine::platform::windows
         ID3D11Texture2D *depth_buffer;
 
         direct3d::AlwaysAssert(direct3d::api::device->CreateTexture2D(&depth_buffer_desc_, nullptr, &depth_buffer),
-                               "Failed to initialize depthbuffer");
+            "Failed to initialize depthbuffer");
 
         ID3D11DepthStencilView *depth_buffer_view;
 
         direct3d::AlwaysAssert(direct3d::api::device->CreateDepthStencilView(depth_buffer, nullptr, &depth_buffer_view),
-                               "Failed to initialize depthbuffer");
+            "Failed to initialize depthbuffer");
 
         depth_buffer_ = depth_buffer;
         depth_buffer_view_ = depth_buffer_view;

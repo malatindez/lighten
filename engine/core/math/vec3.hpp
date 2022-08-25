@@ -20,8 +20,8 @@ namespace engine::core::math
         explicit constexpr vec(A a, B b, C c);
         template <typename... U>
         explicit constexpr vec(U... data);
-        explicit constexpr vec(std::array<T, size> const &arr) : data { arr } {}
-        explicit constexpr vec(std::array<T, size> &&arr) : data { std::move(arr) } {}
+        explicit constexpr vec(std::array<T, size> const &arr) : data{ arr } {}
+        explicit constexpr vec(std::array<T, size> &&arr) : data{ std::move(arr) } {}
 
         constexpr void reset() noexcept;
         template <typename U>
@@ -88,6 +88,12 @@ namespace engine::core::math
                 };
             };
             std::array<T, 3> data;
+            vec<2, T> xy;
+            struct
+            {
+                T x_anonymous_padding_;
+                vec<2, T> yz;
+            };
         };
         static_assert(sizeof(data) == 3 * sizeof(T));
 

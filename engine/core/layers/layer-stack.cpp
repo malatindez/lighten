@@ -1,5 +1,4 @@
 #include "layer-stack.hpp"
-#include "include/pch.hpp"
 namespace engine::core
 {
     LayerStack::~LayerStack()

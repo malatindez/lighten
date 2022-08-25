@@ -1,6 +1,5 @@
 #pragma once
 #include "imgui-layer.hpp"
-#include "include/pch.hpp"
 #include "layer-stack.hpp"
 namespace engine::core
 {

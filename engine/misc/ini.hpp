@@ -92,7 +92,7 @@ namespace engine::ini
             }
             value_ = std::string(t);
             type_ = Type::kString;
-            data_ = std::monostate {};
+            data_ = std::monostate{};
             return *this;
         }
         template <typename T>

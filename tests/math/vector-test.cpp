@@ -2,6 +2,8 @@
 #include "pch.h"
 #include "utils.hpp"
 using namespace engine::core::math;
+
+#ifdef TEMPLATE_TESTS
 template <size_t size, typename T>
 void vec_test_basic_arithmetic_same_types()
 {
@@ -125,7 +127,6 @@ TEST(TEST_VECTORS_ARITHMETIC, RandomTestSameTypes)
         vec_test_basic_arithmetic_same_types_all<utils::RandomConstexpr(7, 2, 256)>();
     }
 }
-
 template <size_t size, typename T, typename U>
 void vec_test_basic_arithmetic_different_types()
 {
@@ -254,3 +255,4 @@ TEST(TEST_VECTORS_ARITHMETIC, RandomTestDifferentTypes)
         vec_test_basic_arithmetic_different_types_all<utils::RandomConstexpr(34, 2, 256)>();
     }
 }
+#endif

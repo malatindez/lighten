@@ -16,7 +16,7 @@ namespace engine::platform::windows
     private:
         void FrameBegin() override;
         void FrameEnd() override;
-        core::math::vec4 sky_color_ { core::math::vec3{0.25f}, 0.0f };
+        core::math::vec4 sky_color_{ core::math::vec3{0.25f}, 0.0f };
         engine::direct3d::RasterizerState1 rasterizer_state_;
         engine::direct3d::SamplerState sampler_state_;
         engine::direct3d::DepthStencilState depth_stencil_state_;

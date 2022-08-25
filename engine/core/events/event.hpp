@@ -38,7 +38,7 @@ namespace engine::core::events
     class Event
     {
     public:
-        Event(EventType type, uint8_t flags) : kType { type }, kCategoryFlags { flags } {}
+        Event(EventType type, uint8_t flags) : kType{ type }, kCategoryFlags{ flags } {}
         virtual ~Event() = default;
 
         [[nodiscard]] EventType type() const noexcept { return kType; }

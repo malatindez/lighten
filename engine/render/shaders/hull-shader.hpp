@@ -7,11 +7,11 @@ namespace engine::render
         friend struct ShaderProgram;
 
     public:
-        static constexpr ShaderType kType = ShaderType::HullShader;
-        HullShader(ShaderBlob const &shader_blob) : Shader(shader_blob, ShaderType::HullShader)
+        static constexpr direct3d::ShaderType kType = direct3d::ShaderType::HullShader;
+        HullShader(ShaderBlob const &shader_blob) : Shader(shader_blob, direct3d::ShaderType::HullShader)
         {
             utils::AlwaysAssert(direct3d::api::device->CreateHullShader(blob().ptr(), blob().size(), nullptr, &hs.ptr()) >= 0,
-                                "Failed to create vertex shader");
+                "Failed to create vertex shader");
         }
         void Bind() override
         {
@@ -26,7 +26,7 @@ namespace engine::render
             blob() = new_blob;
             hs = nullptr;
             utils::AlwaysAssert(direct3d::api::device->CreateHullShader(blob().ptr(), blob().size(), nullptr, &hs.ptr()) >= 0,
-                                "Failed to recreate vertex shader");
+                "Failed to recreate vertex shader");
         }
 
     private:

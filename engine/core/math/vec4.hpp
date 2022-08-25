@@ -20,8 +20,8 @@ namespace engine::core::math
         explicit constexpr vec(A a, B b, C c, D d);
         template <typename... U>
         explicit constexpr vec(U... data);
-        explicit constexpr vec(std::array<T, size> const &arr) : data { arr } {}
-        explicit constexpr vec(std::array<T, size> &&arr) : data { std::move(arr) } {}
+        explicit constexpr vec(std::array<T, size> const &arr) : data{ arr } {}
+        explicit constexpr vec(std::array<T, size> &&arr) : data{ std::move(arr) } {}
         template <typename U>
         constexpr vec<size, T> &operator=(_detail::rvec<size, U> const &b)
         {
@@ -92,6 +92,22 @@ namespace engine::core::math
                 };
             };
             std::array<T, size> data;
+            vec<3, T> xyz;
+            struct
+            {
+                T x_anonymous_padding_;
+                vec<2, T> yz;
+            };
+            struct
+            {
+                vec<2, T> xy;
+                vec<2, T> zw;
+            };
+            struct
+            {
+                T x_anonymous_padding__;
+                vec<2, T> yzw;
+            };
         };
         static_assert(sizeof(data) == size * sizeof(T));
 

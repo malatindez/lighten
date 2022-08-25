@@ -7,7 +7,9 @@ namespace engine::core::math
     public:
         Ray() = default;
         Ray(vec3 const &origin, vec3 const &direction)
-            : origin_(origin), direction_(direction) { OnDirecitonUpdate(); }
+            : origin_(origin), direction_(direction) {
+            OnDirecitonUpdate();
+        }
         [[nodiscard]] constexpr vec3 const &origin() const noexcept { return origin_; }
         [[nodiscard]] constexpr vec3 &origin() noexcept { return origin_; }
         [[nodiscard]] constexpr vec3 const &direction() const noexcept { return direction_; }
@@ -27,7 +29,7 @@ namespace engine::core::math
         void OnDirecitonUpdate()
         {
             inv_direction_ = 1 / direction_;
-            sign_ = ivec3 { inv_direction_.x < 0, inv_direction_.y < 0, inv_direction_.z < 0 };
+            sign_ = ivec3{ inv_direction_.x < 0, inv_direction_.y < 0, inv_direction_.z < 0 };
         }
         vec3 origin_;
         vec3 direction_;

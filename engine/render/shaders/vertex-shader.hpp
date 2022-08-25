@@ -7,12 +7,12 @@ namespace engine::render
         friend struct ShaderProgram;
 
     public:
-        static constexpr ShaderType kType = ShaderType::VertexShader;
+        static constexpr direct3d::ShaderType kType = direct3d::ShaderType::VertexShader;
 
-        VertexShader(ShaderBlob const &shader_blob) : Shader(shader_blob, ShaderType::VertexShader)
+        VertexShader(ShaderBlob const &shader_blob) : Shader(shader_blob, direct3d::ShaderType::VertexShader)
         {
             utils::AlwaysAssert(direct3d::api::device->CreateVertexShader(blob().ptr(), blob().size(), nullptr, &vs.ptr()) >= 0,
-                                "Failed to create vertex shader");
+                "Failed to create vertex shader");
         }
         void Bind() override
         {
@@ -27,7 +27,7 @@ namespace engine::render
             blob() = new_blob;
             vs = nullptr;
             utils::AlwaysAssert(direct3d::api::device->CreateVertexShader(blob().ptr(), blob().size(), nullptr, &vs.ptr()) >= 0,
-                                "Failed to recreate vertex shader");
+                "Failed to recreate vertex shader");
         }
 
     private:

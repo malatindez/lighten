@@ -1,3 +1,6 @@
+#include "layers/model-loader.hpp"
+#include "layers/shader-manager.hpp"
+#include "layers/texture-manager.hpp"
 #include "layers/imgui-layer.hpp"
 #include "layers/input-layer.hpp"
 #include "layers/layer-stack-threadsafe.hpp"

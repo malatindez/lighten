@@ -1,5 +1,5 @@
 #pragma once
-#include "include/pch.hpp"
+#include "include/library-pch.hpp"
 
 #ifndef DEBUG_UTILS_ASSERT_LOGS
 #define DEBUG_UTILS_ASSERT_LOGS 1
