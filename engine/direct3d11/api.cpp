@@ -53,22 +53,22 @@ namespace engine::direct3d
         D3D11_CREATE_DEVICE_FLAG flag = D3D11_CREATE_DEVICE_DEBUG;
 #endif
         AlwaysAssert(D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, flag,
-            &kFeatureLevelRequested, 1, D3D11_SDK_VERSION, &device.reset(), &featureLevelInitialized, &devcon.reset()),
-            "Failed to create device and devcon");
+                                       &kFeatureLevelRequested, 1, D3D11_SDK_VERSION, &device.reset(), &featureLevelInitialized, &devcon.reset()),
+                     "Failed to create device and devcon");
 
         utils::AlwaysAssert(kFeatureLevelRequested == featureLevelInitialized, "featureLevelInitialized != D3D_FEATURE_LEVEL_11_0");
 
         AlwaysAssert(device->QueryInterface(__uuidof(ID3D11Device5), (void **)&device5.reset()),
-            "Failed to query ID3D11Device5");
+                     "Failed to query ID3D11Device5");
 
         AlwaysAssert(devcon->QueryInterface(__uuidof(ID3D11DeviceContext4), (void **)&devcon4.reset()),
-            "Failed to query ID3D11DeviceContext4");
+                     "Failed to query ID3D11DeviceContext4");
 #if defined(_DEBUG)
         AlwaysAssert(device->QueryInterface(__uuidof(ID3D11Debug), (void **)&debug.reset()),
-            "Failed to query ID3D11Debug");
+                     "Failed to query ID3D11Debug");
 
         AlwaysAssert(device->QueryInterface(__uuidof(ID3D11InfoQueue), (void **)&debug_info_queue.reset()),
-            "Failed to query ID3D11InfoQueue");
+                     "Failed to query ID3D11InfoQueue");
 #endif
     }
     void api::Deinit()

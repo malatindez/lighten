@@ -5,7 +5,7 @@ namespace engine
     using namespace math;
 
     CameraController::CameraController(entt::registry *registry, entt::entity entity,
-        ivec2 const &window_size)
+                                       ivec2 const &window_size)
         : registry_(registry), camera_(entity), window_size_(window_size)
     {
         Init();

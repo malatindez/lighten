@@ -57,7 +57,7 @@ namespace engine::ini
 
     std::string Section::Serialize() const noexcept
     {
-        static constexpr auto format = [](std::string_view const s)
+        static constexpr auto format = [] (std::string_view const s)
         {
             std::string str(s);
             std::erase(str, '\n');
@@ -119,7 +119,7 @@ namespace engine::ini
                 line.clear();
             }
             else if ((str[i] == ';' || str[i] == '#') &&
-                (i == 0 || str[i - 1] != '\\'))
+                     (i == 0 || str[i - 1] != '\\'))
             {
                 skip = true;
             }
@@ -139,7 +139,7 @@ namespace engine::ini
 
     inline void
         Ini::DeserializeLine(std::string const &section,
-            std::string &line)
+                             std::string &line)
     { /* creating temporary object because
          Section() constructor is private */
         dict_.try_emplace(section, Section());

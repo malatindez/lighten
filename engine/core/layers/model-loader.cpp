@@ -15,9 +15,9 @@ namespace engine::core
         Mesh SetupMesh(std::vector<Material> &&materials, aiMatrix4x4 const &transformation, Mesh::MeshRange &&mesh_range)
         {
             auto temp = math::mat4(transformation.a1, transformation.a2, transformation.a3, transformation.a4,
-                transformation.b1, transformation.b2, transformation.b3, transformation.b4,
-                transformation.c1, transformation.c2, transformation.c3, transformation.c4,
-                transformation.d1, transformation.b2, transformation.d3, transformation.d4);
+                                   transformation.b1, transformation.b2, transformation.b3, transformation.b4,
+                                   transformation.c1, transformation.c2, transformation.c3, transformation.c4,
+                                   transformation.d1, transformation.b2, transformation.d3, transformation.d4);
             return Mesh{
                 .materials = std::move(materials),
                 .mesh_to_model = temp,
@@ -27,12 +27,12 @@ namespace engine::core
         }
 
         void processMesh(std::vector<Vertex> &vertices,
-            std::vector<uint32_t> &indices,
-            std::vector<Mesh> &meshes,
-            std::filesystem::path const &folder,
-            aiMesh *mesh,
-            aiMatrix4x4 const &transformation,
-            const aiScene *scene)
+                         std::vector<uint32_t> &indices,
+                         std::vector<Mesh> &meshes,
+                         std::filesystem::path const &folder,
+                         aiMesh *mesh,
+                         aiMatrix4x4 const &transformation,
+                         const aiScene *scene)
         {
             std::vector<Material> materials;
             for (uint32_t i = 0; i < mesh->mNumVertices; i++)
@@ -71,14 +71,14 @@ namespace engine::core
                     .min = math::vec3{mesh->mAABB.mMin.x, mesh->mAABB.mMin.y, mesh->mAABB.mMin.z},
                     .max = math::vec3{mesh->mAABB.mMax.x, mesh->mAABB.mMax.y, mesh->mAABB.mMax.z}
                 }
-                }
+                                          }
             ));
         }
 
         void processNode(std::vector<Vertex> &vertices,
-            std::vector<uint32_t> &indices,
-            std::vector<Mesh> &meshes,
-            std::filesystem::path const &folder, aiNode *node, aiScene const *scene)
+                         std::vector<uint32_t> &indices,
+                         std::vector<Mesh> &meshes,
+                         std::filesystem::path const &folder, aiNode *node, aiScene const *scene)
         {
             for (uint32_t i = 0; i < node->mNumMeshes; i++)
             {
@@ -103,12 +103,12 @@ namespace engine::core
 
         Assimp::Importer importer;
         aiScene const *scene_ptr = importer.ReadFile(path.string().c_str(),
-            aiProcess_Triangulate |
-            aiProcess_MakeLeftHanded |
-            aiProcess_FlipUVs |
-            aiProcess_FlipWindingOrder |
-            aiProcess_JoinIdenticalVertices |
-            (uint32_t)aiProcess_GenBoundingBoxes);
+                                                     aiProcess_Triangulate |
+                                                     aiProcess_MakeLeftHanded |
+                                                     aiProcess_FlipUVs |
+                                                     aiProcess_FlipWindingOrder |
+                                                     aiProcess_JoinIdenticalVertices |
+                                                     (uint32_t)aiProcess_GenBoundingBoxes);
 
         if (scene_ptr == nullptr)
         {
@@ -136,7 +136,7 @@ namespace engine::core
         uint32_t rv = ModelSystem::AddModel(Model{ .meshes = meshes,
                 .vertices = direct3d::ImmutableVertexBuffer<Vertex>(vertices),
                 .indices = direct3d::ImmutableIndexBuffer<uint32_t>(indices)
-            });
+                                            });
         models_.emplace(std::pair<size_t, uint32_t>{std::filesystem::hash_value(path), rv});
         return rv;
     }

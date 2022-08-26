@@ -9,13 +9,13 @@ namespace engine::direct3d
     public:
         ImmutableVertexBuffer(std::span<const T> span, uint32_t cpu_access_flags = 0, uint32_t misc_flags = 0)
             : ImmutableBuffer<T>(_detail::CreateBasicBufferDesc(D3D11_BIND_VERTEX_BUFFER, cpu_access_flags, misc_flags),
-                span)
+                                 span)
         {
         }
 
         ImmutableVertexBuffer(void *ptr, uint32_t size, uint32_t cpu_access_flags = 0, uint32_t misc_flags = 0)
             : ImmutableBuffer<T>(_detail::CreateBasicBufferDesc(D3D11_BIND_VERTEX_BUFFER, cpu_access_flags, misc_flags),
-                ptr, size)
+                                 ptr, size)
         {
         }
 
@@ -35,12 +35,12 @@ namespace engine::direct3d
 
         DynamicVertexBuffer(std::span<const T> span, uint32_t cpu_access_flags = D3D11_CPU_ACCESS_WRITE, uint32_t misc_flags = 0)
             : DynamicBuffer<T>(_detail::CreateBasicBufferDesc(D3D11_BIND_VERTEX_BUFFER, cpu_access_flags, misc_flags),
-                span)
+                               span)
         {}
 
         DynamicVertexBuffer(void *ptr, uint32_t size, uint32_t cpu_access_flags = D3D11_CPU_ACCESS_WRITE, uint32_t misc_flags = 0)
             : DynamicBuffer<T>(_detail::CreateBasicBufferDesc(D3D11_BIND_VERTEX_BUFFER, cpu_access_flags, misc_flags),
-                ptr, size)
+                               ptr, size)
         {}
         void Bind(uint32_t start_slot = 0, uint32_t offset = 0)
         {

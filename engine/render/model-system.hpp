@@ -23,8 +23,8 @@ namespace engine::render
         ~ModelSystem() = default;
 
         static std::optional<entt::entity> FindIntersection(entt::registry &registry,
-            engine::core::math::Ray const &ray,
-            engine::core::math::Intersection &nearest);
+                                                            engine::core::math::Ray const &ray,
+                                                            engine::core::math::Intersection &nearest);
 
         void Render() { opaque_render_system_.Render(); }
 

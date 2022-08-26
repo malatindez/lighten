@@ -11,8 +11,8 @@ namespace engine::core
 
         template <typename T>
         void AddShaderForUpdate(std::shared_ptr<T> const &shader_ptr,
-            ShaderCompileInput const &input,
-            std::vector<std::filesystem::path> const &dependent_files);
+                                ShaderCompileInput const &input,
+                                std::vector<std::filesystem::path> const &dependent_files);
 
         template <typename T>
         std::shared_ptr<T> CompileShader(ShaderCompileInput const &input);

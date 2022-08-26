@@ -24,8 +24,8 @@ namespace engine::core
             return;
         }
         application_ = std::unique_ptr<Engine>(new Engine{});
-        debug::RedirectOutputDebugString([&](std::string_view view)
-            { application_->logger_->info(view); });
+        debug::RedirectOutputDebugString([&] (std::string_view view)
+                                         { application_->logger_->info(view); });
         if (config()["Logger"]["console_enabled"].as_boolean())
         {
             AllocConsole();
@@ -99,7 +99,7 @@ namespace engine::core
     Engine::Engine()
     {
         event_function_ = std::bind_front([this](Event &e) __lambda_force_inline
-            { OnEvent(e); });
+                                          { OnEvent(e); });
         std::ifstream config("config.ini");
         std::stringstream data;
         if (config.is_open())

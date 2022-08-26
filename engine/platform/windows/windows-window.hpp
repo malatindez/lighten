@@ -49,9 +49,9 @@ namespace engine::platform::windows
         Window &operator=(Window const &Window) = delete;
 
         LRESULT CALLBACK WindowProcCallback(HWND handle, UINT message, WPARAM w_param,
-            LPARAM l_param);
+                                            LPARAM l_param);
         static LRESULT CALLBACK StaticWindowProc(HWND handle, UINT message,
-            WPARAM w_param, LPARAM l_param);
+                                                 WPARAM w_param, LPARAM l_param);
 
         HWND handle_;
 

@@ -62,7 +62,7 @@ namespace engine::core::math
     constexpr mat<a, b, T>::mat(U... data)
     {
         static_assert(get_parameter_pack_size<U...>() == a * b,
-            "You have provided wrong amount of data");
+                      "You have provided wrong amount of data");
         unpack_data(0, data...);
     }
 
@@ -233,7 +233,7 @@ namespace engine::core::math
     template <size_t a, size_t b, Primitive T>
     template <typename A, typename B, typename... C>
     constexpr void mat<a, b, T>::unpack_data(size_t offset, A first, B second,
-        C... rest)
+                                             C... rest)
     {
         unpack_data(offset, first);
         offset += get_parameter_pack_size<A>();

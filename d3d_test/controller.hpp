@@ -17,23 +17,7 @@ public:
     std::vector<std::function<void(float)>> &update_callbacks() { return update_callbacks_; }
     void OnTick(float delta_time) override;
     void OnEvent(engine::core::events::Event &e) override;
-    void OnGuiRender() override
-    {
-        ImGui::Begin("Framerate");
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        ImGui::Text("Move speed: ");
-        ImGui::Text("%.3f", first_scene->main_camera->move_speed());
-        ImGui::Text("FOV: ");
-        ImGui::Text("%.3f", first_scene->main_camera->fovy());
-        ImGui::Text("Flags: ");
-        ImGui::Text("%u", first_scene->main_camera->flags());
-        ImGui::Text("Position: ");
-        auto &temp1 = first_scene->main_camera->transform();
-        auto &temp2 = first_scene->registry.get<engine::components::TransformComponent>(first_scene->main_camera->camera_);
-        ImGui::Text("%s", engine::utils::FormatToString(first_scene->main_camera->transform().position).c_str());
-        ImGui::End();
-    }
-
+    void OnGuiRender() override;
 private:
     engine::core::math::ivec2 const &current_mouse_position_;
 

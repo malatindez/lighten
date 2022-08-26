@@ -1,5 +1,4 @@
 #pragma once
-#include "layer.hpp"
 #include "include/engine-pch.hpp"
 
 namespace engine::core::_detail

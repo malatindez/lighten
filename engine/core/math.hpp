@@ -20,7 +20,7 @@ namespace engine::core::math
 {
     template <class T>
     [[nodiscard]] constexpr vec<3, T> reflect(vec<3, T> const &normal,
-        vec<3, T> const &dir)
+                                              vec<3, T> const &dir)
     {
         return dir - 2.0f * dot(normal, dir) * normal;
     }

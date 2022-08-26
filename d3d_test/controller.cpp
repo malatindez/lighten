@@ -4,20 +4,114 @@ using namespace core;
 using namespace events;
 using namespace math;
 using namespace components;
+void EditTransform(CameraController const &camera, mat4 &matrix, bool enabled = true)
+{
+    static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::ROTATE);
+    static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
+    if (ImGui::IsKeyPressed(90))
+        mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+    if (ImGui::IsKeyPressed(69))
+        mCurrentGizmoOperation = ImGuizmo::ROTATE;
+    if (ImGui::IsKeyPressed(82)) // r Key
+        mCurrentGizmoOperation = ImGuizmo::SCALE;
+    if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
+        mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+    ImGui::SameLine();
+    if (ImGui::RadioButton("Rotate", mCurrentGizmoOperation == ImGuizmo::ROTATE))
+        mCurrentGizmoOperation = ImGuizmo::ROTATE;
+    ImGui::SameLine();
+    if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
+        mCurrentGizmoOperation = ImGuizmo::SCALE;
+    float matrixTranslation[3], matrixRotation[3], matrixScale[3];
+    ImGuizmo::DecomposeMatrixToComponents(matrix.arr.data(), matrixTranslation, matrixRotation, matrixScale);
+    ImGui::InputFloat3("Tr", matrixTranslation, "%.3f", 3);
+    ImGui::InputFloat3("Rt", matrixRotation, "%.3f", 3);
+    ImGui::InputFloat3("Sc", matrixScale, "%.3f", 3);
+    ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, matrix.arr.data());
+
+    if (mCurrentGizmoOperation != ImGuizmo::SCALE)
+    {
+        if (ImGui::RadioButton("Local", mCurrentGizmoMode == ImGuizmo::LOCAL))
+            mCurrentGizmoMode = ImGuizmo::LOCAL;
+        ImGui::SameLine();
+        if (ImGui::RadioButton("World", mCurrentGizmoMode == ImGuizmo::WORLD))
+            mCurrentGizmoMode = ImGuizmo::WORLD;
+    }
+    static bool useSnap(false);
+    if (ImGui::IsKeyPressed(83))
+        useSnap = !useSnap;
+    ImGui::Checkbox("checkbox", &useSnap);
+    ImGui::SameLine();
+    vec4 snap;
+    switch (mCurrentGizmoOperation)
+    {
+    case ImGuizmo::TRANSLATE:
+        ImGui::InputFloat3("Snap", &snap.x);
+        break;
+    case ImGuizmo::ROTATE:
+        ImGui::InputFloat("Angle Snap", &snap.x);
+        break;
+    case ImGuizmo::SCALE:
+        ImGui::InputFloat("Scale Snap", &snap.x);
+        break;
+    }
+    ImGuiIO &io = ImGui::GetIO();
+    ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
+    if (enabled)
+    {
+        ImGuizmo::Manipulate(camera.camera().view.arr.data(),
+                             camera.camera().projection.arr.data(),
+                             mCurrentGizmoOperation,
+                             mCurrentGizmoMode,
+                             matrix.arr.data(),
+                             NULL,
+                             useSnap ? &snap.x : NULL);
+    }
+}
+
+void Controller::OnGuiRender()
+{
+    static bool b = true;
+    static mat4 empty{ 1 };
+    ImGui::Begin("Framerate");
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+    ImGui::Text("Move speed: ");
+    ImGui::Text("%.3f", first_scene->main_camera->move_speed());
+    ImGui::Text("FOV: ");
+    ImGui::Text("%.3f", first_scene->main_camera->fovy());
+    ImGui::Text("Flags: ");
+    ImGui::Text("%u", first_scene->main_camera->flags());
+    ImGui::Text("Edit target transform: ");
+    if (selected_entity_ != entt::null && selected_entity_scene_ == Engine::scene())
+    {
+        TransformComponent &transform = Engine::scene()->registry.get<TransformComponent>(selected_entity_);
+        EditTransform(*Engine::scene()->main_camera, transform.model);
+        render::ModelSystem::instance()->OnInstancesUpdated(Engine::scene()->registry);
+    }
+    else
+    {
+        ImGui::BeginDisabled();
+        EditTransform(*Engine::scene()->main_camera, empty, false);
+        ImGui::EndDisabled();
+    }
+    ImGui::End();
+
+    //ImGui::Begin("Transform Editor");
+}
 
 Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &window_size) : current_mouse_position_(InputLayer::instance()->mouse_position()), renderer_{ renderer }
 {
     first_scene = std::make_shared<Scene>();
 
     auto &registry = first_scene->registry;
-    registry.create();// create an empty entity for debug
     main_camera_entity = registry.create();
     registry.emplace<CameraComponent>(main_camera_entity, CameraComponent());
     registry.emplace<TransformComponent>(main_camera_entity, TransformComponent());
     registry.emplace<TagComponent>(main_camera_entity, TagComponent{ .tag = "Main Camera" });
     first_scene->main_camera = std::make_unique<CameraController>(&registry, main_camera_entity, window_size);
     Engine::SetScene(first_scene);
-    int amount = 1;
+    int amount = 10;
     for (int i = 0; i < amount; i++)
     {
         auto knight = registry.create();
@@ -40,51 +134,44 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
 
     input->AddUpdateKeyCallback(
         InputLayer::KeySeq{ engine::core::Key::KEY_W },
-        [this](InputLayer::KeySeq const &, uint32_t)
+        [this] (InputLayer::KeySeq const &, uint32_t)
         { first_scene->main_camera->flags() |= CameraController::MoveForward; });
     input->AddUpdateKeyCallback(
         InputLayer::KeySeq{ engine::core::Key::KEY_S },
-        [this](InputLayer::KeySeq const &, uint32_t)
+        [this] (InputLayer::KeySeq const &, uint32_t)
         { first_scene->main_camera->flags() |= CameraController::MoveBackwards; });
     input->AddUpdateKeyCallback(
         InputLayer::KeySeq{ engine::core::Key::KEY_A },
-        [this](InputLayer::KeySeq const &, uint32_t)
+        [this] (InputLayer::KeySeq const &, uint32_t)
         { first_scene->main_camera->flags() |= CameraController::MoveLeft; });
     input->AddUpdateKeyCallback(
         InputLayer::KeySeq{ engine::core::Key::KEY_D },
-        [this](InputLayer::KeySeq const &, uint32_t)
+        [this] (InputLayer::KeySeq const &, uint32_t)
         { first_scene->main_camera->flags() |= CameraController::MoveRight; });
     input->AddUpdateKeyCallback(
         InputLayer::KeySeq{ engine::core::Key::KEY_SPACE },
-        [this](InputLayer::KeySeq const &, uint32_t)
+        [this] (InputLayer::KeySeq const &, uint32_t)
         { first_scene->main_camera->flags() |= CameraController::MoveUp; });
     input->AddUpdateKeyCallback(
         InputLayer::KeySeq{ engine::core::Key::KEY_CONTROL },
-        [this](InputLayer::KeySeq const &, uint32_t)
+        [this] (InputLayer::KeySeq const &, uint32_t)
         { first_scene->main_camera->flags() |= CameraController::MoveDown; });
     input->AddUpdateKeyCallback(
         InputLayer::KeySeq{ engine::core::Key::KEY_Q },
-        [this](InputLayer::KeySeq const &, uint32_t)
+        [this] (InputLayer::KeySeq const &, uint32_t)
         { first_scene->main_camera->flags() |= CameraController::RotateLeft; });
     input->AddUpdateKeyCallback(
         InputLayer::KeySeq{ engine::core::Key::KEY_E },
-        [this](InputLayer::KeySeq const &, uint32_t)
+        [this] (InputLayer::KeySeq const &, uint32_t)
         { first_scene->main_camera->flags() |= CameraController::RotateRight; });
     input->AddUpdateKeyCallback(
         InputLayer::KeySeq{ engine::core::Key::KEY_SHIFT },
-        [this](InputLayer::KeySeq const &, uint32_t)
+        [this] (InputLayer::KeySeq const &, uint32_t)
         { first_scene->main_camera->flags() |= CameraController::Accelerate; });
     input->AddUpdateKeyCallback(
         InputLayer::KeySeq{ engine::core::Key::KEY_RBUTTON },
-        [this](InputLayer::KeySeq const &, uint32_t count)
+        [this] (InputLayer::KeySeq const &, uint32_t count)
         {
-            if (count != 1)
-            {
-                selected_entity_ = entt::null;
-                selected_entity_scene_ = nullptr;
-                selected_object_distance_ = 0;
-                return;
-            }
             auto &input = *InputLayer::instance();
             auto scene = Engine::scene();
             auto &registry = scene->registry;
@@ -94,22 +181,11 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
             std::optional<entt::entity> entity = render::ModelSystem::FindIntersection(scene->registry, ray, nearest);
             if (entity.has_value())
             {
-                auto knight = registry.create();
-                last_created_knight = knight;
-                auto &knight_transform = registry.emplace<TransformComponent>(knight);
-                knight_transform.scale = vec3{ 0.25f };
-                knight_transform.position = nearest.point;
-                knight_transform.UpdateMatrices();
-                registry.emplace<OpaqueComponent>(knight);
-                registry.emplace<ModelComponent>(knight).model_id = renderer_->knight_model_id;
-                render::ModelSystem::instance()->OnInstancesUpdated(registry);
-                return;
                 selected_entity_ = entity.value();
                 selected_entity_scene_ = scene;
                 TransformComponent &transform = registry.get<TransformComponent>(selected_entity_);
                 selected_object_distance_ = nearest.t;
                 selected_object_offset_ = transform.position - ray.PointAtParameter(nearest.t);
-                rb_saved_mouse_position_ = input.mouse_position();
             }
             else
             {
@@ -145,17 +221,7 @@ void Controller::OnTick([[maybe_unused]] float delta_time)
     first_scene->main_camera->OnTick(delta_time, pixel_delta);
 
     renderer_->per_frame.view_projection = first_scene->main_camera->camera().view_projection;
-    if (input.rbutton_down() && selected_entity_ != entt::null && selected_entity_scene_ == scene)
-    {
-        Ray a = Engine::scene()->main_camera->Raycast(vec2{ rb_saved_mouse_position_ });
-        Ray b = Engine::scene()->main_camera->Raycast(vec2{ input.mouse_position() });
-        rb_saved_mouse_position_ = input.mouse_position();
-        vec3 obj_offset = b.PointAtParameter(selected_object_distance_);
-        TransformComponent &transform = scene->registry.get<TransformComponent>(selected_entity_);
-        transform.position = selected_object_offset_ + obj_offset;
-        transform.UpdateMatrices();
-        render::ModelSystem::instance()->OnInstancesUpdated(Engine::scene()->registry);
-    }
+
     if (input.mouse_scrolled())
     {
         if (selected_entity_ != entt::null && selected_entity_scene_ == scene && input.rbutton_down())

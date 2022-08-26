@@ -290,7 +290,7 @@ namespace engine::core::math
     constexpr mat<4, 4, T> perspective(T fov_y, T aspect_ratio, T z_near, T z_far) requires(!std::numeric_limits<T>::is_integer)
     {
         assert(std::abs(aspect_ratio - std::numeric_limits<T>::epsilon()) >
-            static_cast<T>(0));
+               static_cast<T>(0));
 
         T const tan_half_fov_y = tan(fov_y / static_cast<T>(2));
 

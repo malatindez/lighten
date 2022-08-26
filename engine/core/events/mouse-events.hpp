@@ -55,11 +55,11 @@ namespace engine::core::events
     {
     public:
         explicit MouseButtonReleasedEvent(uint16_t const code,
-            math::ivec2 &&coordinates)
+                                          math::ivec2 &&coordinates)
             : Event(EventType::MouseButtonReleased, EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput), mouse_button_(code), coordinates_(std::move(coordinates))
         {}
         explicit MouseButtonReleasedEvent(uint16_t const code,
-            math::ivec2 const &coordinates)
+                                          math::ivec2 const &coordinates)
             : Event(EventType::MouseButtonReleased, EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput), mouse_button_(code), coordinates_(coordinates)
         {}
         [[nodiscard]] std::string to_string() const noexcept override
@@ -84,11 +84,11 @@ namespace engine::core::events
     {
     public:
         explicit MouseScrollEvent(int16_t const scroll_delta,
-            math::ivec2 &&coordinates)
+                                  math::ivec2 &&coordinates)
             : Event(EventType::MouseScrolled, EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput), delta_(scroll_delta), coordinates_(std::move(coordinates))
         {}
         explicit MouseScrollEvent(int16_t const scroll_delta,
-            math::ivec2 const &coordinates)
+                                  math::ivec2 const &coordinates)
             : Event(EventType::MouseScrolled, EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput), delta_(scroll_delta), coordinates_(coordinates)
         {}
         [[nodiscard]] std::string to_string() const noexcept override

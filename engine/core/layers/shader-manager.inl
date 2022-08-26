@@ -4,8 +4,8 @@ namespace engine::core
 {
     template <typename T>
     void ShaderManager::AddShaderForUpdate(std::shared_ptr<T> const &shader_ptr,
-        ShaderCompileInput const &input,
-        std::vector<std::filesystem::path> const &dependent_files)
+                                           ShaderCompileInput const &input,
+                                           std::vector<std::filesystem::path> const &dependent_files)
     {
         utils::Assert(utils::for_each_true(
             dependent_files.cbegin(),

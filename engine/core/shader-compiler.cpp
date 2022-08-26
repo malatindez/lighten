@@ -37,7 +37,7 @@ namespace engine::core
                 {
                     std::string contents;
                     contents.assign(std::istreambuf_iterator<char>(file_stream),
-                        std::istreambuf_iterator<char>());
+                                    std::istreambuf_iterator<char>());
 
                     char *buf = new char[contents.size()];
                     contents.copy(buf, contents.size());
@@ -130,9 +130,9 @@ namespace engine::core
 
             CShaderInclude includer(input.source_file.parent_path().string().c_str());
             HRESULT hr = D3DCompileFromFile(input.source_file.wstring().c_str(),
-                defines.data(),
-                &includer, entrypoint.c_str(), model.c_str(),
-                input.flags, 0, &bytecode_blob.ptr(), &error_blob.ptr());
+                                            defines.data(),
+                                            &includer, entrypoint.c_str(), model.c_str(),
+                                            input.flags, 0, &bytecode_blob.ptr(), &error_blob.ptr());
             auto const &includes = includer.includes();
 
             if (FAILED(hr))

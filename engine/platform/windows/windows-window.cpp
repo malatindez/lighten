@@ -25,9 +25,9 @@ namespace engine::platform::windows
         RegisterClassExW(&wc);
 
         handle_ = CreateWindowExW(NULL, wc.lpszClassName, title_.c_str(),
-            WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-            position_.x, position_.y, size_.x, size_.y,
-            nullptr, nullptr, GetModuleHandle(NULL), nullptr);
+                                  WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+                                  position_.x, position_.y, size_.x, size_.y,
+                                  nullptr, nullptr, GetModuleHandle(NULL), nullptr);
 
         // save window handle in the window class
         SetWindowLongPtrW(handle_, 0, reinterpret_cast<LONG_PTR>(this));
@@ -69,7 +69,7 @@ namespace engine::platform::windows
         return true;
     }
     LRESULT CALLBACK Window::WindowProcCallback(HWND handle, UINT message,
-        WPARAM w_param, LPARAM l_param)
+                                                WPARAM w_param, LPARAM l_param)
     {
         if (ImGui_ImplWin32_WndProcHandler(handle, message, w_param, l_param))
             return true;
@@ -121,7 +121,7 @@ namespace engine::platform::windows
         }
         else if (message == WM_EXITSIZEMOVE || message == WM_PAINT)
         {
-            WindowResizeEvent event{ size_.x, size_.y};
+            WindowResizeEvent event{ size_.x, size_.y };
             event_callback_(event);
             OnSizeChangeEnd();
         }
@@ -139,7 +139,7 @@ namespace engine::platform::windows
     }
 
     LRESULT CALLBACK Window::StaticWindowProc(HWND handle, UINT message,
-        WPARAM w_param, LPARAM l_param)
+                                              WPARAM w_param, LPARAM l_param)
     {
         if (auto ptr = reinterpret_cast<Window *>(GetWindowLongPtrW(handle, 0));
             ptr != nullptr)
@@ -193,7 +193,7 @@ namespace engine::platform::windows
         IDXGISwapChain1 *swapchain = nullptr;
         SetLastError(0);
         direct3d::AlwaysAssert(direct3d::api::factory5->CreateSwapChainForHwnd(direct3d::api::device, hWnd, &desc, nullptr, nullptr, &swapchain),
-            "Failed to create the swapchain");
+                               "Failed to create the swapchain");
         return direct3d::SwapChain1{ swapchain };
     }
 
@@ -202,12 +202,12 @@ namespace engine::platform::windows
         ID3D11Texture2D *frame_buffer = nullptr;
 
         direct3d::AlwaysAssert(swapchain_->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void **>(&frame_buffer)),
-            "Failed to get frame buffer");
+                               "Failed to get frame buffer");
 
         ID3D11RenderTargetView *frame_buffer_view = nullptr;
 
         direct3d::AlwaysAssert(direct3d::api::device->CreateRenderTargetView(frame_buffer, nullptr, &frame_buffer_view),
-            "Failed to initialize framebuffer");
+                               "Failed to initialize framebuffer");
         frame_buffer_ = frame_buffer;
         frame_buffer_view_ = frame_buffer_view;
     }
@@ -222,12 +222,12 @@ namespace engine::platform::windows
         ID3D11Texture2D *depth_buffer;
 
         direct3d::AlwaysAssert(direct3d::api::device->CreateTexture2D(&depth_buffer_desc_, nullptr, &depth_buffer),
-            "Failed to initialize depthbuffer");
+                               "Failed to initialize depthbuffer");
 
         ID3D11DepthStencilView *depth_buffer_view;
 
         direct3d::AlwaysAssert(direct3d::api::device->CreateDepthStencilView(depth_buffer, nullptr, &depth_buffer_view),
-            "Failed to initialize depthbuffer");
+                               "Failed to initialize depthbuffer");
 
         depth_buffer_ = depth_buffer;
         depth_buffer_view_ = depth_buffer_view;

@@ -9,12 +9,12 @@ namespace engine::direct3d
     public:
         ImmutableIndexBuffer(std::span<const T> span, uint32_t cpu_access_flags = 0, uint32_t misc_flags = 0)
             : ImmutableBuffer<T>(_detail::CreateBasicBufferDesc(D3D11_BIND_INDEX_BUFFER, cpu_access_flags, misc_flags),
-                span)
+                                 span)
         {}
 
         ImmutableIndexBuffer(void *ptr, uint32_t size, uint32_t cpu_access_flags = 0, uint32_t misc_flags = 0)
             : ImmutableBuffer<T>(_detail::CreateBasicBufferDesc(D3D11_BIND_INDEX_BUFFER, cpu_access_flags, misc_flags),
-                ptr, size)
+                                 ptr, size)
         {}
         void Bind(DXGI_FORMAT format = DXGI_FORMAT_R32_UINT, uint32_t offset = 0)
         {
@@ -31,11 +31,11 @@ namespace engine::direct3d
             : DynamicBuffer<T>(_detail::CreateBasicBufferDesc(D3D11_BIND_INDEX_BUFFER, cpu_access_flags, misc_flags)) {}
         DynamicIndexBuffer(std::span<const T> span, uint32_t cpu_access_flags = D3D11_CPU_ACCESS_WRITE, uint32_t misc_flags = 0)
             : DynamicBuffer<T>(_detail::CreateBasicBufferDesc(D3D11_BIND_INDEX_BUFFER, cpu_access_flags, misc_flags),
-                span)
+                               span)
         {}
         DynamicIndexBuffer(void *ptr, uint32_t size, uint32_t cpu_access_flags = D3D11_CPU_ACCESS_WRITE, uint32_t misc_flags = 0)
             : DynamicBuffer<T>(_detail::CreateBasicBufferDesc(D3D11_BIND_INDEX_BUFFER, cpu_access_flags, misc_flags),
-                ptr, size)
+                               ptr, size)
         {}
         void Bind(DXGI_FORMAT format = DXGI_FORMAT_R32_UINT, uint32_t offset = 0)
         {

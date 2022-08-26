@@ -88,7 +88,7 @@ namespace engine::render::_detail
 
                     // fetch instance index
                     size_t instance_index = 0;
-                    auto it = std::ranges::find_if(instance_ids_, [&instance_id](auto const &pair) { return pair.first == instance_id; });
+                    auto it = std::ranges::find_if(instance_ids_, [&instance_id] (auto const &pair) { return pair.first == instance_id; });
                     if (it == instance_ids_.end()) // create new if it not exists
                     {
                         instance_ids_.push_back(std::pair<InstanceId, InstanceIndex>{ instance_id, instances_.size()});
@@ -135,7 +135,7 @@ namespace engine::render::_detail
                 for (uint32_t material_id = 0; material_id < mesh.materials.size(); material_id++)
                 {
                     uint64_t instance_id = ((uint64_t)(mesh_id) << 32) | (uint64_t)model_ref.model_id;
-                    auto it = std::ranges::find_if(instance_ids_, [&instance_id](auto const &pair) { return pair.first == instance_id; });
+                    auto it = std::ranges::find_if(instance_ids_, [&instance_id] (auto const &pair) { return pair.first == instance_id; });
                     InstanceInfo &instance = instances_[it->second];
 
                     dst[instance_offsets_[instance_id] + instance.amount++] = Instance{ .model_transform = transform.model };

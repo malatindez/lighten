@@ -13,7 +13,7 @@ namespace engine::platform::windows
         ID3D11RasterizerState1 *rasterizer_state;
 
         api::device5->CreateRasterizerState1(&rasterizer_desc,
-            &rasterizer_state);
+                                             &rasterizer_state);
 
         D3D11_SAMPLER_DESC sampler_desc = {};
         sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;

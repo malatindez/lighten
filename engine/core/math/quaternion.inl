@@ -383,6 +383,6 @@ namespace engine::core::math
         }
         T one_over_len = static_cast<T>(1) / l;
         return qua<T>(q.w * one_over_len, q.x * one_over_len, q.y * one_over_len,
-            q.z * one_over_len);
+                      q.z * one_over_len);
     }
 } // namespace engine::core::math
