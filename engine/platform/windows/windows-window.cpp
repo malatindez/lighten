@@ -121,6 +121,8 @@ namespace engine::platform::windows
         }
         else if (message == WM_EXITSIZEMOVE || message == WM_PAINT)
         {
+            WindowResizeEvent event{ size_.x, size_.y};
+            event_callback_(event);
             OnSizeChangeEnd();
         }
         else if (message == WM_WINDOWPOSCHANGED) // update window position if it has changed

@@ -14,12 +14,14 @@ namespace engine::core
     {
         Mesh SetupMesh(std::vector<Material> &&materials, aiMatrix4x4 const &transformation, Mesh::MeshRange &&mesh_range)
         {
+            auto temp = math::mat4(transformation.a1, transformation.a2, transformation.a3, transformation.a4,
+                transformation.b1, transformation.b2, transformation.b3, transformation.b4,
+                transformation.c1, transformation.c2, transformation.c3, transformation.c4,
+                transformation.d1, transformation.b2, transformation.d3, transformation.d4);
             return Mesh{
                 .materials = std::move(materials),
-                .mesh_to_model = math::mat4(transformation.a1, transformation.a2, transformation.a3, transformation.a4,
-                                            transformation.b1, transformation.b2, transformation.b3, transformation.b4,
-                                            transformation.c1, transformation.c2, transformation.c3, transformation.c4,
-                                            transformation.d1, transformation.b2, transformation.d3, transformation.d4),
+                .mesh_to_model = temp,
+                .inv_mesh_to_model = math::inverse(temp),
                 .mesh_range = std::move(mesh_range)
             };
         }
@@ -36,8 +38,8 @@ namespace engine::core
             for (uint32_t i = 0; i < mesh->mNumVertices; i++)
             {
                 vertices.emplace_back(Vertex{
-                    .coords = engine::core::math::vec3{mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z},
-                    .uv = engine::core::math::vec2{mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y} });
+                    .coords = math::vec3{mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z},
+                    .uv = math::vec2{mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y} });
             }
             for (uint32_t i = 0; i < mesh->mNumFaces; i++)
             {
@@ -64,7 +66,12 @@ namespace engine::core
                 .vertex_offset = std::numeric_limits<uint32_t>::max(),
                 .index_offset = std::numeric_limits<uint32_t>::max(),
                 .vertex_num = mesh->mNumVertices,
-                .index_num = mesh->mNumFaces * 3 }
+                .index_num = mesh->mNumFaces * 3,
+                .bounding_box = math::AABB {
+                    .min = math::vec3{mesh->mAABB.mMin.x, mesh->mAABB.mMin.y, mesh->mAABB.mMin.z},
+                    .max = math::vec3{mesh->mAABB.mMax.x, mesh->mAABB.mMax.y, mesh->mAABB.mMax.z}
+                }
+                }
             ));
         }
 

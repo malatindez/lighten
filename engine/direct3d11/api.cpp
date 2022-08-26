@@ -25,8 +25,8 @@ namespace engine::direct3d
 
     void api::Init()
     {
-        direct3d::AlwaysAssert(CreateDXGIFactory(__uuidof(IDXGIFactory), (void **)&factory.reset()), "Failed to create DXGI factory");
-        direct3d::AlwaysAssert(factory->QueryInterface(__uuidof(IDXGIFactory5), (void **)(&factory5.reset())), " Failed to create IDXGI factory 5");
+        AlwaysAssert(CreateDXGIFactory(__uuidof(IDXGIFactory), (void **)&factory.reset()), "Failed to create DXGI factory");
+        AlwaysAssert(factory->QueryInterface(__uuidof(IDXGIFactory5), (void **)(&factory5.reset())), " Failed to create IDXGI factory 5");
         {
             uint32_t index = 0;
             IDXGIAdapter1 *adapter;
@@ -52,35 +52,41 @@ namespace engine::direct3d
 #else
         D3D11_CREATE_DEVICE_FLAG flag = D3D11_CREATE_DEVICE_DEBUG;
 #endif
-        direct3d::AlwaysAssert(D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, flag,
+        AlwaysAssert(D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, flag,
             &kFeatureLevelRequested, 1, D3D11_SDK_VERSION, &device.reset(), &featureLevelInitialized, &devcon.reset()),
             "Failed to create device and devcon");
 
         utils::AlwaysAssert(kFeatureLevelRequested == featureLevelInitialized, "featureLevelInitialized != D3D_FEATURE_LEVEL_11_0");
 
-        direct3d::AlwaysAssert(device->QueryInterface(__uuidof(ID3D11Device5), (void **)&device5.reset()),
+        AlwaysAssert(device->QueryInterface(__uuidof(ID3D11Device5), (void **)&device5.reset()),
             "Failed to query ID3D11Device5");
 
-        direct3d::AlwaysAssert(devcon->QueryInterface(__uuidof(ID3D11DeviceContext4), (void **)&devcon4.reset()),
+        AlwaysAssert(devcon->QueryInterface(__uuidof(ID3D11DeviceContext4), (void **)&devcon4.reset()),
             "Failed to query ID3D11DeviceContext4");
 #if defined(_DEBUG)
-        direct3d::AlwaysAssert(device->QueryInterface(__uuidof(ID3D11Debug), (void **)&debug.reset()),
+        AlwaysAssert(device->QueryInterface(__uuidof(ID3D11Debug), (void **)&debug.reset()),
             "Failed to query ID3D11Debug");
 
-        direct3d::AlwaysAssert(device->QueryInterface(__uuidof(ID3D11InfoQueue), (void **)&debug_info_queue.reset()),
+        AlwaysAssert(device->QueryInterface(__uuidof(ID3D11InfoQueue), (void **)&debug_info_queue.reset()),
             "Failed to query ID3D11InfoQueue");
 #endif
     }
     void api::Deinit()
     {
-        factory = nullptr;
-        factory5 = nullptr;
-        device = nullptr;
-        device5 = nullptr;
-        devcon = nullptr;
-#if defined(_DEBUG)
         devcon4 = nullptr;
+        device5 = nullptr;
+        factory5 = nullptr;
+        factory = nullptr;
+        devcon->ClearState();
+        devcon->Flush();
+        devcon = nullptr;
+        device = nullptr;
+#if defined(_DEBUG)
+        debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+        debug->ReportLiveDeviceObjects(D3D11_RLDO_SUMMARY);
+        LogDebugInfoQueue();
         debug = nullptr;
+        debug_info_queue = nullptr;
 #endif
     }
 } // namespace engine::direct3d

@@ -28,6 +28,7 @@ namespace engine::render
 
         std::vector<Material> materials;
         core::math::mat4 mesh_to_model;
+        core::math::mat4 inv_mesh_to_model;
         MeshRange mesh_range;
     };
 

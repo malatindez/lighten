@@ -17,7 +17,7 @@ cmake --build . --config Release
 :open_folder
 set /P c=Open Solution[Y/N]?
 if /I "%c%" EQU "N" goto :end
-start dle_internship.sln
+start engine.sln
 :end
 cd ..
 pause

@@ -65,7 +65,7 @@ namespace engine::render::_detail
     void OpaqueRenderSystem::OnInstancesUpdated(entt::registry &registry)
     {
         uint32_t total_instances = 0;
-
+        instances_.clear();
         auto instance_group = registry.group<components::ModelComponent, components::TransformComponent>(entt::get<components::OpaqueComponent>);
         using InstanceId = uint64_t;
         using InstanceIndex = size_t;
@@ -134,8 +134,6 @@ namespace engine::render::_detail
                 auto &mesh = model.meshes[mesh_id];
                 for (uint32_t material_id = 0; material_id < mesh.materials.size(); material_id++)
                 {
-                    auto &material = mesh.materials[material_id];
-
                     uint64_t instance_id = ((uint64_t)(mesh_id) << 32) | (uint64_t)model_ref.model_id;
                     auto it = std::ranges::find_if(instance_ids_, [&instance_id](auto const &pair) { return pair.first == instance_id; });
                     InstanceInfo &instance = instances_[it->second];

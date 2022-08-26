@@ -31,6 +31,7 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 
         shader_manager = nullptr;
         render_pipeline = nullptr;
+        renderer = nullptr;
 
         app.Run();
     }
@@ -41,6 +42,6 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(250));
     Engine::Deinit();
-    std::this_thread::sleep_for(std::chrono::milliseconds(250));
+    std::this_thread::sleep_for(std::chrono::milliseconds(750));
     return 0;
 }

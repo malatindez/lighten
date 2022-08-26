@@ -39,13 +39,14 @@ namespace engine::render
 
             float t = tmin;
 
-            if (t < 0 || t < nearest.t)
+            if (t < 0)
             {
                 t = tmax;
-                if (t < 0 || t < nearest.t)
+                if (t < 0 || t > nearest.t)
                     return false;
             }
             nearest.t = t;
+            nearest.point = ray.PointAtParameter(t);
             return true;
         }
         bool CheckForIntersection(Model const &model,
@@ -54,12 +55,21 @@ namespace engine::render
             Intersection &nearest)
         {
             Ray local = ray;
-            local.SetDirection(core::math::as_vec<3>(core::math::vec4{ local.direction(), 0 } *transform.inv_model));
-            local.origin() = core::math::as_vec<3>(core::math::vec4{ local.origin(), 1 } *transform.inv_model);
+            local.SetDirection(normalize((core::math::vec4{ local.direction(), 0 } *transform.inv_model).xyz));
+            local.origin() = (core::math::vec4{ local.origin(), 1 } *transform.inv_model).xyz;
             bool rv = false;
             for (auto const &mesh : model.meshes)
             {
-                rv |= CheckForIntersection(mesh.mesh_range.bounding_box, ray, nearest);
+                Ray mesh_local = local;
+                mesh_local.origin() = core::math::as_vec<3>(core::math::vec4{ local.origin(), 1 } *mesh.inv_mesh_to_model);
+                mesh_local.SetDirection(core::math::as_vec<3>(core::math::vec4{ local.direction(), 0 } *mesh.inv_mesh_to_model));
+                bool t = CheckForIntersection(mesh.mesh_range.bounding_box, local, nearest);
+                if (t)
+                {
+                    nearest.point = (core::math::vec4{ nearest.point, 1 } *mesh.mesh_to_model).xyz;
+                    nearest.point = (core::math::vec4{ nearest.point, 1 } *transform.model).xyz;
+                    rv = t;
+                }
             }
             return rv;
         }
@@ -68,7 +78,7 @@ namespace engine::render
         Ray const &ray,
         Intersection &nearest)
     {
-        auto group = registry.group<>(entt::get<components::ModelComponent, components::TransformComponent>);
+        auto group = registry.group<components::ModelComponent, components::TransformComponent>();
         std::optional<entt::entity> rv = std::nullopt;
         group.each([&rv, &ray, &nearest](auto const entity, auto const &mesh_component, auto const &transform)
             {

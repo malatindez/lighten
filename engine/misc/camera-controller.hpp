@@ -49,9 +49,17 @@ namespace engine
             return core::math::Ray(cam.position(), core::math::normalize(as_vec<3>(direction) / direction.w - cam.position()));
         }
 
+        [[nodiscard]] inline core::math::Ray PixelRaycast(core::math::vec2 ndc) const noexcept
+        {
+            ndc /= window_size();
+            ndc = ndc * 2.0f - 1.0f;
+            ndc.v = -ndc.v;
+            return Raycast(ndc);
+        }
+
 
         [[nodiscard]] inline components::CameraComponent const &camera() const noexcept { return registry_->get<components::CameraComponent>(camera_); }
-        [[nodiscard]] inline components::TransformComponent const &transform() const noexcept { registry_->get<components::TransformComponent>(camera_); }
+        [[nodiscard]] inline components::TransformComponent const &transform() const noexcept { return registry_->get<components::TransformComponent>(camera_); }
         [[nodiscard]] inline components::CameraComponent &camera() noexcept { return registry_->get<components::CameraComponent>(camera_); }
         [[nodiscard]] inline components::TransformComponent &transform() noexcept { return registry_->get<components::TransformComponent>(camera_); }
 
@@ -94,7 +102,7 @@ namespace engine
         float accelerated_speed_ = 10.0f;
         float roll_speed_ = engine::core::math::radians(60.0f);
 
-    private:
+    public:
         entt::registry *registry_;
         entt::entity camera_;
         core::math::ivec2 const &window_size_;
