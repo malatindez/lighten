@@ -34,6 +34,7 @@ namespace engine::render
 
     struct Model
     {
+        core::math::AABB bounding_box;
         std::vector<Mesh> meshes;
         direct3d::ImmutableVertexBuffer<Vertex> vertices;
         direct3d::ImmutableIndexBuffer<uint32_t> indices;

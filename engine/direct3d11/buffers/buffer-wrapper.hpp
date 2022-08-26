@@ -23,13 +23,13 @@ namespace engine::direct3d
     protected:
         inline void Init(D3D11_BUFFER_DESC &&desc, D3D11_SUBRESOURCE_DATA &initial_data)
         {
-            direct3d::AlwaysAssert(direct3d::api::device5->CreateBuffer(&desc, &initial_data, &buffer_.ptr()),
+            direct3d::AlwaysAssert(direct3d::api::device5->CreateBuffer(&desc, &initial_data, &buffer_.reset()),
                                    "Failed to create buffer");
             description_ = desc;
         }
         inline void Init(D3D11_BUFFER_DESC &&desc)
         {
-            direct3d::AlwaysAssert(direct3d::api::device5->CreateBuffer(&desc, nullptr, &buffer_.ptr()),
+            direct3d::AlwaysAssert(direct3d::api::device5->CreateBuffer(&desc, nullptr, &buffer_.reset()),
                                    "Failed to create buffer");
             description_ = desc;
         }

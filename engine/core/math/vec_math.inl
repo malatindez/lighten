@@ -514,6 +514,24 @@ namespace engine::core::math
         return rv;
     }
 
+    template <AnyVec T>
+    constexpr void rmin(T &left, T const &max) noexcept
+    {
+        for (int i = 0; i < T::size; i++)
+        {
+            left[i] = std::min(left[i], static_cast<typename T::type>(max[i]));
+        }
+    }
+
+    template <AnyVec T>
+    constexpr void rmax(T &left, T const &min) noexcept
+    {
+        for (int i = 0; i < T::size; i++)
+        {
+            left[i] = std::max(left[i], static_cast<typename T::type>(min[i]));
+        }
+    }
+
     template <AnyVec T, Primitive U>
     constexpr void rmin(T &left, U const max) noexcept
     {
@@ -530,5 +548,17 @@ namespace engine::core::math
         {
             left[i] = std::max(left[i], static_cast<typename T::type>(min));
         }
+    }
+
+    template <Primitive T, Primitive U>
+    constexpr void rmin(T &left, U const max) noexcept
+    {
+        left = left < max ? left : max;
+    }
+
+    template <Primitive T, Primitive U>
+    constexpr void rmax(T &left, U const min) noexcept
+    {
+        left = left > min ? left : max;
     }
 } // namespace engine::core::math

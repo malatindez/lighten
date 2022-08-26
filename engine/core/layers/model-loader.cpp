@@ -123,9 +123,14 @@ namespace engine::core
         processNode(vertices, indices, meshes, std::filesystem::absolute(path.parent_path()), scene_ptr->mRootNode, scene_ptr);
         uint32_t index_offset = 0;
         uint32_t vertex_offset = 0;
+        math::vec3 min{ std::numeric_limits<float>::max() };
+        math::vec3 max{ std::numeric_limits<float>::min() };
+
         for (auto &mesh : meshes)
         {
             auto &mesh_range = mesh.mesh_range;
+            math::rmin(min, mesh_range.bounding_box.min);
+            math::rmax(max, mesh_range.bounding_box.max);
 
             mesh_range.index_offset = index_offset;
             mesh_range.vertex_offset = vertex_offset;
@@ -133,7 +138,10 @@ namespace engine::core
             vertex_offset += mesh_range.vertex_num;
         }
 
-        uint32_t rv = ModelSystem::AddModel(Model{ .meshes = meshes,
+
+        uint32_t rv = ModelSystem::AddModel(Model{
+                .bounding_box = math::AABB{.min = min, .max = max},
+                .meshes = meshes,
                 .vertices = direct3d::ImmutableVertexBuffer<Vertex>(vertices),
                 .indices = direct3d::ImmutableIndexBuffer<uint32_t>(indices)
                                             });

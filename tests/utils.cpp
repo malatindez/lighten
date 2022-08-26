@@ -113,7 +113,7 @@ namespace utils
     {
         std::string return_value;
         return_value.reserve(size);
-        std::uniform_int_distribution<size_t> dis { 0, including.size() - 1 };
+        std::uniform_int_distribution<size_t> dis{ 0, including.size() - 1 };
         for (size_t i = 0; i < size; i++)
         {
             size_t k = dis(gen);
