@@ -26,12 +26,18 @@ namespace engine::render::_detail
     {
         if (instance_buffer_.size() == 0)
             return;
+        direct3d::api::devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+        direct3d::api::devcon4->RSSetState(direct3d::states::cull_back);
+        direct3d::api::devcon4->PSSetSamplers(0, 1, &direct3d::states::linear_wrap_sampler.ptr());
+        direct3d::api::devcon4->OMSetDepthStencilState(direct3d::states::geq_depth, 0);
+        direct3d::api::devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
+
         opaque_shader_.Bind();
         mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 1);
 
         instance_buffer_.Bind(1);
 
-        direct3d::api::devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
         uint32_t model_id = std::numeric_limits<uint32_t>::max();
         uint32_t mesh_id = std::numeric_limits<uint32_t>::max();
@@ -54,7 +60,7 @@ namespace engine::render::_detail
             {
                 mesh_to_model_buffer_.Update(mesh.mesh_to_model);
             }
-            direct3d::api::devcon4->PSSetShaderResources(0, 1, &material.texture.ptr());
+            direct3d::api::devcon4->PSSetShaderResources(0, 1, &material.texture);
 
             uint32_t num_instances = uint32_t(instance.amount);
             direct3d::api::devcon4->DrawIndexedInstanced(mesh.mesh_range.index_num, num_instances, mesh.mesh_range.index_offset, mesh.mesh_range.vertex_offset, rendered_instances);
@@ -89,7 +95,7 @@ namespace engine::render::_detail
                     // fetch instance index
                     size_t instance_index = 0;
                     auto it = std::ranges::find_if(instance_ids_, [&instance_id] (auto const &pair) { return pair.first == instance_id; });
-                    if (it == instance_ids_.end()) // create new if it not exists
+                    if (it == instance_ids_.end()) // create new if it doesnt exist
                     {
                         instance_ids_.push_back(std::pair<InstanceId, InstanceIndex>{ instance_id, instances_.size()});
                         instance_index = instances_.size();
@@ -138,7 +144,7 @@ namespace engine::render::_detail
                     auto it = std::ranges::find_if(instance_ids_, [&instance_id] (auto const &pair) { return pair.first == instance_id; });
                     InstanceInfo &instance = instances_[it->second];
 
-                    dst[instance_offsets_[instance_id] + instance.amount++] = Instance{ .model_transform = transform.model };
+                    dst[instance_offsets_[instance_id] + instance.amount++] = Instance{ .model_transform = mesh.mesh_to_model * transform.model };
                 }
             }
         }

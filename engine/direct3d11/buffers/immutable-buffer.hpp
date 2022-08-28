@@ -8,6 +8,7 @@ namespace engine::direct3d
     public:
         using BufferBase<T>::buffer;
         using BufferBase<T>::description;
+        using BufferBase<T>::size;
     public:
         ImmutableBuffer(D3D11_BUFFER_DESC &&desc, std::span<const T> span) : BufferBase<T>(D3D11_USAGE_IMMUTABLE)
         {

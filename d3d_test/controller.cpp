@@ -1,6 +1,7 @@
 #include "controller.hpp"
 #include "transform-editor.hpp"
 #include "camera-movement.hpp"
+#include "misc/skybox-manager.hpp"
 using namespace engine;
 using namespace core;
 using namespace events;
@@ -56,6 +57,15 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
         transform.UpdateMatrices();
     }
     render::ModelSystem::instance()->OnInstancesUpdated(registry);
+    const auto skybox_path = std::filesystem::current_path() / "assets/textures/skyboxes/yokohama";
+    SkyboxManager::LoadSkybox(registry, std::array<std::filesystem::path, 6> {
+        skybox_path / "posx.jpg",
+            skybox_path / "negx.jpg",
+            skybox_path / "posy.jpg",
+            skybox_path / "negy.jpg",
+            skybox_path / "posz.jpg",
+            skybox_path / "negz.jpg",
+    });
 
     camera_movement::RegisterKeyCallbacks();
     transform_editor::RegisterKeyCallbacks();

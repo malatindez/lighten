@@ -2,7 +2,7 @@
 #include "utils/utils.hpp"
 #include "utils/win-utils.hpp"
 #include "d3d-debug.hpp"
-
+#include "states.hpp"
 extern "C"
 {
     _declspec(dllexport) uint32_t NvOptimusEnablement = 1;
@@ -70,9 +70,11 @@ namespace engine::direct3d
         AlwaysAssert(device->QueryInterface(__uuidof(ID3D11InfoQueue), (void **)&debug_info_queue.reset()),
                      "Failed to query ID3D11InfoQueue");
 #endif
+        states::_state_detail::StateInitializer::Init();
     }
     void api::Deinit()
     {
+        states::_state_detail::StateInitializer::Deinit();
         devcon4 = nullptr;
         device5 = nullptr;
         factory5 = nullptr;

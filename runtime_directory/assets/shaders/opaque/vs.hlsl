@@ -1,8 +1,4 @@
 #include "../globals/vs.hlsli"
-cbuffer PerMesh : register(b1)
-{
-    row_major matrix mesh_transform;
-}
 
 struct VS_OUT {
 	float4 pos : SV_POSITION;
@@ -24,7 +20,6 @@ VS_OUT vs_main(VS_INPUT input)
 	VS_OUT output;
 	float4x4 world_transform = float4x4(input.RowX, input.RowY, input.RowZ, input.RowW);
 	input.pos.w = 1;
-	//output.pos = mul(input.pos, mesh_transform);
 	output.pos = mul(input.pos, world_transform);
 	output.pos = mul(output.pos, view_projection);
 	output.texcoord = input.texcoord;

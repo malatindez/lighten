@@ -85,12 +85,9 @@ namespace transform_editor
         auto scene = Engine::scene();
         input.AddUpdateKeyCallback(
             InputLayer::KeySeq{ engine::core::Key::KEY_LBUTTON },
-            [&] (InputLayer::KeySeq const &, uint32_t count)
+            [&] (InputLayer::KeySeq const &, uint32_t)
             {
-                if (ImGui::GetIO().WantCaptureMouse)
-                {
-                    return;
-                }
+                if (ImGui::GetIO().WantCaptureMouse) { return; }
                 auto &input = *InputLayer::instance();
                 auto scene = Engine::scene();
                 auto &registry = scene->registry;

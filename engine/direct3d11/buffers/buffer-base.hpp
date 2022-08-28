@@ -24,7 +24,7 @@ namespace engine::direct3d
         using BufferWrapper::Unmap;
         using BufferWrapper::buffer;
         using BufferWrapper::description;
-        [[nodiscard]] uint32_t size() { return description_.ByteWidth / sizeof(T); }
+        [[nodiscard]] inline uint32_t size() { return description_.ByteWidth / sizeof(T); }
 
     protected:
         BufferBase(D3D11_USAGE usage) : kUsage{ usage } { }

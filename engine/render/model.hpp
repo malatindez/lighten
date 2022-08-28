@@ -12,7 +12,7 @@ namespace engine::render
 
     struct Material
     {
-        direct3d::ShaderResourceView texture;
+        ID3D11ShaderResourceView *texture;
     };
 
     struct Mesh

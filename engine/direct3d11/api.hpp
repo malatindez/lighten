@@ -8,41 +8,27 @@ namespace engine::direct3d
 {
     class api;
 
-    namespace _detail
+    namespace _api_detail
     {
         // class protected from accidental pointer overwriting
         template <typename T>
-        class global_d3d_resource_wrapper : protected d3d_resource_wrapper<T>
+        class api_readonly_wrapper final : public readonly_d3d_resource_wrapper<T>
         {
-        public:
-            constexpr operator T const *() const noexcept { return d3d_resource_wrapper<T>::ptr(); }
-            constexpr operator T *() noexcept { return d3d_resource_wrapper<T>::ptr(); }
-            constexpr T const *operator->() const noexcept { return d3d_resource_wrapper<T>::ptr(); }
-            constexpr T *operator->() noexcept { return d3d_resource_wrapper<T>::ptr(); }
-
-            [[nodiscard]] constexpr T *const &ptr() noexcept { return d3d_resource_wrapper<T>::ptr(); }
-            [[nodiscard]] constexpr T const *const &ptr() const noexcept { return d3d_resource_wrapper<T>::ptr(); }
-
-            using d3d_resource_wrapper<T>::valid;
-            using d3d_resource_wrapper<T>::operator();
-
-        private:
             friend class engine::direct3d::api;
-
-            using d3d_resource_wrapper<T>::d3d_resource_wrapper;
-            using d3d_resource_wrapper<T>::operator=;
+            using readonly_d3d_resource_wrapper<T>::operator=;
+            using readonly_d3d_resource_wrapper<T>::readonly_d3d_resource_wrapper;
         };
-    } // namespace _detail
+    } // namespace _api_detail
 
-    using Factory = _detail::global_d3d_resource_wrapper<IDXGIFactory>;
-    using Factory5 = _detail::global_d3d_resource_wrapper<IDXGIFactory5>;
-    using Device = _detail::global_d3d_resource_wrapper<ID3D11Device>;
-    using Device5 = _detail::global_d3d_resource_wrapper<ID3D11Device5>;
-    using DeviceContext = _detail::global_d3d_resource_wrapper<ID3D11DeviceContext>;
-    using DeviceContext4 = _detail::global_d3d_resource_wrapper<ID3D11DeviceContext4>;
+    using Factory = _api_detail::api_readonly_wrapper<IDXGIFactory>;
+    using Factory5 = _api_detail::api_readonly_wrapper<IDXGIFactory5>;
+    using Device = _api_detail::api_readonly_wrapper<ID3D11Device>;
+    using Device5 = _api_detail::api_readonly_wrapper<ID3D11Device5>;
+    using DeviceContext = _api_detail::api_readonly_wrapper<ID3D11DeviceContext>;
+    using DeviceContext4 = _api_detail::api_readonly_wrapper<ID3D11DeviceContext4>;
 #if defined(_DEBUG)
-    using Debug = _detail::global_d3d_resource_wrapper<ID3D11Debug>;
-    using DebugInfoQueue = _detail::global_d3d_resource_wrapper<ID3D11InfoQueue>;
+    using Debug = _api_detail::api_readonly_wrapper<ID3D11Debug>;
+    using DebugInfoQueue = _api_detail::api_readonly_wrapper<ID3D11InfoQueue>;
 #endif
 
     class api final

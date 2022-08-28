@@ -63,7 +63,7 @@ namespace engine::render
                 Ray mesh_local = local;
                 mesh_local.origin() = (core::math::vec4{ local.origin(), 1 } *mesh.inv_mesh_to_model).xyz;
                 mesh_local.SetDirection((core::math::vec4{ local.direction(), 0 } *mesh.inv_mesh_to_model).xyz);
-                bool t = CheckForIntersection(mesh.mesh_range.bounding_box, local, nearest);
+                bool t = CheckForIntersection(mesh.mesh_range.bounding_box, mesh_local, nearest);
                 if (t)
                 {
                     nearest.point = (core::math::vec4{ nearest.point, 1 } *mesh.mesh_to_model).xyz;
