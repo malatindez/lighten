@@ -86,7 +86,7 @@ namespace engine::platform::windows
         }
         else if (message == WM_MOUSEMOVE)
         {
-            MouseMovedEvent event{ core::math::ivec2{LOWORD(l_param), HIWORD(l_param)} };
+            MouseMovedEvent event{ core::math::ivec2{(int16_t)(LOWORD(l_param)),(int16_t)(HIWORD(l_param))} };
             event_callback_(event);
         }
         else if (message == WM_LBUTTONDOWN)
