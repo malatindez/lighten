@@ -132,6 +132,22 @@ namespace transform_editor
             },
             false);
 
+        input.AddUpdateKeyCallback(
+            InputLayer::KeySeq{ engine::core::Key::KEY_C },
+            [&] (InputLayer::KeySeq const &, uint32_t count)
+            {
+                if (count == std::numeric_limits<uint32_t>::max()) { return; }
+                if (ImGuizmo::LOCAL == mCurrentGizmoMode)
+                {
+                    mCurrentGizmoMode = ImGuizmo::WORLD;
+                }
+                else
+                {
+                    mCurrentGizmoMode = ImGuizmo::LOCAL;
+                }
+            },
+            false);
+
     }
 
     void OnGuiRender(ivec2 const &window_pos, ivec2 const &window_size)

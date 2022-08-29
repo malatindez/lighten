@@ -4,42 +4,73 @@ using namespace core;
 using namespace direct3d;
 using namespace math;
 using namespace ShaderCompiler;
+void Renderer::OnGuiRender()
+{
+    ImGui::Begin("Cube render settings");
+    const char *items[] = { "PointWrapSampler","PointClampSampler", "LinearWrapSampler","LinearClampSampler", "AnisotropicWrapSampler","AnisotropicClampSampler" };
+    static const char *current_item = "PointWrapSampler";
+    static int current_item_id = 0, previous_item_id = 0;
+    if (ImGui::BeginCombo("Sampler", current_item, ImGuiComboFlags_NoArrowButton))
+    {
+        current_item_id = -1;
+        for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+        {
+            bool is_selected = (current_item == items[n]);
+            if (ImGui::Selectable(items[n], is_selected))
+            {
+                current_item = items[n];
+                current_item_id = n;
+            }
+            if (is_selected)
+            {
+                ImGui::SetItemDefaultFocus();
+                current_item_id = n;
+            }
+        }
+        ImGui::EndCombo();
+        if (current_item_id != previous_item_id)
+        {
+            previous_item_id = current_item_id;
+            switch (current_item_id)
+            {
+            case 0:
+                current_state = direct3d::states::point_wrap_sampler.as_default_wrapper();
+                spdlog::info("PointWrapSampler is bound for cube.");
+                break;
+            case 1:
+                current_state = direct3d::states::point_clamp_sampler.as_default_wrapper();
+                spdlog::info("PointClampSampler is bound for cube.");
+                break;
+            case 2:
+                current_state = direct3d::states::linear_wrap_sampler.as_default_wrapper();
+                spdlog::info("LinearWrapSampler is bound for cube.");
+                break;
+            case 3:
+                current_state = direct3d::states::linear_clamp_sampler.as_default_wrapper();
+                spdlog::info("LinearClampSampler is bound for cube.");
+                break;
+            case 4:
+                current_state = direct3d::states::anisotropic_wrap_sampler.as_default_wrapper();
+                spdlog::info("AnisotropicWrapSampler is bound for cube.");
+                break;
+            case 5:
+                current_state = direct3d::states::anisotropic_clamp_sampler.as_default_wrapper();
+                spdlog::info("AnisotropicClampSampler is bound for cube.");
+                break;
+            default:
+                current_state = direct3d::states::point_wrap_sampler.as_default_wrapper();
+                spdlog::info("PointWrapSampler is bound for cube.");
+                break;
+            }
+
+        }
+    }
+    ImGui::End();
+}
 Renderer::Renderer()
 {
     knight_model_id = ModelLoader::instance()->Load("assets\\models\\Knight\\Knight.fbx").value_or(0);
     cube_model_id = ModelLoader::instance()->Load("assets\\models\\Cube\\Cube.fbx").value_or(0);
-    // switch sampler states for cube
-    auto &input = *InputLayer::instance();
-    input.AddUpdateKeyCallback(InputLayer::KeySeq{ engine::core::Key::KEY_1 },
-                               [this] (InputLayer::KeySeq const &, uint32_t count) { if (count == std::numeric_limits<uint32_t>::max()) { return; } current_state = direct3d::states::point_wrap_sampler.as_default_wrapper();
-    spdlog::info("PointWrapSampler is bound for cube.");
-                               },
-                               false);
-    input.AddUpdateKeyCallback(InputLayer::KeySeq{ engine::core::Key::KEY_2 },
-                               [this] (InputLayer::KeySeq const &, uint32_t count) { if (count == std::numeric_limits<uint32_t>::max()) { return; } current_state = direct3d::states::point_clamp_sampler.as_default_wrapper();
-    spdlog::info("PointClampSampler is bound for cube.");
-                               },
-                               false);
-    input.AddUpdateKeyCallback(InputLayer::KeySeq{ engine::core::Key::KEY_3 },
-                               [this] (InputLayer::KeySeq const &, uint32_t count) { if (count == std::numeric_limits<uint32_t>::max()) { return; } current_state = direct3d::states::linear_wrap_sampler.as_default_wrapper();
-    spdlog::info("LinearWrapSampler is bound for cube.");
-                               },
-                               false);
-    input.AddUpdateKeyCallback(InputLayer::KeySeq{ engine::core::Key::KEY_4 },
-                               [this] (InputLayer::KeySeq const &, uint32_t count) {if (count == std::numeric_limits<uint32_t>::max()) { return; } current_state = direct3d::states::linear_clamp_sampler.as_default_wrapper();
-    spdlog::info("LinearClampSampler is bound for cube.");
-                               },
-                               false);
-    input.AddUpdateKeyCallback(InputLayer::KeySeq{ engine::core::Key::KEY_5 },
-                               [this] (InputLayer::KeySeq const &, uint32_t count) { if (count == std::numeric_limits<uint32_t>::max()) { return; } current_state = direct3d::states::anisotropic_wrap_sampler.as_default_wrapper();
-    spdlog::info("AnisotropicWrapSampler is bound for cube.");
-                               },
-                               false);
-    input.AddUpdateKeyCallback(InputLayer::KeySeq{ engine::core::Key::KEY_6 },
-                               [this] (InputLayer::KeySeq const &, uint32_t count) { if (count == std::numeric_limits<uint32_t>::max()) { return; } current_state = direct3d::states::anisotropic_clamp_sampler.as_default_wrapper();
-    spdlog::info("AnisotropicClampSampler is bound for cube.");
-                               },
-                               false);
     current_state = direct3d::states::point_wrap_sampler.as_default_wrapper();
     spdlog::info("PointWrapSampler is bound for cube.");
 

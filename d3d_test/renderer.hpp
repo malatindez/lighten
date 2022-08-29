@@ -5,11 +5,13 @@
 struct TestCubeComponent {};
 class Renderer
     : public engine::core::Layer,
-    public engine::core::Layer::HandleRender
+    public engine::core::Layer::HandleRender,
+    public engine::core::Layer::HandleGuiRender
 {
 public:
     Renderer();
     void OnRender() override;
+    void OnGuiRender() override;
 
     engine::render::PerFrame per_frame;
     engine::direct3d::DynamicUniformBuffer<engine::render::PerFrame> per_frame_buffer{};

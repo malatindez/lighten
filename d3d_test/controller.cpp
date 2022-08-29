@@ -11,7 +11,9 @@ void Controller::OnGuiRender()
 {
     ImGui::Begin("Framerate");
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    ImGui::End();
 
+    ImGui::Begin("Camera info");
     ImGui::Text("Move speed: ");
     ImGui::Text("%.3f", Engine::scene()->main_camera->move_speed());
     ImGui::Text("FOV: ");
@@ -22,7 +24,9 @@ void Controller::OnGuiRender()
     ImGui::Text("%s", utils::FormatToString(Engine::scene()->main_camera->transform().model).c_str());
     ImGui::Text("Camera inv view matrix");
     ImGui::Text("%s", utils::FormatToString(Engine::scene()->main_camera->camera().inv_view).c_str());
-    ImGui::Text("Edit target transform: ");
+    ImGui::End();
+
+    ImGui::Begin("Transform edit");
     transform_editor::OnGuiRender(window_pos, window_size);
     ImGui::End();
 }
@@ -93,17 +97,8 @@ void Controller::OnTick([[maybe_unused]] float delta_time)
 
     if (input.mouse_scrolled())
     {
-        if (transform_editor::selected_entity != entt::null && transform_editor::selected_scene == scene && input.rbutton_down())
-        {
-            TransformComponent &transform = scene->registry.get<TransformComponent>(transform_editor::selected_entity);
-            transform.scale *= vec3{ powf(math::clamp(1 + delta_time / 120 * input.scroll_delta(), 0.5f, 1.5f), 0.5f) };
-            rclamp(transform.scale, 0.1f, std::numeric_limits<float>::max());
-        }
-        else
-        {
-            auto &move_speed = scene->main_camera->move_speed();
-            move_speed = std::max(0.01f, move_speed * (input.scroll_delta() > 0 ? 1.1f : 1.0f / 1.1f));
-        }
+        auto &move_speed = scene->main_camera->move_speed();
+        move_speed = std::max(0.01f, move_speed * (input.scroll_delta() > 0 ? 1.1f : 1.0f / 1.1f));
         input.flush();
     }
 }
