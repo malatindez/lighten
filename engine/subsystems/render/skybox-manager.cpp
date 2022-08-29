@@ -1,6 +1,6 @@
 #pragma once
 #include "skybox-manager.hpp"
-#include "core/layers/shader-manager.hpp"
+#include "../core/shader-manager.hpp"
 namespace engine
 {
     std::unique_ptr<direct3d::ImmutableVertexBuffer<core::math::vec3>> SkyboxManager::cube_vb_;

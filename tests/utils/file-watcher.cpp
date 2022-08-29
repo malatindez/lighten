@@ -7,7 +7,7 @@ using namespace engine::core::events;
 TEST(FILE_WATCHER_TEST, BasicTest)
 {
     std::optional<FilesChangedEvent> last_event = std::nullopt;
-    auto callback_fn = [&](Event &e)
+    auto callback_fn = [&] (Event &e)
     {
         engine::utils::AlwaysAssert(e.type() == EventType::FilesChanged);
 
@@ -32,7 +32,7 @@ TEST(FILE_WATCHER_TEST, RandomTest)
 {
     static constexpr size_t kTestSize = utils::RandomConstexpr(0, 2, 8);
     std::optional<FilesChangedEvent> last_event = std::nullopt;
-    auto callback_fn = [&](Event &e)
+    auto callback_fn = [&] (Event &e)
     {
         engine::utils::AlwaysAssert(e.type() == EventType::FilesChanged);
 

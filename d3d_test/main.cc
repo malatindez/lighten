@@ -23,7 +23,7 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
         auto renderer = std::make_shared<Renderer>();
 
         render_pipeline->PushLayer(renderer);
-        auto controller = std::make_shared<Controller>(renderer, render_pipeline->window()->size());
+        auto controller = std::make_shared<Controller>(renderer, render_pipeline->window()->size(), render_pipeline->window()->position());
         render_pipeline->PushLayer(controller);
         render_pipeline->window()->SetEventCallback(Engine::event_function());
 

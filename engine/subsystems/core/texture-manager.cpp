@@ -1,12 +1,12 @@
 #include "texture-manager.hpp"
 namespace engine::core
 {
+    std::unique_ptr<TextureManager> TextureManager::instance_ = nullptr;
 
-    TextureId TextureManager::current_id_ = 0;
-    std::unordered_map<TextureId, direct3d::ShaderResourceView> TextureManager::textures_;
-    std::unordered_map<TextureManager::TextureHash, TextureId> TextureManager::hash_ids_;
     namespace
     {
+
+
         direct3d::ShaderResourceView LoadTextureFromPath(std::filesystem::path const &path)
         {
             static direct3d::Resource texture_resource;
@@ -112,23 +112,23 @@ namespace engine::core
     {
         utils::AlwaysAssert(path.is_absolute(), "Paths provided to texture manager should be absolute!");
         utils::Assert(path.has_extension(), "Path to texture should have an extension");
-        if (auto it = hash_ids_.find(std::filesystem::hash_value(path));
-            it != hash_ids_.end())
+        if (auto it = instance_->hash_ids_.find(std::filesystem::hash_value(path));
+            it != instance_->hash_ids_.end())
         {
             return it->second;
         }
         auto shader_resource_view = LoadTextureFromPath(path);
-        textures_.emplace(std::make_pair(current_id_, shader_resource_view));
-        hash_ids_.emplace(std::make_pair(std::filesystem::hash_value(path), current_id_));
-        return current_id_++;
+        instance_->textures_.emplace(std::make_pair(instance_->current_id_, shader_resource_view));
+        instance_->hash_ids_.emplace(std::make_pair(std::filesystem::hash_value(path), instance_->current_id_));
+        return instance_->current_id_++;
     }
 
     TextureId TextureManager::LoadCubemap(std::filesystem::path const &path)
     {
         std::string extension = utils::as_lowercase(path.extension().string());
         utils::Assert(extension == ".dds", "Single-file cubemap has to be in dds format");
-        if (auto it = hash_ids_.find(std::filesystem::hash_value(path));
-            it != hash_ids_.end())
+        if (auto it = instance_->hash_ids_.find(std::filesystem::hash_value(path));
+            it != instance_->hash_ids_.end())
         {
             return it->second;
         }
@@ -149,9 +149,9 @@ namespace engine::core
                                                 &shader_resource_view.reset()),
             "Failed to load dds texture from file @" + path.string());
 
-        textures_.emplace(std::make_pair(current_id_, shader_resource_view));
-        hash_ids_.emplace(std::make_pair(std::filesystem::hash_value(path), current_id_));
-        return current_id_++;
+        instance_->textures_.emplace(std::make_pair(instance_->current_id_, shader_resource_view));
+        instance_->hash_ids_.emplace(std::make_pair(std::filesystem::hash_value(path), instance_->current_id_));
+        return instance_->current_id_++;
     }
     TextureId TextureManager::LoadCubemap(std::array<std::filesystem::path, 6> const &cubemap_textures, bool generate_mipmaps)
     {
@@ -172,12 +172,12 @@ namespace engine::core
 
             D3D11_SUBRESOURCE_DATA subresource_data{};
             subresource_data.pSysMem = images.back()->GetImage(0, 0, 0)->pixels;
-            subresource_data.SysMemPitch = images.back()->GetImage(0, 0, 0)->rowPitch;
+            subresource_data.SysMemPitch = (uint32_t)images.back()->GetImage(0, 0, 0)->rowPitch;
             subresource_data_array.push_back(subresource_data);
         }
 
-        desc.Width = images[0]->GetImage(0, 0, 0)->width;
-        desc.Height = images[0]->GetImage(0, 0, 0)->height;
+        desc.Width = (uint32_t)images[0]->GetImage(0, 0, 0)->width;
+        desc.Height = (uint32_t)images[0]->GetImage(0, 0, 0)->height;
         desc.MipLevels = generate_mipmaps ? MipmapLevels(desc.Width, desc.Height) : 1;
         desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
@@ -203,16 +203,15 @@ namespace engine::core
         srv_desc.Format = desc.Format;
         srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
         srv_desc.TextureCube.MostDetailedMip = 0;
-        srv_desc.TextureCube.MipLevels = -1;
+        srv_desc.TextureCube.MipLevels = std::numeric_limits<UINT>::max();
 
-        ID3D11ShaderResourceView *pSRV = nullptr;
         direct3d::ShaderResourceView shader_resource_view;
         direct3d::AlwaysAssert(direct3d::api::device->CreateShaderResourceView(texture, &srv_desc, &shader_resource_view.ptr()),
                                "Failed to create shader resource view");
 
         if (generate_mipmaps) direct3d::api::devcon->GenerateMips(shader_resource_view);
-        textures_.emplace(std::make_pair(current_id_, shader_resource_view));
-        return current_id_++;
+        instance_->textures_.emplace(std::make_pair(instance_->current_id_, shader_resource_view));
+        return instance_->current_id_++;
 
     }
 }

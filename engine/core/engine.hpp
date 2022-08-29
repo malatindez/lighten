@@ -3,6 +3,8 @@
 #include "layers.hpp"
 #include "misc/ini.hpp"
 #include "core/scene.hpp"
+#include "subsystems/core/core.hpp"
+#include "subsystems/render/render.hpp"
 
 namespace engine::core
 {

@@ -1,7 +1,5 @@
 #include "engine.hpp"
 #include "include/win-debug.hpp"
-#include "render/model-system.hpp"
-#include "misc/skybox-manager.hpp"
 
 static std::string const kDefaultConfig =
 R"(
@@ -44,6 +42,7 @@ namespace engine::core
         ShaderManager::Init();
         ModelLoader::Init();
         SkyboxManager::Init();
+        TextureManager::Init();
         render::ModelSystem::Init();
     }
 
@@ -55,6 +54,7 @@ namespace engine::core
         ShaderManager::Deinit();
         ModelLoader::Deinit();
         SkyboxManager::Deinit();
+        TextureManager::Deinit();
         render::ModelSystem::Deinit();
         direct3d::api::Deinit();
     }

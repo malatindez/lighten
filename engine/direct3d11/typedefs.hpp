@@ -1,7 +1,7 @@
 #include "d3d-common.hpp"
 namespace engine::direct3d
 {
-    
+
     enum class ShaderType : uint8_t
     {
         VertexShader = 0,

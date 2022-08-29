@@ -1,7 +1,7 @@
 #include "opaque-render-system.hpp"
 #include "components/components.hpp"
 #include "../model-system.hpp"
-#include "core/layers/shader-manager.hpp"
+#include "../../core/shader-manager.hpp"
 namespace engine::render::_detail
 {
     OpaqueRenderSystem::OpaqueRenderSystem()
@@ -59,6 +59,7 @@ namespace engine::render::_detail
             else if (mesh_id != instance.mesh_id())
             {
                 mesh_to_model_buffer_.Update(mesh.mesh_to_model);
+                mesh_id = instance.mesh_id();
             }
             direct3d::api::devcon4->PSSetShaderResources(0, 1, &material.texture);
 

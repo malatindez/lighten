@@ -2,7 +2,7 @@
 #include "detail/opaque-render-system.hpp"
 #include "components/components.hpp"
 #include "core/math/ray.hpp"
-#include "model.hpp"
+#include "render/model.hpp"
 namespace engine::components
 {
     struct ModelComponent

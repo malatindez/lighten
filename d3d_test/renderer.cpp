@@ -1,5 +1,4 @@
 #include "renderer.hpp"
-#include "misc/skybox-manager.hpp"
 using namespace engine;
 using namespace core;
 using namespace direct3d;

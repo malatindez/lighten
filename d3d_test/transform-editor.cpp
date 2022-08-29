@@ -15,7 +15,7 @@ namespace transform_editor
     ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
 
 
-    void EditTransform(CameraController const &camera, TransformComponent &transform, AABB const &bounding_box, bool enabled = true)
+    void EditTransform(CameraController const &camera, TransformComponent &transform, AABB const &bounding_box, bool enabled, ivec2 const &window_pos, ivec2 const &window_size)
     {
         mat4 &matrix = transform.model;
         if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
@@ -59,8 +59,7 @@ namespace transform_editor
             ImGui::InputFloat("Scale Snap", &snap.x);
             break;
         }
-        ImGuiIO &io = ImGui::GetIO();
-        ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
+        ImGuizmo::SetRect((float)window_pos.x, (float)window_pos.y, (float)window_size.x, (float)window_size.y);
         if (enabled)
         {
             static float boundsSnap[] = { 0.1f, 0.1f, 0.1f };
@@ -90,7 +89,6 @@ namespace transform_editor
                 if (ImGui::GetIO().WantCaptureMouse) { return; }
                 auto &input = *InputLayer::instance();
                 auto scene = Engine::scene();
-                auto &registry = scene->registry;
                 Ray ray = scene->main_camera->PixelRaycast(vec2{ input.mouse_position() });
                 Intersection nearest;
                 nearest.reset();
@@ -99,7 +97,6 @@ namespace transform_editor
                 {
                     selected_entity = entity.value();
                     selected_scene = scene;
-                    TransformComponent &transform = registry.get<TransformComponent>(selected_entity);
                     selected_distance = nearest.t;
                 }
                 else
@@ -137,7 +134,7 @@ namespace transform_editor
 
     }
 
-    void OnGuiRender()
+    void OnGuiRender(ivec2 const &window_pos, ivec2 const &window_size)
     {
         static TransformComponent empty;
         static AABB empty_bb;
@@ -146,13 +143,13 @@ namespace transform_editor
             TransformComponent &transform = Engine::scene()->registry.get<TransformComponent>(selected_entity);
             auto id = Engine::scene()->registry.get<ModelComponent>(selected_entity).model_id;
             auto const &model_ref = render::ModelSystem::GetModel(id);
-            EditTransform(*Engine::scene()->main_camera, transform, model_ref.bounding_box);
+            EditTransform(*Engine::scene()->main_camera, transform, model_ref.bounding_box, true, window_pos, window_size);
             render::ModelSystem::instance()->OnInstancesUpdated(Engine::scene()->registry);
         }
         else
         {
             ImGui::BeginDisabled();
-            EditTransform(*Engine::scene()->main_camera, empty, empty_bb, false);
+            EditTransform(*Engine::scene()->main_camera, empty, empty_bb, false, window_pos, window_size);
             ImGui::EndDisabled();
         }
     }

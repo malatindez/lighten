@@ -13,8 +13,8 @@ void vec_test_basic_arithmetic_same_types()
         arr[i] = utils::Random<T>(1);
     }
     std::array<T, size> invalid_array = arr;
-    vec<size, T> vec1 { invalid_array };
-    vec<size, T> vec2 { std::move(invalid_array) };
+    vec<size, T> vec1{ invalid_array };
+    vec<size, T> vec2{ std::move(invalid_array) };
 
     for (int i = 0; i < arr.size(); ++i)
     {
@@ -28,14 +28,14 @@ void vec_test_basic_arithmetic_same_types()
         vec1[i] = utils::Random<T>(1);
     }
 
-    vec<size, T> add { vec1 + vec2 };
-    vec<size, T> sub { vec1 - vec2 };
-    vec<size, T> mul { vec1 * vec2 };
-    vec<size, T> div { vec1 / vec2 };
+    vec<size, T> add{ vec1 + vec2 };
+    vec<size, T> sub{ vec1 - vec2 };
+    vec<size, T> mul{ vec1 * vec2 };
+    vec<size, T> div{ vec1 / vec2 };
     vec<size, T> mod;
     if constexpr (std::is_integral_v<T>)
     {
-        mod = vec<size, T> { vec1 % vec2 };
+        mod = vec<size, T>{ vec1 % vec2 };
     }
 
     for (int i = 0; i < arr.size(); ++i)
@@ -130,8 +130,8 @@ TEST(TEST_VECTORS_ARITHMETIC, RandomTestSameTypes)
 template <size_t size, typename T, typename U>
 void vec_test_basic_arithmetic_different_types()
 {
-    vec<size, T> vec1 {};
-    vec<size, U> vec2 {};
+    vec<size, T> vec1{};
+    vec<size, U> vec2{};
 
     for (int i = 0; i < size; ++i)
     {
@@ -141,8 +141,8 @@ void vec_test_basic_arithmetic_different_types()
     {
         vec2[i] = utils::Random<U>(1);
     }
-    vec<size, U> _test1 { vec1 };
-    vec<size, T> _test2 { vec2 };
+    vec<size, U> _test1{ vec1 };
+    vec<size, T> _test2{ vec2 };
 
     for (int i = 0; i < size; ++i)
     {
@@ -150,14 +150,14 @@ void vec_test_basic_arithmetic_different_types()
         ASSERT_TRUE(_test2[i] == static_cast<T>(vec2[i]));
     }
 
-    vec<size, T> add { vec1 + vec2 };
-    vec<size, T> sub { vec1 - vec2 };
-    vec<size, T> mul { vec1 * vec2 };
-    vec<size, T> div { vec1 / vec2 };
+    vec<size, T> add{ vec1 + vec2 };
+    vec<size, T> sub{ vec1 - vec2 };
+    vec<size, T> mul{ vec1 * vec2 };
+    vec<size, T> div{ vec1 / vec2 };
     vec<size, T> mod;
     if constexpr (std::is_integral_v<T> && std::is_integral_v<U>)
     {
-        mod = vec<size, T> { vec1 % vec2 };
+        mod = vec<size, T>{ vec1 % vec2 };
     }
 
     for (int i = 0; i < size; ++i)

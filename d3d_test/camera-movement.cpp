@@ -12,57 +12,57 @@ namespace camera_movement
 
     void RegisterKeyCallbacks()
     {
-    auto input = InputLayer::instance();
-    input->AddUpdateKeyCallback(
-        InputLayer::KeySeq{ engine::core::Key::KEY_W },
-        [&] (InputLayer::KeySeq const &, uint32_t)
-        { Engine::scene()->main_camera->flags() |= CameraController::MoveForward; });
-    input->AddUpdateKeyCallback(
-        InputLayer::KeySeq{ engine::core::Key::KEY_S },
-        [&] (InputLayer::KeySeq const &, uint32_t)
-        { Engine::scene()->main_camera->flags() |= CameraController::MoveBackwards; });
-    input->AddUpdateKeyCallback(
-        InputLayer::KeySeq{ engine::core::Key::KEY_A },
-        [&] (InputLayer::KeySeq const &, uint32_t)
-        { Engine::scene()->main_camera->flags() |= CameraController::MoveLeft; });
-    input->AddUpdateKeyCallback(
-        InputLayer::KeySeq{ engine::core::Key::KEY_D },
-        [&] (InputLayer::KeySeq const &, uint32_t)
-        { Engine::scene()->main_camera->flags() |= CameraController::MoveRight; });
-    input->AddUpdateKeyCallback(
-        InputLayer::KeySeq{ engine::core::Key::KEY_SPACE },
-        [&] (InputLayer::KeySeq const &, uint32_t)
-        { Engine::scene()->main_camera->flags() |= CameraController::MoveUp; });
-    input->AddUpdateKeyCallback(
-        InputLayer::KeySeq{ engine::core::Key::KEY_CONTROL },
-        [&] (InputLayer::KeySeq const &, uint32_t)
-        { Engine::scene()->main_camera->flags() |= CameraController::MoveDown; });
-    input->AddUpdateKeyCallback(
-        InputLayer::KeySeq{ engine::core::Key::KEY_Q },
-        [&] (InputLayer::KeySeq const &, uint32_t)
-        { Engine::scene()->main_camera->flags() |= CameraController::RotateLeft; });
-    input->AddUpdateKeyCallback(
-        InputLayer::KeySeq{ engine::core::Key::KEY_E },
-        [&] (InputLayer::KeySeq const &, uint32_t)
-        { Engine::scene()->main_camera->flags() |= CameraController::RotateRight; });
-    input->AddUpdateKeyCallback(
-        InputLayer::KeySeq{ engine::core::Key::KEY_SHIFT },
-        [&] (InputLayer::KeySeq const &, uint32_t)
-        { Engine::scene()->main_camera->flags() |= CameraController::Accelerate; });
-    input->AddUpdateKeyCallback(
-        InputLayer::KeySeq{ engine::core::Key::KEY_RBUTTON },
-        [&] (InputLayer::KeySeq const &, uint32_t count)
-        {
-            if (count == std::numeric_limits<uint32_t>::max())
+        auto input = InputLayer::instance();
+        input->AddUpdateKeyCallback(
+            InputLayer::KeySeq{ engine::core::Key::KEY_W },
+            [&] (InputLayer::KeySeq const &, uint32_t)
+            { Engine::scene()->main_camera->flags() |= CameraController::MoveForward; });
+        input->AddUpdateKeyCallback(
+            InputLayer::KeySeq{ engine::core::Key::KEY_S },
+            [&] (InputLayer::KeySeq const &, uint32_t)
+            { Engine::scene()->main_camera->flags() |= CameraController::MoveBackwards; });
+        input->AddUpdateKeyCallback(
+            InputLayer::KeySeq{ engine::core::Key::KEY_A },
+            [&] (InputLayer::KeySeq const &, uint32_t)
+            { Engine::scene()->main_camera->flags() |= CameraController::MoveLeft; });
+        input->AddUpdateKeyCallback(
+            InputLayer::KeySeq{ engine::core::Key::KEY_D },
+            [&] (InputLayer::KeySeq const &, uint32_t)
+            { Engine::scene()->main_camera->flags() |= CameraController::MoveRight; });
+        input->AddUpdateKeyCallback(
+            InputLayer::KeySeq{ engine::core::Key::KEY_SPACE },
+            [&] (InputLayer::KeySeq const &, uint32_t)
+            { Engine::scene()->main_camera->flags() |= CameraController::MoveUp; });
+        input->AddUpdateKeyCallback(
+            InputLayer::KeySeq{ engine::core::Key::KEY_CONTROL },
+            [&] (InputLayer::KeySeq const &, uint32_t)
+            { Engine::scene()->main_camera->flags() |= CameraController::MoveDown; });
+        input->AddUpdateKeyCallback(
+            InputLayer::KeySeq{ engine::core::Key::KEY_Q },
+            [&] (InputLayer::KeySeq const &, uint32_t)
+            { Engine::scene()->main_camera->flags() |= CameraController::RotateLeft; });
+        input->AddUpdateKeyCallback(
+            InputLayer::KeySeq{ engine::core::Key::KEY_E },
+            [&] (InputLayer::KeySeq const &, uint32_t)
+            { Engine::scene()->main_camera->flags() |= CameraController::RotateRight; });
+        input->AddUpdateKeyCallback(
+            InputLayer::KeySeq{ engine::core::Key::KEY_SHIFT },
+            [&] (InputLayer::KeySeq const &, uint32_t)
+            { Engine::scene()->main_camera->flags() |= CameraController::Accelerate; });
+        input->AddUpdateKeyCallback(
+            InputLayer::KeySeq{ engine::core::Key::KEY_RBUTTON },
+            [&] (InputLayer::KeySeq const &, uint32_t count)
             {
-                previous_mouse_position = core::math::ivec2{ -1 };
-                return;
-            }
-            if (previous_mouse_position == core::math::vec2{ -1 })
-            {
-                previous_mouse_position = mouse_position();
-            }
-        });
+                if (count == std::numeric_limits<uint32_t>::max())
+                {
+                    previous_mouse_position = core::math::ivec2{ -1 };
+                    return;
+                }
+                if (previous_mouse_position == core::math::vec2{ -1 })
+                {
+                    previous_mouse_position = mouse_position();
+                }
+            });
     }
     void UpdateCamera(float delta_time)
     {

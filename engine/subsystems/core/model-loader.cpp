@@ -5,7 +5,7 @@
 #include <assimp\scene.h>
 
 #include "texture-manager.hpp"
-#include "render/model-system.hpp"
+#include "../render/model-system.hpp"
 
 namespace engine::core
 {

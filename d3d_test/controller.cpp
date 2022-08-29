@@ -1,12 +1,12 @@
 #include "controller.hpp"
 #include "transform-editor.hpp"
 #include "camera-movement.hpp"
-#include "misc/skybox-manager.hpp"
 using namespace engine;
 using namespace core;
 using namespace events;
 using namespace math;
 using namespace components;
+
 void Controller::OnGuiRender()
 {
     ImGui::Begin("Framerate");
@@ -18,16 +18,16 @@ void Controller::OnGuiRender()
     ImGui::Text("%.3f", Engine::scene()->main_camera->fovy());
     ImGui::Text("Flags: ");
     ImGui::Text("%u", Engine::scene()->main_camera->flags());
-    ImGui::Text("Edit target transform: ");
     ImGui::Text("Camera model matrix");
     ImGui::Text("%s", utils::FormatToString(Engine::scene()->main_camera->transform().model).c_str());
     ImGui::Text("Camera inv view matrix");
     ImGui::Text("%s", utils::FormatToString(Engine::scene()->main_camera->camera().inv_view).c_str());
-    transform_editor::OnGuiRender();
+    ImGui::Text("Edit target transform: ");
+    transform_editor::OnGuiRender(window_pos, window_size);
     ImGui::End();
 }
 
-Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &window_size) : renderer_{ renderer }
+Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &window_size, math::ivec2 const &window_pos) : renderer_{ renderer }, window_size{ window_size }, window_pos{ window_pos }
 {
     first_scene = std::make_shared<Scene>();
 

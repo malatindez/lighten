@@ -1,5 +1,5 @@
 #pragma once
-#include "core/shader-compiler.hpp"
+#include "shader-compiler.hpp"
 namespace engine::core
 {
     class Engine;

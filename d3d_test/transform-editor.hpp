@@ -14,5 +14,5 @@ namespace transform_editor
 
     void RegisterKeyCallbacks();
 
-    void OnGuiRender();
+    void OnGuiRender(engine::core::math::ivec2 const &window_pos, engine::core::math::ivec2 const &window_size);
 }

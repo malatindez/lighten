@@ -1,5 +1,6 @@
 #include "windows-window.hpp"
 #include "include/imgui.hpp"
+#include <ImGuizmo.h>
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace engine::platform::windows
@@ -151,6 +152,8 @@ namespace engine::platform::windows
 
     void Window::OnSizeChangeEnd()
     {
+        ImGuizmo::SetRect(position().x, position().y, size().x, size().y);
+
         if (frame_buffer_.valid())
         {
             direct3d::api::devcon4->OMSetRenderTargets(0, nullptr, nullptr);
