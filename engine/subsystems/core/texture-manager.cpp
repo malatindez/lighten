@@ -5,9 +5,14 @@ namespace engine::core
 
     namespace
     {
+        constexpr uint32_t MipmapLevels(uint32_t width, uint32_t height)
+        {
+            uint32_t levels = 1;
+            while ((width | height) >> levels) ++levels;
+            return levels;
+        }
 
-
-        direct3d::ShaderResourceView LoadTextureFromPath(std::filesystem::path const &path)
+        direct3d::ShaderResourceView LoadTextureFromPath(std::filesystem::path const &path, bool mipmaps)
         {
             static direct3d::Resource texture_resource;
             direct3d::ShaderResourceView shader_resource_view;
@@ -38,13 +43,14 @@ namespace engine::core
                 tdesc.SampleDesc.Count = 1;
                 tdesc.SampleDesc.Quality = 0;
                 tdesc.ArraySize = (uint32_t)metadata.arraySize;
-                tdesc.MipLevels = (uint32_t)metadata.mipLevels;
+                tdesc.MipLevels = mipmaps ? MipmapLevels((uint32_t)metadata.width, (uint32_t)metadata.height) : (uint32_t)metadata.mipLevels;
                 tdesc.Width = (uint32_t)metadata.width;
                 tdesc.Height = (uint32_t)metadata.height;
-                tdesc.Usage = D3D11_USAGE_IMMUTABLE;
+                tdesc.Usage = D3D11_USAGE_DEFAULT;
                 tdesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
                 tdesc.CPUAccessFlags = 0;
-                tdesc.MiscFlags = metadata.miscFlags;
+                tdesc.BindFlags = mipmaps ? D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET : D3D11_BIND_SHADER_RESOURCE;
+                tdesc.MiscFlags = mipmaps ?  D3D11_RESOURCE_MISC_GENERATE_MIPS | metadata.miscFlags : metadata.miscFlags;
 
                 D3D11_SUBRESOURCE_DATA srd;
                 srd = D3D11_SUBRESOURCE_DATA{};
@@ -52,18 +58,33 @@ namespace engine::core
                 srd.SysMemPitch = (uint32_t)image->GetImage(0, 0, 0)->rowPitch;
                 srd.SysMemSlicePitch = 0;
 
-                ID3D11Texture2D *texture_ = nullptr;
-                direct3d::AlwaysAssert(direct3d::api::device5->CreateTexture2D(&tdesc, &srd, &texture_),
-                                       "Failed to create 2d texture: ");
-                utils::AlwaysAssert(texture_ != nullptr);
-                texture_resource = texture_;
-                D3D11_SHADER_RESOURCE_VIEW_DESC srvd;
-                srvd.Format = metadata.format;
-                srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-                srvd.Texture2D.MipLevels = (uint32_t)metadata.mipLevels;
-                srvd.Texture2D.MostDetailedMip = 0;
-                direct3d::AlwaysAssert(direct3d::api::device5->CreateShaderResourceView(texture_, &srvd, &shader_resource_view.reset()),
-                                       "Failed to create shader resource view: ");
+                direct3d::Texture2D texture;
+                if (mipmaps)
+                {
+                    direct3d::AlwaysAssert(direct3d::api::device->CreateTexture2D(&tdesc, nullptr, &texture.reset()), "Failed to create texture");
+                    direct3d::api::devcon->UpdateSubresource(texture,
+                                                             D3D11CalcSubresource(0, 0, tdesc.MipLevels),
+                                                             nullptr,
+                                                             srd.pSysMem,
+                                                             srd.SysMemPitch,
+                                                             1);
+                }
+                else
+                {
+                    direct3d::AlwaysAssert(direct3d::api::device->CreateTexture2D(&tdesc, &srd, &texture.reset()),
+                                           "Failed to create texture resource");
+                }
+
+                D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc{};
+                srv_desc.Format = tdesc.Format;
+                srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+                srv_desc.TextureCube.MostDetailedMip = 0;
+                srv_desc.TextureCube.MipLevels = std::numeric_limits<UINT>::max();
+
+                direct3d::AlwaysAssert(direct3d::api::device->CreateShaderResourceView(texture, &srv_desc, &shader_resource_view.ptr()),
+                                       "Failed to create shader resource view");
+
+                if (mipmaps) direct3d::api::devcon->GenerateMips(shader_resource_view);
             }
             else
             {
@@ -100,15 +121,9 @@ namespace engine::core
             return image;
         }
 
-        constexpr uint32_t MipmapLevels(uint32_t width, uint32_t height)
-        {
-            uint32_t levels = 1;
-            while ((width | height) >> levels) ++levels;
-            return levels;
-        }
     }
 
-    TextureId TextureManager::LoadTexture(std::filesystem::path const &path)
+    TextureId TextureManager::LoadTexture(std::filesystem::path const &path, bool generate_mipmaps)
     {
         utils::AlwaysAssert(path.is_absolute(), "Paths provided to texture manager should be absolute!");
         utils::Assert(path.has_extension(), "Path to texture should have an extension");
@@ -117,7 +132,7 @@ namespace engine::core
         {
             return it->second;
         }
-        auto shader_resource_view = LoadTextureFromPath(path);
+        auto shader_resource_view = LoadTextureFromPath(path, generate_mipmaps);
         instance_->textures_.emplace(std::make_pair(instance_->current_id_, shader_resource_view));
         instance_->hash_ids_.emplace(std::make_pair(std::filesystem::hash_value(path), instance_->current_id_));
         return instance_->current_id_++;

@@ -34,5 +34,12 @@ namespace engine::direct3d::states
     extern ReadOnlyDepthStencilState geq_depth;
 
 
+    extern ReadOnlySamplerState point_wrap_sampler;
+    extern ReadOnlySamplerState point_clamp_sampler;
     extern ReadOnlySamplerState linear_wrap_sampler;
+    extern ReadOnlySamplerState linear_clamp_sampler;
+    extern ReadOnlySamplerState anisotropic_wrap_sampler;
+    extern ReadOnlySamplerState anisotropic_clamp_sampler;
+
+
 }

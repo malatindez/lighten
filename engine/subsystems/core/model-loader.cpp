@@ -129,8 +129,12 @@ namespace engine::core
         for (auto &mesh : meshes)
         {
             auto &mesh_range = mesh.mesh_range;
-            math::rmin(min, (math::vec4(mesh_range.bounding_box.min, 1) * mesh.mesh_to_model).xyz);
-            math::rmax(max, (math::vec4(mesh_range.bounding_box.max, 1) * mesh.mesh_to_model).xyz);
+            auto mesh_min = (math::vec4(mesh_range.bounding_box.min, 1) * mesh.mesh_to_model).xyz;
+            auto mesh_max = (math::vec4(mesh_range.bounding_box.max, 1) * mesh.mesh_to_model).xyz;
+            math::rmin(min, mesh_min);
+            math::rmin(min, mesh_max);
+            math::rmax(max, mesh_min);
+            math::rmax(max, mesh_max);
 
             mesh_range.index_offset = index_offset;
             mesh_range.vertex_offset = vertex_offset;

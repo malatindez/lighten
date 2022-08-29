@@ -116,9 +116,12 @@ namespace engine::platform::windows
         }
         else if (message == WM_SIZE) // update the window size if it has changed
         {
-            WindowResizeEvent event{ LOWORD(l_param), HIWORD(l_param) };
-            size_ = core::math::ivec2{ LOWORD(l_param), HIWORD(l_param) };
-            event_callback_(event);
+            if (l_param != 0)
+            {
+                WindowResizeEvent event{ LOWORD(l_param), HIWORD(l_param) };
+                size_ = core::math::ivec2{ LOWORD(l_param), HIWORD(l_param) };
+                event_callback_(event);
+            }
         }
         else if (message == WM_EXITSIZEMOVE || message == WM_PAINT)
         {

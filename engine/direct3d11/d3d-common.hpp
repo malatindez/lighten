@@ -99,7 +99,8 @@ namespace engine::direct3d
         constexpr operator T *() noexcept { return d3d_resource_wrapper<T>::ptr(); }
         constexpr T const *operator->() const noexcept { return d3d_resource_wrapper<T>::ptr(); }
         constexpr T *operator->() noexcept { return d3d_resource_wrapper<T>::ptr(); }
-
+        constexpr operator d3d_resource_wrapper<T>() { return d3d_resource_wrapper<T>() = *this; }
+        constexpr d3d_resource_wrapper<T> as_default_wrapper() { return d3d_resource_wrapper<T>() = *this; }
         [[nodiscard]] constexpr T *const &ptr() noexcept { return d3d_resource_wrapper<T>::ptr(); }
         [[nodiscard]] constexpr T const *const &ptr() const noexcept { return d3d_resource_wrapper<T>::ptr(); }
 

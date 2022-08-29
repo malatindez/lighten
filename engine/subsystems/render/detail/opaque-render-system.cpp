@@ -26,14 +26,15 @@ namespace engine::render::_detail
     {
         if (instance_buffer_.size() == 0)
             return;
+        opaque_shader_.Bind();
+
         direct3d::api::devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
         direct3d::api::devcon4->RSSetState(direct3d::states::cull_back);
-        direct3d::api::devcon4->PSSetSamplers(0, 1, &direct3d::states::linear_wrap_sampler.ptr());
+        direct3d::api::devcon4->PSSetSamplers(0, 1, &direct3d::states::point_wrap_sampler.ptr());
         direct3d::api::devcon4->OMSetDepthStencilState(direct3d::states::geq_depth, 0);
         direct3d::api::devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 
-        opaque_shader_.Bind();
         mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 1);
 
         instance_buffer_.Bind(1);

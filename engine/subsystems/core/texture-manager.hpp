@@ -13,7 +13,7 @@ namespace engine::core
     private:
         using TextureHash = size_t;
     public:
-        static TextureId LoadTexture(std::filesystem::path const &path);
+        static TextureId LoadTexture(std::filesystem::path const &path, bool generate_mipmaps = true);
         static TextureId LoadCubemap(std::filesystem::path const &path);
         static TextureId LoadCubemap(std::array<std::filesystem::path, 6> const &cubemap_textures, bool generate_mipmaps = true);
 

@@ -57,6 +57,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
         transform.UpdateMatrices();
     }
     render::ModelSystem::instance()->OnInstancesUpdated(registry);
+    /*
     const auto skybox_path = std::filesystem::current_path() / "assets/textures/skyboxes/yokohama";
     SkyboxManager::LoadSkybox(registry, std::array<std::filesystem::path, 6> {
         skybox_path / "posx.jpg",
@@ -65,8 +66,16 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
             skybox_path / "negy.jpg",
             skybox_path / "posz.jpg",
             skybox_path / "negz.jpg",
-    });
-
+    });*/
+    SkyboxManager::LoadSkybox(registry, std::filesystem::current_path() / "assets/textures/skyboxes/skybox.dds");
+    auto cube = registry.create();
+    registry.emplace<TestCubeComponent>(cube);
+    registry.emplace<TransformComponent>(cube).reset();
+    registry.get<TransformComponent>(cube).position = vec3{ 0,5,0 };
+    registry.get<TransformComponent>(cube).scale = vec3{ 0.01f };
+    registry.get<TransformComponent>(cube).rotation = QuaternionFromEuler(0.0f, 0.0f, 0.0f);
+    registry.get<TransformComponent>(cube).UpdateMatrices();
+    registry.emplace<ModelComponent>(cube).model_id = renderer->cube_model_id;
     camera_movement::RegisterKeyCallbacks();
     transform_editor::RegisterKeyCallbacks();
 }

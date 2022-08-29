@@ -37,7 +37,7 @@ namespace engine
         auto view = core::TextureManager::GetTextureView(skybox.texture_id);
 
         direct3d::api::devcon->RSSetState(direct3d::states::cull_none);
-        direct3d::api::devcon4->PSSetSamplers(0, 1, &direct3d::states::linear_wrap_sampler.ptr());
+        direct3d::api::devcon4->PSSetSamplers(0, 1, &direct3d::states::point_wrap_sampler.ptr());
         direct3d::api::devcon4->OMSetDepthStencilState(direct3d::states::geq_depth, 0);
         direct3d::api::devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 

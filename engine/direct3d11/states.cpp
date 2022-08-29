@@ -63,7 +63,13 @@ namespace engine::direct3d::states
     ReadOnlyDepthStencilState geq_depth;
 
 
+    ReadOnlySamplerState point_wrap_sampler;
+    ReadOnlySamplerState point_clamp_sampler;
     ReadOnlySamplerState linear_wrap_sampler;
+    ReadOnlySamplerState linear_clamp_sampler;
+    ReadOnlySamplerState anisotropic_wrap_sampler;
+    ReadOnlySamplerState anisotropic_clamp_sampler;
+
 
 
     namespace _state_detail
@@ -85,7 +91,22 @@ namespace engine::direct3d::states
 
 
             D3D11_SAMPLER_DESC sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_WRAP);
+            api::device5->CreateSamplerState(&sampler_desc, &point_wrap_sampler.reset());
+
+            sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP);
+            api::device5->CreateSamplerState(&sampler_desc, &point_clamp_sampler.reset());
+
+            sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_WRAP);
             api::device5->CreateSamplerState(&sampler_desc, &linear_wrap_sampler.reset());
+
+            sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_CLAMP);
+            api::device5->CreateSamplerState(&sampler_desc, &linear_clamp_sampler.reset());
+
+            sampler_desc = CreateSamplerState(D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP);
+            api::device5->CreateSamplerState(&sampler_desc, &anisotropic_wrap_sampler.reset());
+
+            sampler_desc = CreateSamplerState(D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_CLAMP);
+            api::device5->CreateSamplerState(&sampler_desc, &anisotropic_clamp_sampler.reset());
 
         }
         void StateInitializer::Deinit()
