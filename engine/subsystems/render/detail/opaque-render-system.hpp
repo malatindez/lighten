@@ -13,8 +13,7 @@ namespace engine::render
 }
 namespace engine::render::_detail
 {
-    auto constexpr opaque_vertex_shader_path = "assets/shaders/opaque/vs.hlsl";
-    auto constexpr opaque_pixel_shader_path = "assets/shaders/opaque/ps.hlsl";
+    auto constexpr opaque_shader_path = "assets/shaders/opaque/opaque.hlsl";
     // This class can only be used as a member of ModelSystemw
     class OpaqueRenderSystem
     {

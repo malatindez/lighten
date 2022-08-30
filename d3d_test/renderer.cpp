@@ -67,7 +67,7 @@ void Renderer::OnGuiRender()
     }
     ImGui::End();
 }
-Renderer::Renderer()
+Renderer::Renderer(ivec2 const &screen_resolution) : screen_resolution(screen_resolution)
 {
     knight_model_id = ModelLoader::instance()->Load("assets\\models\\Knight\\Knight.fbx").value_or(0);
     cube_model_id = ModelLoader::instance()->Load("assets\\models\\Cube\\Cube.fbx").value_or(0);
@@ -81,8 +81,8 @@ Renderer::Renderer()
     };
 
     auto path = std::filesystem::current_path();
-    auto vs = core::ShaderManager::instance()->CompileVertexShader(path / "assets/shaders/test-cube/vs.hlsl");
-    auto ps = core::ShaderManager::instance()->CompilePixelShader(path / "assets/shaders/test-cube/ps.hlsl");
+    auto vs = core::ShaderManager::instance()->CompileVertexShader(path / "assets/shaders/test-cube/test-cube.hlsl");
+    auto ps = core::ShaderManager::instance()->CompilePixelShader(path / "assets/shaders/test-cube/test-cube.hlsl");
     auto il = std::make_shared<render::InputLayout>(vs->blob(), d3d_input_desc);
     test_shader.SetVertexShader(vs).SetPixelShader(ps).SetInputLayout(il);
 }
@@ -121,17 +121,25 @@ void Renderer::DrawTestCube()
 }
 void Renderer::OnRender()
 {
-    per_frame.view_projection = Engine::scene()->main_camera->camera().view_projection;
+    auto const &camera = Engine::scene()->main_camera->camera();
+    per_frame.view = camera.view;
+    per_frame.projection = camera.projection;
+    per_frame.view_projection = camera.view_projection;
+    per_frame.inv_view = camera.inv_view;
+    per_frame.inv_projection = camera.inv_projection;
+    per_frame.inv_view_projection = camera.inv_view_projection;
+    per_frame.screen_resolution = vec2{ screen_resolution };
+    per_frame.mouse_position = InputLayer::instance()->mouse_position();
     per_frame_buffer.Update(per_frame);
     per_frame_buffer.Bind(direct3d::ShaderType::VertexShader, 0);
-    for (auto entity : Engine::scene()->registry.view<components::SkyboxComponent>())
-    {
-        SkyboxManager::RenderSkybox(Engine::scene()->registry.get<components::SkyboxComponent>(entity), Engine::scene()->main_camera->transform().position);
-    }
     render::ModelSystem::instance()->Render();
 
     DrawTestCube();
 
 
+    for (auto entity : Engine::scene()->registry.view<components::SkyboxComponent>())
+    {
+        SkyboxManager::RenderSkybox(Engine::scene()->registry.get<components::SkyboxComponent>(entity));
+    }
 
 }

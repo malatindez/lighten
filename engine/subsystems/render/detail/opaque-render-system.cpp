@@ -17,8 +17,8 @@ namespace engine::render::_detail
          { "ROWW",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1}
         };
 
-        auto vs = core::ShaderManager::instance()->CompileVertexShader(path / opaque_vertex_shader_path);
-        auto ps = core::ShaderManager::instance()->CompilePixelShader(path / opaque_pixel_shader_path);
+        auto vs = core::ShaderManager::instance()->CompileVertexShader(path / opaque_shader_path);
+        auto ps = core::ShaderManager::instance()->CompilePixelShader(path / opaque_shader_path);
         auto il = std::make_shared<InputLayout>(vs->blob(), d3d_input_desc);
         opaque_shader_.SetVertexShader(vs).SetPixelShader(ps).SetInputLayout(il);
     }

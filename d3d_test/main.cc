@@ -20,7 +20,7 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
         app.PushLayer(input_layer);
 
         auto render_pipeline = std::make_shared<windows::RenderPipeline>();
-        auto renderer = std::make_shared<Renderer>();
+        auto renderer = std::make_shared<Renderer>(render_pipeline->window()->size());
 
         render_pipeline->PushLayer(renderer);
         auto controller = std::make_shared<Controller>(renderer, render_pipeline->window()->size(), render_pipeline->window()->position());

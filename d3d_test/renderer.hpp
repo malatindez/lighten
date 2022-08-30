@@ -9,7 +9,7 @@ class Renderer
     public engine::core::Layer::HandleGuiRender
 {
 public:
-    Renderer();
+    Renderer(engine::core::math::ivec2 const &screen_resolution);
     void OnRender() override;
     void OnGuiRender() override;
 
@@ -18,6 +18,7 @@ public:
     uint32_t knight_model_id, cube_model_id;
     engine::direct3d::SamplerState current_state;
 private:
+    engine::core::math::ivec2 const &screen_resolution;
     engine::render::GraphicsShaderProgram test_shader;
     void DrawTestCube();
 };

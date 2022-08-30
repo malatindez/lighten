@@ -39,7 +39,6 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
     main_camera_entity = registry.create();
     registry.emplace<CameraComponent>(main_camera_entity, CameraComponent());
     registry.emplace<TransformComponent>(main_camera_entity, TransformComponent());
-    registry.emplace<TagComponent>(main_camera_entity, TagComponent{ .tag = "Main Camera" });
     first_scene->main_camera = std::make_unique<CameraController>(&registry, main_camera_entity, window_size);
     Engine::SetScene(first_scene);
     int amount = 10;
@@ -74,11 +73,12 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
     SkyboxManager::LoadSkybox(registry, std::filesystem::current_path() / "assets/textures/skyboxes/skybox.dds");
     auto cube = registry.create();
     registry.emplace<TestCubeComponent>(cube);
-    registry.emplace<TransformComponent>(cube).reset();
-    registry.get<TransformComponent>(cube).position = vec3{ 0,5,0 };
-    registry.get<TransformComponent>(cube).scale = vec3{ 0.01f };
-    registry.get<TransformComponent>(cube).rotation = QuaternionFromEuler(0.0f, 0.0f, 0.0f);
-    registry.get<TransformComponent>(cube).UpdateMatrices();
+    auto &cube_transform = registry.emplace<TransformComponent>(cube);
+    cube_transform.reset();
+    cube_transform.position = vec3{ 0,5,0 };
+    cube_transform.scale = vec3{ 0.01f };
+    cube_transform.rotation = QuaternionFromEuler(0.0f, 0.0f, 0.0f);
+    cube_transform.UpdateMatrices();
     registry.emplace<ModelComponent>(cube).model_id = renderer->cube_model_id;
     camera_movement::RegisterKeyCallbacks();
     transform_editor::RegisterKeyCallbacks();
