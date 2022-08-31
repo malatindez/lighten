@@ -32,6 +32,7 @@ namespace engine::direct3d::states
 
 
     extern ReadOnlyDepthStencilState geq_depth;
+    extern ReadOnlyDepthStencilState geq_depth_no_write;
 
 
     extern ReadOnlySamplerState point_wrap_sampler;

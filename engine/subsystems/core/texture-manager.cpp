@@ -50,7 +50,7 @@ namespace engine::core
                 tdesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
                 tdesc.CPUAccessFlags = 0;
                 tdesc.BindFlags = mipmaps ? D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET : D3D11_BIND_SHADER_RESOURCE;
-                tdesc.MiscFlags = mipmaps ?  D3D11_RESOURCE_MISC_GENERATE_MIPS | metadata.miscFlags : metadata.miscFlags;
+                tdesc.MiscFlags = mipmaps ? D3D11_RESOURCE_MISC_GENERATE_MIPS | metadata.miscFlags : metadata.miscFlags;
 
                 D3D11_SUBRESOURCE_DATA srd;
                 srd = D3D11_SUBRESOURCE_DATA{};

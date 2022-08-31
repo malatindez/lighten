@@ -79,8 +79,8 @@ Renderer::Renderer(ivec2 const &screen_resolution) : screen_resolution(screen_re
     };
 
     auto path = std::filesystem::current_path();
-    auto vs = core::ShaderManager::instance()->CompileVertexShader(path / "assets/shaders/test-cube/test-cube.hlsl");
-    auto ps = core::ShaderManager::instance()->CompilePixelShader(path / "assets/shaders/test-cube/test-cube.hlsl");
+    auto vs = core::ShaderManager::instance()->CompileVertexShader(path / "assets/shaders/test-cube/test-samplers.hlsl");
+    auto ps = core::ShaderManager::instance()->CompilePixelShader(path / "assets/shaders/test-cube/test-samplers.hlsl");
     auto il = std::make_shared<render::InputLayout>(vs->blob(), d3d_input_desc);
     test_shader.SetVertexShader(vs).SetPixelShader(ps).SetInputLayout(il);
 }
@@ -101,12 +101,12 @@ void Renderer::DrawTestCube()
 
     for (auto entity : Engine::scene()->registry.view<components::TransformComponent, components::ModelInstanceComponent, TestCubeComponent>())
     {
-        auto model_component = Engine::scene()->registry.get<components::ModelInstanceComponent>(entity);
+        auto const &model_component = Engine::scene()->registry.get<components::ModelInstanceComponent>(entity);
         auto &model_instance = render::ModelSystem::GetModelInstance(model_component.kInstanceId);
         auto &model = render::ModelSystem::GetModel(model_instance.model_id);
         model.vertices.Bind();
         model.indices.Bind();
-        auto transform = Engine::scene()->registry.get<components::TransformComponent>(entity);
+        auto const &transform = Engine::scene()->registry.get<components::TransformComponent>(entity);
         for (auto const &mesh_instance : model_instance.mesh_instances)
         {
             auto &mesh = model.meshes[mesh_instance.mesh_id];
@@ -126,7 +126,7 @@ void Renderer::OnRender()
     per_frame.inv_projection = camera.inv_projection;
     per_frame.inv_view_projection = camera.inv_view_projection;
     per_frame.screen_resolution = vec2{ screen_resolution };
-    per_frame.mouse_position = InputLayer::instance()->mouse_position();
+    per_frame.mouse_position = vec2{ InputLayer::instance()->mouse_position() };
     per_frame_buffer.Update(per_frame);
     per_frame_buffer.Bind(direct3d::ShaderType::VertexShader, 0);
     render::ModelSystem::instance()->Render();

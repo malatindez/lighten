@@ -138,7 +138,7 @@ namespace engine::ini
     Ini Ini::Deserialize(std::string_view const str) { return Ini(str); }
 
     inline void Ini::DeserializeLine(std::string const &section,
-                             std::string &line)
+                                     std::string &line)
     { /* creating temporary object because
          Section() constructor is private */
         dict_.try_emplace(section, Section());

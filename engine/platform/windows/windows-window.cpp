@@ -155,7 +155,7 @@ namespace engine::platform::windows
 
     void Window::OnSizeChangeEnd()
     {
-        ImGuizmo::SetRect(position().x, position().y, size().x, size().y);
+        ImGuizmo::SetRect((float)position().x, (float)position().y, (float)size().x, (float)size().y);
 
         if (frame_buffer_.valid())
         {

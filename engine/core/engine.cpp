@@ -49,12 +49,12 @@ namespace engine::core
     {
         application_->logger_->flush();
         application_ = nullptr;
-        InputLayer::Deinit();
-        ShaderManager::Deinit();
-        ModelLoader::Deinit();
-        SkyboxManager::Deinit();
-        TextureManager::Deinit();
         render::ModelSystem::Deinit();
+        TextureManager::Deinit();
+        SkyboxManager::Deinit();
+        ModelLoader::Deinit();
+        ShaderManager::Deinit();
+        InputLayer::Deinit();
         direct3d::api::Deinit();
     }
     void Engine::Exit()

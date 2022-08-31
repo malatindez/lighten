@@ -1,3 +1,5 @@
+#ifndef VS_GLOBALS_HLSLI
+#define VS_GLOBALS_HLSLI
 cbuffer PerFrame : register(b0)
 {
 	row_major matrix view;
@@ -9,3 +11,4 @@ cbuffer PerFrame : register(b0)
 	float2 screen_resolution;
 	float2 mouse_position;
 }
+#endif

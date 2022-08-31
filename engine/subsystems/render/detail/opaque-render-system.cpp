@@ -96,12 +96,11 @@ namespace engine::render::_detail
         // we need order so we cant use map
         std::vector<std::pair<InstanceId, InstanceIndex>> instance_ids_;
         std::unordered_map<InstanceId, CurrentOffset> instance_offsets_;
-        // we will store as instance_index the amount of instances at first
+        // at first we will store in instance_ids_ instance_index as the amount of instances that we should render
         for (auto entity : instance_group)
         {
             auto const &model_ref = instance_group.get<components::ModelInstanceComponent>(entity);
             auto &model_instance = ModelSystem::GetModelInstance(model_ref.kInstanceId);
-            auto &model = ModelSystem::GetModel(model_instance.model_id);
             for (auto const &mesh_instance : model_instance.mesh_instances)
             {
                 total_instances += 1;
@@ -125,15 +124,14 @@ namespace engine::render::_detail
                   { return (((uint64_t(first.first.model_id)) << 32) | (uint64_t)first.first.mesh_id) < (((uint64_t(second.first.model_id)) << 32) | (uint64_t)second.first.mesh_id); });
 
         instances_.clear();
-        // Then, after counting total amount of instances
-        // we will create the list of all instances sorted by model and mesh
+        // Then after counting total amount of instances we will create the list of all instances sorted by model and mesh
         for (size_t i = 0; i < instance_ids_.size(); i++)
         {
             auto &[instance_id, instance_amount] = instance_ids_[i];
             auto &model = ModelSystem::GetModel(instance_id.model_id);
             auto &mesh = model.meshes[instance_id.mesh_id];
             auto &material = model.materials[instance_id.material_id];
-            instances_.emplace_back(InstanceInfo(model, mesh, material, instance_id, instance_amount)).amount;
+            instances_.emplace_back(InstanceInfo(model, mesh, material, instance_id, (uint32_t)instance_amount)).amount;
             instance_amount = i;
         }
         uint32_t copied_num = 0;
@@ -153,7 +151,7 @@ namespace engine::render::_detail
         instance_buffer_.Init(total_instances); // resizes if needed
         auto mapping = instance_buffer_.Map();
         Instance *dst = static_cast<Instance *>(mapping.pData);
-
+        // And then fill the instance buffer at desired offsets
         for (auto entity : instance_group)
         {
             auto const &transform = instance_group.get<components::TransformComponent>(entity);

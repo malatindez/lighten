@@ -61,6 +61,7 @@ namespace engine::direct3d::states
 
 
     ReadOnlyDepthStencilState geq_depth;
+    ReadOnlyDepthStencilState geq_depth_no_write;
 
 
     ReadOnlySamplerState point_wrap_sampler;
@@ -86,6 +87,8 @@ namespace engine::direct3d::states
 
             D3D11_DEPTH_STENCIL_DESC ds_desc = CreateDepthState(true, true);
             api::device->CreateDepthStencilState(&ds_desc, &geq_depth.reset());
+            ds_desc = CreateDepthState(true, false);
+            api::device->CreateDepthStencilState(&ds_desc, &geq_depth_no_write.reset());
 
 
 
@@ -111,8 +114,21 @@ namespace engine::direct3d::states
         }
         void StateInitializer::Deinit()
         {
+
             cull_none = nullptr;
+            cull_back = nullptr;
+
+
             geq_depth = nullptr;
+            geq_depth_no_write = nullptr;
+
+
+            point_wrap_sampler = nullptr;
+            point_clamp_sampler = nullptr;
+            linear_wrap_sampler = nullptr;
+            linear_clamp_sampler = nullptr;
+            anisotropic_wrap_sampler = nullptr;
+            anisotropic_clamp_sampler = nullptr;
         }
     }
 }

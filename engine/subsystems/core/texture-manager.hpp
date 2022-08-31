@@ -50,7 +50,7 @@ namespace engine::core
         static std::unique_ptr<TextureManager> instance_;
 
     private:
-        TextureId current_id_;
+        TextureId current_id_ = 0;
         std::unordered_map<TextureId, direct3d::ShaderResourceView> textures_;
         std::unordered_map<TextureHash, TextureId> hash_ids_;
     };
