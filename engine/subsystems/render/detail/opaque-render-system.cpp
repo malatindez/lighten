@@ -2,6 +2,24 @@
 #include "components/components.hpp"
 #include "../model-system.hpp"
 #include "../../core/shader-manager.hpp"
+
+namespace std
+{
+    template <>
+    struct hash<engine::render::_detail::InstanceId>
+    {
+        std::size_t operator()(engine::render::_detail::InstanceId const &kInstanceId) const
+        {
+            using std::size_t;
+            using std::hash;
+
+            return ((hash<engine::render::_detail::ModelId>()(kInstanceId.model_id)
+                     ^ (hash<engine::render::_detail::MeshId>()(kInstanceId.mesh_id) << 1)) >> 1)
+                ^ (hash<engine::render::_detail::MaterialId>()(kInstanceId.material_id) << 1);
+        }
+    };
+
+}
 namespace engine::render::_detail
 {
     OpaqueRenderSystem::OpaqueRenderSystem()
@@ -50,17 +68,17 @@ namespace engine::render::_detail
             auto &model = instance.model.get();
             auto &mesh = instance.mesh.get();
             auto &material = instance.material.get();
-            if (model_id != instance.model_id())
+            if (model_id != instance.kInstanceId.model_id)
             {
-                model_id = instance.model_id();
+                model_id = instance.kInstanceId.model_id;
                 model.vertices.Bind(0);
                 model.indices.Bind();
                 mesh_to_model_buffer_.Update(mesh.mesh_to_model);
             }
-            else if (mesh_id != instance.mesh_id())
+            else if (mesh_id != instance.kInstanceId.mesh_id)
             {
                 mesh_to_model_buffer_.Update(mesh.mesh_to_model);
-                mesh_id = instance.mesh_id();
+                mesh_id = instance.kInstanceId.mesh_id;
             }
             direct3d::api::devcon4->PSSetShaderResources(0, 1, &material.texture);
 
@@ -69,57 +87,61 @@ namespace engine::render::_detail
             rendered_instances += num_instances;
         }
     }
-
     void OpaqueRenderSystem::OnInstancesUpdated(entt::registry &registry)
     {
         uint32_t total_instances = 0;
-        instances_.clear();
-        auto instance_group = registry.group<components::ModelComponent, components::TransformComponent>(entt::get<components::OpaqueComponent>);
-        using InstanceId = uint64_t;
+        auto instance_group = registry.group<components::ModelInstanceComponent, components::TransformComponent>(entt::get<components::OpaqueComponent>);
         using InstanceIndex = size_t;
         using CurrentOffset = size_t;
         // we need order so we cant use map
         std::vector<std::pair<InstanceId, InstanceIndex>> instance_ids_;
         std::unordered_map<InstanceId, CurrentOffset> instance_offsets_;
-
+        // we will store as instance_index the amount of instances at first
         for (auto entity : instance_group)
         {
-            auto const &model_ref = instance_group.get<components::ModelComponent>(entity);
-            auto &model = ModelSystem::GetModel(model_ref.model_id);
-            for (uint32_t mesh_id = 0; mesh_id < model.meshes.size(); mesh_id++)
+            auto const &model_ref = instance_group.get<components::ModelInstanceComponent>(entity);
+            auto &model_instance = ModelSystem::GetModelInstance(model_ref.kInstanceId);
+            auto &model = ModelSystem::GetModel(model_instance.model_id);
+            for (auto const &mesh_instance : model_instance.mesh_instances)
             {
-                auto &mesh = model.meshes[mesh_id];
-                total_instances += (uint32_t)mesh.materials.size();
-                for (auto &material : mesh.materials)
+                total_instances += 1;
+                InstanceId kInstanceId
                 {
-                    uint64_t instance_id = ((uint64_t)(mesh_id) << 32) | (uint64_t)model_ref.model_id;
+                    .model_id = model_instance.model_id,
+                    .mesh_id = mesh_instance.mesh_id,
+                    .material_id = mesh_instance.material_id
+                };
+                auto it = std::ranges::find_if(instance_ids_, [&kInstanceId] (auto const &pair) { return pair.first == kInstanceId; });
 
-                    // fetch instance index
-                    size_t instance_index = 0;
-                    auto it = std::ranges::find_if(instance_ids_, [&instance_id] (auto const &pair) { return pair.first == instance_id; });
-                    if (it == instance_ids_.end()) // create new if it doesnt exist
-                    {
-                        instance_ids_.push_back(std::pair<InstanceId, InstanceIndex>{ instance_id, instances_.size()});
-                        instance_index = instances_.size();
-                        instances_.emplace_back(InstanceInfo(model, mesh, material, instance_id));
-                    }
-                    else
-                    {
-                        instance_index = it->second;
-                    }
-
-
-                    InstanceInfo &instance = instances_[instance_index];
-
-                    instance.amount++;
+                if (it == instance_ids_.end()) // create new if it doesnt exist
+                {
+                    instance_ids_.push_back(std::pair<InstanceId, InstanceIndex>{ kInstanceId, 0});
+                    it = std::prev(instance_ids_.end());
                 }
+                it->second++;
             }
         }
+        std::sort(instance_ids_.begin(), instance_ids_.end(), [] (auto const &first, auto const &second) -> bool
+                  { return (((uint64_t(first.first.model_id)) << 32) | (uint64_t)first.first.mesh_id) < (((uint64_t(second.first.model_id)) << 32) | (uint64_t)second.first.mesh_id); });
+
+        instances_.clear();
+        // Then, after counting total amount of instances
+        // we will create the list of all instances sorted by model and mesh
+        for (size_t i = 0; i < instance_ids_.size(); i++)
+        {
+            auto &[instance_id, instance_amount] = instance_ids_[i];
+            auto &model = ModelSystem::GetModel(instance_id.model_id);
+            auto &mesh = model.meshes[instance_id.mesh_id];
+            auto &material = model.materials[instance_id.material_id];
+            instances_.emplace_back(InstanceInfo(model, mesh, material, instance_id, instance_amount)).amount;
+            instance_amount = i;
+        }
         uint32_t copied_num = 0;
-        for (auto const &[instance_id, instance_index] : instance_ids_)
+        // Then we will fill offsets for each instance in instance buffer
+        for (auto const &[kInstanceId, instance_index] : instance_ids_)
         {
             InstanceInfo &instance = instances_[instance_index];
-            instance_offsets_[instance_id] = copied_num;
+            instance_offsets_[kInstanceId] = copied_num;
             copied_num += instance.amount;
             instance.amount = 0; // set offset back to zero
         }
@@ -134,20 +156,23 @@ namespace engine::render::_detail
 
         for (auto entity : instance_group)
         {
-            auto const &model_ref = instance_group.get<components::ModelComponent>(entity);
             auto const &transform = instance_group.get<components::TransformComponent>(entity);
-            auto &model = ModelSystem::GetModel(model_ref.model_id);
-            for (uint32_t mesh_id = 0; mesh_id < model.meshes.size(); mesh_id++)
-            {
-                auto &mesh = model.meshes[mesh_id];
-                for (uint32_t material_id = 0; material_id < mesh.materials.size(); material_id++)
-                {
-                    uint64_t instance_id = ((uint64_t)(mesh_id) << 32) | (uint64_t)model_ref.model_id;
-                    auto it = std::ranges::find_if(instance_ids_, [&instance_id] (auto const &pair) { return pair.first == instance_id; });
-                    InstanceInfo &instance = instances_[it->second];
+            auto const &model_ref = instance_group.get<components::ModelInstanceComponent>(entity);
+            auto &model_instance = ModelSystem::GetModelInstance(model_ref.kInstanceId);
+            auto &model = ModelSystem::GetModel(model_instance.model_id);
 
-                    dst[instance_offsets_[instance_id] + instance.amount++] = Instance{ .model_transform = mesh.mesh_to_model * transform.model };
-                }
+            for (auto const &mesh_instance : model_instance.mesh_instances)
+            {
+                InstanceId kInstanceId
+                {
+                    .model_id = model_instance.model_id,
+                    .mesh_id = mesh_instance.mesh_id,
+                    .material_id = mesh_instance.material_id
+                };
+                auto it = std::ranges::find_if(instance_ids_, [&kInstanceId] (auto const &pair) { return pair.first == kInstanceId; });
+                InstanceInfo &instance = instances_[it->second];
+                auto &mesh = model.meshes[kInstanceId.mesh_id];
+                dst[instance_offsets_[kInstanceId] + instance.amount++] = Instance{ .model_transform = mesh.mesh_to_model * transform.model };
             }
         }
 

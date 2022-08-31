@@ -137,8 +137,7 @@ namespace engine::ini
 
     Ini Ini::Deserialize(std::string_view const str) { return Ini(str); }
 
-    inline void
-        Ini::DeserializeLine(std::string const &section,
+    inline void Ini::DeserializeLine(std::string const &section,
                              std::string &line)
     { /* creating temporary object because
          Section() constructor is private */

@@ -5,9 +5,9 @@
 #include "render/model.hpp"
 namespace engine::components
 {
-    struct ModelComponent
+    struct ModelInstanceComponent
     {
-        uint32_t model_id;
+        uint64_t kInstanceId;
     };
 }
 namespace engine::core
@@ -17,6 +17,23 @@ namespace engine::core
 }
 namespace engine::render
 {
+    class ModelSystem;
+
+    struct MeshInstance
+    {
+        // mesh id within the model vector
+        uint32_t mesh_id = std::numeric_limits<uint32_t>::max();
+        // material id within the model vector
+        uint32_t material_id = std::numeric_limits<uint32_t>::max();
+    };
+    struct ModelInstance
+    {
+        // Id of this instance
+        const uint64_t kInstanceId = std::numeric_limits<uint64_t>::max();
+        uint32_t model_id = std::numeric_limits<uint32_t>::max();
+        std::vector<MeshInstance> mesh_instances;
+        ModelInstance(uint64_t kInstanceId) : kInstanceId(kInstanceId) {}
+    };
     class ModelSystem final
     {
     public:
@@ -32,14 +49,27 @@ namespace engine::render
         {
             opaque_render_system_.OnInstancesUpdated(registry);
         }
-
+        static inline ModelInstance &CreateEmptyModelInstance()
+        {
+            return instance_->model_instances_.emplace_back(ModelInstance(instance_->model_instances_.size()));
+        }
+        static inline ModelInstance &GetModelInstance(uint64_t kInstanceId)
+        {
+            return instance_->model_instances_[kInstanceId];
+        }
+        static inline ModelInstance &GetLoadedModelInstance(uint32_t model_id)
+        {
+            return GetModelInstance(instance_->loaded_model_instance_ids_[model_id]);
+        }
+        static inline uint64_t GetLoadedModelInstanceId(uint32_t model_id)
+        {
+            return instance_->loaded_model_instance_ids_[model_id];
+        }
     public:
         [[nodiscard]] static std::shared_ptr<ModelSystem> instance() noexcept { return instance_; }
         [[nodiscard]] static Model &GetModel(uint32_t model_id) { return instance_->models_[model_id]; }
 
-    private:
-        friend class ::engine::core::ModelLoader;
-
+    public:
         static uint32_t AddModel(Model &&model);
     private:
         friend class ::engine::core::Engine;
@@ -68,5 +98,7 @@ namespace engine::render
 
     private:
         std::vector<Model> models_;
+        std::unordered_map<uint32_t, uint64_t> loaded_model_instance_ids_;
+        std::vector<ModelInstance> model_instances_;
     };
 } // namespace engine::render

@@ -69,8 +69,6 @@ void Renderer::OnGuiRender()
 }
 Renderer::Renderer(ivec2 const &screen_resolution) : screen_resolution(screen_resolution)
 {
-    knight_model_id = ModelLoader::instance()->Load("assets\\models\\Knight\\Knight.fbx").value_or(0);
-    cube_model_id = ModelLoader::instance()->Load("assets\\models\\Cube\\Cube.fbx").value_or(0);
     current_state = direct3d::states::point_wrap_sampler.as_default_wrapper();
     spdlog::info("PointWrapSampler is bound for cube.");
 
@@ -101,21 +99,20 @@ void Renderer::DrawTestCube()
     DynamicUniformBuffer<math::mat4> transform_buffer;
     transform_buffer.Bind(direct3d::ShaderType::VertexShader, 1);
 
-    for (auto entity : Engine::scene()->registry.view<components::TransformComponent, components::ModelComponent, TestCubeComponent>())
+    for (auto entity : Engine::scene()->registry.view<components::TransformComponent, components::ModelInstanceComponent, TestCubeComponent>())
     {
-        auto model_component = Engine::scene()->registry.get<components::ModelComponent>(entity);
-        auto &model = render::ModelSystem::GetModel(model_component.model_id);
+        auto model_component = Engine::scene()->registry.get<components::ModelInstanceComponent>(entity);
+        auto &model_instance = render::ModelSystem::GetModelInstance(model_component.kInstanceId);
+        auto &model = render::ModelSystem::GetModel(model_instance.model_id);
         model.vertices.Bind();
         model.indices.Bind();
         auto transform = Engine::scene()->registry.get<components::TransformComponent>(entity);
-        for (auto const &mesh : model.meshes)
+        for (auto const &mesh_instance : model_instance.mesh_instances)
         {
+            auto &mesh = model.meshes[mesh_instance.mesh_id];
             transform_buffer.Update(mesh.mesh_to_model * transform.model);
-            for (auto const &material : mesh.materials)
-            {
-                direct3d::api::devcon4->PSSetShaderResources(0, 1, &material.texture);
-                direct3d::api::devcon4->DrawIndexed(mesh.mesh_range.index_num, mesh.mesh_range.index_offset, 0);
-            }
+            direct3d::api::devcon4->PSSetShaderResources(0, 1, &model.materials[mesh_instance.material_id].texture);
+            direct3d::api::devcon4->DrawIndexed(mesh.mesh_range.index_num, mesh.mesh_range.index_offset, 0);
         }
     }
 }

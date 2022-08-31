@@ -15,7 +15,6 @@ public:
 
     engine::render::PerFrame per_frame;
     engine::direct3d::DynamicUniformBuffer<engine::render::PerFrame> per_frame_buffer{};
-    uint32_t knight_model_id, cube_model_id;
     engine::direct3d::SamplerState current_state;
 private:
     engine::core::math::ivec2 const &screen_resolution;

@@ -7,8 +7,7 @@ namespace engine::core
     {
     public:
         // Returns id of the model stored in ModelSystem
-        std::optional<uint32_t> Load(std::filesystem::path const &path);
-        [[nodiscard]] static std::shared_ptr<ModelLoader> instance() noexcept { return instance_; }
+        static std::optional<uint32_t> Load(std::filesystem::path const &path);
 
     private:
         friend class ::engine::core::Engine;

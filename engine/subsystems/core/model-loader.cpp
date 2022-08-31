@@ -12,14 +12,14 @@ namespace engine::core
     using namespace render;
     namespace
     {
-        Mesh SetupMesh(std::vector<Material> &&materials, aiMatrix4x4 const &transformation, Mesh::MeshRange &&mesh_range)
+        Mesh SetupMesh(uint32_t material_id, aiMatrix4x4 const &transformation, Mesh::MeshRange &&mesh_range)
         {
             auto temp = math::mat4(transformation.a1, transformation.a2, transformation.a3, transformation.a4,
                                    transformation.b1, transformation.b2, transformation.b3, transformation.b4,
                                    transformation.c1, transformation.c2, transformation.c3, transformation.c4,
                                    transformation.d1, transformation.b2, transformation.d3, transformation.d4);
             return Mesh{
-                .materials = std::move(materials),
+                .loaded_material_id = material_id,
                 .mesh_to_model = temp,
                 .inv_mesh_to_model = math::inverse(temp),
                 .mesh_range = std::move(mesh_range)
@@ -29,12 +29,9 @@ namespace engine::core
         void processMesh(std::vector<Vertex> &vertices,
                          std::vector<uint32_t> &indices,
                          std::vector<Mesh> &meshes,
-                         std::filesystem::path const &folder,
                          aiMesh *mesh,
-                         aiMatrix4x4 const &transformation,
-                         const aiScene *scene)
+                         aiMatrix4x4 const &transformation)
         {
-            std::vector<Material> materials;
             for (uint32_t i = 0; i < mesh->mNumVertices; i++)
             {
                 vertices.emplace_back(Vertex{
@@ -49,19 +46,7 @@ namespace engine::core
                     indices.push_back(face.mIndices[j]);
                 }
             }
-
-            if (mesh->mMaterialIndex >= 0)
-            {
-                aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-                for (UINT i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); i++)
-                {
-                    aiString str;
-                    material->GetTexture(aiTextureType_DIFFUSE, i, &str);
-                    materials.emplace_back(Material{ .texture = TextureManager::GetTextureView(TextureManager::LoadTexture(folder / str.C_Str())) });
-                }
-            }
-
-            meshes.emplace_back(SetupMesh(std::move(materials), transformation, Mesh::MeshRange{
+            meshes.emplace_back(SetupMesh(mesh->mMaterialIndex, transformation, Mesh::MeshRange{
                 // we are gonna fill offsets later
                 .vertex_offset = std::numeric_limits<uint32_t>::max(),
                 .index_offset = std::numeric_limits<uint32_t>::max(),
@@ -78,25 +63,26 @@ namespace engine::core
         void processNode(std::vector<Vertex> &vertices,
                          std::vector<uint32_t> &indices,
                          std::vector<Mesh> &meshes,
-                         std::filesystem::path const &folder, aiNode *node, aiScene const *scene)
+                         aiNode *node,
+                         aiScene const *scene)
         {
             for (uint32_t i = 0; i < node->mNumMeshes; i++)
             {
                 aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-                processMesh(vertices, indices, meshes, folder, mesh, node->mTransformation, scene);
+                processMesh(vertices, indices, meshes, mesh, node->mTransformation);
             }
 
             for (UINT i = 0; i < node->mNumChildren; i++)
             {
-                processNode(vertices, indices, meshes, folder, node->mChildren[i], scene);
+                processNode(vertices, indices, meshes, node->mChildren[i], scene);
             }
         }
     } // namespace
 
     std::optional<uint32_t> ModelLoader::Load(std::filesystem::path const &path)
     {
-        if (auto it = models_.find(std::filesystem::hash_value(path));
-            it != models_.end())
+        if (auto it = instance_->models_.find(std::filesystem::hash_value(path));
+            it != instance_->models_.end())
         {
             return it->second;
         }
@@ -108,19 +94,34 @@ namespace engine::core
                                                      aiProcess_FlipUVs |
                                                      aiProcess_FlipWindingOrder |
                                                      aiProcess_JoinIdenticalVertices |
-                                                     (uint32_t)aiProcess_GenBoundingBoxes);
+                                                     (uint32_t)aiProcess_GenBoundingBoxes |
+                                                     aiProcess_CalcTangentSpace);
 
         if (scene_ptr == nullptr)
         {
             utils::AlwaysAssert(false, "Failed to load model @ " + path.string());
             return std::nullopt;
         }
+        auto model_folder = std::filesystem::absolute(path.parent_path());
 
         std::vector<Vertex> vertices;
         std::vector<uint32_t> indices;
         std::vector<Mesh> meshes;
+        std::vector<Material> materials;
 
-        processNode(vertices, indices, meshes, std::filesystem::absolute(path.parent_path()), scene_ptr->mRootNode, scene_ptr);
+        for (size_t material_index = 0; material_index < scene_ptr->mNumMaterials; material_index++)
+        {
+            aiMaterial *material = scene_ptr->mMaterials[material_index];
+            for (UINT i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); i++)
+            {
+                aiString str;
+                material->GetTexture(aiTextureType_DIFFUSE, i, &str);
+                materials.emplace_back(Material{ .texture = TextureManager::GetTextureView(TextureManager::LoadTexture(model_folder / str.C_Str())) });
+            }
+        }
+
+
+        processNode(vertices, indices, meshes, scene_ptr->mRootNode, scene_ptr);
         uint32_t index_offset = 0;
         uint32_t vertex_offset = 0;
         math::vec3 min{ std::numeric_limits<float>::max() };
@@ -145,11 +146,12 @@ namespace engine::core
 
         uint32_t rv = ModelSystem::AddModel(Model{
                 .bounding_box = math::AABB{.min = min, .max = max},
-                .meshes = meshes,
+                .meshes = std::move(meshes),
+                .materials = std::move(materials),
                 .vertices = direct3d::ImmutableVertexBuffer<Vertex>(vertices),
                 .indices = direct3d::ImmutableIndexBuffer<uint32_t>(indices)
                                             });
-        models_.emplace(std::pair<size_t, uint32_t>{std::filesystem::hash_value(path), rv});
+        instance_->models_.emplace(std::pair<size_t, uint32_t>{std::filesystem::hash_value(path), rv});
         return rv;
     }
 

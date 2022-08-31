@@ -11,6 +11,25 @@ namespace engine::render
 {
     class ModelSystem;
 }
+
+namespace engine::render::_detail
+{
+    using ModelId = uint32_t;
+    using MeshId = uint32_t;
+    using MaterialId = uint32_t;
+    struct InstanceId
+    {
+        ModelId model_id;
+        MeshId mesh_id;
+        MaterialId material_id;
+        bool operator==(InstanceId const &other) const
+        {
+            return (model_id == other.model_id &&
+                    mesh_id == other.mesh_id &&
+                    material_id == other.material_id);
+        }
+    };
+}
 namespace engine::render::_detail
 {
     auto constexpr opaque_shader_path = "assets/shaders/opaque/opaque.hlsl";
@@ -37,13 +56,10 @@ namespace engine::render::_detail
             std::reference_wrapper<Material> material;
             // first 32 bits represent mesh_id
             // the next 32 bits represent model_id
-            uint64_t instance_id = 0;
+            InstanceId kInstanceId;
             uint32_t amount = 0;
 
-            [[nodiscard]] constexpr uint32_t mesh_id() const noexcept { return uint32_t(instance_id >> 32); }
-            [[nodiscard]] constexpr uint32_t model_id() const noexcept { return uint32_t(instance_id & 0xffffffff); }
-
-            InstanceInfo(Model &model, Mesh &mesh, Material &material, size_t instance_id) : model(model), mesh(mesh), material(material), instance_id(instance_id) {}
+            InstanceInfo(Model &model, Mesh &mesh, Material &material, InstanceId kInstanceId, uint32_t amount) : model(model), mesh(mesh), material(material), kInstanceId(kInstanceId), amount(amount) {}
         };
 
         std::vector<InstanceInfo> instances_;

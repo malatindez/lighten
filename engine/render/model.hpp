@@ -25,8 +25,7 @@ namespace engine::render
             uint32_t index_num;
             core::math::AABB bounding_box;
         };
-
-        std::vector<Material> materials;
+        uint32_t loaded_material_id;
         core::math::mat4 mesh_to_model;
         core::math::mat4 inv_mesh_to_model;
         MeshRange mesh_range;
@@ -36,6 +35,7 @@ namespace engine::render
     {
         core::math::AABB bounding_box;
         std::vector<Mesh> meshes;
+        std::vector<Material> materials;
         direct3d::ImmutableVertexBuffer<Vertex> vertices;
         direct3d::ImmutableIndexBuffer<uint32_t> indices;
     };

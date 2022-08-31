@@ -23,8 +23,7 @@ namespace engine::core
             return;
         }
         application_ = std::unique_ptr<Engine>(new Engine{});
-        debug::RedirectOutputDebugString([&] (std::string_view view)
-                                         { application_->logger_->info(view); });
+        debug::RedirectOutputDebugString([&](std::string_view view) __lambda_force_inline{ application_->logger_->info(view); });
         if (config()["Logger"]["console_enabled"].as_boolean())
         {
             AllocConsole();
