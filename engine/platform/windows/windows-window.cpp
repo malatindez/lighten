@@ -1,6 +1,7 @@
 #include "windows-window.hpp"
 #include "include/imgui.hpp"
 #include <ImGuizmo.h>
+#include "utils/win-utils.hpp"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace engine::platform::windows
@@ -25,7 +26,7 @@ namespace engine::platform::windows
 
         RegisterClassExW(&wc);
 
-        handle_ = CreateWindowExW(NULL, wc.lpszClassName, title_.c_str(),
+        handle_ = CreateWindowExW(NULL, wc.lpszClassName, utils::string_to_wstring(title_).c_str(),
                                   WS_OVERLAPPEDWINDOW | WS_VISIBLE,
                                   position_.x, position_.y, size_.x, size_.y,
                                   nullptr, nullptr, GetModuleHandle(NULL), nullptr);
@@ -159,7 +160,7 @@ namespace engine::platform::windows
 
         if (frame_buffer_.valid())
         {
-            direct3d::api::devcon4->OMSetRenderTargets(0, nullptr, nullptr);
+            direct3d::api().devcon4->OMSetRenderTargets(0, nullptr, nullptr);
             frame_buffer_.reset();
             frame_buffer_view_.reset();
             depth_buffer_.reset();
@@ -177,7 +178,7 @@ namespace engine::platform::windows
         vp.MaxDepth = 1.0f;
         vp.TopLeftX = 0;
         vp.TopLeftY = 0;
-        direct3d::api::devcon4->RSSetViewports(1, &vp);
+        direct3d::api().devcon4->RSSetViewports(1, &vp);
     }
     direct3d::SwapChain1 initializeSwapchain(HWND hWnd, core::math::ivec2 const &window_size)
     {
@@ -198,7 +199,7 @@ namespace engine::platform::windows
 
         IDXGISwapChain1 *swapchain = nullptr;
         SetLastError(0);
-        direct3d::AlwaysAssert(direct3d::api::factory5->CreateSwapChainForHwnd(direct3d::api::device, hWnd, &desc, nullptr, nullptr, &swapchain),
+        direct3d::AlwaysAssert(direct3d::api().factory5->CreateSwapChainForHwnd(direct3d::api().device, hWnd, &desc, nullptr, nullptr, &swapchain),
                                "Failed to create the swapchain");
         return direct3d::SwapChain1{ swapchain };
     }
@@ -212,7 +213,7 @@ namespace engine::platform::windows
 
         ID3D11RenderTargetView *frame_buffer_view = nullptr;
 
-        direct3d::AlwaysAssert(direct3d::api::device->CreateRenderTargetView(frame_buffer, nullptr, &frame_buffer_view),
+        direct3d::AlwaysAssert(direct3d::api().device->CreateRenderTargetView(frame_buffer, nullptr, &frame_buffer_view),
                                "Failed to initialize framebuffer");
         frame_buffer_ = frame_buffer;
         frame_buffer_view_ = frame_buffer_view;
@@ -227,12 +228,12 @@ namespace engine::platform::windows
 
         ID3D11Texture2D *depth_buffer;
 
-        direct3d::AlwaysAssert(direct3d::api::device->CreateTexture2D(&depth_buffer_desc_, nullptr, &depth_buffer),
+        direct3d::AlwaysAssert(direct3d::api().device->CreateTexture2D(&depth_buffer_desc_, nullptr, &depth_buffer),
                                "Failed to initialize depthbuffer");
 
         ID3D11DepthStencilView *depth_buffer_view;
 
-        direct3d::AlwaysAssert(direct3d::api::device->CreateDepthStencilView(depth_buffer, nullptr, &depth_buffer_view),
+        direct3d::AlwaysAssert(direct3d::api().device->CreateDepthStencilView(depth_buffer, nullptr, &depth_buffer_view),
                                "Failed to initialize depthbuffer");
 
         depth_buffer_ = depth_buffer;

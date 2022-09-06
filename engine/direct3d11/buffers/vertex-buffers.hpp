@@ -22,7 +22,7 @@ namespace engine::direct3d
         void Bind(uint32_t start_slot = 0, uint32_t offset = 0)
         {
             uint32_t stride = sizeof(T);
-            api::devcon->IASetVertexBuffers(start_slot, 1, &ImmutableBuffer<T>::buffer(), &stride, &offset);
+            api().devcon->IASetVertexBuffers(start_slot, 1, &ImmutableBuffer<T>::buffer(), &stride, &offset);
         }
     };
 
@@ -45,7 +45,7 @@ namespace engine::direct3d
         void Bind(uint32_t start_slot = 0, uint32_t offset = 0)
         {
             uint32_t stride = sizeof(T);
-            direct3d::api::devcon->IASetVertexBuffers(start_slot, 1, &DynamicBuffer<T>::buffer(), &stride, &offset);
+            direct3d::api().devcon->IASetVertexBuffers(start_slot, 1, &DynamicBuffer<T>::buffer(), &stride, &offset);
         }
 
         inline D3D11_MAPPED_SUBRESOURCE Map()

@@ -5,3 +5,4 @@
 #include "core/events.hpp"
 #include "utils/utils.hpp"
 #include "components/components.hpp"
+#include "core/config.hpp"

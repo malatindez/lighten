@@ -20,7 +20,7 @@ namespace engine::core
             if (extension == ".dds")
             {
                 direct3d::AlwaysAssert(
-                    DirectX::CreateDDSTextureFromFile(direct3d::api::device5, direct3d::api::devcon4, path.wstring().c_str(), &texture_resource.reset(), &shader_resource_view.reset()),
+                    DirectX::CreateDDSTextureFromFile(direct3d::api().device5, direct3d::api().devcon4, path.wstring().c_str(), &texture_resource.reset(), &shader_resource_view.reset()),
                     "Failed to load dds texture from file @" + path.string());
             }
             else if (extension == ".hdr")
@@ -61,17 +61,17 @@ namespace engine::core
                 direct3d::Texture2D texture;
                 if (mipmaps)
                 {
-                    direct3d::AlwaysAssert(direct3d::api::device->CreateTexture2D(&tdesc, nullptr, &texture.reset()), "Failed to create texture");
-                    direct3d::api::devcon->UpdateSubresource(texture,
-                                                             D3D11CalcSubresource(0, 0, tdesc.MipLevels),
-                                                             nullptr,
-                                                             srd.pSysMem,
-                                                             srd.SysMemPitch,
-                                                             1);
+                    direct3d::AlwaysAssert(direct3d::api().device->CreateTexture2D(&tdesc, nullptr, &texture.reset()), "Failed to create texture");
+                    direct3d::api().devcon->UpdateSubresource(texture,
+                                                              D3D11CalcSubresource(0, 0, tdesc.MipLevels),
+                                                              nullptr,
+                                                              srd.pSysMem,
+                                                              srd.SysMemPitch,
+                                                              1);
                 }
                 else
                 {
-                    direct3d::AlwaysAssert(direct3d::api::device->CreateTexture2D(&tdesc, &srd, &texture.reset()),
+                    direct3d::AlwaysAssert(direct3d::api().device->CreateTexture2D(&tdesc, &srd, &texture.reset()),
                                            "Failed to create texture resource");
                 }
 
@@ -81,16 +81,16 @@ namespace engine::core
                 srv_desc.TextureCube.MostDetailedMip = 0;
                 srv_desc.TextureCube.MipLevels = std::numeric_limits<UINT>::max();
 
-                direct3d::AlwaysAssert(direct3d::api::device->CreateShaderResourceView(texture, &srv_desc, &shader_resource_view.ptr()),
+                direct3d::AlwaysAssert(direct3d::api().device->CreateShaderResourceView(texture, &srv_desc, &shader_resource_view.ptr()),
                                        "Failed to create shader resource view");
 
-                if (mipmaps) direct3d::api::devcon->GenerateMips(shader_resource_view);
+                if (mipmaps) direct3d::api().devcon->GenerateMips(shader_resource_view);
             }
             else
             {
                 direct3d::AlwaysAssert(
-                    DirectX::CreateWICTextureFromFile(direct3d::api::device5,
-                                                      direct3d::api::devcon4,
+                    DirectX::CreateWICTextureFromFile(direct3d::api().device5,
+                                                      direct3d::api().devcon4,
                                                       path.wstring().c_str(),
                                                       &texture_resource.reset(),
                                                       &shader_resource_view.reset()),
@@ -151,8 +151,8 @@ namespace engine::core
         static direct3d::Resource texture_resource;
         direct3d::ShaderResourceView shader_resource_view;
         direct3d::AlwaysAssert(
-            DirectX::CreateDDSTextureFromFileEx(direct3d::api::device5,
-                                                direct3d::api::devcon4,
+            DirectX::CreateDDSTextureFromFileEx(direct3d::api().device5,
+                                                direct3d::api().devcon4,
                                                 path.wstring().c_str(),
                                                 0,
                                                 D3D11_USAGE_IMMUTABLE,
@@ -200,17 +200,17 @@ namespace engine::core
 
         if (generate_mipmaps)
         {
-            direct3d::AlwaysAssert(direct3d::api::device->CreateTexture2D(&desc, nullptr, &texture.reset()), "Failed to create texture");
+            direct3d::AlwaysAssert(direct3d::api().device->CreateTexture2D(&desc, nullptr, &texture.reset()), "Failed to create texture");
             for (uint32_t i = 0; i < cubemap_textures.size(); ++i)
-                direct3d::api::devcon->UpdateSubresource(texture,
-                                                         D3D11CalcSubresource(0, i, desc.MipLevels),
-                                                         nullptr,
-                                                         subresource_data_array[i].pSysMem,
-                                                         subresource_data_array[i].SysMemPitch, 1);
+                direct3d::api().devcon->UpdateSubresource(texture,
+                                                          D3D11CalcSubresource(0, i, desc.MipLevels),
+                                                          nullptr,
+                                                          subresource_data_array[i].pSysMem,
+                                                          subresource_data_array[i].SysMemPitch, 1);
         }
         else
         {
-            direct3d::AlwaysAssert(direct3d::api::device->CreateTexture2D(&desc, subresource_data_array.data(), &texture.reset()),
+            direct3d::AlwaysAssert(direct3d::api().device->CreateTexture2D(&desc, subresource_data_array.data(), &texture.reset()),
                                    "Failed to create texture resource");
         }
 
@@ -221,10 +221,10 @@ namespace engine::core
         srv_desc.TextureCube.MipLevels = std::numeric_limits<UINT>::max();
 
         direct3d::ShaderResourceView shader_resource_view;
-        direct3d::AlwaysAssert(direct3d::api::device->CreateShaderResourceView(texture, &srv_desc, &shader_resource_view.ptr()),
+        direct3d::AlwaysAssert(direct3d::api().device->CreateShaderResourceView(texture, &srv_desc, &shader_resource_view.ptr()),
                                "Failed to create shader resource view");
 
-        if (generate_mipmaps) direct3d::api::devcon->GenerateMips(shader_resource_view);
+        if (generate_mipmaps) direct3d::api().devcon->GenerateMips(shader_resource_view);
         instance_->textures_.emplace(std::make_pair(instance_->current_id_, shader_resource_view));
         return instance_->current_id_++;
 

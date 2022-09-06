@@ -34,31 +34,31 @@ void Renderer::OnGuiRender()
             switch (current_item_id)
             {
             case 0:
-                current_state = direct3d::states::point_wrap_sampler.as_default_wrapper();
+                current_state = direct3d::states().point_wrap_sampler.as_default_wrapper();
                 spdlog::info("PointWrapSampler is bound for cube.");
                 break;
             case 1:
-                current_state = direct3d::states::point_clamp_sampler.as_default_wrapper();
+                current_state = direct3d::states().point_clamp_sampler.as_default_wrapper();
                 spdlog::info("PointClampSampler is bound for cube.");
                 break;
             case 2:
-                current_state = direct3d::states::linear_wrap_sampler.as_default_wrapper();
+                current_state = direct3d::states().linear_wrap_sampler.as_default_wrapper();
                 spdlog::info("LinearWrapSampler is bound for cube.");
                 break;
             case 3:
-                current_state = direct3d::states::linear_clamp_sampler.as_default_wrapper();
+                current_state = direct3d::states().linear_clamp_sampler.as_default_wrapper();
                 spdlog::info("LinearClampSampler is bound for cube.");
                 break;
             case 4:
-                current_state = direct3d::states::anisotropic_wrap_sampler.as_default_wrapper();
+                current_state = direct3d::states().anisotropic_wrap_sampler.as_default_wrapper();
                 spdlog::info("AnisotropicWrapSampler is bound for cube.");
                 break;
             case 5:
-                current_state = direct3d::states::anisotropic_clamp_sampler.as_default_wrapper();
+                current_state = direct3d::states().anisotropic_clamp_sampler.as_default_wrapper();
                 spdlog::info("AnisotropicClampSampler is bound for cube.");
                 break;
             default:
-                current_state = direct3d::states::point_wrap_sampler.as_default_wrapper();
+                current_state = direct3d::states().point_wrap_sampler.as_default_wrapper();
                 spdlog::info("PointWrapSampler is bound for cube.");
                 break;
             }
@@ -67,9 +67,9 @@ void Renderer::OnGuiRender()
     }
     ImGui::End();
 }
-Renderer::Renderer(ivec2 const &screen_resolution) : screen_resolution(screen_resolution)
+Renderer::Renderer(ivec2 const &screen_resolution, engine::render::PerFrame &per_frame) : screen_resolution(screen_resolution), per_frame(per_frame)
 {
-    current_state = direct3d::states::point_wrap_sampler.as_default_wrapper();
+    current_state = direct3d::states().point_wrap_sampler.as_default_wrapper();
     spdlog::info("PointWrapSampler is bound for cube.");
 
 
@@ -89,12 +89,12 @@ void Renderer::DrawTestCube()
 {
 
     test_shader.Bind();
-    direct3d::api::devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    direct3d::api().devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    direct3d::api::devcon4->RSSetState(direct3d::states::cull_back);
-    direct3d::api::devcon4->PSSetSamplers(0, 1, &current_state.ptr());
-    direct3d::api::devcon4->OMSetDepthStencilState(direct3d::states::geq_depth, 0);
-    direct3d::api::devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
+    direct3d::api().devcon4->RSSetState(direct3d::states().cull_back);
+    direct3d::api().devcon4->PSSetSamplers(0, 1, &current_state.ptr());
+    direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth, 0);
+    direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 
     DynamicUniformBuffer<math::mat4> transform_buffer;
     transform_buffer.Bind(direct3d::ShaderType::VertexShader, 1);
@@ -109,8 +109,8 @@ void Renderer::DrawTestCube()
         for (auto const &mesh : model.meshes)
         {
             transform_buffer.Update(mesh.mesh_to_model * transform.model);
-            direct3d::api::devcon4->PSSetShaderResources(0, 1, &model.materials[mesh.loaded_material_id].texture);
-            direct3d::api::devcon4->DrawIndexed(mesh.mesh_range.index_num, mesh.mesh_range.index_offset, 0);
+            direct3d::api().devcon4->PSSetShaderResources(0, 1, &model.materials[mesh.loaded_material_id].texture);
+            direct3d::api().devcon4->DrawIndexed(mesh.mesh_range.index_num, mesh.mesh_range.index_offset, 0);
         }
     }
 }
@@ -125,8 +125,6 @@ void Renderer::OnRender()
     per_frame.inv_view_projection = camera.inv_view_projection;
     per_frame.screen_resolution = vec2{ screen_resolution };
     per_frame.mouse_position = vec2{ InputLayer::instance()->mouse_position() };
-    per_frame_buffer.Update(per_frame);
-    per_frame_buffer.Bind(direct3d::ShaderType::VertexShader, 0);
     render::ModelSystem::instance().Render();
 
     DrawTestCube();
@@ -134,7 +132,7 @@ void Renderer::OnRender()
 
     for (auto entity : Engine::scene()->registry.view<components::SkyboxComponent>())
     {
-        SkyboxManager::RenderSkybox(Engine::scene()->registry.get<components::SkyboxComponent>(entity));
+        SkyboxManager::RenderSkybox(Engine::scene()->registry.get<components::SkyboxComponent>(entity), per_frame);
     }
 
 }

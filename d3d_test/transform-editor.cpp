@@ -83,7 +83,7 @@ namespace transform_editor
         auto &input = *InputLayer::instance();
         auto scene = Engine::scene();
         input.AddUpdateKeyCallback(
-            InputLayer::KeySeq{ engine::core::Key::KEY_LBUTTON },
+            InputLayer::KeySeq{ engine::core::Key::KEY_CONTROL, engine::core::Key::KEY_LBUTTON },
             [&] (InputLayer::KeySeq const &, uint32_t)
             {
                 if (ImGui::GetIO().WantCaptureMouse) { return; }
@@ -154,7 +154,7 @@ namespace transform_editor
     {
         static TransformComponent empty;
         static AABB empty_bb;
-        if (selected_entity != entt::null && selected_scene == Engine::scene())
+        if (selected_entity != entt::null && selected_scene == Engine::scene() && InputLayer::instance()->key_state(engine::core::Key::KEY_CONTROL))
         {
             TransformComponent &transform = Engine::scene()->registry.get<TransformComponent>(selected_entity);
             auto id = Engine::scene()->registry.get<OpaqueComponent>(selected_entity).model_id;

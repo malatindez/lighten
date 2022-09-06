@@ -10,12 +10,11 @@ class Renderer
     public engine::core::Layer::HandleGuiRender
 {
 public:
-    Renderer(engine::core::math::ivec2 const &screen_resolution);
+    Renderer(engine::core::math::ivec2 const &screen_resolution, engine::render::PerFrame &per_frame);
     void OnRender() override;
     void OnGuiRender() override;
 
-    engine::render::PerFrame per_frame;
-    engine::direct3d::DynamicUniformBuffer<engine::render::PerFrame> per_frame_buffer{};
+    engine::render::PerFrame &per_frame;
     engine::direct3d::SamplerState current_state;
 private:
     engine::core::math::ivec2 const &screen_resolution;

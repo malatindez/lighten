@@ -18,7 +18,7 @@ namespace engine::direct3d
         {}
         void Bind(DXGI_FORMAT format = DXGI_FORMAT_R32_UINT, uint32_t offset = 0)
         {
-            direct3d::api::devcon->IASetIndexBuffer(ImmutableBuffer<T>::buffer(), format, offset);
+            direct3d::api().devcon->IASetIndexBuffer(ImmutableBuffer<T>::buffer(), format, offset);
         }
     };
 
@@ -39,7 +39,7 @@ namespace engine::direct3d
         {}
         void Bind(DXGI_FORMAT format = DXGI_FORMAT_R32_UINT, uint32_t offset = 0)
         {
-            direct3d::api::devcon->IASetIndexBuffer(ImmutableBuffer<T>::buffer(), format, offset);
+            direct3d::api().devcon->IASetIndexBuffer(ImmutableBuffer<T>::buffer(), format, offset);
         }
     };
 } // namespace engine::direct3d

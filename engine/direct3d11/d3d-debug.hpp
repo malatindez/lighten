@@ -17,15 +17,15 @@ namespace engine::direct3d
 #if !defined(_DEBUG)
         return;
 #else
-        UINT64 message_count = api::debug_info_queue->GetNumStoredMessages();
+        UINT64 message_count = api().debug_info_queue->GetNumStoredMessages();
 
         for (UINT64 i = 0; i < message_count; i++)
         {
             SIZE_T message_size = 0;
-            api::debug_info_queue->GetMessage(i, nullptr, &message_size); //get the size of the message
+            api().debug_info_queue->GetMessage(i, nullptr, &message_size); //get the size of the message
 
             D3D11_MESSAGE *message = (D3D11_MESSAGE *)malloc(message_size); //allocate enough space
-            if (message == nullptr || FAILED(api::debug_info_queue->GetMessage(i, message, &message_size)))
+            if (message == nullptr || FAILED(api().debug_info_queue->GetMessage(i, message, &message_size)))
             {
                 free(message);
                 continue;
@@ -36,7 +36,7 @@ namespace engine::direct3d
             free(message);
         }
 
-        api::debug_info_queue->ClearStoredMessages();
+        api().debug_info_queue->ClearStoredMessages();
 #endif
     }
 

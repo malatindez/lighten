@@ -1,15 +1,6 @@
 #include "engine.hpp"
 #include "include/win-debug.hpp"
 
-static std::string const kDefaultConfig =
-R"(
-[Logger]
-is_absolute = no
-folder = logs
-console_enabled = true
-log_level = trace
-)";
-
 namespace engine::core
 {
     using namespace events;
@@ -22,6 +13,8 @@ namespace engine::core
         {
             return;
         }
+        Config::Init();
+
         application_ = std::unique_ptr<Engine>(new Engine{});
         debug::RedirectOutputDebugString([&](std::string_view view) __lambda_force_inline{ application_->logger_->info(view); });
         if (config()["Logger"]["console_enabled"].as_boolean())
@@ -36,7 +29,7 @@ namespace engine::core
         }
         spdlog::set_default_logger(application_->logger_);
 
-        direct3d::api::Init();
+        direct3d::Api::Init();
         InputLayer::Init();
         ShaderManager::Init();
         ModelLoader::Init();
@@ -55,7 +48,8 @@ namespace engine::core
         ModelLoader::Deinit();
         ShaderManager::Deinit();
         InputLayer::Deinit();
-        direct3d::api::Deinit();
+        direct3d::Api::Deinit();
+        Config::Deinit();
     }
     void Engine::Exit()
     {
@@ -100,22 +94,10 @@ namespace engine::core
     {
         event_function_ = std::bind_front([this](Event &e) __lambda_force_inline
                                           { OnEvent(e); });
-        std::ifstream config("config.ini");
-        std::stringstream data;
-        if (config.is_open())
-        {
-            data << config.rdbuf();
-        }
-        else
-        {
-            data << kDefaultConfig;
-        }
-        config.close();
-        config_ = std::make_unique<ini::Ini>(data.str());
         std::filesystem::path target_folder;
-        if (!(*config_)["Logger"]["is_absolute"].as_boolean())
+        if (!config()["Logger"]["is_absolute"].as_boolean())
         {
-            target_folder = std::filesystem::current_path() / (*config_)["Logger"]["folder"].str();
+            target_folder = std::filesystem::current_path() / config()["Logger"]["folder"].str();
         }
         if (!std::filesystem::is_directory(target_folder) && !std::filesystem::exists(target_folder))
         {
@@ -147,12 +129,6 @@ namespace engine::core
 
     Engine::~Engine()
     {
-        if (config_)
-        {
-            std::ofstream config("config.ini");
-            config << config_->Serialize();
-            config.close();
-        }
     }
 
 } // namespace engine::core

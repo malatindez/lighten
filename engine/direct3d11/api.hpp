@@ -1,12 +1,13 @@
 #pragma once
 #include "d3d-common.hpp"
+#include "utils/utils.hpp"
 namespace engine::core
 {
     class Engine;
 }
 namespace engine::direct3d
 {
-    class api;
+    class Api;
 
     namespace _api_detail
     {
@@ -14,7 +15,7 @@ namespace engine::direct3d
         template <typename T>
         class api_readonly_wrapper final : public readonly_d3d_resource_wrapper<T>
         {
-            friend class engine::direct3d::api;
+            friend class engine::direct3d::Api;
             using readonly_d3d_resource_wrapper<T>::operator=;
             using readonly_d3d_resource_wrapper<T>::readonly_d3d_resource_wrapper;
         };
@@ -31,19 +32,19 @@ namespace engine::direct3d
     using DebugInfoQueue = _api_detail::api_readonly_wrapper<ID3D11InfoQueue>;
 #endif
 
-    class api final
+    class Api final
     {
     public:
         // global pointers to most used D3D11 objects for convenience:
-        static Factory factory;
-        static Factory5 factory5;
-        static Device device;
-        static Device5 device5;
-        static DeviceContext devcon;
-        static DeviceContext4 devcon4;
+        Factory factory;
+        Factory5 factory5;
+        Device device;
+        Device5 device5;
+        DeviceContext devcon;
+        DeviceContext4 devcon4;
 #if defined(_DEBUG)
-        static Debug debug;
-        static DebugInfoQueue debug_info_queue;
+        Debug debug;
+        DebugInfoQueue debug_info_queue;
 #endif
 
 #if defined(ENGINE_TEST)
@@ -53,10 +54,20 @@ namespace engine::direct3d
         }
         static void public_deinit() { Deinit(); }
 #endif
+        [[nodiscard]] static inline Api &instance() { utils::Assert(instance_ != nullptr); return *instance_; }
+    private:
 
+        Api() = default;
+        // delete move & copy semantics
+        Api(Api &&) = delete;
+        Api(Api const &) = delete;
+        Api &operator=(Api &&) = delete;
+        Api &operator=(Api const &) = delete;
     private:
         friend class ::engine::core::Engine;
         static void Init();
         static void Deinit();
+        static std::unique_ptr<Api> instance_;
     };
+    [[nodiscard]] inline Api &api() { return Api::instance(); }
 } // namespace engine::direct3d

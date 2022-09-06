@@ -21,7 +21,7 @@ namespace engine
     public:
         static entt::entity LoadSkybox(entt::registry &registry, std::filesystem::path const &path);
         static entt::entity LoadSkybox(entt::registry &registry, std::array<std::filesystem::path, 6> const &paths);
-        static void RenderSkybox(components::SkyboxComponent const &skybox);
+        static void RenderSkybox(components::SkyboxComponent const &skybox, render::PerFrame const &per_frame);
     private:
         friend class core::Engine;
         static void Init();
@@ -30,5 +30,6 @@ namespace engine
         static auto constexpr skybox_shader_path = "assets/shaders/skybox/skybox.hlsl";
 
         static render::GraphicsShaderProgram skybox_shader_;
+        static std::unique_ptr<direct3d::DynamicUniformBuffer<core::math::mat4x3>> skybox_buffer_;
     };
 }

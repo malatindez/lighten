@@ -30,11 +30,11 @@ namespace engine::render::_opaque_detail
             return;
         opaque_shader_.Bind();
 
-        direct3d::api::devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        direct3d::api::devcon4->RSSetState(direct3d::states::cull_back);
-        direct3d::api::devcon4->PSSetSamplers(0, 1, &direct3d::states::point_wrap_sampler.ptr());
-        direct3d::api::devcon4->OMSetDepthStencilState(direct3d::states::geq_depth, 0);
-        direct3d::api::devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
+        direct3d::api().devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        direct3d::api().devcon4->RSSetState(direct3d::states().cull_back);
+        direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().point_wrap_sampler.ptr());
+        direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth, 0);
+        direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 
         mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 1);
 
@@ -59,10 +59,10 @@ namespace engine::render::_opaque_detail
 
                     const auto &material = perMaterial.second.material;
 
-                    direct3d::api::devcon4->PSSetShaderResources(0, 1, &material.albedo);
+                    direct3d::api().devcon4->PSSetShaderResources(0, 1, &material.albedo);
 
                     uint32_t numInstances = uint32_t(perMaterial.second.instances.size());
-                    direct3d::api::devcon4->DrawIndexedInstanced(meshRange.index_num, numInstances, meshRange.index_offset, meshRange.vertex_offset, renderedInstances);
+                    direct3d::api().devcon4->DrawIndexedInstanced(meshRange.index_num, numInstances, meshRange.index_offset, meshRange.vertex_offset, renderedInstances);
                     renderedInstances += numInstances;
                 }
             }
@@ -83,20 +83,19 @@ namespace engine::render::_opaque_detail
 
         auto mapping = instance_buffer_.Map();
         OpaqueInstance *dst = static_cast<OpaqueInstance *>(mapping.pData);
-
+        auto instance_group = registry.group<components::TransformComponent, components::OpaqueComponent>();
         uint32_t copiedNum = 0;
         for (auto &pair : model_instances_)
         {
             auto &model_instance = pair.second;
             for (uint32_t meshIndex = 0; meshIndex < model_instance.mesh_instances.size(); ++meshIndex)
             {
-                const Mesh &mesh = model_instance.model.meshes[meshIndex];
                 for (const auto &perMaterial : model_instance.mesh_instances[meshIndex].material_instances)
                 {
                     auto &instances = perMaterial.second.instances;
                     for (auto entity : instances)
                     {
-                        dst[copiedNum++] = OpaqueInstance{ .world_transform = registry.get<components::TransformComponent>(entity).model };
+                        dst[copiedNum++] = OpaqueInstance{ .world_transform = instance_group.get<components::TransformComponent>(entity).model };
                     }
                 }
             }

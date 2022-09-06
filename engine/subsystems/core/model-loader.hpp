@@ -7,7 +7,7 @@ namespace engine::core
     {
     public:
         // Returns id of the model stored in ModelSystem
-        static std::optional<uint32_t> Load(std::filesystem::path const &path);
+        static std::optional<uint64_t> Load(std::filesystem::path const &path);
 
     private:
         friend class ::engine::core::Engine;
@@ -32,7 +32,7 @@ namespace engine::core
         static std::shared_ptr<ModelLoader> instance_;
 
     private:
-        std::unordered_map<size_t, uint32_t> models_;
+        std::unordered_map<size_t, uint64_t> models_;
 
         bool attached_ = false;
     };

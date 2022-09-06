@@ -92,7 +92,7 @@ namespace engine::render
     }
     uint64_t ModelSystem::AddModel(Model &&model_)
     {
-        auto const &model = instance_->models_.emplace(current_index, std::move(model_));
+        instance_->models_.emplace(current_index, std::move(model_));
         return current_index++;
     }
 

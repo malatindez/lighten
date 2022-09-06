@@ -32,10 +32,13 @@ namespace engine::platform::windows
     void RenderPipeline::FrameBegin()
     {
         ID3D11RenderTargetView *view = window_->frame_buffer_view();
-        api::devcon4->OMSetRenderTargets(1, &view, window_->depth_buffer_view());
+        api().devcon4->OMSetRenderTargets(1, &view, window_->depth_buffer_view());
 
-        direct3d::api::devcon4->ClearRenderTargetView(window_->frame_buffer_view(), sky_color_.data.data());
-        direct3d::api::devcon4->ClearDepthStencilView(window_->depth_buffer_view(), D3D11_CLEAR_DEPTH, 0.0f, 0);
+        direct3d::api().devcon4->ClearRenderTargetView(window_->frame_buffer_view(), sky_color_.data.data());
+        direct3d::api().devcon4->ClearDepthStencilView(window_->depth_buffer_view(), D3D11_CLEAR_DEPTH, 0.0f, 0);
+
+        per_frame_buffer_.Update(per_frame_);
+        per_frame_buffer_.Bind(direct3d::ShaderType::VertexShader, 0);
     }
     void RenderPipeline::FrameEnd()
     {

@@ -79,7 +79,7 @@ namespace engine::core
         }
     } // namespace
 
-    std::optional<uint32_t> ModelLoader::Load(std::filesystem::path const &path)
+    std::optional<uint64_t> ModelLoader::Load(std::filesystem::path const &path)
     {
         if (auto it = instance_->models_.find(std::filesystem::hash_value(path));
             it != instance_->models_.end())
@@ -144,14 +144,14 @@ namespace engine::core
         }
 
 
-        uint32_t rv = ModelSystem::instance().AddModel(Model{
+        uint64_t rv = ModelSystem::instance().AddModel(Model{
                 .bounding_box = math::AABB{.min = min, .max = max},
                 .meshes = std::move(meshes),
                 .materials = std::move(materials),
                 .vertices = direct3d::ImmutableVertexBuffer<Vertex>(vertices),
                 .indices = direct3d::ImmutableIndexBuffer<uint32_t>(indices)
                                                        });
-        instance_->models_.emplace(std::pair<size_t, uint32_t>{std::filesystem::hash_value(path), rv});
+        instance_->models_.emplace(std::pair<size_t, uint64_t>{std::filesystem::hash_value(path), rv});
         return rv;
     }
 

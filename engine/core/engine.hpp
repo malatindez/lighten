@@ -33,7 +33,6 @@ namespace engine::core
         [[nodiscard]] static inline Engine &Get() noexcept { return *application_; }
         [[nodiscard]] static inline EventCallbackFn const &event_function() { return application_->event_function_; }
         [[nodiscard]] static inline spdlog::logger &logger() { return *application_->logger_; }
-        [[nodiscard]] static inline ini::Ini &config() { return *application_->config_; }
 
         [[nodiscard]] static inline std::shared_ptr<Scene> scene() { return application_->scene_; }
 
@@ -65,7 +64,6 @@ namespace engine::core
 
         EventCallbackFn event_function_;
 
-        std::unique_ptr<ini::Ini> config_;
         std::shared_ptr<spdlog::logger> logger_;
 
         static std::unique_ptr<Engine> application_;

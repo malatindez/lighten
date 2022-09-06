@@ -12,22 +12,22 @@ namespace engine::direct3d
             switch (type)
             {
             case ShaderType::VertexShader:
-                direct3d::api::devcon->VSSetConstantBuffers(slot, 1, buffer);
+                direct3d::api().devcon->VSSetConstantBuffers(slot, 1, buffer);
                 break;
             case ShaderType::PixelShader:
-                direct3d::api::devcon->PSSetConstantBuffers(slot, 1, buffer);
+                direct3d::api().devcon->PSSetConstantBuffers(slot, 1, buffer);
                 break;
             case ShaderType::HullShader:
-                direct3d::api::devcon->HSSetConstantBuffers(slot, 1, buffer);
+                direct3d::api().devcon->HSSetConstantBuffers(slot, 1, buffer);
                 break;
             case ShaderType::DomainShader:
-                direct3d::api::devcon->DSSetConstantBuffers(slot, 1, buffer);
+                direct3d::api().devcon->DSSetConstantBuffers(slot, 1, buffer);
                 break;
             case ShaderType::GeometryShader:
-                direct3d::api::devcon->GSSetConstantBuffers(slot, 1, buffer);
+                direct3d::api().devcon->GSSetConstantBuffers(slot, 1, buffer);
                 break;
             case ShaderType::ComputeShader:
-                direct3d::api::devcon->CSSetConstantBuffers(slot, 1, buffer);
+                direct3d::api().devcon->CSSetConstantBuffers(slot, 1, buffer);
                 break;
             default:
                 break;
@@ -47,7 +47,7 @@ namespace engine::direct3d
 
         void Update(void const *data, uint32_t data_size)
         {
-            direct3d::api::devcon->UpdateSubresource(&DynamicBuffer<T>::buffer(), 0, nullptr, &data, 0, 0);
+            direct3d::api().devcon->UpdateSubresource(&DynamicBuffer<T>::buffer(), 0, nullptr, &data, 0, 0);
         }
         void Update(T const &value)
         {
