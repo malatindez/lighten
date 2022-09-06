@@ -2,25 +2,9 @@
 #include "components/components.hpp"
 #include "../model-system.hpp"
 #include "../../core/shader-manager.hpp"
+#include "utils/utils.hpp"
 
-namespace std
-{
-    template <>
-    struct hash<engine::render::_detail::InstanceId>
-    {
-        std::size_t operator()(engine::render::_detail::InstanceId const &kInstanceId) const
-        {
-            using std::size_t;
-            using std::hash;
-
-            return ((hash<engine::render::_detail::ModelId>()(kInstanceId.model_id)
-                     ^ (hash<engine::render::_detail::MeshId>()(kInstanceId.mesh_id) << 1)) >> 1)
-                ^ (hash<engine::render::_detail::MaterialId>()(kInstanceId.material_id) << 1);
-        }
-    };
-
-}
-namespace engine::render::_detail
+namespace engine::render::_opaque_detail
 {
     OpaqueRenderSystem::OpaqueRenderSystem()
     {
@@ -47,7 +31,6 @@ namespace engine::render::_detail
         opaque_shader_.Bind();
 
         direct3d::api::devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
         direct3d::api::devcon4->RSSetState(direct3d::states::cull_back);
         direct3d::api::devcon4->PSSetSamplers(0, 1, &direct3d::states::point_wrap_sampler.ptr());
         direct3d::api::devcon4->OMSetDepthStencilState(direct3d::states::geq_depth, 0);
@@ -57,123 +40,117 @@ namespace engine::render::_detail
 
         instance_buffer_.Bind(1);
 
-
-        uint32_t model_id = std::numeric_limits<uint32_t>::max();
-        uint32_t mesh_id = std::numeric_limits<uint32_t>::max();
-
-        uint32_t rendered_instances = 0;
-
-        for (const auto &instance : instances_)
+        uint32_t renderedInstances = 0;
+        for (const auto &pair : model_instances_)
         {
-            auto &model = instance.model.get();
-            auto &mesh = instance.mesh.get();
-            auto &material = instance.material.get();
-            if (model_id != instance.kInstanceId.model_id)
-            {
-                model_id = instance.kInstanceId.model_id;
-                model.vertices.Bind(0);
-                model.indices.Bind();
-                mesh_to_model_buffer_.Update(mesh.mesh_to_model);
-            }
-            else if (mesh_id != instance.kInstanceId.mesh_id)
-            {
-                mesh_to_model_buffer_.Update(mesh.mesh_to_model);
-                mesh_id = instance.kInstanceId.mesh_id;
-            }
-            direct3d::api::devcon4->PSSetShaderResources(0, 1, &material.texture);
+            auto &model_instance = pair.second;
+            model_instance.model.vertices.Bind(0);
+            model_instance.model.indices.Bind();
 
-            uint32_t num_instances = uint32_t(instance.amount);
-            direct3d::api::devcon4->DrawIndexedInstanced(mesh.mesh_range.index_num, num_instances, mesh.mesh_range.index_offset, mesh.mesh_range.vertex_offset, rendered_instances);
-            rendered_instances += num_instances;
+            for (uint32_t meshIndex = 0; meshIndex < model_instance.mesh_instances.size(); ++meshIndex)
+            {
+                Mesh const &mesh = model_instance.model.meshes[meshIndex];
+                auto const &meshRange = mesh.mesh_range;
+                mesh_to_model_buffer_.Update(mesh.mesh_to_model);
+
+                for (auto const &perMaterial : model_instance.mesh_instances[meshIndex].material_instances)
+                {
+                    if (perMaterial.second.instances.empty()) continue;
+
+                    const auto &material = perMaterial.second.material;
+
+                    direct3d::api::devcon4->PSSetShaderResources(0, 1, &material.albedo);
+
+                    uint32_t numInstances = uint32_t(perMaterial.second.instances.size());
+                    direct3d::api::devcon4->DrawIndexedInstanced(meshRange.index_num, numInstances, meshRange.index_offset, meshRange.vertex_offset, renderedInstances);
+                    renderedInstances += numInstances;
+                }
+            }
         }
     }
     void OpaqueRenderSystem::OnInstancesUpdated(entt::registry &registry)
     {
         uint32_t total_instances = 0;
-        auto instance_group = registry.group<components::ModelInstanceComponent, components::TransformComponent>(entt::get<components::OpaqueComponent>);
-        using InstanceIndex = size_t;
-        using CurrentOffset = size_t;
-        // we need order so we cant use map
-        std::vector<std::pair<InstanceId, InstanceIndex>> instance_ids_;
-        std::unordered_map<InstanceId, CurrentOffset> instance_offsets_;
-        // at first we will store in instance_ids_ instance_index as the amount of instances that we should render
-        for (auto entity : instance_group)
-        {
-            auto const &model_ref = instance_group.get<components::ModelInstanceComponent>(entity);
-            auto &model_instance = ModelSystem::GetModelInstance(model_ref.kInstanceId);
-            for (auto const &mesh_instance : model_instance.mesh_instances)
-            {
-                total_instances += 1;
-                InstanceId kInstanceId
-                {
-                    .model_id = model_instance.model_id,
-                    .mesh_id = mesh_instance.mesh_id,
-                    .material_id = mesh_instance.material_id
-                };
-                auto it = std::ranges::find_if(instance_ids_, [&kInstanceId] (auto const &pair) { return pair.first == kInstanceId; });
+        for (auto &model_instance : model_instances_)
+            for (auto &mesh_instance : model_instance.second.mesh_instances)
+                for (auto const &material_instance : mesh_instance.material_instances)
+                    total_instances += uint32_t(material_instance.second.instances.size());
 
-                if (it == instance_ids_.end()) // create new if it doesnt exist
-                {
-                    instance_ids_.push_back(std::pair<InstanceId, InstanceIndex>{ kInstanceId, 0});
-                    it = std::prev(instance_ids_.end());
-                }
-                it->second++;
-            }
-        }
-        std::sort(instance_ids_.begin(), instance_ids_.end(), [] (auto const &first, auto const &second) -> bool
-                  { return (((uint64_t(first.first.model_id)) << 32) | (uint64_t)first.first.mesh_id) < (((uint64_t(second.first.model_id)) << 32) | (uint64_t)second.first.mesh_id); });
-
-        instances_.clear();
-        // Then after counting total amount of instances we will create the list of all instances sorted by model and mesh
-        for (size_t i = 0; i < instance_ids_.size(); i++)
-        {
-            auto &[instance_id, instance_amount] = instance_ids_[i];
-            auto &model = ModelSystem::GetModel(instance_id.model_id);
-            auto &mesh = model.meshes[instance_id.mesh_id];
-            auto &material = model.materials[instance_id.material_id];
-            instances_.emplace_back(InstanceInfo(model, mesh, material, instance_id, (uint32_t)instance_amount)).amount;
-            instance_amount = i;
-        }
-        uint32_t copied_num = 0;
-        // Then we will fill offsets for each instance in instance buffer
-        for (auto const &[kInstanceId, instance_index] : instance_ids_)
-        {
-            InstanceInfo &instance = instances_[instance_index];
-            instance_offsets_[kInstanceId] = copied_num;
-            copied_num += instance.amount;
-            instance.amount = 0; // set offset back to zero
-        }
         if (total_instances == 0)
-        {
             return;
-        }
 
         instance_buffer_.Init(total_instances); // resizes if needed
-        auto mapping = instance_buffer_.Map();
-        Instance *dst = static_cast<Instance *>(mapping.pData);
-        // And then fill the instance buffer at desired offsets
-        for (auto entity : instance_group)
-        {
-            auto const &transform = instance_group.get<components::TransformComponent>(entity);
-            auto const &model_ref = instance_group.get<components::ModelInstanceComponent>(entity);
-            auto &model_instance = ModelSystem::GetModelInstance(model_ref.kInstanceId);
-            auto &model = ModelSystem::GetModel(model_instance.model_id);
 
-            for (auto const &mesh_instance : model_instance.mesh_instances)
+        auto mapping = instance_buffer_.Map();
+        OpaqueInstance *dst = static_cast<OpaqueInstance *>(mapping.pData);
+
+        uint32_t copiedNum = 0;
+        for (auto &pair : model_instances_)
+        {
+            auto &model_instance = pair.second;
+            for (uint32_t meshIndex = 0; meshIndex < model_instance.mesh_instances.size(); ++meshIndex)
             {
-                InstanceId kInstanceId
+                const Mesh &mesh = model_instance.model.meshes[meshIndex];
+                for (const auto &perMaterial : model_instance.mesh_instances[meshIndex].material_instances)
                 {
-                    .model_id = model_instance.model_id,
-                    .mesh_id = mesh_instance.mesh_id,
-                    .material_id = mesh_instance.material_id
-                };
-                auto it = std::ranges::find_if(instance_ids_, [&kInstanceId] (auto const &pair) { return pair.first == kInstanceId; });
-                InstanceInfo &instance = instances_[it->second];
-                auto &mesh = model.meshes[kInstanceId.mesh_id];
-                dst[instance_offsets_[kInstanceId] + instance.amount++] = Instance{ .model_transform = mesh.mesh_to_model * transform.model };
+                    auto &instances = perMaterial.second.instances;
+                    for (auto entity : instances)
+                    {
+                        dst[copiedNum++] = OpaqueInstance{ .world_transform = registry.get<components::TransformComponent>(entity).model };
+                    }
+                }
             }
         }
-
         instance_buffer_.Unmap();
     }
+    ModelInstance &OpaqueRenderSystem::GetInstance(uint64_t model_id)
+    {
+        auto it = model_instances_.find(model_id);
+        if (it != model_instances_.end())
+        {
+            return it->second;
+        }
+        model_instances_.emplace(model_id, ModelInstance{ .model = ModelSystem::GetModel(model_id) });
+        auto &instance = model_instances_.at(model_id);
+        for (auto const &mesh : instance.model.meshes)
+        {
+            MeshInstance value;
+            MaterialInstance material_instance{ .material = OpaqueMaterial(instance.model.materials[mesh.loaded_material_id]) };
+            value.material_instances.emplace(std::hash<OpaqueMaterial>()(material_instance.material), material_instance);
+            instance.mesh_instances.emplace_back(std::move(value));
+        }
+        return instance;
+    }
+
+    void OpaqueRenderSystem::AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity)
+    {
+        auto &instance = GetInstance(model_id);
+        for (size_t mesh_index = 0; mesh_index < instance.model.meshes.size(); mesh_index++)
+        {
+            auto const &mesh = instance.model.meshes[mesh_index];
+            auto &material_instances = instance.mesh_instances[mesh_index].material_instances;
+            MaterialInstance material_instance{ .material = OpaqueMaterial(instance.model.materials[mesh.loaded_material_id]) };
+            auto it = material_instances.emplace(std::hash<OpaqueMaterial>()(material_instance.material), material_instance);
+            it.first->second.instances.emplace(entity);
+        }
+        registry.emplace<components::OpaqueComponent>(entity, components::OpaqueComponent{ .model_id = model_id });
+    }
+
+    void OpaqueRenderSystem::AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, std::vector<OpaqueMaterial> const &materials)
+    {
+        auto &instance = GetInstance(model_id);
+        utils::Assert(materials.size() == instance.mesh_instances.size());
+        for (size_t mesh_index = 0; mesh_index < instance.model.meshes.size(); mesh_index++)
+        {
+            auto &material_instances = instance.mesh_instances[mesh_index].material_instances;
+            MaterialInstance material_instance{ .material = OpaqueMaterial(materials[mesh_index]) };
+            auto it = material_instances.emplace(std::hash<OpaqueMaterial>()(material_instance.material), material_instance);
+            it.first->second.instances.emplace(entity);
+        }
+        registry.emplace<components::OpaqueComponent>(entity, components::OpaqueComponent{ .model_id = model_id });
+
+        std::vector<entt::entity> instances;
+    }
+    // make a struct that contains the model id and the materials
+
 }

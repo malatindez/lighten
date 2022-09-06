@@ -1,8 +1,9 @@
 #pragma once
-#pragma once
 #include "core/engine.hpp"
 #include "render/render.hpp"
-struct TestCubeComponent {};
+struct TestCubeComponent {
+    uint64_t model_id;
+};
 class Renderer
     : public engine::core::Layer,
     public engine::core::Layer::HandleRender,

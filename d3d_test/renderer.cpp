@@ -99,19 +99,17 @@ void Renderer::DrawTestCube()
     DynamicUniformBuffer<math::mat4> transform_buffer;
     transform_buffer.Bind(direct3d::ShaderType::VertexShader, 1);
 
-    for (auto entity : Engine::scene()->registry.view<components::TransformComponent, components::ModelInstanceComponent, TestCubeComponent>())
+    for (auto entity : Engine::scene()->registry.view<components::TransformComponent, TestCubeComponent>())
     {
-        auto const &model_component = Engine::scene()->registry.get<components::ModelInstanceComponent>(entity);
-        auto &model_instance = render::ModelSystem::GetModelInstance(model_component.kInstanceId);
-        auto &model = render::ModelSystem::GetModel(model_instance.model_id);
+        auto const &model_component = Engine::scene()->registry.get<TestCubeComponent>(entity);
+        auto &model = render::ModelSystem::instance().GetModel(model_component.model_id);
         model.vertices.Bind();
         model.indices.Bind();
         auto const &transform = Engine::scene()->registry.get<components::TransformComponent>(entity);
-        for (auto const &mesh_instance : model_instance.mesh_instances)
+        for (auto const &mesh : model.meshes)
         {
-            auto &mesh = model.meshes[mesh_instance.mesh_id];
             transform_buffer.Update(mesh.mesh_to_model * transform.model);
-            direct3d::api::devcon4->PSSetShaderResources(0, 1, &model.materials[mesh_instance.material_id].texture);
+            direct3d::api::devcon4->PSSetShaderResources(0, 1, &model.materials[mesh.loaded_material_id].texture);
             direct3d::api::devcon4->DrawIndexed(mesh.mesh_range.index_num, mesh.mesh_range.index_offset, 0);
         }
     }
@@ -129,7 +127,7 @@ void Renderer::OnRender()
     per_frame.mouse_position = vec2{ InputLayer::instance()->mouse_position() };
     per_frame_buffer.Update(per_frame);
     per_frame_buffer.Bind(direct3d::ShaderType::VertexShader, 0);
-    render::ModelSystem::instance()->Render();
+    render::ModelSystem::instance().Render();
 
     DrawTestCube();
 

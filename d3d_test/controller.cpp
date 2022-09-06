@@ -47,8 +47,9 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
         auto knight = registry.create();
         last_created_knight = knight;
         auto &transform = registry.emplace<TransformComponent>(knight);
-        registry.emplace<OpaqueComponent>(knight);
-        registry.emplace<ModelInstanceComponent>(knight).kInstanceId = render::ModelSystem::GetLoadedModelInstanceId(ModelLoader::Load("assets\\models\\Knight\\Knight.fbx").value());
+
+        auto model_id = ModelLoader::Load("assets\\models\\Knight\\Knight.fbx").value();
+        render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, knight);
         transform.position = vec3
         {
             std::sin(float(i) / amount * 2 * (float)std::numbers::pi),
@@ -69,13 +70,6 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
             skybox_path / "posz.jpg",
             skybox_path / "negz.jpg",
     });*/
-    uint32_t cube_copy_id = 0;
-    {
-        render::Model cube_copy = render::ModelSystem::GetModel(ModelLoader::Load("assets\\models\\Cube\\Cube.fbx").value());
-        cube_copy.materials.push_back(render::Material{ .texture = TextureManager::GetTextureView(TextureManager::LoadTexture(std::filesystem::current_path() / "assets\\models\\Cube\\textures\\cube2.jpg")) });
-
-        cube_copy_id = render::ModelSystem::AddModel(std::move(cube_copy));
-    }
     SkyboxManager::LoadSkybox(registry, std::filesystem::current_path() / "assets/textures/skyboxes/skybox.dds");
     {
         auto cube = registry.create();
@@ -86,16 +80,14 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
         cube_transform.scale = vec3{ 0.01f };
         cube_transform.rotation = QuaternionFromEuler(0.0f, 0.0f, 0.0f);
         cube_transform.UpdateMatrices();
-        registry.emplace<ModelInstanceComponent>(cube).kInstanceId = render::ModelSystem::GetLoadedModelInstanceId(ModelLoader::Load("assets\\models\\Cube\\Cube.fbx").value());
+        auto model_id = ModelLoader::Load("assets\\models\\Cube\\Cube.fbx").value();
+        render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, cube);
     }
     { // Add two opaque cubes with two different materials
+        auto model_id = ModelLoader::Load("assets\\models\\Cube\\Cube.fbx").value();
         {
             auto cube = registry.create();
-            registry.emplace<OpaqueComponent>(cube);
-            auto &model_instance = render::ModelSystem::CreateEmptyModelInstance();
-            model_instance.model_id = cube_copy_id;
-            model_instance.mesh_instances.push_back(render::MeshInstance{ .mesh_id = 0, .material_id = 0 });
-            registry.emplace<ModelInstanceComponent>(cube).kInstanceId = model_instance.kInstanceId;
+            render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, cube);
             auto &cube_transform = registry.emplace<TransformComponent>(cube);
             cube_transform.reset();
             cube_transform.position = vec3{ -10,1,0 };
@@ -105,11 +97,8 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
         }
         {
             auto cube = registry.create();
-            registry.emplace<OpaqueComponent>(cube);
-            auto &model_instance = render::ModelSystem::CreateEmptyModelInstance();
-            model_instance.model_id = cube_copy_id;
-            model_instance.mesh_instances.push_back(render::MeshInstance{ .mesh_id = 0, .material_id = 1 });
-            registry.emplace<ModelInstanceComponent>(cube).kInstanceId = model_instance.kInstanceId;
+            auto texture_view = TextureManager::GetTextureView(TextureManager::LoadTexture(std::filesystem::current_path() / "assets\\models\\Cube\\textures\\cube2.jpg"));
+            render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, cube, { render::OpaqueMaterial(texture_view) });
             auto &cube_transform = registry.emplace<TransformComponent>(cube);
             cube_transform.reset();
             cube_transform.position = vec3{ -10,3,0 };
@@ -118,7 +107,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
             cube_transform.UpdateMatrices();
         }
     }
-    render::ModelSystem::instance()->OnInstancesUpdated(registry);
+    render::ModelSystem::instance().OnInstancesUpdated(registry);
     camera_movement::RegisterKeyCallbacks();
     transform_editor::RegisterKeyCallbacks();
 }

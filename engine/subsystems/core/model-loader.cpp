@@ -144,13 +144,13 @@ namespace engine::core
         }
 
 
-        uint32_t rv = ModelSystem::AddModel(Model{
+        uint32_t rv = ModelSystem::instance().AddModel(Model{
                 .bounding_box = math::AABB{.min = min, .max = max},
                 .meshes = std::move(meshes),
                 .materials = std::move(materials),
                 .vertices = direct3d::ImmutableVertexBuffer<Vertex>(vertices),
                 .indices = direct3d::ImmutableIndexBuffer<uint32_t>(indices)
-                                            });
+                                                       });
         instance_->models_.emplace(std::pair<size_t, uint32_t>{std::filesystem::hash_value(path), rv});
         return rv;
     }

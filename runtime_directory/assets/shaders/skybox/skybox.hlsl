@@ -15,9 +15,9 @@ VertexOut vs_main(VertexIn vin) {
   if (vin.vertex == 0) { vertex_coords = float2(0, 1); } 
   else if (vin.vertex == 1) { vertex_coords = float2(0, 0); } 
   else if (vin.vertex == 2) { vertex_coords = float2(1, 0); }
-  float4x4 g_camera_inv_view_projection = inv_view;
+  float4x4 g_camera_inv_view_projection = g_inv_view;
   g_camera_inv_view_projection[3][0] = g_camera_inv_view_projection[3][1] = g_camera_inv_view_projection[3][2] = 0;
-  g_camera_inv_view_projection = mul(inv_projection,g_camera_inv_view_projection);
+  g_camera_inv_view_projection = mul(g_inv_projection,g_camera_inv_view_projection);
   float4 bl4 = mul(float4(-1, -1, 1, 1), g_camera_inv_view_projection);
   float4 br4 = mul(float4(1, -1, 1, 1), g_camera_inv_view_projection);
   float4 tl4 = mul(float4(-1, 1, 1, 1), g_camera_inv_view_projection);

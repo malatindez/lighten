@@ -78,11 +78,11 @@ namespace engine::render
                                                               Ray const &ray,
                                                               Intersection &nearest)
     {
-        auto group = registry.group<components::ModelInstanceComponent, components::TransformComponent>();
+        auto group = registry.group<components::OpaqueComponent, components::TransformComponent>();
         std::optional<entt::entity> rv = std::nullopt;
         group.each([&rv, &ray, &nearest] (auto const entity, auto const &model_instance, auto const &transform)
                    {
-                       auto const &model = GetModel(GetModelInstance(model_instance.kInstanceId).model_id);
+                       auto const &model = GetModel(model_instance.model_id);
                        if (CheckForIntersection(model, transform, ray, nearest))
                        {
                            rv = entity;
@@ -90,19 +90,10 @@ namespace engine::render
                    });
         return rv;
     }
-    uint32_t ModelSystem::AddModel(Model &&model_)
+    uint64_t ModelSystem::AddModel(Model &&model_)
     {
-        auto const &model = instance_->models_.emplace_back(std::move(model_));
-        uint32_t model_id = (uint32_t)instance_->models_.size() - 1;
-        auto &model_instance = CreateEmptyModelInstance();
-        instance_->loaded_model_instance_ids_[model_id] = model_instance.kInstanceId;
-        model_instance.model_id = model_id;
-        for (uint32_t mesh_id = 0; mesh_id < model.meshes.size(); mesh_id++)
-        {
-            auto &mesh = model.meshes[mesh_id];
-            model_instance.mesh_instances.emplace_back(MeshInstance{ .mesh_id = mesh_id, .material_id = mesh.loaded_material_id });
-        }
-        return model_id;
+        auto const &model = instance_->models_.emplace(current_index, std::move(model_));
+        return current_index++;
     }
 
 } // namespace engine::render

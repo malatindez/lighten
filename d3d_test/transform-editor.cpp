@@ -157,10 +157,10 @@ namespace transform_editor
         if (selected_entity != entt::null && selected_scene == Engine::scene())
         {
             TransformComponent &transform = Engine::scene()->registry.get<TransformComponent>(selected_entity);
-            auto id = Engine::scene()->registry.get<ModelInstanceComponent>(selected_entity).kInstanceId;
-            auto const &model = render::ModelSystem::GetModel(render::ModelSystem::GetModelInstance(id).model_id);
+            auto id = Engine::scene()->registry.get<OpaqueComponent>(selected_entity).model_id;
+            auto const &model = render::ModelSystem::GetModel(id);
             EditTransform(*Engine::scene()->main_camera, transform, model.bounding_box, true, window_pos, window_size);
-            render::ModelSystem::instance()->OnInstancesUpdated(Engine::scene()->registry);
+            render::ModelSystem::instance().OnInstancesUpdated(Engine::scene()->registry);
         }
         else
         {

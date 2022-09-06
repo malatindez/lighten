@@ -25,7 +25,7 @@ namespace engine::render
             uint32_t index_num;
             core::math::AABB bounding_box;
         };
-        uint32_t loaded_material_id;
+        uint32_t loaded_material_id = std::numeric_limits<uint32_t>::max();
         core::math::mat4 mesh_to_model;
         core::math::mat4 inv_mesh_to_model;
         MeshRange mesh_range;
