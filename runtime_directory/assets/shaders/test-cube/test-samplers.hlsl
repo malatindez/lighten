@@ -1,4 +1,4 @@
-#include "../globals/vs.hlsli"
+#include "../globals/globals.hlsli"
 
 cbuffer Model : register(b1)
 {
@@ -25,7 +25,6 @@ VS_OUT vs_main(VS_INPUT input)
 	
 	return output;
 }
-#include "../globals/ps.hlsli"
 Texture2D diffTexture;
 
 float4 ps_main(float4 pos : SV_POSITION, float2 texcoord : TEXCOORD) : SV_TARGET

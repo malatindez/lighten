@@ -51,17 +51,17 @@ namespace engine::render::_opaque_detail
             {
                 Mesh const &mesh = model_instance.model.meshes[meshIndex];
                 auto const &meshRange = mesh.mesh_range;
-                mesh_to_model_buffer_.Update(mesh.mesh_to_model);
+                mesh_to_model_buffer_.Update(OpaqueInstance{ .world_transform = mesh.mesh_to_model });
 
                 for (auto const &perMaterial : model_instance.mesh_instances[meshIndex].material_instances)
                 {
-                    if (perMaterial.second.instances.empty()) continue;
+                    if (perMaterial.instances.empty()) continue;
 
-                    const auto &material = perMaterial.second.material;
+                    const auto &material = perMaterial.material;
 
                     direct3d::api().devcon4->PSSetShaderResources(0, 1, &material.albedo);
 
-                    uint32_t numInstances = uint32_t(perMaterial.second.instances.size());
+                    uint32_t numInstances = uint32_t(perMaterial.instances.size());
                     direct3d::api().devcon4->DrawIndexedInstanced(meshRange.index_num, numInstances, meshRange.index_offset, meshRange.vertex_offset, renderedInstances);
                     renderedInstances += numInstances;
                 }
@@ -74,7 +74,7 @@ namespace engine::render::_opaque_detail
         for (auto &model_instance : model_instances_)
             for (auto &mesh_instance : model_instance.second.mesh_instances)
                 for (auto const &material_instance : mesh_instance.material_instances)
-                    total_instances += uint32_t(material_instance.second.instances.size());
+                    total_instances += uint32_t(material_instance.instances.size());
 
         if (total_instances == 0)
             return;
@@ -92,7 +92,7 @@ namespace engine::render::_opaque_detail
             {
                 for (const auto &perMaterial : model_instance.mesh_instances[meshIndex].material_instances)
                 {
-                    auto &instances = perMaterial.second.instances;
+                    auto &instances = perMaterial.instances;
                     for (auto entity : instances)
                     {
                         dst[copiedNum++] = OpaqueInstance{ .world_transform = instance_group.get<components::TransformComponent>(entity).model };
@@ -115,7 +115,7 @@ namespace engine::render::_opaque_detail
         {
             MeshInstance value;
             MaterialInstance material_instance{ .material = OpaqueMaterial(instance.model.materials[mesh.loaded_material_id]) };
-            value.material_instances.emplace(std::hash<OpaqueMaterial>()(material_instance.material), material_instance);
+            value.material_instances.emplace_back(std::move(material_instance));
             instance.mesh_instances.emplace_back(std::move(value));
         }
         return instance;
@@ -129,8 +129,21 @@ namespace engine::render::_opaque_detail
             auto const &mesh = instance.model.meshes[mesh_index];
             auto &material_instances = instance.mesh_instances[mesh_index].material_instances;
             MaterialInstance material_instance{ .material = OpaqueMaterial(instance.model.materials[mesh.loaded_material_id]) };
-            auto it = material_instances.emplace(std::hash<OpaqueMaterial>()(material_instance.material), material_instance);
-            it.first->second.instances.emplace(entity);
+            bool add_new_material = true;
+            for (auto &mat_instance : material_instances)
+            {
+                if (std::hash<OpaqueMaterial>()(mat_instance.material) == std::hash<OpaqueMaterial>()(material_instance.material)) [[likely]]
+                {
+                    add_new_material = false;
+                    mat_instance.instances.push_back(entity);
+                    break;
+                }
+            }
+            if (add_new_material) [[unlikely]]
+            {
+                auto it = material_instances.emplace_back(std::move(material_instance));
+                it.instances.push_back(entity);
+            }
         }
         registry.emplace<components::OpaqueComponent>(entity, components::OpaqueComponent{ .model_id = model_id });
     }
@@ -143,13 +156,23 @@ namespace engine::render::_opaque_detail
         {
             auto &material_instances = instance.mesh_instances[mesh_index].material_instances;
             MaterialInstance material_instance{ .material = OpaqueMaterial(materials[mesh_index]) };
-            auto it = material_instances.emplace(std::hash<OpaqueMaterial>()(material_instance.material), material_instance);
-            it.first->second.instances.emplace(entity);
+            bool add_new_material = true;
+            for (auto &mat_instance : material_instances)
+            {
+                if (std::hash<OpaqueMaterial>()(mat_instance.material) == std::hash<OpaqueMaterial>()(material_instance.material)) [[likely]]
+                {
+                    add_new_material = false;
+                    mat_instance.instances.push_back(entity);
+                    break;
+                }
+            }
+            if (add_new_material) [[unlikely]]
+            {
+                auto it = material_instances.emplace_back(std::move(material_instance));
+                it.instances.push_back(entity);
+            }
         }
         registry.emplace<components::OpaqueComponent>(entity, components::OpaqueComponent{ .model_id = model_id });
-
-        std::vector<entt::entity> instances;
     }
-    // make a struct that contains the model id and the materials
 
 }

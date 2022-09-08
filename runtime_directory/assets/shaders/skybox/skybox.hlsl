@@ -1,9 +1,12 @@
-#include "../globals/vs.hlsli"
+#include "../globals/globals.hlsli"
 cbuffer SkyboxBuffer : register(b1)
 {
-  float4 g_bl;
-  float4 g_right;
-  float4 g_up;
+  float3 g_bl;
+  float padding0;
+  float3 g_right;
+  float padding1;
+  float3 g_up;
+  float padding2;
 }
 struct VertexIn {
   uint vertex : SV_VertexID;
@@ -16,18 +19,13 @@ struct VertexOut {
 
 VertexOut vs_main(VertexIn vin) {
   VertexOut vout;
-  float2 vertex_coords;
-  if (vin.vertex == 0) { vertex_coords = float2(0, 1); } 
-  else if (vin.vertex == 1) { vertex_coords = float2(0, 0); } 
-  else if (vin.vertex == 2) { vertex_coords = float2(1, 0); }
-  
-  float4 ray = g_bl + g_right * vertex_coords.x * 2 + g_up * vertex_coords.y * 2;
-  vout.ray_direction = ray.xyz / ray.w;
-  vout.sv_position = float4(vertex_coords * 4 - float2(1, 1), 0, 1);
+  float2 vertex_coords = float2((vin.vertex == 2) * 2, (vin.vertex == 0) * 2);
+  float3 ray = g_bl + g_right * vertex_coords.x + g_up * vertex_coords.y;
+  vout.ray_direction = ray;
+  vout.sv_position = float4(vertex_coords * 2 - float2(1, 1), 0, 1);
   return vout;
 }
 
-#include "../globals/ps.hlsli"
 
 TextureCube cubeMap : register(t0);
 SamplerState linear_wrap_sampler : register(s0);

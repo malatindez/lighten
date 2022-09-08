@@ -39,12 +39,11 @@ namespace engine::render::_opaque_detail
     struct MaterialInstance
     {
         OpaqueMaterial material;
-        std::set<entt::entity> instances;
+        std::vector<entt::entity> instances;
     };
     struct MeshInstance
     {
-        // Key is the hash of OpaqueMaterial
-        std::unordered_map<size_t, MaterialInstance> material_instances;
+        std::vector<MaterialInstance> material_instances;
     };
     struct ModelInstance
     {
@@ -74,7 +73,7 @@ namespace engine::render::_opaque_detail
         uint64_t current_index = 0;
 
         GraphicsShaderProgram opaque_shader_;
-        direct3d::DynamicUniformBuffer<core::math::mat4> mesh_to_model_buffer_;
+        direct3d::DynamicUniformBuffer<OpaqueInstance> mesh_to_model_buffer_;
         direct3d::DynamicVertexBuffer<OpaqueInstance> instance_buffer_;
     };
 } // namespace engine::render::_opaque_detail

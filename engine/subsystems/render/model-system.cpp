@@ -68,6 +68,7 @@ namespace engine::render
                 {
                     nearest.point = (core::math::vec4{ nearest.point, 1 } *mesh.mesh_to_model).xyz;
                     nearest.point = (core::math::vec4{ nearest.point, 1 } *transform.model).xyz;
+                    nearest.t *= core::math::length(mesh_local.direction());
                     rv = t;
                 }
             }

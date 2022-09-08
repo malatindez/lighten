@@ -11,4 +11,7 @@ cbuffer PerFrame : register(b0)
 	float2 g_screen_resolution;
 	float2 g_mouse_position;
 }
+
+
+SamplerState g_default_sampler : register(s0);
 #endif

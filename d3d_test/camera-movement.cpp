@@ -97,12 +97,12 @@ namespace camera_movement
                 }
                 else if (selected_scene)
                 {
+
                     auto &input = *InputLayer::instance();
                     auto scene = Engine::scene();
                     Ray a = scene->main_camera->PixelRaycast(vec2{ rb_saved_mouse_position });
                     Ray b = scene->main_camera->PixelRaycast(vec2{ input.mouse_position() });
                     rb_saved_mouse_position = input.mouse_position();
-
                     vec3 obj_offset = b.PointAtParameter(selected_distance);
                     auto &transform = scene->registry.get<TransformComponent>(selected_entity);
                     transform.position = selected_object_offset + obj_offset;

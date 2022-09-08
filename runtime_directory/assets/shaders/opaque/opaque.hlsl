@@ -1,6 +1,6 @@
-#include "../globals/vs.hlsli"
+#include "../globals/globals.hlsli"
 
-cbuffer PerFrame : register(b1)
+cbuffer PerModel : register(b1)
 {
 	row_major matrix mesh_to_model;
 }
@@ -31,7 +31,6 @@ VS_OUT vs_main(VS_INPUT input)
 	
 	return output;
 }
-#include "../globals/ps.hlsli"
 Texture2D g_diffTexture;
 
 float4 ps_main(float4 pos : SV_POSITION, float2 texcoord : TEXCOORD) : SV_TARGET
