@@ -141,8 +141,8 @@ namespace engine::render::_opaque_detail
             }
             if (add_new_material) [[unlikely]]
             {
-                auto it = material_instances.emplace_back(std::move(material_instance));
-                it.instances.push_back(entity);
+                auto &mat = material_instances.emplace_back(std::move(material_instance));
+                mat.instances.push_back(entity);
             }
         }
         registry.emplace<components::OpaqueComponent>(entity, components::OpaqueComponent{ .model_id = model_id });
@@ -168,8 +168,8 @@ namespace engine::render::_opaque_detail
             }
             if (add_new_material) [[unlikely]]
             {
-                auto it = material_instances.emplace_back(std::move(material_instance));
-                it.instances.push_back(entity);
+                auto &mat = material_instances.emplace_back(std::move(material_instance));
+                mat.instances.push_back(entity);
             }
         }
         registry.emplace<components::OpaqueComponent>(entity, components::OpaqueComponent{ .model_id = model_id });
