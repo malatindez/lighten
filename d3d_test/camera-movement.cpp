@@ -84,7 +84,7 @@ namespace camera_movement
                         rb_saved_mouse_position = mouse_position();
                         selected_entity = entity.value();
                         selected_scene = scene;
-                        selected_distance = nearest.t;
+                        selected_distance = nearest.t * dot(scene->main_camera->forward(), ray.direction());
                         selected_object_offset = scene->registry.get<TransformComponent>(selected_entity).position - ray.PointAtParameter(nearest.t);
                     }
                     else
@@ -100,12 +100,11 @@ namespace camera_movement
 
                     auto &input = *InputLayer::instance();
                     auto scene = Engine::scene();
-                    Ray a = scene->main_camera->PixelRaycast(vec2{ rb_saved_mouse_position });
                     Ray b = scene->main_camera->PixelRaycast(vec2{ input.mouse_position() });
                     rb_saved_mouse_position = input.mouse_position();
-                    vec3 obj_offset = b.PointAtParameter(selected_distance);
+                    vec3 obj_offset = b.direction() * selected_distance / dot(scene->main_camera->forward(), b.direction());
                     auto &transform = scene->registry.get<TransformComponent>(selected_entity);
-                    transform.position = selected_object_offset + obj_offset;
+                    transform.position = selected_object_offset + obj_offset + scene->main_camera->position();
                     transform.UpdateMatrices();
                     render::ModelSystem::instance().OnInstancesUpdated(scene->registry);
                 }

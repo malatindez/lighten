@@ -48,6 +48,7 @@ namespace engine::render::_opaque_detail
     struct ModelInstance
     {
         Model &model;
+        uint64_t model_id;
         // Each MeshInstance should correspond the one on the same index in model
         std::vector<MeshInstance> mesh_instances;
     };
@@ -66,11 +67,7 @@ namespace engine::render::_opaque_detail
         ModelInstance &GetInstance(uint64_t model_id);
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity);
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, std::vector<OpaqueMaterial> const &materials);
-        // The key is model_id in model_system
-        // Used to properly store IDs after their deletion
-        // Deleted IDs will not be used and will be marked as tombstone ones
-        std::unordered_map<uint64_t, ModelInstance> model_instances_;
-        uint64_t current_index = 0;
+        std::vector<ModelInstance> model_instances_;
 
         GraphicsShaderProgram opaque_shader_;
         direct3d::DynamicUniformBuffer<OpaqueInstance> mesh_to_model_buffer_;

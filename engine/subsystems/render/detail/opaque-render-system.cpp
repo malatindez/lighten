@@ -41,9 +41,8 @@ namespace engine::render::_opaque_detail
         instance_buffer_.Bind(1);
 
         uint32_t renderedInstances = 0;
-        for (const auto &pair : model_instances_)
+        for (const auto &model_instance : model_instances_)
         {
-            auto &model_instance = pair.second;
             model_instance.model.vertices.Bind(0);
             model_instance.model.indices.Bind();
 
@@ -72,7 +71,7 @@ namespace engine::render::_opaque_detail
     {
         uint32_t total_instances = 0;
         for (auto &model_instance : model_instances_)
-            for (auto &mesh_instance : model_instance.second.mesh_instances)
+            for (auto &mesh_instance : model_instance.mesh_instances)
                 for (auto const &material_instance : mesh_instance.material_instances)
                     total_instances += uint32_t(material_instance.instances.size());
 
@@ -85,9 +84,8 @@ namespace engine::render::_opaque_detail
         OpaqueInstance *dst = static_cast<OpaqueInstance *>(mapping.pData);
         auto instance_group = registry.group<components::TransformComponent, components::OpaqueComponent>();
         uint32_t copiedNum = 0;
-        for (auto &pair : model_instances_)
+        for (auto &model_instance : model_instances_)
         {
-            auto &model_instance = pair.second;
             for (uint32_t meshIndex = 0; meshIndex < model_instance.mesh_instances.size(); ++meshIndex)
             {
                 for (const auto &perMaterial : model_instance.mesh_instances[meshIndex].material_instances)
@@ -104,12 +102,12 @@ namespace engine::render::_opaque_detail
     }
     ModelInstance &OpaqueRenderSystem::GetInstance(uint64_t model_id)
     {
-        auto it = model_instances_.find(model_id);
+        auto it = std::find_if(model_instances_.begin(), model_instances_.end(), [&model_id] (auto const &instance) { return instance.model_id == model_id; });
         if (it != model_instances_.end())
         {
-            return it->second;
+            return *it;
         }
-        model_instances_.emplace(model_id, ModelInstance{ .model = ModelSystem::GetModel(model_id) });
+        model_instances_.emplace_back(ModelInstance{ .model = ModelSystem::GetModel(model_id), .model_id = model_id });
         auto &instance = model_instances_.at(model_id);
         for (auto const &mesh : instance.model.meshes)
         {

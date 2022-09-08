@@ -25,7 +25,8 @@ void Controller::OnGuiRender()
     ImGui::Text("Camera inv view matrix");
     ImGui::Text("%s", utils::FormatToString(Engine::scene()->main_camera->camera().inv_view).c_str());
     ImGui::End();
-
+    static bool window = true;
+    ImGui::ShowDemoWindow(&window);
     ImGui::Begin("Transform edit");
     transform_editor::OnGuiRender(window_pos, window_size);
     ImGui::End();
