@@ -114,7 +114,7 @@ namespace camera_movement
         auto &input = *InputLayer::instance();
         auto scene = Engine::scene();
         ivec2 pixel_delta{ 0 };
-        if (input.lbutton_down() && !InputLayer::instance()->key_state(engine::core::Key::KEY_CONTROL))
+        if (lb_saved_mouse_position != ivec2{ -1 } && input.lbutton_down() && !InputLayer::instance()->key_state(engine::core::Key::KEY_CONTROL))
         {
             pixel_delta = input.mouse_position() - lb_saved_mouse_position;
         }

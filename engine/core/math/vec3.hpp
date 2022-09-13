@@ -6,7 +6,6 @@
 #pragma warning(disable : 4201)
 namespace engine::core::math
 {
-
     template <Primitive T>
     struct vec<3, T>
     {

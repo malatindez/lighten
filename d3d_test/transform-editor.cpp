@@ -73,7 +73,7 @@ namespace transform_editor
             ImGuizmo::DecomposeMatrixToComponents(matrix.arr.data(), matrixTranslation, matrixRotation, matrixScale);
             transform.position = vec3{ matrixTranslation[0], matrixTranslation[1], matrixTranslation[2] };
             transform.rotation = QuaternionFromEuler(math::radians(-matrixRotation[2]), -math::radians(matrixRotation[0]), -math::radians(matrixRotation[1]));
-            transform.scale = vec3{ matrixScale[0], matrixScale[1], matrixScale[2] };
+            transform.scale = vec3{ matrixScale[0], matrixScale[1] ,matrixScale[2] };
             transform.UpdateMatrices();
         }
     }

@@ -33,9 +33,6 @@ namespace engine::render
                                   Ray const &ray,
                                   core::MeshIntersection &nearest)
         {
-            Ray local = ray;
-            local.origin() = (core::math::vec4{ local.origin(), 1 } *transform.inv_model).xyz;
-            local.SetDirection(normalize((core::math::vec4{ local.direction(), 0 } *transform.inv_model).xyz));
             bool rv = false;
             for (auto const &mesh : model.meshes)
             {
@@ -54,7 +51,6 @@ namespace engine::render
                 {
                     nearest.point = (core::math::vec4{ nearest.point, 1 } *mat).xyz;
                     nearest.normal = (core::math::vec4{ nearest.normal, 0 } *mat).xyz;
-                    nearest.t *= core::math::length(mesh_local.direction());
                     rv = t;
                 }
             }
