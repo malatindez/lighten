@@ -21,7 +21,7 @@ namespace engine::core
             auto const &V1 = mesh.vertices[mesh.indices[i++]].coords;
             auto const &V2 = mesh.vertices[mesh.indices[i++]].coords;
             auto const &V3 = mesh.vertices[mesh.indices[i++]].coords;
-            
+
             math::vec3 center = (V1 + V2 + V3) / 3.f;
 
             bool inserted = addTriangle((uint32_t)(i / 3 - 1), V1, V2, V3, center);

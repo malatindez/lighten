@@ -39,14 +39,10 @@ namespace engine::render
                 mat4 mat = mesh.mesh_to_model * transform.model;
                 mat4 inv_mat = inverse(mat);
                 Ray mesh_local = ray;
-                mesh_local.origin() = (core::math::vec4{ mesh_local.origin(), 1 } * inv_mat).xyz;
+                mesh_local.origin() = (core::math::vec4{ mesh_local.origin(), 1 } *inv_mat).xyz;
                 mesh_local.SetDirection((core::math::vec4{ mesh_local.direction(), 0 } *inv_mat).xyz);
                 float temp = nearest.t;
-                bool t = mesh.mesh_range.bounding_box.Intersect(mesh_local, temp);
-                if (t)
-                {
-                    t = mesh.triangle_octree.intersect(mesh_local, nearest);
-                }
+                bool t = mesh.triangle_octree.intersect(mesh_local, nearest);
                 if (t)
                 {
                     nearest.point = (core::math::vec4{ nearest.point, 1 } *mat).xyz;
