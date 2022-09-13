@@ -9,7 +9,7 @@ namespace engine::direct3d
         template <typename T>
         class state_readonly_wrapper final : public readonly_d3d_resource_wrapper<T>
         {
-            friend class States;
+            friend class engine::direct3d::States;
             using readonly_d3d_resource_wrapper<T>::operator=;
             using readonly_d3d_resource_wrapper<T>::readonly_d3d_resource_wrapper;
         };

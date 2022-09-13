@@ -1,4 +1,3 @@
-#pragma once
 #include "camera-movement.hpp"
 using namespace engine;
 using namespace core;

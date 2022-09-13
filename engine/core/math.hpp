@@ -12,8 +12,11 @@
 #endif
 
 #include "math/mat.hpp"
-#include "math/aabb.hpp"
+#include "math/ray.hpp"
+#include "math/intersection.hpp"
+#include "math/triangle.hpp"
 #include "math/plane.hpp"
+#include "math/box.hpp"
 #include "math/quaternion.hpp"
 #include "math/sphere.hpp"
 namespace engine::core::math

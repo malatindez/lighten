@@ -5,69 +5,55 @@ namespace engine::render
     std::shared_ptr<ModelSystem> ModelSystem::instance_;
     namespace
     {
-        inline bool CheckForIntersection(AABB const &aabb,
-                                         Ray const &ray,
-                                         Intersection &nearest)
+        inline bool CheckMeshIntersection(
+            Mesh const &mesh,
+            Ray const &ray,
+            Intersection &nearest)
         {
-            float tmin, tmax, tymin, tymax, tzmin, tzmax;
-
-            auto const &bounds = reinterpret_cast<std::array<vec3, 2> const &>(aabb);
-
-            tmin = (bounds[ray.sign()[0]].x - ray.origin().x) * ray.inv_direction().x;
-            tmax = (bounds[1ll - ray.sign()[0]].x - ray.origin().x) * ray.inv_direction().x;
-            tymin = (bounds[ray.sign()[1]].y - ray.origin().y) * ray.inv_direction().y;
-            tymax = (bounds[1ll - ray.sign()[1]].y - ray.origin().y) * ray.inv_direction().y;
-
-            if ((tmin > tymax) || (tymin > tmax))
-                return false;
-
-            if (tymin > tmin)
-                tmin = tymin;
-            if (tymax < tmax)
-                tmax = tymax;
-
-            tzmin = (bounds[ray.sign()[2]].z - ray.origin().z) * ray.inv_direction().z;
-            tzmax = (bounds[1ll - ray.sign()[2]].z - ray.origin().z) * ray.inv_direction().z;
-
-            if ((tmin > tzmax) || (tzmin > tmax))
-                return false;
-
-            if (tzmin > tmin)
-                tmin = tzmin;
-            if (tzmax < tmax)
-                tmax = tzmax;
-
-            float t = tmin;
-
-            if (t < 0)
+            bool rv = false;
+            for (size_t i = 0; i < mesh.indices.size();)
             {
-                t = tmax;
-                if (t < 0 || t > nearest.t)
-                    return false;
+                auto const &p0 = mesh.vertices[mesh.indices[i++]].coords;
+                auto const &p1 = mesh.vertices[mesh.indices[i++]].coords;
+                auto const &p2 = mesh.vertices[mesh.indices[i++]].coords;
+                auto const U = p1 - p0;
+                auto const V = p2 - p0;
+                auto const normal = cross(U, V);
+                bool a = Triangle::Intersect(p0, p1, p2, normal, nearest, ray);
+                if (a)
+                {
+                    spdlog::info("intersected");
+                    rv = true;
+                }
             }
-            nearest.t = t;
-            nearest.point = ray.PointAtParameter(t);
-            return true;
+            return rv;
         }
         bool CheckForIntersection(Model const &model,
                                   components::TransformComponent transform,
                                   Ray const &ray,
-                                  Intersection &nearest)
+                                  core::MeshIntersection &nearest)
         {
             Ray local = ray;
-            local.SetDirection(normalize((core::math::vec4{ local.direction(), 0 } *transform.inv_model).xyz));
             local.origin() = (core::math::vec4{ local.origin(), 1 } *transform.inv_model).xyz;
+            local.SetDirection(normalize((core::math::vec4{ local.direction(), 0 } *transform.inv_model).xyz));
             bool rv = false;
             for (auto const &mesh : model.meshes)
             {
-                Ray mesh_local = local;
-                mesh_local.origin() = (core::math::vec4{ local.origin(), 1 } *mesh.inv_mesh_to_model).xyz;
-                mesh_local.SetDirection((core::math::vec4{ local.direction(), 0 } *mesh.inv_mesh_to_model).xyz);
-                bool t = CheckForIntersection(mesh.mesh_range.bounding_box, mesh_local, nearest);
+                mat4 mat = mesh.mesh_to_model * transform.model;
+                mat4 inv_mat = inverse(mat);
+                Ray mesh_local = ray;
+                mesh_local.origin() = (core::math::vec4{ mesh_local.origin(), 1 } * inv_mat).xyz;
+                mesh_local.SetDirection(normalize((core::math::vec4{ mesh_local.direction(), 0 } *inv_mat).xyz));
+                float temp = nearest.t;
+                bool t = mesh.mesh_range.bounding_box.Intersect(mesh_local, temp);
                 if (t)
                 {
-                    nearest.point = (core::math::vec4{ nearest.point, 1 } *mesh.mesh_to_model).xyz;
-                    nearest.point = (core::math::vec4{ nearest.point, 1 } *transform.model).xyz;
+                    t = mesh.triangle_octree.intersect(mesh_local, nearest);
+                }
+                if (t)
+                {
+                    nearest.point = (core::math::vec4{ nearest.point, 1 } *mat).xyz;
+                    nearest.normal = (core::math::vec4{ nearest.normal, 0 } *mat).xyz;
                     nearest.t *= core::math::length(mesh_local.direction());
                     rv = t;
                 }
@@ -76,8 +62,8 @@ namespace engine::render
         }
     }
     std::optional<entt::entity> ModelSystem::FindIntersection(entt::registry &registry,
-                                                              Ray const &ray,
-                                                              Intersection &nearest)
+                                                              core::math::Ray const &ray,
+                                                              core::MeshIntersection &nearest)
     {
         auto group = registry.group<components::OpaqueComponent, components::TransformComponent>();
         std::optional<entt::entity> rv = std::nullopt;
@@ -89,6 +75,20 @@ namespace engine::render
                            rv = entity;
                        }
                    });
+        return rv;
+    }
+    std::optional<entt::entity> ModelSystem::FindIntersection(entt::registry &registry,
+                                                              Ray const &ray,
+                                                              Intersection &nearest)
+    {
+        core::MeshIntersection mesh_intersection;
+        mesh_intersection.normal = nearest.normal;
+        mesh_intersection.t = nearest.t;
+        mesh_intersection.point = nearest.point;
+        auto rv = FindIntersection(registry, ray, mesh_intersection);
+        nearest.normal = mesh_intersection.normal;
+        nearest.t = mesh_intersection.t;
+        nearest.point = mesh_intersection.point;
         return rv;
     }
     uint64_t ModelSystem::AddModel(Model &&model_)

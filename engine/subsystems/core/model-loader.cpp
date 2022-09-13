@@ -12,26 +12,23 @@ namespace engine::core
     using namespace render;
     namespace
     {
-        Mesh SetupMesh(uint32_t material_id, aiMatrix4x4 const &transformation, Mesh::MeshRange &&mesh_range)
+        Mesh SetupMesh(std::vector<Vertex> &&vertices, std::vector<uint32_t> &&indices, uint32_t material_id, aiMatrix4x4 const &transformation, Mesh::MeshRange &&mesh_range)
         {
             auto temp = math::mat4(transformation.a1, transformation.a2, transformation.a3, transformation.a4,
                                    transformation.b1, transformation.b2, transformation.b3, transformation.b4,
                                    transformation.c1, transformation.c2, transformation.c3, transformation.c4,
                                    transformation.d1, transformation.b2, transformation.d3, transformation.d4);
-            return Mesh{
-                .loaded_material_id = material_id,
-                .mesh_to_model = temp,
-                .inv_mesh_to_model = math::inverse(temp),
-                .mesh_range = std::move(mesh_range)
-            };
+            return Mesh(material_id, temp, std::move(mesh_range), std::move(vertices), std::move(indices));
         }
 
-        void processMesh(std::vector<Vertex> &vertices,
-                         std::vector<uint32_t> &indices,
+        void processMesh(std::vector<Vertex> &vertices_dest,
+                         std::vector<uint32_t> &indices_dest,
                          std::vector<Mesh> &meshes,
                          aiMesh *mesh,
                          aiMatrix4x4 const &transformation)
         {
+            std::vector<Vertex> vertices;
+            std::vector<uint32_t> indices;
             for (uint32_t i = 0; i < mesh->mNumVertices; i++)
             {
                 vertices.emplace_back(Vertex{
@@ -46,18 +43,20 @@ namespace engine::core
                     indices.push_back(face.mIndices[j]);
                 }
             }
-            meshes.emplace_back(SetupMesh(mesh->mMaterialIndex, transformation, Mesh::MeshRange{
+            vertices_dest.insert(vertices_dest.end(), vertices.begin(), vertices.end());
+            indices_dest.insert(indices_dest.end(), indices.begin(), indices.end());
+            Mesh mesh__ = SetupMesh(std::move(vertices), std::move(indices), mesh->mMaterialIndex, transformation, Mesh::MeshRange{
                 // we are gonna fill offsets later
                 .vertex_offset = std::numeric_limits<uint32_t>::max(),
                 .index_offset = std::numeric_limits<uint32_t>::max(),
                 .vertex_num = mesh->mNumVertices,
                 .index_num = mesh->mNumFaces * 3,
-                .bounding_box = math::AABB {
+                .bounding_box = math::Box {
                     .min = math::vec3{mesh->mAABB.mMin.x, mesh->mAABB.mMin.y, mesh->mAABB.mMin.z},
                     .max = math::vec3{mesh->mAABB.mMax.x, mesh->mAABB.mMax.y, mesh->mAABB.mMax.z}
-                }
-                                          }
-            ));
+                } }
+            );
+            meshes.push_back(std::move(mesh__));
         }
 
         void processNode(std::vector<Vertex> &vertices,
@@ -142,10 +141,13 @@ namespace engine::core
             index_offset += mesh_range.index_num;
             vertex_offset += mesh_range.vertex_num;
         }
-
+        for (auto &mesh : meshes)
+        {
+            mesh.triangle_octree.initialize(mesh);
+        }
 
         uint64_t rv = ModelSystem::instance().AddModel(Model{
-                .bounding_box = math::AABB{.min = min, .max = max},
+                .bounding_box = math::Box{.min = min, .max = max},
                 .meshes = std::move(meshes),
                 .materials = std::move(materials),
                 .vertices = direct3d::ImmutableVertexBuffer<Vertex>(vertices),

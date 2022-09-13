@@ -11,6 +11,10 @@ namespace engine::core::math
         vec3 normal;
 
         constexpr Intersection() = default;
+        constexpr Intersection(Intersection const &) = default;
+        constexpr Intersection &operator=(Intersection const &) = default;
+        constexpr Intersection(Intersection &&) = default;
+        constexpr Intersection &operator=(Intersection &&) = default;
         constexpr void reset() { t = std::numeric_limits<float>::infinity(); }
         inline bool exists() const { return std::isfinite(t); }
         static constexpr Intersection infinite()

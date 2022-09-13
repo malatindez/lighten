@@ -29,7 +29,7 @@ namespace engine::core::math
             return rv0;
         }
 
-        bool CheckIntersection(core::math::Intersection &i, core::math::Ray const &ray) const
+        bool Intersect(core::math::Intersection &i, core::math::Ray const &ray) const
         {
             float t = Sphere::Hit(ray, position, radius);
 

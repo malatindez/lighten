@@ -15,7 +15,7 @@ namespace transform_editor
     ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
 
 
-    void EditTransform(CameraController const &camera, TransformComponent &transform, AABB const &bounding_box, bool enabled, ivec2 const &window_pos, ivec2 const &window_size)
+    void EditTransform(CameraController const &camera, TransformComponent &transform, Box const &bounding_box, bool enabled, ivec2 const &window_pos, ivec2 const &window_size)
     {
         mat4 &matrix = transform.model;
         if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
@@ -72,9 +72,9 @@ namespace transform_editor
                                  useSnap ? &snap.x : NULL, bounding_box.min.data.data(), boundsSnap);
             ImGuizmo::DecomposeMatrixToComponents(matrix.arr.data(), matrixTranslation, matrixRotation, matrixScale);
             transform.position = vec3{ matrixTranslation[0], matrixTranslation[1], matrixTranslation[2] };
-            transform.rotation = QuaternionFromEuler(matrixRotation[0], matrixRotation[1], matrixRotation[2]);
+            transform.rotation = QuaternionFromEuler(math::radians(-matrixRotation[2]), -math::radians(matrixRotation[0]), -math::radians(matrixRotation[1]));
             transform.scale = vec3{ matrixScale[0], matrixScale[1], matrixScale[2] };
-            transform.inv_model = inverse(transform.model);
+            transform.UpdateMatrices();
         }
     }
 
@@ -153,7 +153,6 @@ namespace transform_editor
     void OnGuiRender(ivec2 const &window_pos, ivec2 const &window_size)
     {
         static TransformComponent empty;
-        static AABB empty_bb;
         if (selected_entity != entt::null && selected_scene == Engine::scene() && InputLayer::instance()->key_state(engine::core::Key::KEY_CONTROL))
         {
             TransformComponent &transform = Engine::scene()->registry.get<TransformComponent>(selected_entity);
@@ -165,7 +164,7 @@ namespace transform_editor
         else
         {
             ImGui::BeginDisabled();
-            EditTransform(*Engine::scene()->main_camera, empty, empty_bb, false, window_pos, window_size);
+            EditTransform(*Engine::scene()->main_camera, empty, Box::empty(), false, window_pos, window_size);
             ImGui::EndDisabled();
         }
     }

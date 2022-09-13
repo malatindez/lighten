@@ -17,8 +17,8 @@ namespace engine::components
         {
             model = core::math::mat4{ 1 };
             model = core::math::translate(model, position);
-            model = rotation.as_mat4() * model;
             model = core::math::scale(model, scale);
+            model = rotation.as_mat4() * model;
             inv_model = core::math::inverse(model);
         }
         core::math::vec3 position{ 0 };
