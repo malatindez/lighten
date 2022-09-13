@@ -83,7 +83,7 @@ namespace camera_movement
                         rb_saved_mouse_position = mouse_position();
                         selected_entity = entity.value();
                         selected_scene = scene;
-                        selected_distance = nearest.t * dot(scene->main_camera->forward(), ray.direction());
+                        selected_distance = length(nearest.point - scene->main_camera->position()) * dot(scene->main_camera->forward(), ray.direction());
                         selected_object_offset = scene->registry.get<TransformComponent>(selected_entity).position - ray.PointAtParameter(nearest.t);
                     }
                     else

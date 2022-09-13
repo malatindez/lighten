@@ -40,7 +40,7 @@ namespace engine::render
                 mat4 inv_mat = inverse(mat);
                 Ray mesh_local = ray;
                 mesh_local.origin() = (core::math::vec4{ mesh_local.origin(), 1 } * inv_mat).xyz;
-                mesh_local.SetDirection(normalize((core::math::vec4{ mesh_local.direction(), 0 } *inv_mat).xyz));
+                mesh_local.SetDirection((core::math::vec4{ mesh_local.direction(), 0 } *inv_mat).xyz);
                 float temp = nearest.t;
                 bool t = mesh.mesh_range.bounding_box.Intersect(mesh_local, temp);
                 if (t)
@@ -51,7 +51,7 @@ namespace engine::render
                 {
                     nearest.point = (core::math::vec4{ nearest.point, 1 } *mat).xyz;
                     nearest.normal = (core::math::vec4{ nearest.normal, 0 } *mat).xyz;
-                    rv = t;
+                    rv = t / core::math::length(mesh_local.direction());
                 }
             }
             return rv;
