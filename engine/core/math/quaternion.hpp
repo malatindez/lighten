@@ -23,10 +23,6 @@ namespace engine::core::math
         [[nodiscard]] constexpr qua<T> operator-() const noexcept;
 
         template <Primitive U>
-        constexpr qua<T> &operator+=(U const value) noexcept;
-        template <Primitive U>
-        constexpr qua<T> &operator-=(U const value) noexcept;
-        template <Primitive U>
         constexpr qua<T> &operator*=(U const value) noexcept;
         template <Primitive U>
         constexpr qua<T> &operator/=(U const value) noexcept;
@@ -76,9 +72,7 @@ namespace engine::core::math
     template <Primitive T, Primitive U>
     [[nodiscard]] constexpr qua<T> operator*(U const value, qua<T> const &vector) noexcept;
     template <Primitive T, Primitive U>
-    [[nodiscard]] constexpr qua<T> operator+(qua<T> const &vector, U const value) noexcept;
-    template <Primitive T, Primitive U>
-    [[nodiscard]] constexpr qua<T> operator-(qua<T> const &vector, U const value) noexcept;
+    [[nodiscard]] constexpr qua<T> operator/(U const value, qua<T> const &vector) noexcept;
     template <Primitive T, Primitive U>
     [[nodiscard]] constexpr qua<T> operator*(qua<T> const &vector, U const value) noexcept;
     template <Primitive T, Primitive U>
@@ -95,7 +89,18 @@ namespace engine::core::math
     template <Primitive T, Primitive U>
     [[nodiscard]] constexpr T dot(qua<T> const &left, qua<U> const &right) noexcept;
     template <Primitive T>
-    [[nodiscard]] constexpr qua<T> QuaternionFromEuler(vec<3, T> angles) noexcept;
+    [[nodiscard]] constexpr T angle(qua<T> const &quaternion) noexcept;
+    template <Primitive T>
+    [[nodiscard]] constexpr T pitch(qua<T> const &quaternion) noexcept;
+    template <Primitive T>
+    [[nodiscard]] constexpr T yaw(qua<T> const &quaternion) noexcept;
+    template <Primitive T>
+    [[nodiscard]] constexpr T roll(qua<T> const &quaternion) noexcept;
+    template <Primitive T>
+    [[nodiscard]] constexpr vec<3, T> QuaternionToEuler(qua<T> const &quaternion) noexcept;
+
+    template <Primitive T>
+    [[nodiscard]] constexpr qua<T> QuaternionFromEuler(vec<3, T> const &angles) noexcept;
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> QuaternionFromEuler(T roll, T pitch, T yaw) noexcept requires(std::is_floating_point_v<T>);
     template <AnyMat U>
@@ -115,6 +120,8 @@ namespace engine::core::math
     [[nodiscard]] constexpr vec<3, T> cross(qua<T> const &left, vec<3, U> const &right) noexcept;
     template <Primitive T, Primitive U>
     [[nodiscard]] constexpr vec<3, T> cross(vec<3, U> const &left, qua<T> const &right) noexcept;
+    template <Primitive T, Primitive U>
+    [[nodiscard]] constexpr qua<T> cross(qua<T> const &left, qua<U> const &right) noexcept;
 
     template <Primitive T>
     [[nodiscard]] constexpr mat<4, 4, T> rotate(mat<4, 4, T> const &matrix, qua<T> const &q) noexcept;

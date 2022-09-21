@@ -29,38 +29,63 @@ namespace engine::core::math
         }
         return os;
     }
-
-    template <AnyMat T, AnyMat U>
-    [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator*(T const left, U const &right) requires(T::size.y == U::size.x)
+    template <AnyMat U, AnyMat V>
+    [[nodiscard]] constexpr auto operator*(U const &lhs, V const &rhs) requires (U::size.x == V::size.y)
     {
-        mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> return_value;
-        for (size_t i = 0; i < T::size.x; i++)
+        using T = decltype(lhs[0][0] * rhs[0][0]);
+        using R = mat<V::size.x, U::size.y, T>;
+        R result;
+        for (int i = 0; i < V::size.x; i++)
         {
-            for (size_t j = 0; j < U::size.y; j++)
+            for (int j = 0; j < U::size.y; j++)
             {
-                return_value[i][j] = 0;
-                for (size_t k = 0; k < U::size.x; k++)
+                T sum = 0;
+                for (int k = 0; k < V::size.y; k++)
                 {
-                    return_value[i][j] += left[i][k] * right[k][j];
+                    sum += lhs[k][j] * rhs[i][k];
                 }
+                result[i][j] = sum;
             }
         }
-        return return_value;
+        return result;
     }
-    template <AnyVec T, AnyMat U>
-    [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> operator*(T const &left, U const &right) requires(U::size.x == T::size)
+
+    template <AnyVec V, AnyMat M>
+    [[nodiscard]] constexpr auto operator*(V const &left, M const &right) requires (V::size == M::size.y)
     {
-        vec<T::size, std::remove_const_t<typename T::type>> return_value;
-        for (size_t j = 0; j < U::size.y; j++)
+        using T = decltype(left[0] * right[0][0]);
+        using R = vec<M::size.x, T>;
+        R result;
+        for (int i = 0; i < M::size.x; i++)
         {
-            return_value[j] = 0;
-            for (size_t k = 0; k < U::size.x; k++)
+            T sum = 0;
+            for (int j = 0; j < M::size.y; j++)
             {
-                return_value[j] += left[k] * right[k][j];
+                sum += left[j] * right[i][j];
             }
+            result[i] = sum;
         }
-        return return_value;
+        return result;
     }
+    template <AnyMat M, AnyVec V>
+    [[nodiscard]] constexpr auto operator*(M const &left, V const &right) requires (M::size.x == V::size)
+    {
+        using T = decltype(left[0][0] * right[0]);
+        using R = vec<M::size.y, T>;
+        R result;
+        for (int i = 0; i < M::size.y; i++)
+        {
+            T sum = 0;
+            for (int j = 0; j < M::size.x; j++)
+            {
+                sum += left[j][i] * right[j];
+            }
+            result[i] = sum;
+        }
+        return result;
+    }
+
+
     template <AnyMat T, Primitive U>
     [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator*(T const &left, U const right)
     {
@@ -96,12 +121,12 @@ namespace engine::core::math
     template <AnyMat T>
     constexpr mat<T::size.y, T::size.x, std::remove_const_t<typename T::type>> transpose(T const &matrix)
     {
-        mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> return_value;
+        mat<T::size.y, T::size.x, std::remove_const_t<typename T::type>> return_value;
         for (int i = 0; i < T::size.x; i++)
         {
             for (int j = 0; j < T::size.y; j++)
             {
-                return_value.arr[j * T::size.x + i] = matrix[i][j];
+                return_value[j][i] = matrix[i][j];
             }
         }
         return return_value;
@@ -109,7 +134,7 @@ namespace engine::core::math
     template <AnyMat T>
     constexpr rmat<T::size.y, T::size.x, typename T::type> rtranspose(T &matrix)
     {
-        rmat<T::size.x, T::size.y, typename T::type> return_value;
+        rmat<T::size.y, T::size.x, typename T::type> return_value;
         for (int i = 0; i < T::size.x; i++)
         {
             for (int j = 0; j < T::size.y; j++)
@@ -122,7 +147,7 @@ namespace engine::core::math
     template <AnyMat T>
     constexpr rmat<T::size.y, T::size.x, const typename T::type> rctranspose(T const &matrix)
     {
-        rmat<T::size.x, T::size.y, const typename T::type> return_value;
+        rmat<T::size.y, T::size.x, const typename T::type> return_value;
         for (int i = 0; i < T::size.x; i++)
         {
             for (int j = 0; j < T::size.y; j++)
@@ -166,6 +191,8 @@ namespace engine::core::math
     template <AnyMat T>
     constexpr typename T::type det(T const &m) requires(T::size.x == T::size.y)
     {
+        if constexpr (T::size.x == 1)
+            return m[0][0];
         if constexpr (T::size.x == 2)
             return det_2(m);
         if constexpr (T::size.x == 3)
@@ -173,37 +200,41 @@ namespace engine::core::math
         if constexpr (T::size.x == 4)
             return det_4(m);
     }
+    template <AnyMat T>
+    constexpr typename T::type determinant(T const &matrix) requires(T::size.x == T::size.y)
+    {
+        return det(matrix);
+    }
 
+    template <AnyMat T>
+    constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> adj(T const &m) requires(T::size.x == T::size.y)
+    {
+        mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> return_value;
+        for (int i = 0; i < T::size.x; i++)
+        {
+            for (int j = 0; j < T::size.y; j++)
+            {
+                mat<T::size.x - 1, T::size.y - 1, std::remove_const_t<typename T::type>> sub_matrix;
+                for (int k = 0; k < T::size.x; k++)
+                {
+                    for (int l = 0; l < T::size.y; l++)
+                    {
+                        if (k != i && l != j)
+                        {
+                            sub_matrix[k < i ? k : k - 1][l < j ? l : l - 1] = m[k][l];
+                        }
+                    }
+                }
+                return_value[j][i] = det(sub_matrix) * ((i + j) % 2 == 0 ? 1 : -1);
+            }
+        }
+        return return_value;
+    }
+    // calculate an adjugate for a matrix
     template <AnyMat T>
     constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> adjugate(T const &m) requires(T::size.x == T::size.y)
     {
-        mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> return_value;
-        mat<T::size.x - 1, T::size.y - 1, std::remove_const_t<typename T::type>> temp;
-        int sign = 1;
-        for (size_t i = 0; i < T::size.x; i++)
-        {
-            for (size_t j = 0; j < T::size.x; j++)
-            {
-                // create 3x3 matrix using m without column i and row j
-                for (size_t k = 0, s = 0; k < T::size.x; k++)
-                {
-                    if (k == j)
-                        continue;
-                    for (size_t l = 0, t = 0; l < T::size.x; l++)
-                    {
-                        if (l == i)
-                            continue;
-                        temp[s][t] = m[k][l];
-                        t++;
-                    }
-                    s++;
-                }
-                return_value[i][j] = sign * det(temp);
-                sign *= -1;
-            }
-            sign *= -1;
-        }
-        return return_value;
+        return adj(m);
     }
 
     template <AnyMat T>
@@ -219,8 +250,7 @@ namespace engine::core::math
         return_value[0] = matrix[0];
         return_value[1] = matrix[1];
         return_value[2] = matrix[2];
-        return_value[3] =
-            matrix[0] * vec[0] + matrix[1] * vec[1] + matrix[2] * vec[2] + matrix[3];
+        return_value[3] = matrix[0] * vec[0] + matrix[1] * vec[1] + matrix[2] * vec[2] + matrix[3];
         return return_value;
     }
     template <AnyMat T, Primitive U, AnyVec V>
@@ -266,10 +296,10 @@ namespace engine::core::math
     }
 
     template <AnyVec Position>
-    constexpr mat<4, 4, std::remove_const_t<typename Position::type>> lookAt(Position const &eye, Position const &center, Position const &world_up) requires(Position::size == 3)
+    constexpr mat<4, 4, std::remove_const_t<typename Position::type>> look_at(Position const &eye, Position const &center, Position const &world_up) requires(Position::size == 3)
     {
         vec<3, typename Position::type> const forward = normalize(center - eye);
-        vec<3, typename Position::type> const right = normalize(cross(forward, world_up));
+        vec<3, typename Position::type> const right = normalize(cross(world_up, forward));
         vec<3, typename Position::type> const up = cross(forward, right);
         mat<4, 4, typename Position::type> return_value(1);
         return_value[0][0] = right.x;
@@ -278,9 +308,9 @@ namespace engine::core::math
         return_value[0][1] = up.x;
         return_value[1][1] = up.y;
         return_value[2][1] = up.z;
-        return_value[0][2] = -forward.x;
-        return_value[1][2] = -forward.y;
-        return_value[2][2] = -forward.z;
+        return_value[0][2] = forward.x;
+        return_value[1][2] = forward.y;
+        return_value[2][2] = forward.z;
         return_value[3][0] = -dot(right, eye);
         return_value[3][1] = -dot(up, eye);
         return_value[3][2] = -dot(forward, eye);
@@ -351,11 +381,11 @@ namespace engine::core::math
         dst[2][1] = src[1][2];
 
         vec3 lengths{
-            core::math::detail::sqrt(dst[0][0] * dst[0][0] + dst[0][1] * dst[0][1] +
+            core::math::sqrt(dst[0][0] * dst[0][0] + dst[0][1] * dst[0][1] +
                                      dst[0][2] * dst[0][2]),
-            core::math::detail::sqrt(dst[1][0] * dst[1][0] + dst[1][1] * dst[1][1] +
+            core::math::sqrt(dst[1][0] * dst[1][0] + dst[1][1] * dst[1][1] +
                                      dst[1][2] * dst[1][2]),
-            core::math::detail::sqrt(dst[2][0] * dst[2][0] + dst[2][1] * dst[2][1] +
+            core::math::sqrt(dst[2][0] * dst[2][0] + dst[2][1] * dst[2][1] +
                                      dst[2][2] * dst[2][2]),
         };
 

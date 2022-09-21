@@ -128,21 +128,79 @@ namespace engine::core::math
 
     template <AnyVec T>
     constexpr vec<T::size, std::remove_const_t<typename T::type>> cos(T const &vector) noexcept;
-
     template <AnyVec T>
     constexpr vec<T::size, std::remove_const_t<typename T::type>> sin(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> tan(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> acos(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> asin(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> atan(T const &vector) noexcept;
+    template <AnyVec T, AnyVec U>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> atan(T const &left, U const &right) noexcept requires(T::size == U::size);
+    template <AnyVec T, AnyVec U>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> atan2(T const &left, U const &right) noexcept requires(T::size == U::size);
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> cosh(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> sinh(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> tanh(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> acosh(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> asinh(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> atanh(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> exp(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> exp2(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> expm1(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> log(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> log2(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> log10(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> log1p(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> logb(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> sqrt(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> inversesqrt(T const &vector) noexcept;
+
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> abs(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> sign(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> floor(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> ceil(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> trunc(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> round(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> roundEven(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> fract(T const &vector) noexcept;
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> mod(T const &vector, typename T::type const &scalar) noexcept;
+    template <AnyVec T, AnyVec U>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> mod(T const &left, U const &right) noexcept requires(T::size == U::size);
 
     template <AnyVec T, Primitive U>
     constexpr vec<T::size, std::remove_const_t<typename T::type>> pow(T const &vector, U const pow) noexcept;
 
     template <AnyVec T, AnyVec U>
     constexpr vec<T::size, std::remove_const_t<typename T::type>> pow(T const &vector1, U const &vector2) noexcept;
-
-    template <AnyVec T>
-    constexpr vec<T::size, std::remove_const_t<typename T::type>> exp(T const &vector2) noexcept;
-
-    template <AnyVec T>
-    constexpr vec<T::size, std::remove_const_t<typename T::type>> sqrt(T const &vector) noexcept;
 
     template <AnyVec T, AnyVec U>
     constexpr vec<3, std::remove_const_t<typename T::type>> cross(T const &left, U const &right) noexcept requires(T::size == U::size && T::size == 3);
@@ -176,5 +234,14 @@ namespace engine::core::math
 
     template <AnyVec T>
     [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> max(T const &left, T const &max) noexcept;
+
+    template <AnyVec T>
+    [[nodiscard]] constexpr std::remove_const_t<typename T::type> distance(T const &left, T const &right) noexcept;
+
+    template <AnyVec T, Primitive U>
+    [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> lerp(T const &from, T const &to, U const param) noexcept;
+
+    template <AnyVec T, Primitive U>
+    [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> mix(T const &from, T const &to, U const param) noexcept;
 } // namespace engine::core::math
 #include "vec_math.inl"

@@ -22,12 +22,12 @@ namespace engine::core::math
     template <Primitive T>
     constexpr qua<T>::qua(T radians, vec<3, T> axis)
     {
-        if (core::math::length(axis) != 0)
+        if (length(axis) != 0)
         {
             axis = normalize(axis);
         }
-        w = core::math::detail::cos(radians / 2);
-        auto const ss = core::math::detail::sin(radians / 2);
+        w = cos(radians / 2);
+        auto const ss = sin(radians / 2);
         x = axis.x * ss;
         y = axis.y * ss;
         z = axis.z * ss;
@@ -48,15 +48,15 @@ namespace engine::core::math
         T qwz(w * z);
 
         return_value[0][0] = T(1) - T(2) * (qyy + qzz);
-        return_value[0][1] = T(2) * (qxy - qwz);
-        return_value[0][2] = T(2) * (qxz + qwy);
+        return_value[1][0] = T(2) * (qxy - qwz);
+        return_value[2][0] = T(2) * (qxz + qwy);
 
-        return_value[1][0] = T(2) * (qxy + qwz);
+        return_value[0][1] = T(2) * (qxy + qwz);
         return_value[1][1] = T(1) - T(2) * (qxx + qzz);
-        return_value[1][2] = T(2) * (qyz - qwx);
+        return_value[2][1] = T(2) * (qyz - qwx);
 
-        return_value[2][0] = T(2) * (qxz - qwy);
-        return_value[2][1] = T(2) * (qyz + qwx);
+        return_value[0][2] = T(2) * (qxz - qwy);
+        return_value[1][2] = T(2) * (qyz + qwx);
         return_value[2][2] = T(1) - T(2) * (qxx + qyy);
         return return_value;
     }
@@ -88,26 +88,6 @@ namespace engine::core::math
         return qua<T>(-x, -y, -z, -w);
     }
 
-    template <Primitive T>
-    template <Primitive U>
-    constexpr qua<T> &qua<T>::operator+=(U const value) noexcept
-    {
-        x += value;
-        y += value;
-        z += value;
-        w += value;
-        return *this;
-    }
-    template <Primitive T>
-    template <Primitive U>
-    constexpr qua<T> &qua<T>::operator-=(U const value) noexcept
-    {
-        x -= value;
-        y -= value;
-        z -= value;
-        w -= value;
-        return *this;
-    }
     template <Primitive T>
     template <Primitive U>
     constexpr qua<T> &qua<T>::operator*=(U const value) noexcept
@@ -209,14 +189,9 @@ namespace engine::core::math
         return qua<T>(vector) *= value;
     }
     template <Primitive T, Primitive U>
-    [[nodiscard]] constexpr qua<T> operator+(qua<T> const &vector, U const value) noexcept
+    [[nodiscard]] constexpr qua<T> operator/(U const value, qua<T> const &vector) noexcept
     {
-        return qua<T>(vector) += value;
-    }
-    template <Primitive T, Primitive U>
-    [[nodiscard]] constexpr qua<T> operator-(qua<T> const &vector, U const value) noexcept
-    {
-        return qua<T>(vector) -= value;
+        return qua<T>(value / vector.x, value / vector.y, value / vector.z, value / vector.w);
     }
     template <Primitive T, Primitive U>
     [[nodiscard]] constexpr qua<T> operator*(qua<T> const &vector, U const value) noexcept
@@ -261,6 +236,49 @@ namespace engine::core::math
     }
 
     template <Primitive T>
+    [[nodiscard]] constexpr T angle(qua<T> const &quaternion) noexcept
+    {
+        if (abs(quaternion.w) > cos(0.5f))
+        {
+            T const a = asin(sqrt(quaternion.x * quaternion.x +
+                                  quaternion.y * quaternion.y +
+                                  quaternion.z * quaternion.z))
+                * static_cast<T>(2);
+            if (quaternion.w < static_cast<T>(0))
+            {
+                return std::numbers::pi * static_cast<T>(2) - a;
+            }
+            return a;
+        }
+        return acos(quaternion.w) * T(2);
+    }
+
+    template <Primitive T>
+    [[nodiscard]] constexpr T pitch(qua<T> const &quaternion) noexcept
+    {
+        return std::atan2(
+            2 * (quaternion.y * quaternion.z + quaternion.w * quaternion.x),
+            quaternion.w * quaternion.w - quaternion.x * quaternion.x - quaternion.y * quaternion.y + quaternion.z * quaternion.z);
+    }
+    template <Primitive T>
+    [[nodiscard]] constexpr T yaw(qua<T> const &quaternion) noexcept
+    {
+        return std::asin(clamp(static_cast<T>(-2) * (quaternion.x * quaternion.z - quaternion.w * quaternion.y), static_cast<T>(-1), static_cast<T>(1)));
+    }
+    template <Primitive T>
+    [[nodiscard]] constexpr T roll(qua<T> const &quaternion) noexcept
+    {
+        return std::atan2(
+            2 * (quaternion.x * quaternion.y + quaternion.w * quaternion.z),
+            quaternion.w * quaternion.w + quaternion.x * quaternion.x - quaternion.y * quaternion.y - quaternion.z * quaternion.z);
+    }
+    template <Primitive T>
+    [[nodiscard]] constexpr vec<3, T> QuaternionToEuler(qua<T> const &quaternion) noexcept
+    {
+        return vec<3, T>(pitch(quaternion), yaw(quaternion), roll(quaternion));
+    }
+
+    template <Primitive T>
     qua<T> constexpr conjugate(qua<T> const &q) noexcept
     {
         return qua<T>(q.w, -q.x, -q.y, -q.z);
@@ -280,21 +298,35 @@ namespace engine::core::math
     template <Primitive T, Primitive U>
     constexpr vec<3, T> cross(vec<3, U> const &left, qua<T> const &right) noexcept
     {
-        return inverse(left) * right;
+        return inverse(right) * left;
+    }
+    template <Primitive T, Primitive U>
+    [[nodiscard]] constexpr qua<T> cross(qua<T> const &left, qua<U> const &right) noexcept
+    {
+        return qua<T>{
+            left.w *right.x + left.x * right.w + left.y * right.z - left.z * right.y,
+                left.w *right.y - left.x * right.z + left.y * right.w + left.z * right.x,
+                left.w *right.z + left.x * right.y - left.y * right.x + left.z * right.w,
+                left.w *right.w - left.x * right.x - left.y * right.y - left.z * right.z};
     }
 
     template <Primitive T>
-    [[nodiscard]] constexpr qua<T> QuaternionFromEuler(vec<3, T> angles) noexcept
+    [[nodiscard]] constexpr qua<T> QuaternionFromEuler(vec<3, T> const &angles) noexcept
     {
-        return qua<T>(angles.x, vec<3, T>{1, 0, 0}) *
-            qua<T>(angles.y, vec<3, T>{0, 1, 0}) *
-            qua<T>(angles.z, vec<3, T>{0, 0, 1});
+        vec<3, T> c = cos(angles * T(0.5));
+        vec<3, T> s = sin(angles * T(0.5));
+
+        return qua<T>{
+            c.x *c.y *c.z + s.x * s.y * s.z,
+                s.x *c.y *c.z - c.x * s.y * s.z,
+                c.x *s.y *c.z + s.x * c.y * s.z,
+                c.x *c.y *s.z - s.x * s.y * c.z
+        };
     }
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> QuaternionFromEuler(T roll, T pitch, T yaw) noexcept requires(std::is_floating_point_v<T>)
     {
-        return qua<T>(pitch, vec<3, T>{1, 0, 0}) *qua<T>(yaw, vec<3, T>{0, 1, 0}) *
-            qua<T>(roll, vec<3, T>{0, 0, 1});
+        return QuaternionFromEuler(vec<3, T>(roll, pitch, yaw));
     }
     template <AnyMat U>
     [[nodiscard]] constexpr qua<typename U::type> QuaternionFromRotationMatrix(U const &m) noexcept requires(U::size.x == 3 && U::size.y == 3 && std::is_floating_point_v<typename U::type>)
@@ -363,15 +395,16 @@ namespace engine::core::math
     }
 
     template <Primitive T>
-    [[nodiscard]] constexpr mat<4, 4, T> rotate(mat<4, 4, T> const &matrix, qua<T> const &q) noexcept
+    [[nodiscard]] constexpr qua<T> rotate(mat<4, 4, T> const &matrix, qua<T> const &q) noexcept
     {
         return rotate(matrix, q.w, vec<3, T>{q.x, q.y, q.z});
     }
 
+
     template <Primitive T>
     [[nodiscard]] constexpr T length(qua<T> const &q) noexcept
     {
-        return core::math::detail::sqrt(dot(q, q));
+        return sqrt(dot(q, q));
     }
     template <Primitive T>
     [[nodiscard]] constexpr qua<T> normalize(qua<T> const &q) noexcept

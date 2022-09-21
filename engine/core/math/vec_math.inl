@@ -293,7 +293,7 @@ namespace engine::core::math
     template <AnyVec T>
     [[nodiscard]] constexpr auto length(T const &vector) noexcept
     {
-        return math::detail::sqrt(squared_length(vector));
+        return sqrt(squared_length(vector));
     }
 
     template <AnyVec T>
@@ -311,16 +311,18 @@ namespace engine::core::math
     constexpr std::remove_const_t<typename T::type> dot(T const &left, U const &right) noexcept requires(T::size == U::size)
     {
         std::remove_const_t<typename T::type> return_value = 0;
+        auto const temp = left * right;
         for (size_t i = 0; i < T::size; i++)
         {
-            return_value += left[i] * static_cast<std::remove_const_t<typename T::type>>(right[i]);
+            return_value += temp[i];
         }
         return return_value;
     }
+
     template <AnyVec T, AnyVec U>
     constexpr typename std::remove_const_t<typename T::type> angle(T const &left, U const &right) noexcept requires(T::size == U::size)
     {
-        return math::detail::acos(dot(left, right) / length(left) / length(right));
+        return acos(clamp(dot(left, right), typename T::type(-1), typename T::type(1)));
     }
 
     template <AnyVec T>
@@ -329,7 +331,7 @@ namespace engine::core::math
         vec<T::size, std::remove_const_t<typename T::type>> return_value;
         for (size_t i = 0; i < T::size; i++)
         {
-            return_value[i] = math::detail::cos(vector[i]);
+            return_value[i] = cos(vector[i]);
         }
         return return_value;
     }
@@ -340,10 +342,326 @@ namespace engine::core::math
         vec<T::size, std::remove_const_t<typename T::type>> return_value;
         for (size_t i = 0; i < T::size; i++)
         {
-            return_value[i] = math::detail::sin(vector[i]);
+            return_value[i] = sin(vector[i]);
         }
         return return_value;
     }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> tan(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = tan(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> acos(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = acos(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> asin(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = asin(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> atan(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = atan(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T, AnyVec U>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> atan(T const &left, U const &right) noexcept requires(T::size == U::size)
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = atan2(left[i], right[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T, AnyVec U>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> atan2(T const &left, U const &right) noexcept requires(T::size == U::size)
+    {
+        return atan(left, right);
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> sinh(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = sinh(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> cosh(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = cosh(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> tanh(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = tanh(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> asinh(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = asinh(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> acosh(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = acosh(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> atanh(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = atanh(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> exp(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = exp(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> exp2(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = exp2(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> expm1(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = expm1(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> log(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = log(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> log2(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = log2(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> log10(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = log10(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> log1p(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = log1p(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> logb(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = logb(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> sqrt(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = sqrt(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> inversesqrt(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = inversesqrt(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> abs(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = abs(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> sign(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = sign(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> floor(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = floor(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> ceil(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = ceil(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> trunc(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = trunc(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> round(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = round(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> roundEven(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = roundEven(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> fract(T const &vector) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = fract(vector[i]);
+        }
+        return return_value;
+    }
+    template <AnyVec T>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> mod(T const &vector, typename T::type const &scalar) noexcept
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = mod(vector[i], scalar);
+        }
+        return return_value;
+    }
+    template <AnyVec T, AnyVec U>
+    constexpr vec<T::size, std::remove_const_t<typename T::type>> mod(T const &left, U const &right) noexcept requires(T::size == U::size)
+    {
+        vec<T::size, std::remove_const_t<typename T::type>> return_value;
+        for (size_t i = 0; i < T::size; i++)
+        {
+            return_value[i] = mod(left[i], right[i]);
+        }
+        return return_value;
+    }
+
 
     template <AnyVec T, Primitive U>
     constexpr vec<T::size, std::remove_const_t<typename T::type>> pow(T const &vector, U const value) noexcept
@@ -351,7 +669,7 @@ namespace engine::core::math
         vec<T::size, std::remove_const_t<typename T::type>> return_value;
         for (size_t i = 0; i < T::size; i++)
         {
-            return_value[i] = math::detail::pow(vector[i], value);
+            return_value[i] = pow(vector[i], value);
         }
         return return_value;
     }
@@ -361,28 +679,7 @@ namespace engine::core::math
         vec<T::size, std::remove_const_t<typename T::type>> return_value;
         for (size_t i = 0; i < T::size; i++)
         {
-            return_value[i] = math::detail::pow(vector1[i], vector2[i]);
-        }
-        return return_value;
-    }
-
-    template <AnyVec T>
-    constexpr vec<T::size, std::remove_const_t<typename T::type>> exp(T const &vector2) noexcept
-    {
-        vec<T::size, std::remove_const_t<typename T::type>> return_value;
-        for (size_t i = 0; i < T::size; i++)
-        {
-            return_value[i] = math::detail::exp(vector2[i]);
-        }
-        return return_value;
-    }
-    template <AnyVec T, Primitive U>
-    constexpr vec<T::size, std::remove_const_t<typename T::type>> sqrt(T const &vector) noexcept
-    {
-        vec<T::size, std::remove_const_t<typename T::type>> return_value;
-        for (size_t i = 0; i < T::size; i++)
-        {
-            return_value[i] = math::detail::sqrt(vector[i]);
+            return_value[i] = pow(vector1[i], vector2[i]);
         }
         return return_value;
     }
@@ -582,5 +879,25 @@ namespace engine::core::math
     constexpr void rmax(T &left, U const min) noexcept
     {
         left = left > min ? left : min;
+    }
+    template <AnyVec T>
+    [[nodiscard]] constexpr std::remove_const_t<typename T::type> distance(T const &left, T const &right) noexcept
+    {
+        return length(left - right);
+    }
+    template <AnyVec T, Primitive U>
+    [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> lerp(T const &from, T const &to, U const param) noexcept
+    {
+        return from * (1 - param) + to * param;
+    }
+    template <AnyVec T, Primitive U>
+    [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> mix(T const &from, T const &to, U const param) noexcept
+    {
+        return from * (1 - param) + to * param;
+    }
+    template <AnyVec T, AnyVec U>
+    [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> mix(T const &from, T const &to, U const &param) noexcept
+    {
+        return from * (1 - param) + to * param;
     }
 } // namespace engine::core::math

@@ -189,8 +189,9 @@ namespace engine::core::math
     template <Primitive T, Primitive U>
     constexpr vec<3, T> cross(vec<3, T> const &left, vec<3, U> const &right)
     {
-        return vec<3, T>{left.y *right.z - left.z * right.y,
-            left.x *right.z - left.z * right.x,
-            left.x *right.y - left.y * right.x};
+        return vec<3, T>{
+            left.y *right.z - right.y * left.z,
+                left.z *right.x - right.z * left.x,
+                left.x *right.y - right.x * left.y};
     }
 } // namespace engine::core::math

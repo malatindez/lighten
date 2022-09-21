@@ -21,25 +21,61 @@
 #include "math/sphere.hpp"
 namespace engine::core::math
 {
-    template <class T>
-    [[nodiscard]] constexpr vec<3, T> reflect(vec<3, T> const &normal,
-                                              vec<3, T> const &dir)
+    template <AnyVec Vector>
+    [[nodiscard]] constexpr vec<Vector::size, std::remove_const_t<typename Vector::type>> reflect(Vector const &normal, Vector const &incident) noexcept
     {
-        return dir - 2.0f * dot(normal, dir) * normal;
+        return incident - 2.0f * dot(normal, incident) * normal;
     }
-    template <class T>
-    [[nodiscard]] constexpr vec<3, T> reflect_normal(vec<3, T> const &normal, vec<3, T> const &dir)
+    template <AnyVec Vector>
+    [[nodiscard]] constexpr vec<Vector::size, std::remove_const_t<typename Vector::type>> refract(Vector const &normal, Vector const &incident, float eta) noexcept
     {
-        return normalize(dir - 2.0f * dot(normal, dir) * normal);
+        auto const cos_theta = dot(normal, incident);
+        auto const r_out_perp = eta * (incident - cos_theta * normal);
+        auto const r_out_parallel = -std::sqrt(std::abs(1.0f - squared_length(r_out_perp))) * normal;
+        return r_out_perp + r_out_parallel;
     }
-    template <class T>
-    [[nodiscard]] constexpr vec<3, T> reflect_normal_safe(vec<3, T> const &normal, vec<3, T> const &dir)
+    template <AnyVec Vector>
+    [[nodiscard]] constexpr vec<Vector::size, std::remove_const_t<typename Vector::type>> refract(Vector const &normal, Vector const &incident, float eta, float &cos_theta) noexcept
     {
-        vec<3, T> t = dir - 2.0f * dot(normal, dir) * normal;
-        float l = length(t);
-        l = l * (l > 1e-6f) + 1 * (l <= 1e-6f);
-        return t / l;
+        cos_theta = dot(normal, incident);
+        auto const r_out_perp = eta * (incident - cos_theta * normal);
+        auto const r_out_parallel = -std::sqrt(std::abs(1.0f - squared_length(r_out_perp))) * normal;
+        return r_out_perp + r_out_parallel;
     }
+    template <AnyVec Vector>
+    [[nodiscard]] constexpr vec<Vector::size, std::remove_const_t<typename Vector::type>> refract(Vector const &normal, Vector const &incident, float eta, float &cos_theta, float &cos_theta_t) noexcept
+    {
+        cos_theta = dot(normal, incident);
+        auto const r_out_perp = eta * (incident - cos_theta * normal);
+        cos_theta_t = std::sqrt(std::abs(1.0f - squared_length(r_out_perp)));
+        auto const r_out_parallel = -cos_theta_t * normal;
+        return r_out_perp + r_out_parallel;
+    }
+    template <AnyVec Vector>
+    [[nodiscard]] constexpr vec<Vector::size, std::remove_const_t<typename Vector::type>> refract(Vector const &normal, Vector const &incident, float eta, float &cos_theta, float &cos_theta_t, float &reflectance) noexcept
+    {
+        cos_theta = dot(normal, incident);
+        auto const r_out_perp = eta * (incident - cos_theta * normal);
+        cos_theta_t = std::sqrt(std::abs(1.0f - squared_length(r_out_perp)));
+        auto const r_out_parallel = -cos_theta_t * normal;
+        auto const reflectance_perp = (eta * cos_theta - cos_theta_t) / (eta * cos_theta + cos_theta_t);
+        auto const reflectance_parallel = (cos_theta - eta * cos_theta_t) / (cos_theta + eta * cos_theta_t);
+        reflectance = (reflectance_perp * reflectance_perp + reflectance_parallel * reflectance_parallel) / 2.0f;
+        return r_out_perp + r_out_parallel;
+    }
+    template <AnyVec Vector>
+    [[nodiscard]] constexpr vec<Vector::size, std::remove_const_t<typename Vector::type>> refract(Vector const &normal, Vector const &incident, float eta, float &cos_theta, float &cos_theta_t, float &reflectance, float &reflectance_perp, float &reflectance_parallel) noexcept
+    {
+        cos_theta = dot(normal, incident);
+        auto const r_out_perp = eta * (incident - cos_theta * normal);
+        cos_theta_t = std::sqrt(std::abs(1.0f - squared_length(r_out_perp)));
+        auto const r_out_parallel = -cos_theta_t * normal;
+        reflectance_perp = (eta * cos_theta - cos_theta_t) / (eta * cos_theta + cos_theta_t);
+        reflectance_parallel = (cos_theta - eta * cos_theta_t) / (cos_theta + eta * cos_theta_t);
+        reflectance = (reflectance_perp * reflectance_perp + reflectance_parallel * reflectance_parallel) / 2.0f;
+        return r_out_perp + r_out_parallel;
+    }
+
 } // namespace engine::core::math
 
 #if defined(__clang__)
