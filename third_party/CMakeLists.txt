@@ -1,5 +1,6 @@
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party")
 
+set(GLM_DIR "${LIB_DIR}/glm")
 set(ASSIMP_DIR "${LIB_DIR}/assimp")
 set(IMGUI_DIR "${LIB_DIR}/imgui")
 set(IMGUIZMO_DIR "${LIB_DIR}/imguizmo")
@@ -23,6 +24,11 @@ function(target_add_direct3d TARGET)
   target_link_libraries("${TARGET}" ${DirectX_LIBRARY_DIR}/dxgi.lib)
   target_link_libraries("${TARGET}" ${DirectX_LIBRARY_DIR}/d3dcompiler.lib)
 endfunction(target_add_direct3d)
+
+# glm
+function(target_add_glm TARGET)
+  target_include_directories("${TARGET}" PRIVATE "${GLM_DIR}")
+endfunction(target_add_glm)
 
 # assimp
 set(ZLIB_LIBRARIES zlibstatic)
@@ -224,6 +230,11 @@ function(target_add_libraries TARGET)
   if("${ARGN}" MATCHES "[wW][iI][cC]_[tT][eE][xX][tT][uU][rR][eE]_[lL][oO][aA][dD][eE][rR]11")
     target_add_wic_texture_loader(${TARGET})
   endif()
+  
+  if("${ARGN}" MATCHES "[gG][lL][mM]")
+    target_add_glm(${TARGET})
+  endif()
+
 endfunction(target_add_libraries)
 
 function(update_sources_msvc SOURCES)
