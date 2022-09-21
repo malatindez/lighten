@@ -78,6 +78,39 @@ namespace engine::core::math
 
 } // namespace engine::core::math
 
+namespace std {
+    template <size_t size_x, typename vector_type>
+    struct hash<engine::core::math::vec<size_x, vector_type>> {
+        [[nodiscard]] constexpr size_t operator()(engine::core::math::vec<size_x, vector_type> const &v) const noexcept {
+            size_t seed = 0;
+            for (auto const &e : v.data) {
+                seed ^= std::hash<vector_type>{}(e) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+            }
+            return seed;
+        }
+    };
+    template <size_t size_x, size_t size_y, typename matrix_type>
+    struct hash<engine::core::math::mat<size_x, size_y, matrix_type>> {
+        [[nodiscard]] constexpr size_t operator()(engine::core::math::mat<size_x, size_y, matrix_type> const &m) const noexcept {
+            size_t seed = 0;
+            for (auto const &e : m.data) {
+                seed ^= std::hash<matrix_type>{}(e) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+            }
+            return seed;
+        }
+    };
+    template<typename quaternion_type>
+    struct hash<engine::core::math::qua<quaternion_type>> {
+        [[nodiscard]] constexpr size_t operator()(engine::core::math::qua<quaternion_type> const &q) const noexcept {
+            size_t seed = 0;
+            for (auto const &e : q.data) {
+                seed ^= std::hash<quaternion_type>{}(e) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+            }
+            return seed;
+        }
+    };
+} // namespace std
+
 #if defined(__clang__)
 // TODO
 #elif defined(__GNUC__) || defined(__GNUG__)
