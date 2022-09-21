@@ -69,11 +69,11 @@ namespace transform_editor
                                  mCurrentGizmoMode,
                                  matrix.arr.data(),
                                  NULL,
-                                 useSnap ? &snap.x : NULL, bounding_box.min.data.data(), boundsSnap);
+                                 useSnap ? &snap.x : NULL, Box(-bounding_box.min, -bounding_box.max).min.data.data(), boundsSnap);
             ImGuizmo::DecomposeMatrixToComponents(matrix.arr.data(), matrixTranslation, matrixRotation, matrixScale);
             transform.position = vec3{ matrixTranslation[0], matrixTranslation[1], matrixTranslation[2] };
-            transform.rotation = QuaternionFromEuler(math::radians(-matrixRotation[2]), -math::radians(matrixRotation[0]), -math::radians(matrixRotation[1]));
             transform.scale = vec3{ matrixScale[0], matrixScale[1] ,matrixScale[2] };
+            transform.rotation = QuaternionFromRotationMatrix(scale(matrix, 1.0f / transform.scale).as_rmat<3, 3>());
             transform.UpdateMatrices();
         }
     }
