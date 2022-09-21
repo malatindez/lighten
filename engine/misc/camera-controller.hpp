@@ -45,7 +45,7 @@ namespace engine
         [[nodiscard]] inline core::math::Ray Raycast(core::math::vec2 const &ndc) const noexcept
         {
             auto const &cam = camera();
-            core::math::vec4 direction = core::math::vec4(ndc.x, ndc.y, 1, 1) * cam.inv_view_projection;
+            core::math::vec4 direction = cam.inv_view_projection * core::math::vec4(ndc.x, ndc.y, 1, 1);
             return core::math::Ray(cam.position(), core::math::normalize(direction.xyz / direction.w - cam.position()));
         }
 

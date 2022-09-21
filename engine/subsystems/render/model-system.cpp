@@ -16,10 +16,7 @@ namespace engine::render
                 auto const &p0 = mesh.vertices[mesh.indices[i++]].coords;
                 auto const &p1 = mesh.vertices[mesh.indices[i++]].coords;
                 auto const &p2 = mesh.vertices[mesh.indices[i++]].coords;
-                auto const U = p1 - p0;
-                auto const V = p2 - p0;
-                auto const normal = cross(U, V);
-                bool a = Triangle::Intersect(p0, p1, p2, normal, nearest, ray);
+                bool a = Triangle::Intersect(p0, p1, p2, nearest, ray);
                 if (a)
                 {
                     spdlog::info("intersected");
@@ -36,18 +33,18 @@ namespace engine::render
             bool rv = false;
             for (auto const &mesh : model.meshes)
             {
-                mat4 mat = mesh.mesh_to_model * transform.model;
-                mat4 inv_mat = inverse(mat);
+                mat4 mat = transform.model * mesh.mesh_to_model;
+                mat4 inv_mat = mesh.inv_mesh_to_model * transform.inv_model;
                 Ray mesh_local = ray;
-                mesh_local.origin() = (core::math::vec4{ mesh_local.origin(), 1 } *inv_mat).xyz;
-                mesh_local.SetDirection((core::math::vec4{ mesh_local.direction(), 0 } *inv_mat).xyz);
-                float temp = nearest.t;
+                mesh_local.origin() = (inv_mat * core::math::vec4{ mesh_local.origin(), 1 }).xyz;
+                mesh_local.SetDirection((inv_mat * core::math::vec4{ mesh_local.direction(), 0 }).xyz);
                 bool t = mesh.triangle_octree.intersect(mesh_local, nearest);
                 if (t)
                 {
-                    nearest.point = (core::math::vec4{ nearest.point, 1 } *mat).xyz;
-                    nearest.normal = (core::math::vec4{ nearest.normal, 0 } *mat).xyz;
-                    rv = t / core::math::length(mesh_local.direction());
+                    nearest.point = (mat * core::math::vec4{ nearest.point, 1 }).xyz;
+                    nearest.normal = (mat * core::math::vec4{ nearest.normal, 0 }).xyz;
+                    nearest.t /= length(mesh_local.direction());
+                    rv = t;
                 }
             }
             return rv;
@@ -77,6 +74,7 @@ namespace engine::render
         mesh_intersection.normal = nearest.normal;
         mesh_intersection.t = nearest.t;
         mesh_intersection.point = nearest.point;
+        mesh_intersection.near = std::numeric_limits<float>::max();
         auto rv = FindIntersection(registry, ray, mesh_intersection);
         nearest.normal = mesh_intersection.normal;
         nearest.t = mesh_intersection.t;

@@ -28,10 +28,10 @@ namespace engine
 
         core::math::mat4 modified_inv_view_projection = per_frame.inv_view;
         modified_inv_view_projection[3][0] = modified_inv_view_projection[3][1] = modified_inv_view_projection[3][2] = 0;
-        modified_inv_view_projection = per_frame.inv_projection * modified_inv_view_projection;
-        core::math::vec4 bl4 = core::math::vec4(-1, -1, 1, 1) * modified_inv_view_projection;
-        core::math::vec4 br4 = core::math::vec4(1, -1, 1, 1) * modified_inv_view_projection;
-        core::math::vec4 tl4 = core::math::vec4(-1, 1, 1, 1) * modified_inv_view_projection;
+        modified_inv_view_projection = modified_inv_view_projection * per_frame.inv_projection;
+        core::math::vec4 bl4 = modified_inv_view_projection * core::math::vec4(-1, -1, 1, 1);
+        core::math::vec4 br4 = modified_inv_view_projection * core::math::vec4(1, -1, 1, 1);
+        core::math::vec4 tl4 = modified_inv_view_projection * core::math::vec4(-1, 1, 1, 1);
         core::math::vec4 right4 = br4 - bl4;
         core::math::vec4 up4 = tl4 - bl4;
         skybox_buffer_->Update(core::math::mat4x3{ bl4, right4, up4 });

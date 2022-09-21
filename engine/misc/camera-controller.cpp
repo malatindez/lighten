@@ -113,7 +113,7 @@ namespace engine
         update_basis_ = false;
         auto &cam = camera();
         auto &transform_ = transform();
-        cam.inv_view.as_rmat<3, 3>() = transform_.rotation.as_mat3();
+        cam.inv_view.as_rmat<3, 3>() = transpose(transform_.rotation.as_mat3());
     }
 
     void CameraController::UpdateMatrices()
@@ -131,8 +131,8 @@ namespace engine
         as_rvec<3>(cam.inv_view[3]) = transform_.position;
 
         cam.view = invert_orthonormal(cam.inv_view);
-        cam.view_projection = cam.view * cam.projection;
-        cam.inv_view_projection = cam.inv_projection * cam.inv_view;
+        cam.view_projection = cam.projection * cam.view;
+        cam.inv_view_projection = cam.inv_view * cam.inv_projection;
     }
     namespace
     {

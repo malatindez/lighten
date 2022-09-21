@@ -57,8 +57,8 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
             0,
             std::cos(float(i) / amount * 2 * (float)std::numbers::pi)
         } *(float(amount) / std::sqrtf((float)amount));
-        transform.rotation = QuaternionFromEuler(radians(180.0f), 0.0f, radians(180.0f));
-        transform.rotation *= QuaternionFromRotationMatrix(lookAt(transform.position, vec3{ 0,0,0 }, vec3{ 0,1,0 }).as_rmat<3, 3>());
+        transform.rotation = QuaternionFromEuler(0.0f, 0.0f, radians(180.0f));
+        transform.rotation *= QuaternionFromRotationMatrix(look_at(transform.position, vec3{ 0,0,0 }, vec3{ 0,1,0 }).as_rmat<3, 3>());
         transform.UpdateMatrices();
     }
     /*
