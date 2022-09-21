@@ -2,7 +2,7 @@
 #include "layer-stack.hpp"
 namespace engine::core
 {
-    namespace _detail
+    namespace _layer_stack_detail
     {
         template <typename T>
         void UnderlyingStack<T>::PushLayer(T *layer)
@@ -39,9 +39,7 @@ namespace engine::core
         {
             return layers_.end() != std::find(layers_.begin(), layers_.end(), layer);
         }
-    } // namespace _detail
-    namespace _layer_stack_detail
-    {
+
         template <typename T>
         constexpr bool StaticCheck()
         {
@@ -51,7 +49,7 @@ namespace engine::core
                 std::is_base_of_v<Layer::HandleGuiRender, T> ||
                 std::is_base_of_v<Layer::HandleTick, T>;
         }
-    }
+    } // namespace _layer_stack_detail
     template <typename T>
     void LayerStack::PushLayer(std::shared_ptr<T> layer)
     {

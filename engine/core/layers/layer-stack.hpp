@@ -1,7 +1,7 @@
 #pragma once
 #include "include/engine-pch.hpp"
 
-namespace engine::core::_detail
+namespace engine::core::_layer_stack_detail
 {
     using LayerPtrVec = std::vector<std::shared_ptr<Layer>>;
     template <typename T>
@@ -53,7 +53,7 @@ namespace engine::core
         template <typename T>
         void PopOverlay(std::shared_ptr<T> layer);
         template <typename T>
-        bool HasLayer(std::shared_ptr<T>);
+        bool HasLayer(std::shared_ptr<T> layer);
 
         void OnUpdate() override;
         void OnRender() override;
@@ -61,13 +61,13 @@ namespace engine::core
         void OnEvent(events::Event &e) override;
         void OnTick(float delta_time) override;
 
-    private:
+    protected:
         std::vector<std::shared_ptr<Layer>> all_;
-        _detail::UnderlyingStack<Layer::HandleUpdate> update_;
-        _detail::UnderlyingStack<Layer::HandleRender> render_;
-        _detail::UnderlyingStack<Layer::HandleGuiRender> gui_render_;
-        _detail::UnderlyingStack<Layer::HandleEvent> event_;
-        _detail::UnderlyingStack<Layer::HandleTick> tick_;
+        _layer_stack_detail::UnderlyingStack<Layer::HandleUpdate> update_;
+        _layer_stack_detail::UnderlyingStack<Layer::HandleRender> render_;
+        _layer_stack_detail::UnderlyingStack<Layer::HandleGuiRender> gui_render_;
+        _layer_stack_detail::UnderlyingStack<Layer::HandleEvent> event_;
+        _layer_stack_detail::UnderlyingStack<Layer::HandleTick> tick_;
     };
 } // namespace engine::core
 #include "layer-stack.inl"

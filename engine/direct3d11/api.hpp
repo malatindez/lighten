@@ -21,30 +21,30 @@ namespace engine::direct3d
         };
     } // namespace _api_detail
 
-    using Factory = _api_detail::api_readonly_wrapper<IDXGIFactory>;
-    using Factory5 = _api_detail::api_readonly_wrapper<IDXGIFactory5>;
-    using Device = _api_detail::api_readonly_wrapper<ID3D11Device>;
-    using Device5 = _api_detail::api_readonly_wrapper<ID3D11Device5>;
-    using DeviceContext = _api_detail::api_readonly_wrapper<ID3D11DeviceContext>;
-    using DeviceContext4 = _api_detail::api_readonly_wrapper<ID3D11DeviceContext4>;
+    using ReadonlyFactory = _api_detail::api_readonly_wrapper<IDXGIFactory>;
+    using ReadonlyFactory5 = _api_detail::api_readonly_wrapper<IDXGIFactory5>;
+    using ReadonlyDevice = _api_detail::api_readonly_wrapper<ID3D11Device>;
+    using ReadonlyDevice5 = _api_detail::api_readonly_wrapper<ID3D11Device5>;
+    using ReadonlyDeviceContext = _api_detail::api_readonly_wrapper<ID3D11DeviceContext>;
+    using ReadonlyDeviceContext4 = _api_detail::api_readonly_wrapper<ID3D11DeviceContext4>;
 #if defined(_DEBUG)
-    using Debug = _api_detail::api_readonly_wrapper<ID3D11Debug>;
-    using DebugInfoQueue = _api_detail::api_readonly_wrapper<ID3D11InfoQueue>;
+    using ReadonlyDebug = _api_detail::api_readonly_wrapper<ID3D11Debug>;
+    using ReadonlyDebugInfoQueue = _api_detail::api_readonly_wrapper<ID3D11InfoQueue>;
 #endif
 
     class Api final
     {
     public:
         // global pointers to most used D3D11 objects for convenience:
-        Factory factory;
-        Factory5 factory5;
-        Device device;
-        Device5 device5;
-        DeviceContext devcon;
-        DeviceContext4 devcon4;
+        ReadonlyFactory factory;
+        ReadonlyFactory5 factory5;
+        ReadonlyDevice device;
+        ReadonlyDevice5 device5;
+        ReadonlyDeviceContext devcon;
+        ReadonlyDeviceContext4 devcon4;
 #if defined(_DEBUG)
-        Debug debug;
-        DebugInfoQueue debug_info_queue;
+        ReadonlyDebug debug;
+        ReadonlyDebugInfoQueue debug_info_queue;
 #endif
 
 #if defined(ENGINE_TEST)

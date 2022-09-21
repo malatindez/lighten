@@ -1,4 +1,5 @@
 #pragma once
+#include "api.hpp"
 #include "utils/debug.hpp"
 #include "utils/win-utils.hpp"
 #include <system_error>

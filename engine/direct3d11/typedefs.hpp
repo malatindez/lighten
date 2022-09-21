@@ -17,13 +17,13 @@ namespace engine::direct3d
     using RenderTargetView1 = d3d_resource_wrapper<ID3D11RenderTargetView1>;
     using RenderTargetView = d3d_resource_wrapper<ID3D11RenderTargetView>;
     using DepthStencilView = d3d_resource_wrapper<ID3D11DepthStencilView>;
+    using DepthStencilState = d3d_resource_wrapper<ID3D11DepthStencilState>;
     using Texture2D = d3d_resource_wrapper<ID3D11Texture2D>;
     using Buffer = d3d_resource_wrapper<ID3D11Buffer>;
     using InputLayout = d3d_resource_wrapper<ID3D11InputLayout>;
     using RasterizerState1 = d3d_resource_wrapper<ID3D11RasterizerState1>;
     using RasterizerState = d3d_resource_wrapper<ID3D11RasterizerState>;
     using SamplerState = d3d_resource_wrapper<ID3D11SamplerState>;
-    using DepthStencilState = d3d_resource_wrapper<ID3D11DepthStencilState>;
     using Resource = d3d_resource_wrapper<ID3D11Resource>;
     using VertexShader = d3d_resource_wrapper<ID3D11VertexShader>;
     using PixelShader = d3d_resource_wrapper<ID3D11PixelShader>;
@@ -35,6 +35,17 @@ namespace engine::direct3d
     using Buffer = d3d_resource_wrapper<ID3D11Buffer>;
     using ShaderResourceView = d3d_resource_wrapper<ID3D11ShaderResourceView>;
     using Resource = d3d_resource_wrapper<ID3D11Resource>;
+
+    using Factory = d3d_resource_wrapper<IDXGIFactory>;
+    using Factory5 = d3d_resource_wrapper<IDXGIFactory5>;
+    using Device = d3d_resource_wrapper<ID3D11Device>;
+    using Device5 = d3d_resource_wrapper<ID3D11Device5>;
+    using DeviceContext = d3d_resource_wrapper<ID3D11DeviceContext>;
+    using DeviceContext4 = d3d_resource_wrapper<ID3D11DeviceContext4>;
+#if defined(_DEBUG)
+    using Debug = d3d_resource_wrapper<ID3D11Debug>;
+    using DebugInfoQueue = d3d_resource_wrapper<ID3D11InfoQueue>;
+#endif
 }
 namespace engine
 {
