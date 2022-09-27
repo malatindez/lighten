@@ -111,6 +111,11 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
     render::ModelSystem::instance().OnInstancesUpdated(registry);
     camera_movement::RegisterKeyCallbacks();
     transform_editor::RegisterKeyCallbacks();
+    auto &input = *InputLayer::instance();
+    input.AddTickKeyCallback({ Key::KEY_PLUS }, [this] (float dt, InputLayer::KeySeq const &, uint32_t count) { exposure_ += dt; });
+    input.AddTickKeyCallback({ Key::KEY_MINUS }, [this] (float dt, InputLayer::KeySeq const &, uint32_t count) { exposure_ -= dt; });
+    input.AddTickKeyCallback({ Key::KEY_NUMPAD_MINUS }, [this] (float dt, InputLayer::KeySeq const &, uint32_t count) { exposure_ -= dt; });
+    input.AddTickKeyCallback({ Key::KEY_NUMPAD_PLUS }, [this] (float dt, InputLayer::KeySeq const &, uint32_t count) { exposure_ += dt; });
 }
 void Controller::OnTick([[maybe_unused]] float delta_time)
 {
