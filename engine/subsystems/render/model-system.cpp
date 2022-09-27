@@ -5,26 +5,6 @@ namespace engine::render
     std::shared_ptr<ModelSystem> ModelSystem::instance_;
     namespace
     {
-        inline bool CheckMeshIntersection(
-            Mesh const &mesh,
-            Ray const &ray,
-            Intersection &nearest)
-        {
-            bool rv = false;
-            for (size_t i = 0; i < mesh.indices.size();)
-            {
-                auto const &p0 = mesh.vertices[mesh.indices[i++]].coords;
-                auto const &p1 = mesh.vertices[mesh.indices[i++]].coords;
-                auto const &p2 = mesh.vertices[mesh.indices[i++]].coords;
-                bool a = Triangle::Intersect(p0, p1, p2, nearest, ray);
-                if (a)
-                {
-                    spdlog::info("intersected");
-                    rv = true;
-                }
-            }
-            return rv;
-        }
         bool CheckForIntersection(Model const &model,
                                   components::TransformComponent transform,
                                   Ray const &ray,
@@ -43,7 +23,6 @@ namespace engine::render
                 {
                     nearest.point = (mat * core::math::vec4{ nearest.point, 1 }).xyz;
                     nearest.normal = (mat * core::math::vec4{ nearest.normal, 0 }).xyz;
-                    nearest.t /= length(mesh_local.direction());
                     rv = t;
                 }
             }
