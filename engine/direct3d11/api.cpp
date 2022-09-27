@@ -66,6 +66,8 @@ namespace engine::direct3d
     void Api::Deinit()
     {
         States::Deinit();
+
+#if defined(_DEBUG)
         if (core::config()["Debug"]["show_direct3d_debug_output"].as_boolean())
         {
             api().debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
@@ -74,5 +76,6 @@ namespace engine::direct3d
             api().debug = nullptr;
             api().debug_info_queue = nullptr;
         }
+#endif
     }
 } // namespace engine::direct3d
