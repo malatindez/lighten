@@ -14,6 +14,7 @@ foreach(_source IN ITEMS ${ENGINE_SOURCES})
 endforeach()
 
 # add_library(engine STATIC "${ENGINE_SOURCES}")
+# target_precompile_headers(engine PRIVATE "${ENGINE_SOURCES_DIR}/include/library-pch.hpp")
 # target_add_libraries(engine "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console"  "dds_texture_loader11" "wic_texture_loader11" "directxtex")
 # target_include_directories(engine PRIVATE ${ENGINE_SOURCES_DIR})
 
