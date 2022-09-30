@@ -1,62 +1,35 @@
 #pragma once
-#include <unordered_map>
-
-#include "pch.hpp"
-#define NOMINMAX
-#include <Windows.h>
-
-#include "events/mouse-events.hpp"
-#include "events.hpp"
-#include "core/math.hpp"
+#include "core/events.hpp"
 
 namespace engine::core
 {
-  class Window;
+    class Window
+    {
+    public:
+        struct Props
+        {
+            std::string title;
+            math::ivec2 size;
+            math::ivec2 position;
+            Props(std::string_view title = "Engine", math::ivec2 size = math::ivec2{ 1200, 720 }, math::ivec2 position = math::ivec2{ 100, 100 }) : title{ title }, size{ size }, position{ position } {}
+        };
+        Window(Props const &props) : title_{ props.title }, size_{ props.size }, position_{ props.position } {}
+        virtual ~Window() = default;
 
-  using WindowCallback =
-      std::function<LRESULT(Window &, HWND, UINT, WPARAM, LPARAM)>;
+        [[nodiscard]] inline math::ivec2 const &size() const noexcept { return size_; }
+        [[nodiscard]] inline math::ivec2 const &position() const noexcept { return position_; }
+        [[nodiscard]] inline std::string const &title() const noexcept { return title_; }
+        [[nodiscard]] inline bool const &alive() const noexcept { return alive_; }
 
-  // Simple WINAPI window wrapper
-  class Window
-  {
-  public:
-    Window(WNDCLASSEXW const &window_class_template, DWORD extended_style,
-           std::wstring const &class_name, std::wstring const &window_name,
-           DWORD style, core::math::ivec2 position, core::math::ivec2 size,
-           HWND parent_window, HMENU menu, HINSTANCE instance, LPVOID lp_param);
-    // remove copy and move semantics because the callback system is bound to the
-    // address of the window
-    Window(Window &&Window) = delete;
-    Window &operator=(Window &&Window) = delete;
-    Window(Window const &Window) = delete;
-    Window &operator=(Window const &Window) = delete;
+        [[nodiscard]] virtual void *native() = 0;
 
-    virtual ~Window() { DestroyWindow(handle_); }
+        void SetEventCallback(core::EventCallbackFn const &event_fn) noexcept { event_callback_ = event_fn; }
 
-    void SetEventCallback(EventCallbackFn const &callback) noexcept { event_callback_ = callback; }
-
-    [[nodiscard]] constexpr HWND handle() const noexcept { return handle_; }
-    [[nodiscard]] constexpr core::math::ivec2 const &window_size() const noexcept { return window_size_; }
-    [[nodiscard]] constexpr core::math::ivec2 const &position() const noexcept { return position_; }
-    [[nodiscard]] constexpr bool running() const noexcept { return running_; }
-
-    virtual bool PeekOSMessages();
-
-  protected:
-      virtual void OnSizeChanged() {}
-      virtual void OnSizeChangeEnd() {}
-
-  private:
-    LRESULT CALLBACK WindowProcCallback(HWND handle, UINT message, WPARAM w_param,
-                                        LPARAM l_param);
-    static LRESULT CALLBACK StaticWindowProc(HWND handle, UINT message,
-                                             WPARAM w_param, LPARAM l_param);
-
-    EventCallbackFn event_callback_;
-
-    bool running_ = true;
-    HWND handle_;
-    core::math::ivec2 position_;
-    core::math::ivec2 window_size_;
-  };
-}; // namespace engine::core
+    protected:
+        core::EventCallbackFn event_callback_;
+        std::string title_;
+        math::ivec2 size_;
+        math::ivec2 position_;
+        bool alive_ = true;
+    };
+} // namespace engine::core

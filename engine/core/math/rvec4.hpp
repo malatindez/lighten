@@ -4,7 +4,7 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4201)
-namespace engine::core::math
+namespace engine::core::math::_detail
 {
 
     template <Primitive T>
@@ -12,11 +12,11 @@ namespace engine::core::math
     {
         using type = T;
         static constexpr size_t size = 4;
-        explicit constexpr rvec(T &a, T &b, T &c, T &d) : x{a}, y{b}, z{c}, w{d} {}
+        explicit constexpr rvec(T &a, T &b, T &c, T &d) : x{ a }, y{ b }, z{ c }, w{ d } {}
         template <AnyVec V>
-        explicit constexpr rvec(T &other) requires(V::size >= size) : x{other.x}, y{other.y}, z{other.z}, w{other.w} {}
+        explicit constexpr rvec(T &other) requires(V::size >= size) : x{ other.x }, y{ other.y }, z{ other.z }, w{ other.w } {}
         template <AnyVec V>
-        explicit constexpr rvec(T const &other) requires(V::size >= size && std::is_const_v<typename V::type>) : x{other.x}, y{other.y}, z{other.z}, w{other.w} {}
+        explicit constexpr rvec(T const &other) requires(V::size >= size && std::is_const_v<typename V::type>) : x{ other.x }, y{ other.y }, z{ other.z }, w{ other.w } {}
 
         template <AnyVec U>
         static constexpr rvec<4, T> from_vec(U &other) requires(U::size >= 4) { return rvec<4, T>{other.x, other.y, other.z, other.w}; }

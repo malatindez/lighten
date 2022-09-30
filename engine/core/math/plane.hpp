@@ -1,14 +1,14 @@
 #pragma once
-#include "core/math/intersection.hpp"
-#include "core/math/ray.hpp"
+#include "intersection.hpp"
+#include "ray.hpp"
 namespace engine::core::math
 {
     struct Plane
     {
-        bool CheckIntersection(core::math::Intersection &i, core::math::Ray const &ray) const
+        bool Intersect(core::math::Intersection &i, core::math::Ray const &ray) const
         {
             float denom = core::math::dot(normal, ray.direction());
-            if (abs(denom) <= 1e-6f)
+            if (std::abs(denom) <= 1e-6f)
             {
                 return false;
             }

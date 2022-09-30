@@ -1,6 +1,6 @@
 #pragma once
 #include "rvec4.hpp"
-namespace engine::core::math
+namespace engine::core::math::_detail
 {
     template <Primitive T>
     constexpr void rvec<4, T>::reset() noexcept

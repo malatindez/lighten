@@ -2,8 +2,7 @@ option(test "build all tests." ON)
 
 if(test)
   set(TEST_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests")
-  file(GLOB_RECURSE TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR} *.*)
-  list(FILTER TEST_SOURCES INCLUDE REGEX "${CMAKE_CURRENT_SOURCE_DIR}/tests/*")
+  file(GLOB_RECURSE TEST_SOURCES ${TEST_SOURCES_DIR}/*.*)
 
   foreach(_source IN ITEMS ${TEST_SOURCES})
     if(IS_ABSOLUTE "${_source}")
@@ -30,7 +29,7 @@ if(test)
   target_include_directories(runUnitTests PRIVATE ${ENGINE_SOURCES_DIR})
 
   target_compile_options(runUnitTests PRIVATE /bigobj)
-  target_add_libraries(runUnitTests "entt" "spdlog" "benchmark" "gtest")
+  target_add_libraries(runUnitTests "benchmark" "gtest" "entt" "spdlog" "directx" "assimp" "glm" "imgui" "imguizmo" "imgui_console" "directxtex" "dds_texture_loader11" "wic_texture_loader11" "glm")
 
   add_test(NAME TEST COMMAND runUnitTests)
 
@@ -56,4 +55,5 @@ if(test)
   </PropertyGroup> \ 
 </Project> \ 
 ")
+  set_target_properties(runUnitTests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
 endif()

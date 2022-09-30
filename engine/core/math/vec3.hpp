@@ -6,7 +6,6 @@
 #pragma warning(disable : 4201)
 namespace engine::core::math
 {
-
     template <Primitive T>
     struct vec<3, T>
     {
@@ -20,12 +19,12 @@ namespace engine::core::math
         explicit constexpr vec(A a, B b, C c);
         template <typename... U>
         explicit constexpr vec(U... data);
-        explicit constexpr vec(std::array<T, size> const &arr) : data{arr} {}
-        explicit constexpr vec(std::array<T, size> &&arr) : data{std::move(arr)} {}
+        explicit constexpr vec(std::array<T, size> const &arr) : data{ arr } {}
+        explicit constexpr vec(std::array<T, size> &&arr) : data{ std::move(arr) } {}
 
         constexpr void reset() noexcept;
         template <typename U>
-        constexpr vec<size, T> &operator=(rvec<size, U> const &b)
+        constexpr vec<size, T> &operator=(_detail::rvec<size, U> const &b)
         {
             for (size_t i = 0; i < size; i++)
             {
@@ -70,16 +69,6 @@ namespace engine::core::math
         [[nodiscard]] constexpr T &operator[](size_t i);
         [[nodiscard]] constexpr T const &operator[](size_t i) const;
 
-        constexpr explicit operator rvec<3, T>() noexcept { return rvec<3, T>{x, y, z}; }
-        constexpr explicit operator rvec<3, const T>() const noexcept { return rvec<3, const T>{x, y, z}; }
-
-        template <size_t n = size>
-        [[nodiscard]] constexpr rvec<n, T> as_rvec() noexcept requires(n >= 2 && n <= size);
-
-        template <size_t n = size, Primitive U = T>
-        [[nodiscard]] constexpr vec<n, U> as_vec() const noexcept requires(n >= 2 && n <= size);
-        template <size_t n = size>
-        [[nodiscard]] constexpr rvec<n, const T> as_crvec() const noexcept requires(n >= 2 && n <= size);
         union
         {
             struct
@@ -98,6 +87,12 @@ namespace engine::core::math
                 };
             };
             std::array<T, 3> data;
+            vec<2, T> xy;
+            struct
+            {
+                T x_anonymous_padding_;
+                vec<2, T> yz;
+            };
         };
         static_assert(sizeof(data) == 3 * sizeof(T));
 

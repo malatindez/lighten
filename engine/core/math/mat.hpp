@@ -1,7 +1,7 @@
 #pragma once
+#include "vec_math.hpp"
 #include "matnxn.hpp"
 #include "rmatnxn.hpp"
-#include "vec.hpp"
 namespace engine::core::math
 {
     using mat4 = mat<4, 4, float>;

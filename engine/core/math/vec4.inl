@@ -153,32 +153,6 @@ namespace engine::core::math
     }
 
     template <Primitive T>
-    template <size_t n>
-    [[nodiscard]] constexpr rvec<n, T> vec<4, T>::as_rvec() noexcept requires(n >= 2 && n <= size)
-    {
-        return rvec<n, T>::from_vec(*this);
-    }
-
-    template <Primitive T>
-    template <size_t n, Primitive U>
-    [[nodiscard]] constexpr vec<n, U> vec<4, T>::as_vec() const noexcept requires(n >= 2 && n <= size)
-    {
-        vec<n, U> rv{};
-        for (size_t i = 0; i < n; i++)
-        {
-            rv.data[i] = static_cast<U>(data[i]);
-        }
-        return rv;
-    }
-
-    template <Primitive T>
-    template <size_t n>
-    [[nodiscard]] constexpr rvec<n, const T> vec<4, T>::as_crvec() const noexcept requires(n >= 2 && n <= size)
-    {
-        return rvec<n, const T>::from_vec(*this);
-    }
-
-    template <Primitive T>
     template <Primitive _> // primitives
     constexpr size_t vec<4, T>::get_parameter_pack_size()
     {

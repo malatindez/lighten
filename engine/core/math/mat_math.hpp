@@ -7,18 +7,20 @@ namespace engine::core::math
     template <AnyMat U>
     constexpr std::ostream &operator<<(std::ostream &os, U const &matrix);
 
-    template <AnyMat T, AnyMat U>
-    [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator*(T const left, U const &right) requires(T::size.y == U::size.x);
-    template <AnyVec T, AnyMat U>
-    [[nodiscard]] constexpr vec<T::size, std::remove_const_t<typename T::type>> operator*(T const &left, U const &right) requires(U::size.x == T::size);
+    template <AnyMat U, AnyMat V>
+    [[nodiscard]] constexpr auto operator*(U const &lhs, V const &rhs) requires (U::size.x == V::size.y);
+    template <AnyVec V, AnyMat M>
+    [[nodiscard]] constexpr auto operator*(V const &left, M const &right) requires (V::size == M::size.y);
+    template <AnyMat M, AnyVec V>
+    [[nodiscard]] constexpr auto operator*(M const &left, V const &right) requires (M::size.x == V::size);
     template <AnyMat T, Primitive U>
     [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator*(T const &left, U const right);
     template <AnyMat T, Primitive U>
     [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator*(U const left, T const &right);
     template <AnyMat T, Primitive U>
-    [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator-(T const& left, U const right);
+    [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator-(T const &left, U const right);
     template <AnyMat T, Primitive U>
-    [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator+(U const left, T const& right);
+    [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator+(U const left, T const &right);
     template <AnyMat T, AnyMat U>
     [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator-(T const left, U const &right) requires(T::size.x == U::size.x && T::size.y == U::size.y);
     template <AnyMat T, AnyMat U>
@@ -33,9 +35,13 @@ namespace engine::core::math
 
     template <AnyMat T>
     constexpr typename T::type det(T const &matrix) requires(T::size.x == T::size.y);
+    template <AnyMat T>
+    constexpr typename T::type determinant(T const &matrix) requires(T::size.x == T::size.y);
 
     template <AnyMat T>
-    constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> adjugate(T const &matrix) requires(T::size.x == T::size.y);
+    constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> adj(T const &m) requires(T::size.x == T::size.y);
+    template <AnyMat T>
+    constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> adjugate(T const &m) requires(T::size.x == T::size.y);
 
     template <AnyMat T>
     constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> inverse(T const &matrix) requires(T::size.x == T::size.y);
@@ -50,10 +56,13 @@ namespace engine::core::math
     constexpr mat<4, 4, std::remove_const_t<typename T::type>> scale(T const &matrix, V const &scale) requires(T::size.x == T::size.y && T::size.x == 4 && V::size == 3);
 
     template <AnyVec Position>
-    constexpr mat<4, 4, std::remove_const_t<typename Position::type>> lookAt(Position const &eye, Position const &center, Position const &up) requires(Position::size == 3);
+    constexpr mat<4, 4, std::remove_const_t<typename Position::type>> look_at(Position const &eye, Position const &center, Position const &up) requires(Position::size == 3);
 
     template <Primitive T>
     constexpr mat<4, 4, T> perspective(T fov_y, T aspect_ratio, T z_near, T z_far);
+
+    template <Primitive T>
+    constexpr mat<4, 4, T> ortho(T left, T right, T bottom, T top, T zNear, T zFar);
 
     template <Primitive T>
     constexpr void invert_orthonormal(mat<4, 4, T> const &src, mat<4, 4, T> &dst);

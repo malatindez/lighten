@@ -20,12 +20,12 @@ namespace engine::core::math
         explicit constexpr vec(A a, B b);
         template <typename... U>
         explicit constexpr vec(U... data);
-        explicit constexpr vec(std::array<T, size> const &arr) : data{arr} {}
-        explicit constexpr vec(std::array<T, size> &&arr) : data{std::move(arr)} {}
+        explicit constexpr vec(std::array<T, size> const &arr) : data{ arr } {}
+        explicit constexpr vec(std::array<T, size> &&arr) : data{ std::move(arr) } {}
         constexpr void reset() noexcept;
 
         template <typename U>
-        constexpr vec<size, T> &operator=(rvec<size, U> const &b)
+        constexpr vec<size, T> &operator=(_detail::rvec<size, U> const &b)
         {
             for (size_t i = 0; i < size; i++)
             {
@@ -70,9 +70,6 @@ namespace engine::core::math
 
         [[nodiscard]] constexpr T &operator[](size_t i);
         [[nodiscard]] constexpr T const &operator[](size_t i) const;
-
-        constexpr explicit operator rvec<2, T>() noexcept { return rvec<2, T>{x, y}; }
-        constexpr explicit operator rvec<2, const T>() const noexcept { return rvec<2, const T>{x, y}; }
         union
         {
             struct

@@ -1,11 +1,6 @@
 #pragma once
-#include "core/utils.hpp"
-#include <algorithm>
-#include <chrono>
-#include <filesystem>
-#include <fstream>
-#include <limits>
-#include <random>
+#include "utils/utils.hpp"
+#undef CreateFile
 namespace utils
 {
     static std::random_device rd;
@@ -81,14 +76,14 @@ namespace utils
     template <std::integral T>
     [[nodiscard]] T Random(T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
     {
-        std::uniform_int_distribution dis{min, max};
+        std::uniform_int_distribution dis{ min, max };
         return dis(gen);
     }
 
     template <std::floating_point T>
     [[nodiscard]] T Random(T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
     {
-        std::uniform_real_distribution dis{min, max};
+        std::uniform_real_distribution dis{ min, max };
         return dis(gen);
     }
     const std::string kAsciiCharacters =
@@ -99,8 +94,9 @@ namespace utils
 
     [[nodiscard]] inline std::string ExcludeString(std::string const &a, std::string_view const b)
     {
-        std::string return_value{a};
-        std::erase_if(return_value, [&b](char const &c) { return std::ranges::find(b, c) != b.end(); });
+        std::string return_value{ a };
+        std::erase_if(return_value, [&b] (char const &c)
+                      { return std::ranges::find(b, c) != b.end(); });
         return return_value;
     }
 
@@ -111,6 +107,9 @@ namespace utils
     [[nodiscard]] std::string RandomBinaryString(size_t const &size = 32);
     [[nodiscard]] std::string RandomString(size_t const &size = 32, std::string_view const including = kAsciiCharacters);
     [[nodiscard]] std::string RandomFilename(size_t const &size = 32);
+
+    std::vector<fs::path> CreateRandomFiles(fs::path const &path, size_t file_size = 1024, size_t amount = 16);
+    std::vector<fs::path> CreateRandomFilesRecursive(fs::path const &path, int depth = 3, size_t folder_amount = 4, size_t file_amount_per_folder = 4);
 
     void CreateFile(fs::path const &path, char const *data, const size_t size);
 

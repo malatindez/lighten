@@ -8,11 +8,11 @@ namespace engine::core::events
     {
     public:
         explicit MouseMovedEvent(math::ivec2 &&coordinates)
-            : Event(EventType::MouseMoved, EventCategoryMouse | EventCategoryInput), coordinates_{std::move(coordinates)} {}
+            : Event(EventType::MouseMoved, EventCategoryMouse | EventCategoryInput), coordinates_{ std::move(coordinates) } {}
         explicit MouseMovedEvent(math::ivec2 const &coordinates)
-            : Event(EventType::MouseMoved, EventCategoryMouse | EventCategoryInput), coordinates_{coordinates} {}
+            : Event(EventType::MouseMoved, EventCategoryMouse | EventCategoryInput), coordinates_{ coordinates } {}
         MouseMovedEvent(int x, int y)
-            : Event(EventType::MouseMoved, EventCategoryMouse | EventCategoryInput), coordinates_{x, y} {}
+            : Event(EventType::MouseMoved, EventCategoryMouse | EventCategoryInput), coordinates_{ x, y } {}
         [[nodiscard]] inline math::ivec2 const &coordinates() const noexcept
         {
             return coordinates_;
@@ -27,10 +27,12 @@ namespace engine::core::events
     public:
         explicit MouseButtonPressedEvent(uint16_t const code, math::ivec2 &&coordinates)
             : Event(EventType::MouseButtonPressed, EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput),
-              mouse_button_(code), coordinates_(std::move(coordinates)) {}
+            mouse_button_(code), coordinates_(std::move(coordinates))
+        {}
         explicit MouseButtonPressedEvent(uint16_t const code, math::ivec2 const &coordinates)
             : Event(EventType::MouseButtonPressed, EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput),
-              mouse_button_(code), coordinates_(coordinates) {}
+            mouse_button_(code), coordinates_(coordinates)
+        {}
         [[nodiscard]] std::string to_string() const noexcept override
         {
             return std::string(name()) + std::to_string(mouse_button_);
@@ -54,10 +56,12 @@ namespace engine::core::events
     public:
         explicit MouseButtonReleasedEvent(uint16_t const code,
                                           math::ivec2 &&coordinates)
-            : Event(EventType::MouseButtonReleased, EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput), mouse_button_(code), coordinates_(std::move(coordinates)) {}
+            : Event(EventType::MouseButtonReleased, EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput), mouse_button_(code), coordinates_(std::move(coordinates))
+        {}
         explicit MouseButtonReleasedEvent(uint16_t const code,
                                           math::ivec2 const &coordinates)
-            : Event(EventType::MouseButtonReleased, EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput), mouse_button_(code), coordinates_(coordinates) {}
+            : Event(EventType::MouseButtonReleased, EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput), mouse_button_(code), coordinates_(coordinates)
+        {}
         [[nodiscard]] std::string to_string() const noexcept override
         {
             return std::string(name()) + std::to_string(mouse_button_);
@@ -81,10 +85,12 @@ namespace engine::core::events
     public:
         explicit MouseScrollEvent(int16_t const scroll_delta,
                                   math::ivec2 &&coordinates)
-            : Event(EventType::MouseScrolled, EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput), delta_(scroll_delta), coordinates_(std::move(coordinates)) {}
+            : Event(EventType::MouseScrolled, EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput), delta_(scroll_delta), coordinates_(std::move(coordinates))
+        {}
         explicit MouseScrollEvent(int16_t const scroll_delta,
                                   math::ivec2 const &coordinates)
-            : Event(EventType::MouseScrolled, EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput), delta_(scroll_delta), coordinates_(coordinates) {}
+            : Event(EventType::MouseScrolled, EventCategoryMouseButton | EventCategoryMouse | EventCategoryInput), delta_(scroll_delta), coordinates_(coordinates)
+        {}
         [[nodiscard]] std::string to_string() const noexcept override
         {
             return std::string(name()) + std::to_string(delta_);

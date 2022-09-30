@@ -13,33 +13,32 @@ namespace engine::core::events
         WindowClose,
         WindowResize,
 
-        AppTick,
-        AppUpdate,
-        AppRender,
-
         KeyPressed,
         KeyReleased,
 
         MouseButtonPressed,
         MouseButtonReleased,
         MouseMoved,
-        MouseScrolled
+        MouseScrolled,
+
+        FilesChanged
     };
 
     enum EventCategory
     {
         None = 0,
         EventCategoryApplication = 1 << 0,
-        EventCategoryInput = 1 << 1,
-        EventCategoryKeyboard = 1 << 2,
-        EventCategoryMouse = 1 << 3,
-        EventCategoryMouseButton = 1 << 4
+        EventCategoryUtils = 1 << 1,
+        EventCategoryInput = 1 << 2,
+        EventCategoryKeyboard = 1 << 3,
+        EventCategoryMouse = 1 << 4,
+        EventCategoryMouseButton = 1 << 5,
     };
 
     class Event
     {
     public:
-        Event(EventType type, uint8_t flags) : kType{type}, kCategoryFlags{flags} {}
+        Event(EventType type, uint8_t flags) : kType{ type }, kCategoryFlags{ flags } {}
         virtual ~Event() = default;
 
         [[nodiscard]] EventType type() const noexcept { return kType; }

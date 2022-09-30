@@ -1,4 +1,8 @@
-git submodule update --init
+@echo off
+echo|set /p="Updating submodules... "
+git submodule update --init --recursive
+git submodule foreach --recursive git checkout .
+echo [32mDone![0m
 if not exist build mkdir build
 cd build
 cmake ..
@@ -9,10 +13,11 @@ if /I "%c%" EQU "N" goto :open_folder
 goto :open_folder
 :tests
 cmake --build . --config Release
-.\Release\runUnitTests.exe
+.\binary\Release\runUnitTests.exe
 :open_folder
-set /P c=Open build folder[Y/N]?
+set /P c=Open Solution[Y/N]?
 if /I "%c%" EQU "N" goto :end
-explorer .
+start engine.sln
 :end
+cd ..
 pause

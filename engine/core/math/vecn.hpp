@@ -16,20 +16,11 @@ namespace engine::core::math
         template <typename... U>
         explicit constexpr vec(U... data);
 
-        explicit constexpr vec(std::array<T, size> const &arr) : data{arr} {}
-        explicit constexpr vec(std::array<T, size> &&arr) : data{std::move(arr)} {}
+        explicit constexpr vec(std::array<T, size> const &arr) : data{ arr } {}
+        explicit constexpr vec(std::array<T, size> &&arr) : data{ std::move(arr) } {}
 
         constexpr void reset() noexcept;
 
-        template <typename U>
-        constexpr vec<size, T> &operator=(rvec<size, U> const &b)
-        {
-            for (int i = 0; i < size; i++)
-            {
-                data[i] = b.data[i];
-            }
-            return *this;
-        }
         template <typename U>
         constexpr vec<size, T> &operator=(vec<size, U> const &b)
         {
@@ -63,14 +54,6 @@ namespace engine::core::math
 
         [[nodiscard]] constexpr T &operator[](size_t i);
         [[nodiscard]] constexpr T const &operator[](size_t i) const;
-
-        template <size_t n = size>
-        [[nodiscard]] constexpr rvec<n, T> as_rvec() noexcept requires(n >= 2 && n <= size);
-
-        template <size_t n = size, Primitive U = T>
-        [[nodiscard]] constexpr vec<n, U> as_vec() const noexcept requires(n >= 2 && n <= size);
-        template <size_t n = size>
-        [[nodiscard]] constexpr rvec<n, const T> as_crvec() const noexcept requires(n >= 2 && n <= size);
 
         std::array<T, size> data;
 

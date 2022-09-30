@@ -82,7 +82,7 @@ namespace utils
 
             while (temp.size() == 1 &&
                    std::find_if(kProhibitedCharacters.begin(),
-                                kProhibitedCharacters.end(), [&temp](char const &c)
+                                kProhibitedCharacters.end(), [&temp] (char const &c)
                                 { return c == temp[0]; }) != kProhibitedCharacters.end())
             {
                 temp = RandomUTF8Char(32);
@@ -93,15 +93,15 @@ namespace utils
         while (final_char.size() == 1 &&
                std::find_if(kProhibitedCharacters.begin(),
                             kProhibitedCharacters.end(),
-                            [&final_char](char const &c)
+                            [&final_char] (char const &c)
                             {
                                 return c == final_char[0] || final_char[0] == ' ' ||
-                                       final_char[0] == '.';
+                                    final_char[0] == '.';
                             }) != kProhibitedCharacters.end())
         {
             final_char = RandomUTF8Char(32);
         }
-        return return_value + final_char;
+                            return return_value + final_char;
     }
 
     [[nodiscard]] std::string RandomBinaryString(size_t const &size)
@@ -113,7 +113,7 @@ namespace utils
     {
         std::string return_value;
         return_value.reserve(size);
-        std::uniform_int_distribution<size_t> dis{0, including.size() - 1};
+        std::uniform_int_distribution<size_t> dis{ 0, including.size() - 1 };
         for (size_t i = 0; i < size; i++)
         {
             size_t k = dis(gen);
@@ -141,9 +141,45 @@ namespace utils
 
     void CreateFile(fs::path const &path, char const *data, const size_t size)
     {
-        fs::create_directories({path.parent_path()});
+        fs::create_directories({ path.parent_path() });
         std::ofstream ofs(path);
         ofs.write(data, size);
         ofs.close();
+    }
+    std::vector<fs::path> CreateRandomFiles(fs::path const &path,
+                                            size_t file_size,
+                                            size_t amount)
+    {
+        std::vector<fs::path> rv;
+        fs::create_directories({ path.parent_path() });
+        for (int i = 0; i < amount; i++)
+        {
+            fs::path temp = path / RandomFilename(Random<size_t>(5, 32));
+            std::string random_string = RandomBinaryString(file_size);
+            CreateFile(temp, random_string.c_str(), random_string.size());
+            rv.emplace_back(temp);
+        }
+        return rv;
+    }
+    std::vector<fs::path> CreateRandomFilesRecursive(fs::path const &path,
+                                                     int depth,
+                                                     size_t folder_amount,
+                                                     size_t file_amount_per_folder)
+    {
+        if (depth == -1)
+        {
+            return {};
+        }
+        std::vector<fs::path> rv;
+        fs::create_directories({ path.parent_path() });
+        for (int i = 0; i < folder_amount; i++)
+        {
+            fs::path temp = path / RandomFilename(Random<size_t>(5, 32)) / "";
+            auto t = CreateRandomFilesRecursive(temp, depth - 1, folder_amount);
+            rv.insert(rv.begin(), t.begin(), t.end());
+        }
+        auto t = CreateRandomFiles(path, 1024, file_amount_per_folder);
+        rv.insert(rv.begin(), t.begin(), t.end());
+        return rv;
     }
 }

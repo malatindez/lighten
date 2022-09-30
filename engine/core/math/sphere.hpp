@@ -1,21 +1,21 @@
 #pragma once
-#include "core/math/ray.hpp"
+#include "ray.hpp"
 namespace engine::core::math
 {
     struct Sphere
     {
-        static constexpr float Hit(core::math::Ray const &r, core::math::vec3 const &center, float radius) noexcept
+        static constexpr float Hit(Ray const &r, vec3 const &center, float radius) noexcept
         {
-            const core::math::vec3 oc = r.origin() - center;
-            const float a = core::math::dot(r.direction(), r.direction());
-            const float b = core::math::dot(oc, r.direction());
-            const float c = core::math::dot(oc, oc) - radius;
+            const vec3 oc = r.origin() - center;
+            const float a = dot(r.direction(), r.direction());
+            const float b = dot(oc, r.direction());
+            const float c = dot(oc, oc) - radius;
             const float discriminant = b * b - a * c;
             if (discriminant < 0)
             {
                 return -1.0f;
             }
-            const float d = core::math::detail::sqrt(discriminant);
+            const float d = sqrt(discriminant);
             float rv0 = (-b - d) / a;
             float rv1 = (-b + d) / a;
             if (rv0 > rv1)
@@ -29,7 +29,7 @@ namespace engine::core::math
             return rv0;
         }
 
-        bool CheckIntersection(core::math::Intersection &i, core::math::Ray const &ray) const
+        bool Intersect(Intersection &i, Ray const &ray) const
         {
             float t = Sphere::Hit(ray, position, radius);
 
@@ -40,11 +40,11 @@ namespace engine::core::math
             i.t = t;
             i.point = ray.PointAtParameter(t);
             i.normal = normalize(i.point - position);
-            i.normal = i.normal * (core::math::length(ray.origin()) < 1 ? -1 : 1);
+            i.normal = i.normal * (length(ray.origin()) < 1 ? -1 : 1);
             return true;
         }
 
-        core::math::vec3 position{0};
-        float radius{1};
+        vec3 position{ 0 };
+        float radius{ 1 };
     };
 }
