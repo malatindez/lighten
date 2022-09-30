@@ -1,5 +1,5 @@
 #include "controller.hpp"
-#include "platform/windows/windows-render-pipeline.hpp"
+#include "platform/windows/windows-hdr-render-pipeline.hpp"
 using namespace engine;
 using namespace core;
 using namespace math;
@@ -10,7 +10,7 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 {
     Engine::Init();
     Engine &app = Engine::Get();
-
+    spdlog::info(std::to_string(sizeof(render::Material)));
     try
     {
         // Initialize in-engine layers that we need
@@ -19,11 +19,11 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
         app.PushLayer(shader_manager);
         app.PushLayer(input_layer);
 
-        auto render_pipeline = std::make_shared<windows::RenderPipeline>();
+        auto render_pipeline = std::make_shared<windows::HDRRenderPipeline>();
         auto renderer = std::make_shared<Renderer>(render_pipeline->window()->size(), render_pipeline->per_frame());
 
         render_pipeline->PushLayer(renderer);
-        auto controller = std::make_shared<Controller>(renderer, render_pipeline->window()->size(), render_pipeline->window()->position());
+        auto controller = std::make_shared<Controller>(renderer, render_pipeline->window()->size(), render_pipeline->window()->position(), render_pipeline->hdr_to_ldr_layer()->exposure());
         render_pipeline->PushLayer(controller);
         render_pipeline->window()->SetEventCallback(Engine::event_function());
 
