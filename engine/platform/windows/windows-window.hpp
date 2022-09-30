@@ -25,23 +25,12 @@ namespace engine::platform::windows
         [[nodiscard]] constexpr HWND handle() const noexcept { return handle_; }
         [[nodiscard]] constexpr bool running() const noexcept { return alive_; }
 
-        [[nodiscard]] IDXGISwapChain1 *swapchain() noexcept { return swapchain_.ptr(); }
-        [[nodiscard]] ID3D11Texture2D *frame_buffer() noexcept { return frame_buffer_.ptr(); }
-        [[nodiscard]] ID3D11RenderTargetView *frame_buffer_view() noexcept { return frame_buffer_view_.ptr(); }
-        [[nodiscard]] ID3D11Texture2D *depth_buffer() noexcept { return depth_buffer_.ptr(); }
-        [[nodiscard]] ID3D11DepthStencilView *depth_buffer_view() noexcept { return depth_buffer_view_.ptr(); }
-        [[nodiscard]] D3D11_TEXTURE2D_DESC depth_buffer_desc() const noexcept { return depth_buffer_desc_; }
-
         [[nodiscard]] void *native() override { return handle(); };
         // TODO(malatindez) make this method private and handle events using GetMessage
         // save main-thread dependant events in event pool and pass them if Window->OnUpdate is called
         bool OnUpdate();
 
     private:
-        void initialize_d3d();
-        void initializeFramebuffer();
-        void initializeDepthbuffer();
-        void OnSizeChangeEnd();
 
         // remove copy and move semantics because the callback system is bound to the
         // address of the window
@@ -56,12 +45,5 @@ namespace engine::platform::windows
                                                  WPARAM w_param, LPARAM l_param);
 
         HWND handle_;
-
-        direct3d::SwapChain1 swapchain_;
-        direct3d::Texture2D frame_buffer_;
-        direct3d::RenderTargetView frame_buffer_view_;
-        direct3d::Texture2D depth_buffer_;
-        direct3d::DepthStencilView depth_buffer_view_;
-        D3D11_TEXTURE2D_DESC depth_buffer_desc_;
     };
 }; // namespace engine::core
