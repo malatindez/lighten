@@ -3,7 +3,6 @@
 
 namespace engine::core::math
 {
-
     template <Primitive T>
     constexpr qua<T>::qua(T w, T x, T y, T z)
     {
@@ -246,7 +245,7 @@ namespace engine::core::math
                 * static_cast<T>(2);
             if (quaternion.w < static_cast<T>(0))
             {
-                return std::numbers::pi * static_cast<T>(2) - a;
+                return static_cast<T>(std::numbers::pi * 2) - a;
             }
             return a;
         }
@@ -399,7 +398,6 @@ namespace engine::core::math
     {
         return rotate(matrix, q.w, vec<3, T>{q.x, q.y, q.z});
     }
-
 
     template <Primitive T>
     [[nodiscard]] constexpr T length(qua<T> const &q) noexcept

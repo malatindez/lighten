@@ -34,7 +34,6 @@ namespace engine::core::math
             w = second;
             normal = core::math::normalize(temp);
         }
-
         core::math::vec3 v;
         core::math::vec3 w;
         core::math::vec3 normal;

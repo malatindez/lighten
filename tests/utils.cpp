@@ -2,7 +2,6 @@
 namespace fs = std::filesystem;
 namespace utils
 {
-
     inline std::string ProhibitedCharactersInFilename()
     {
         std::string return_value = "<>:\"/\\|?*";

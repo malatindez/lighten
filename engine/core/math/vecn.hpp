@@ -3,7 +3,6 @@
 #include "vec.hpp"
 namespace engine::core::math
 {
-
     template <size_t L, Primitive T>
     struct vec
     {
@@ -72,6 +71,5 @@ namespace engine::core::math
         template <typename A, typename B, typename... C>
         constexpr void unpack_data(int offset, A a, B b, C... c);
     };
-
 }; // namespace engine::core::math
 #include "vecn.inl"

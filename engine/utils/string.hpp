@@ -1,7 +1,6 @@
 #pragma once
 namespace engine::utils
 {
-
     inline std::string as_lowercase(std::string_view const s) noexcept
     {
         std::string rv;

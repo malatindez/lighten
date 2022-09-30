@@ -72,6 +72,5 @@ namespace engine::core::math
     constexpr mat<4, 4, T> invert_orthonormal(mat<4, 4, T> const &src);
     template <Primitive T>
     constexpr mat<4, 4, T> invert_orthogonal(mat<4, 4, T> const &src);
-
 } // namespace engine::core::math
 #include "mat_math.inl"

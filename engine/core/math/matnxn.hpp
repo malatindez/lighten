@@ -4,12 +4,23 @@
 #pragma warning(disable : 4201)
 namespace engine::core::math
 {
-
     template <size_t a, size_t b, Primitive T>
     struct mat
     {
         using type = T;
         static constexpr vec<2, size_t> size{ a, b };
+        static constexpr mat<a, b, T> identity() noexcept
+        {
+            mat<a, b, T> result;
+            for (size_t i = 0; i < a; i++)
+            {
+                for (size_t j = 0; j < b; j++)
+                {
+                    result.data[i][j] = i == j ? static_cast<T>(1) : static_cast<T>(0);
+                }
+            }
+            return result;
+        }
 
         constexpr mat() = default;
         template <Primitive P>
@@ -24,7 +35,6 @@ namespace engine::core::math
         explicit constexpr mat(rmat<a, b, P> p);
         template <typename... U>
         explicit constexpr mat(U... data);
-
         // sets all values to zero
         constexpr void reset() noexcept;
 

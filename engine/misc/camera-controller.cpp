@@ -145,7 +145,6 @@ namespace engine
     }
     void CameraController::OnTick(float delta_time, core::math::ivec2 const &pixel_mouse_delta)
     {
-
         vec3 offset{ 0 };
         // process movement
         if (flags_ & MoveForward)

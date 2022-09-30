@@ -7,9 +7,9 @@ namespace engine::core::math
     template <AnyMat U>
     constexpr std::istream &operator>>(std::istream &is, U &matrix)
     {
-        for (int i = 0; i < U::size.x; i++)
+        for (size_t i = 0; i < U::size.x; i++)
         {
-            for (int j = 0; j < U::size.y; j++)
+            for (size_t j = 0; j < U::size.y; j++)
             {
                 is >> matrix[i][j];
             }
@@ -19,9 +19,9 @@ namespace engine::core::math
     template <AnyMat U>
     constexpr std::ostream &operator<<(std::ostream &os, U const &matrix)
     {
-        for (int i = 0; i < U::size.x; i++)
+        for (size_t i = 0; i < U::size.x; i++)
         {
-            for (int j = 0; j < U::size.y; j++)
+            for (size_t j = 0; j < U::size.y; j++)
             {
                 os << matrix[i][j] << " ";
             }
@@ -35,12 +35,12 @@ namespace engine::core::math
         using T = decltype(lhs[0][0] * rhs[0][0]);
         using R = mat<V::size.x, U::size.y, T>;
         R result;
-        for (int i = 0; i < V::size.x; i++)
+        for (size_t i = 0; i < V::size.x; i++)
         {
-            for (int j = 0; j < U::size.y; j++)
+            for (size_t j = 0; j < U::size.y; j++)
             {
                 T sum = 0;
-                for (int k = 0; k < V::size.y; k++)
+                for (size_t k = 0; k < V::size.y; k++)
                 {
                     sum += lhs[k][j] * rhs[i][k];
                 }
@@ -56,10 +56,10 @@ namespace engine::core::math
         using T = decltype(left[0] * right[0][0]);
         using R = vec<M::size.x, T>;
         R result;
-        for (int i = 0; i < M::size.x; i++)
+        for (size_t i = 0; i < M::size.x; i++)
         {
             T sum = 0;
-            for (int j = 0; j < M::size.y; j++)
+            for (size_t j = 0; j < M::size.y; j++)
             {
                 sum += left[j] * right[i][j];
             }
@@ -73,10 +73,10 @@ namespace engine::core::math
         using T = decltype(left[0][0] * right[0]);
         using R = vec<M::size.y, T>;
         R result;
-        for (int i = 0; i < M::size.y; i++)
+        for (size_t i = 0; i < M::size.y; i++)
         {
             T sum = 0;
-            for (int j = 0; j < M::size.x; j++)
+            for (size_t j = 0; j < M::size.x; j++)
             {
                 sum += left[j][i] * right[j];
             }
@@ -84,7 +84,6 @@ namespace engine::core::math
         }
         return result;
     }
-
 
     template <AnyMat T, Primitive U>
     [[nodiscard]] constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> operator*(T const &left, U const right)
@@ -122,9 +121,9 @@ namespace engine::core::math
     constexpr mat<T::size.y, T::size.x, std::remove_const_t<typename T::type>> transpose(T const &matrix)
     {
         mat<T::size.y, T::size.x, std::remove_const_t<typename T::type>> return_value;
-        for (int i = 0; i < T::size.x; i++)
+        for (size_t i = 0; i < T::size.x; i++)
         {
-            for (int j = 0; j < T::size.y; j++)
+            for (size_t j = 0; j < T::size.y; j++)
             {
                 return_value[j][i] = matrix[i][j];
             }
@@ -135,9 +134,9 @@ namespace engine::core::math
     constexpr rmat<T::size.y, T::size.x, typename T::type> rtranspose(T &matrix)
     {
         rmat<T::size.y, T::size.x, typename T::type> return_value;
-        for (int i = 0; i < T::size.x; i++)
+        for (size_t i = 0; i < T::size.x; i++)
         {
-            for (int j = 0; j < T::size.y; j++)
+            for (size_t j = 0; j < T::size.y; j++)
             {
                 return_value.arr[j * T::size.x + i].set_ptr(matrix[i][j]);
             }
@@ -148,9 +147,9 @@ namespace engine::core::math
     constexpr rmat<T::size.y, T::size.x, const typename T::type> rctranspose(T const &matrix)
     {
         rmat<T::size.y, T::size.x, const typename T::type> return_value;
-        for (int i = 0; i < T::size.x; i++)
+        for (size_t i = 0; i < T::size.x; i++)
         {
-            for (int j = 0; j < T::size.y; j++)
+            for (size_t j = 0; j < T::size.y; j++)
             {
                 return_value.arr[j * T::size.x + i].set_ptr(matrix[i][j]);
             }
@@ -210,14 +209,14 @@ namespace engine::core::math
     constexpr mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> adj(T const &m) requires(T::size.x == T::size.y)
     {
         mat<T::size.x, T::size.y, std::remove_const_t<typename T::type>> return_value;
-        for (int i = 0; i < T::size.x; i++)
+        for (size_t i = 0; i < T::size.x; i++)
         {
-            for (int j = 0; j < T::size.y; j++)
+            for (size_t j = 0; j < T::size.y; j++)
             {
                 mat<T::size.x - 1, T::size.y - 1, std::remove_const_t<typename T::type>> sub_matrix;
-                for (int k = 0; k < T::size.x; k++)
+                for (size_t k = 0; k < T::size.x; k++)
                 {
-                    for (int l = 0; l < T::size.y; l++)
+                    for (size_t l = 0; l < T::size.y; l++)
                     {
                         if (k != i && l != j)
                         {

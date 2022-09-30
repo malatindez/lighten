@@ -39,10 +39,12 @@ namespace engine::direct3d
         const D3D_FEATURE_LEVEL kFeatureLevelRequested = D3D_FEATURE_LEVEL_11_0;
         D3D_FEATURE_LEVEL featureLevelInitialized = D3D_FEATURE_LEVEL_11_0;
 #if !defined(_DEBUG)
-        D3D11_CREATE_DEVICE_FLAG flag = D3D11_CREATE_DEVICE_SINGLETHREADED;
+        UINT flag = D3D11_CREATE_DEVICE_SINGLETHREADED;
 #else
-        D3D11_CREATE_DEVICE_FLAG flag = D3D11_CREATE_DEVICE_DEBUG;
+        UINT flag = D3D11_CREATE_DEVICE_DEBUG;
 #endif
+        flag |= D3D11_CREATE_DEVICE_DISABLE_GPU_TIMEOUT;
+        flag |= D3D11_CREATE_DEVICE_SINGLETHREADED;
         AlwaysAssert(D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, flag,
                                        &kFeatureLevelRequested, 1, D3D11_SDK_VERSION, &instance_->device.reset(), &featureLevelInitialized, &instance_->devcon.reset()),
                      "Failed to create device and devcon");
@@ -66,7 +68,6 @@ namespace engine::direct3d
     void Api::Deinit()
     {
         States::Deinit();
-
 #if defined(_DEBUG)
         if (core::config()["Debug"]["show_direct3d_debug_output"].as_boolean())
         {

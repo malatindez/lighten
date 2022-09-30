@@ -109,5 +109,4 @@ namespace engine::core::math::_detail
         assert(i < size);
         return data[i];
     }
-
 } // namespace engine::core::math

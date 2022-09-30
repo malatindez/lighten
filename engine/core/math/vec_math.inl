@@ -577,7 +577,7 @@ namespace engine::core::math
         vec<T::size, std::remove_const_t<typename T::type>> return_value;
         for (size_t i = 0; i < T::size; i++)
         {
-            return_value[i] = sign(vector[i]);
+            return_value[i] = static_cast<typename T::type>(sign(vector[i]));
         }
         return return_value;
     }
@@ -661,7 +661,6 @@ namespace engine::core::math
         }
         return return_value;
     }
-
 
     template <AnyVec T, Primitive U>
     constexpr vec<T::size, std::remove_const_t<typename T::type>> pow(T const &vector, U const value) noexcept

@@ -4,7 +4,6 @@
 #pragma warning(disable : 4201)
 namespace engine::core::math
 {
-
     template <size_t a, size_t b, Primitive T>
     struct rmat
     {

@@ -6,7 +6,6 @@
 #pragma warning(disable : 4201)
 namespace engine::core::math
 {
-
     template <Primitive T>
     struct vec<4, T>
     {
@@ -15,13 +14,16 @@ namespace engine::core::math
         static constexpr size_t size = 4;
         constexpr vec() = default;
         template <Primitive U>
-        explicit constexpr vec(U value);
+        constexpr vec(U value);
         template <Primitive A, Primitive B, Primitive C, Primitive D>
-        explicit constexpr vec(A a, B b, C c, D d);
+        constexpr vec(A a, B b, C c, D d);
         template <typename... U>
-        explicit constexpr vec(U... data);
-        explicit constexpr vec(std::array<T, size> const &arr) : data{ arr } {}
-        explicit constexpr vec(std::array<T, size> &&arr) : data{ std::move(arr) } {}
+        constexpr vec(U... data);
+        constexpr vec(std::array<T, size> const &arr) : data{ arr } {}
+        constexpr vec(std::array<T, size> &&arr) : data{ std::move(arr) } {}
+        constexpr static vec<4, T> zero() noexcept { return vec<4, T>(0); }
+        constexpr void reset() noexcept;
+
         template <typename U>
         constexpr vec<size, T> &operator=(_detail::rvec<size, U> const &b)
         {
@@ -40,8 +42,6 @@ namespace engine::core::math
             }
             return *this;
         }
-
-        constexpr void reset() noexcept;
 
         [[nodiscard]] constexpr vec<4, T> const &operator+() const noexcept;
         [[nodiscard]] constexpr vec<4, T> operator-() const noexcept;
@@ -126,7 +126,6 @@ namespace engine::core::math
         template <typename A, typename B, typename... C>
         constexpr void unpack_data(size_t offset, A a, B b, C... c);
     };
-
 }; // namespace engine::core::math
 
 #pragma warning(pop)

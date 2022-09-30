@@ -47,5 +47,4 @@ namespace engine::core
             layer->OnTick(delta_time);
         }
     }
-
 }

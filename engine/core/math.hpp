@@ -19,8 +19,10 @@
 #include "math/box.hpp"
 #include "math/quaternion.hpp"
 #include "math/sphere.hpp"
+
 namespace engine::core::math
 {
+    namespace numbers = ::std::numbers;
     template <AnyVec Vector>
     [[nodiscard]] constexpr vec<Vector::size, std::remove_const_t<typename Vector::type>> reflect(Vector const &normal, Vector const &incident) noexcept
     {
@@ -75,7 +77,6 @@ namespace engine::core::math
         reflectance = (reflectance_perp * reflectance_perp + reflectance_parallel * reflectance_parallel) / 2.0f;
         return r_out_perp + r_out_parallel;
     }
-
 } // namespace engine::core::math
 
 namespace std {
@@ -84,7 +85,7 @@ namespace std {
         [[nodiscard]] constexpr size_t operator()(engine::core::math::vec<size_x, vector_type> const &v) const noexcept {
             size_t seed = 0;
             for (auto const &e : v.data) {
-                seed ^= std::hash<vector_type>{}(e) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+                seed ^= std::hash<vector_type>{}(e)+0x9e3779b9 + (seed << 6) + (seed >> 2);
             }
             return seed;
         }
@@ -94,7 +95,7 @@ namespace std {
         [[nodiscard]] constexpr size_t operator()(engine::core::math::mat<size_x, size_y, matrix_type> const &m) const noexcept {
             size_t seed = 0;
             for (auto const &e : m.data) {
-                seed ^= std::hash<matrix_type>{}(e) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+                seed ^= std::hash<matrix_type>{}(e)+0x9e3779b9 + (seed << 6) + (seed >> 2);
             }
             return seed;
         }
@@ -104,13 +105,12 @@ namespace std {
         [[nodiscard]] constexpr size_t operator()(engine::core::math::qua<quaternion_type> const &q) const noexcept {
             size_t seed = 0;
             for (auto const &e : q.data) {
-                seed ^= std::hash<quaternion_type>{}(e) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+                seed ^= std::hash<quaternion_type>{}(e)+0x9e3779b9 + (seed << 6) + (seed >> 2);
             }
             return seed;
         }
     };
 } // namespace std
-
 #if defined(__clang__)
 // TODO
 #elif defined(__GNUC__) || defined(__GNUG__)

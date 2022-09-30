@@ -127,6 +127,5 @@ namespace engine::core::math
             nearest.point = ray.PointAtParameter(t);
             return true;
         }
-
     };
 }

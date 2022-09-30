@@ -170,5 +170,4 @@ namespace engine::core::math
         offset += get_parameter_pack_size<A>();
         unpack_data(offset, b, c...);
     }
-
 } // namespace engine::core::math

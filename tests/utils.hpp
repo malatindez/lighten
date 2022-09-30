@@ -57,7 +57,7 @@ namespace utils
                 // Calculate output function (XSH RR), uses old state for max ILP
                 auto xorshifted = static_cast<uint32_t>(((oldstate >> 18u) ^ oldstate) >> 27u);
                 std::uint32_t rot = oldstate >> 59u;
-                return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
+                return (xorshifted >> rot) | (xorshifted << ((rot * std::numeric_limits<uint32_t>::max()) & 31));
             }
         };
     } // namespace _detail

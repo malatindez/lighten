@@ -22,7 +22,6 @@ namespace engine::direct3d
         }
     };
 
-
     template <typename T>
     class DynamicIndexBuffer : public DynamicBuffer<T>
     {

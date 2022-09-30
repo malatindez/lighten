@@ -14,15 +14,16 @@ namespace engine::core::math
         static constexpr size_t size = 3;
         constexpr vec() = default;
         template <Primitive U>
-        explicit constexpr vec(U value);
+        constexpr vec(U value);
         template <Primitive A, Primitive B, Primitive C>
-        explicit constexpr vec(A a, B b, C c);
+        constexpr vec(A a, B b, C c);
         template <typename... U>
-        explicit constexpr vec(U... data);
-        explicit constexpr vec(std::array<T, size> const &arr) : data{ arr } {}
-        explicit constexpr vec(std::array<T, size> &&arr) : data{ std::move(arr) } {}
-
+        constexpr vec(U... data);
+        constexpr vec(std::array<T, size> const &arr) : data{ arr } {}
+        constexpr vec(std::array<T, size> &&arr) : data{ std::move(arr) } {}
+        constexpr static vec<3, T> zero() noexcept { return vec<3, T>(0); }
         constexpr void reset() noexcept;
+
         template <typename U>
         constexpr vec<size, T> &operator=(_detail::rvec<size, U> const &b)
         {
@@ -114,7 +115,6 @@ namespace engine::core::math
 
     template <Primitive T, Primitive U>
     constexpr vec<3, T> cross(vec<3, T> const &left, vec<3, U> const &right);
-
 }; // namespace engine::core::math
 
 #pragma warning(pop)

@@ -3,7 +3,6 @@ namespace engine::utils
 {
     namespace _template_detail
     {
-
         template <typename A>
         constexpr size_t CalculateSize()
         {

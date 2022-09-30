@@ -6,7 +6,6 @@
 #pragma warning(disable : 4201)
 namespace engine::core::math::_detail
 {
-
     template <Primitive T>
     struct rvec<4, T>
     {
@@ -105,7 +104,6 @@ namespace engine::core::math::_detail
         };
         static_assert(sizeof(data) == 4 * sizeof(_detail::primitive_reference_wrapper<T>));
     };
-
 }; // namespace engine::core::math
 #pragma warning(pop)
 #include "rvec4.inl"

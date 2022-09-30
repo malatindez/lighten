@@ -1,4 +1,4 @@
-#include "core/math.hpp"
+#include "include/library-pch.hpp"
 #include "pch.h"
 #include "utils.hpp"
 #include <glm/glm.hpp>
@@ -211,9 +211,5 @@ TEST(TEST_QUATERNIONS, TestFunctions)
         ASSERT_TRUE(glm::mat3_cast(glm_quat1) == quat1.as_mat3());
         ASSERT_TRUE(glm::mat3_cast(glm_quat2) == quat2.as_mat3());
         ASSERT_TRUE(glm::mat3_cast(glm_quat3) == quat3.as_mat3());
-
-
-
-
     }
 }

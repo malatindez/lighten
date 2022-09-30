@@ -1,5 +1,10 @@
 #pragma once
-#include "include/library-pch.hpp"
+#include <array>
+#include <assert.h>
+#include <cmath>
+#include <concepts>
+#include <numbers>
+#include <ostream>
 #include <type_traits>
 
 namespace engine::core::math
@@ -108,7 +113,6 @@ namespace engine::core::math
         constexpr bool is_default_vec_v = is_default_vec<T>::value;
         template <class T>
         constexpr bool is_vec_v = is_reference_vec_v<T> || is_default_vec_v<T>;
-
     } // namespace _detail
 
     template <class T>

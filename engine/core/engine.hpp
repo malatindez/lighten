@@ -8,7 +8,6 @@
 
 namespace engine::core
 {
-
     const core::math::ivec2 kWindowPosition{ 0 };
     const core::math::ivec2 kWindowResolution{ 640, 360 };
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "include/spdlog.hpp"
 #include "entt/entt.hpp"
 
 #include <algorithm>
@@ -32,6 +31,7 @@
 #include <stdint.h>
 #include <string>
 #include <thread>
+#include <type_traits>
 #include <unordered_set>
 #include <variant>
 #include <vector>
@@ -39,6 +39,8 @@
 #include <chrono>
 #include <fstream>
 #include <random>
+
+#include "core/math.hpp"
 
 #ifdef __clang__
 #define __lambda_force_inline __attribute__((always_inline))

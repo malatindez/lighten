@@ -44,7 +44,6 @@ namespace engine::direct3d
         DefaultUniformBuffer(uint32_t cpu_access_flags = 0, uint32_t misc_flags = 0)
             : DefaultBuffer<T>(_detail::CreateBasicBufferDesc(D3D11_BIND_CONSTANT_BUFFER, cpu_access_flags, misc_flags)) {}
 
-
         void Update(void const *data, uint32_t data_size)
         {
             direct3d::api().devcon->UpdateSubresource(&DynamicBuffer<T>::buffer(), 0, nullptr, &data, 0, 0);
@@ -59,7 +58,6 @@ namespace engine::direct3d
             auto *temp = DynamicBuffer<T>::buffer();
             _uniform_buffer_detail::Bind(&temp, type, slot);
         }
-
     };
 
     template <typename T>
@@ -85,6 +83,5 @@ namespace engine::direct3d
         {
             _uniform_buffer_detail::Bind(&DynamicBuffer<T>::buffer(), type, slot);
         }
-
     };
 }

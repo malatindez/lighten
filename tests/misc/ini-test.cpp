@@ -1,4 +1,3 @@
-
 #include <filesystem>
 #include <fstream>
 #include <misc/ini.hpp>
@@ -56,8 +55,8 @@ TEST(TEST_INI, TestTrimming)
 {
     auto conf = ini::Ini::Deserialize(R"(
 [A]
-  B = 0  #comments test  23 
-   C    =      1  ; test   
+  B = 0  #comments test  23
+   C    =      1  ; test
 D   =           5)");
     ASSERT_EQ(conf["A"]["B"], 0);
     ASSERT_EQ(conf["A"]["C"], 1);

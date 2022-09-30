@@ -2,7 +2,6 @@
 #include "../debug.hpp"
 namespace engine::utils
 {
-
     inline std::string CurrentSourceLocation(std::source_location location = std::source_location::current())
     {
         std::stringstream ss;
