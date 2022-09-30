@@ -4,6 +4,104 @@
 #include "../../core/shader-manager.hpp"
 #include "utils/utils.hpp"
 
+namespace engine::render
+{
+    void OpaqueMaterial::UpdateTextureFlags() {
+        texture_flags = 0;
+        texture_flags |= (ambient != nullptr) ? 1 : 0;
+        texture_flags |= (albedo_map != nullptr) ? 1 << 1 : 0;
+        texture_flags |= (normal_map != nullptr) ? 1 << 2 : 0;
+        texture_flags |= (shininess_map != nullptr) ? 1 << 3 : 0;
+        texture_flags |= (metalness_map != nullptr) ? 1 << 4 : 0;
+        texture_flags |= (ambient_occlusion_map != nullptr) ? 1 << 6 : 0;
+        texture_flags |= (roughness_map != nullptr) ? 1 << 5 : 0;
+        texture_flags |= (reflection_map != nullptr) ? 1 << 7 : 0;
+        texture_flags |= (reverse_normal_y) ? 1 << 8 : 0;
+    }
+
+    void OpaqueMaterial::Bind(direct3d::DynamicUniformBuffer<_opaque_detail::OpaquePerMaterial> &uniform_buffer) const
+    {
+        if (ambient != nullptr) {
+            direct3d::api().devcon4->PSSetShaderResources(0, 1, &ambient);
+        }
+        if (albedo_map != nullptr) {
+            direct3d::api().devcon4->PSSetShaderResources(1, 1, &albedo_map);
+        }
+        if (normal_map != nullptr) {
+            direct3d::api().devcon4->PSSetShaderResources(2, 1, &normal_map);
+        }
+        if (shininess_map != nullptr) {
+            direct3d::api().devcon4->PSSetShaderResources(3, 1, &shininess_map);
+        }
+        if (metalness_map != nullptr) {
+            direct3d::api().devcon4->PSSetShaderResources(4, 1, &metalness_map);
+        }
+        if (roughness_map != nullptr) {
+            direct3d::api().devcon4->PSSetShaderResources(5, 1, &roughness_map);
+        }
+        if (ambient_occlusion_map != nullptr) {
+            direct3d::api().devcon4->PSSetShaderResources(6, 1, &ambient_occlusion_map);
+        }
+        if (reflection_map != nullptr) {
+            direct3d::api().devcon4->PSSetShaderResources(7, 1, &reflection_map);
+        }
+        _opaque_detail::OpaquePerMaterial temporary;
+        temporary.ambient_color = ambient_color;
+        temporary.albedo_color = albedo_color;
+        temporary.reflective_color = reflective_color;
+        temporary.shininess = shininess_value;
+        temporary.metalness = metalness_value;
+        temporary.roughness = roughness_value;
+        temporary.reflectance = reflectance_value;
+        temporary.enabled_texture_flags = texture_flags;
+        temporary.uv_multiplier = uv_multiplier;
+        uniform_buffer.Update(temporary);
+    }
+    OpaqueMaterial::OpaqueMaterial(Material const &material)
+    {
+        if (material.ambient_textures.size() > 0)
+        {
+            albedo_map = material.ambient_textures.front();
+        }
+        if (material.diffuse_textures.size() > 0)
+        {
+            albedo_map = material.diffuse_textures.front();
+        }
+        if (material.normal_textures.size() > 0)
+        {
+            normal_map = material.normal_textures.front();
+        }
+        if (material.shininess_textures.size() > 0)
+        {
+            shininess_map = material.shininess_textures.front();
+        }
+        if (material.metalness_textures.size() > 0)
+        {
+            metalness_map = material.metalness_textures.front();
+        }
+        if (material.diffuse_roughness_textures.size() > 0)
+        {
+            metalness_map = material.diffuse_roughness_textures.front();
+        }
+        if (material.ambient_occlusion_textures.size() > 0)
+        {
+            metalness_map = material.ambient_occlusion_textures.front();
+        }
+        if (material.reflection_textures.size() > 0)
+        {
+            reflection_map = material.reflection_textures.front();
+        }
+        texture_flags = 0;
+        UpdateTextureFlags();
+        ambient_color = material.ambient_color;
+        albedo_color = material.diffuse_color;
+        reflective_color = material.reflective_color;
+        shininess_value = material.shininess;
+        metalness_value = material.metalness;
+        roughness_value = material.roughness;
+        reflectance_value = material.reflectivity;
+    }
+}
 namespace engine::render::_opaque_detail
 {
     OpaqueRenderSystem::OpaqueRenderSystem()
@@ -13,18 +111,21 @@ namespace engine::render::_opaque_detail
         std::vector<D3D11_INPUT_ELEMENT_DESC> d3d_input_desc{
          {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
          {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+         {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0},
+         {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0},
+         {"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D11_INPUT_PER_VERTEX_DATA, 0},
          { "ROWX",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA,  1},
          { "ROWY",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1},
          { "ROWZ",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1},
          { "ROWW",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1}
         };
 
-        auto vs = core::ShaderManager::instance()->CompileVertexShader(path / opaque_shader_path);
-        auto ps = core::ShaderManager::instance()->CompilePixelShader(path / opaque_shader_path);
+        auto vs = core::ShaderManager::instance()->CompileVertexShader(path / opaque_vs_shader_path);
+        auto ps = core::ShaderManager::instance()->CompilePixelShader(path / opaque_ps_shader_path);
         auto il = std::make_shared<InputLayout>(vs->blob(), d3d_input_desc);
         opaque_shader_.SetVertexShader(vs).SetPixelShader(ps).SetInputLayout(il);
     }
-    void OpaqueRenderSystem::Render()
+    void OpaqueRenderSystem::Render(entt::registry &registry)
     {
         if (instance_buffer_.size() == 0)
             return;
@@ -33,13 +134,51 @@ namespace engine::render::_opaque_detail
         direct3d::api().devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         direct3d::api().devcon4->RSSetState(direct3d::states().cull_back);
         direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().point_wrap_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(1, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
         direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth, 0);
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 
         mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 1);
 
         instance_buffer_.Bind(1);
+        OpaquePerFrame opaque_per_frame;
+        {
+            auto point_lights = registry.view<components::TransformComponent, components::PointLight>();
+            auto spot_lights = registry.view<components::TransformComponent, components::SpotLight>();
+            auto directional_lights = registry.view<components::TransformComponent, components::DirectionalLight>();
+            opaque_per_frame.num_point_lights = opaque_per_frame.num_spot_lights = opaque_per_frame.num_directional_lights = 0;
+            for (entt::entity entity : point_lights)
+            {
+                auto &opaque_point_light = opaque_per_frame.point_lights[opaque_per_frame.num_point_lights];
+                auto &registry_point_light = registry.get<components::PointLight>(entity);
+                auto &registry_transform = registry.get<components::TransformComponent>(entity);
+                opaque_point_light.color = registry_point_light.color;
+                opaque_point_light.power = registry_point_light.power;
+                opaque_point_light.position = registry_transform.position;
+                opaque_point_light.radius = length(registry_transform.scale);
 
+                if (++opaque_per_frame.num_point_lights >= 32) { break; }
+            }
+            for (entt::entity entity : spot_lights)
+            {
+                auto &opaque_spot_light = opaque_per_frame.spot_lights[opaque_per_frame.num_spot_lights];
+                auto &registry_point_light = registry.get<components::PointLight>(entity);
+                auto &registry_transform = registry.get<components::TransformComponent>(entity);
+                opaque_spot_light.color = registry_point_light.color;
+                opaque_spot_light.power = registry_point_light.power;
+                opaque_spot_light.position = registry_transform.position;
+                opaque_spot_light.radius = length(registry_transform.scale);
+                if (++opaque_per_frame.num_spot_lights >= 32) { break; }
+            }
+            for (entt::entity entity : directional_lights)
+            {
+                opaque_per_frame.directional_lights[opaque_per_frame.num_directional_lights] = registry.get<components::DirectionalLight>(entity);
+                if (++opaque_per_frame.num_directional_lights >= 4) { break; }
+            }
+        }
+        opaque_per_frame_buffer_.Bind(direct3d::ShaderType::PixelShader, 1);
+        opaque_per_frame_buffer_.Update(opaque_per_frame);
+        opaque_per_material_buffer_.Bind(direct3d::ShaderType::PixelShader, 2);
         uint32_t renderedInstances = 0;
         for (const auto &model_instance : model_instances_)
         {
@@ -48,8 +187,8 @@ namespace engine::render::_opaque_detail
 
             for (uint32_t meshIndex = 0; meshIndex < model_instance.mesh_instances.size(); ++meshIndex)
             {
-                Mesh const &mesh = model_instance.model.meshes[meshIndex];
-                auto const &meshRange = mesh.mesh_range;
+                ModelMesh const &mesh = model_instance.model.meshes[meshIndex];
+                auto const &mesh_range = mesh.mesh_range;
                 mesh_to_model_buffer_.Update(OpaqueInstance{ .world_transform = mesh.mesh_to_model });
 
                 for (auto const &perMaterial : model_instance.mesh_instances[meshIndex].material_instances)
@@ -57,11 +196,10 @@ namespace engine::render::_opaque_detail
                     if (perMaterial.instances.empty()) continue;
 
                     const auto &material = perMaterial.material;
-
-                    direct3d::api().devcon4->PSSetShaderResources(0, 1, &material.albedo);
+                    material.Bind(opaque_per_material_buffer_);
 
                     uint32_t numInstances = uint32_t(perMaterial.instances.size());
-                    direct3d::api().devcon4->DrawIndexedInstanced(meshRange.index_num, numInstances, meshRange.index_offset, meshRange.vertex_offset, renderedInstances);
+                    direct3d::api().devcon4->DrawIndexedInstanced(mesh_range.index_count, numInstances, mesh_range.index_offset, mesh_range.vertex_offset, renderedInstances);
                     renderedInstances += numInstances;
                 }
             }
@@ -82,7 +220,7 @@ namespace engine::render::_opaque_detail
 
         auto mapping = instance_buffer_.Map();
         OpaqueInstance *dst = static_cast<OpaqueInstance *>(mapping.pData);
-        auto instance_group = registry.group<components::TransformComponent, components::OpaqueComponent>();
+        auto instance_group = registry.group<components::OpaqueComponent>(entt::get<components::TransformComponent>);
         uint32_t copiedNum = 0;
         for (auto &model_instance : model_instances_)
         {
@@ -99,6 +237,16 @@ namespace engine::render::_opaque_detail
             }
         }
         instance_buffer_.Unmap();
+    }
+
+    ModelInstance *OpaqueRenderSystem::GetInstancePtr(uint64_t model_id)
+    {
+        auto it = std::find_if(model_instances_.begin(), model_instances_.end(), [&model_id] (auto const &instance) { return instance.model_id == model_id; });
+        if (it != model_instances_.end())
+        {
+            return &(*it);
+        }
+        return nullptr;
     }
     ModelInstance &OpaqueRenderSystem::GetInstance(uint64_t model_id)
     {
@@ -172,5 +320,4 @@ namespace engine::render::_opaque_detail
         }
         registry.emplace<components::OpaqueComponent>(entity, components::OpaqueComponent{ .model_id = model_id });
     }
-
 }
