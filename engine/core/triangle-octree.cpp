@@ -5,8 +5,9 @@ namespace engine::core
     const int TriangleOctree::PREFFERED_TRIANGLE_COUNT = 32;
     const float TriangleOctree::MAX_STRETCHING_RATIO = 1.05f;
 
-    void TriangleOctree::initialize(render::Mesh const &mesh)
+    void TriangleOctree::initialize(render::ModelMesh const &model_mesh)
     {
+        render::Mesh const &mesh = model_mesh.mesh;
         m_triangles.clear();
         m_triangles.shrink_to_fit();
 
@@ -14,13 +15,13 @@ namespace engine::core
         m_children = nullptr;
 
         const math::vec3 eps{ 1e-5f, 1e-5f, 1e-5f };
-        m_box = m_initialBox = math::Box{ mesh.mesh_range.bounding_box.min - eps, mesh.mesh_range.bounding_box.max + eps };
+        m_box = m_initialBox = math::Box{ model_mesh.mesh_range.bounding_box.min - eps, model_mesh.mesh_range.bounding_box.max + eps };
 
         for (size_t i = 0; i < mesh.indices.size();)
         {
-            auto const &V1 = mesh.vertices[mesh.indices[i++]].coords;
-            auto const &V2 = mesh.vertices[mesh.indices[i++]].coords;
-            auto const &V3 = mesh.vertices[mesh.indices[i++]].coords;
+            auto const &V1 = mesh.vertices[mesh.indices[i++]].position;
+            auto const &V2 = mesh.vertices[mesh.indices[i++]].position;
+            auto const &V3 = mesh.vertices[mesh.indices[i++]].position;
 
             math::vec3 center = (V1 + V2 + V3) / 3.f;
 
@@ -29,7 +30,7 @@ namespace engine::core
         }
     }
 
-    void TriangleOctree::initialize(const render::Mesh &mesh, const math::Box &parentBox, const math::vec3 &parentCenter, int octetIndex)
+    void TriangleOctree::initialize(render::Mesh const &mesh, const math::Box &parentBox, const math::vec3 &parentCenter, int octetIndex)
     {
         m_mesh = &mesh;
         m_children = nullptr;
@@ -111,9 +112,9 @@ namespace engine::core
 
                 for (uint32_t index : m_triangles)
                 {
-                    auto const &P1 = m_mesh->vertices[m_mesh->indices[index * 3]].coords;
-                    auto const &P2 = m_mesh->vertices[m_mesh->indices[index * 3 + 1]].coords;
-                    auto const &P3 = m_mesh->vertices[m_mesh->indices[index * 3 + 2]].coords;
+                    auto const &P1 = m_mesh->vertices[m_mesh->indices[index * 3]].position;
+                    auto const &P2 = m_mesh->vertices[m_mesh->indices[index * 3 + 1]].position;
+                    auto const &P3 = m_mesh->vertices[m_mesh->indices[index * 3 + 2]].position;
 
                     math::vec3 P = (P1 + P2 + P3) / 3.f;
 
@@ -165,13 +166,14 @@ namespace engine::core
 
         for (uint32_t i = 0; i < m_triangles.size(); ++i)
         {
-            auto const &V1 = m_mesh->vertices[m_mesh->indices[m_triangles[i] * 3]].coords;
-            auto const &V2 = m_mesh->vertices[m_mesh->indices[m_triangles[i] * 3 + 1]].coords;
-            auto const &V3 = m_mesh->vertices[m_mesh->indices[m_triangles[i] * 3 + 2]].coords;
+            auto const &V1 = m_mesh->vertices[m_mesh->indices[m_triangles[i] * 3]].position;
+            auto const &V2 = m_mesh->vertices[m_mesh->indices[m_triangles[i] * 3 + 1]].position;
+            auto const &V3 = m_mesh->vertices[m_mesh->indices[m_triangles[i] * 3 + 2]].position;
 
             if (math::Triangle::Intersect(V1, V2, V3, nearest, ray))
             {
                 nearest.triangle = i;
+                nearest.mesh_ptr = m_mesh;
                 found = true;
             }
         }
@@ -217,6 +219,7 @@ namespace engine::core
 
             if ((*m_children)[boxIntersections[i].index].intersectInternal(ray, nearest))
             {
+                nearest.mesh_ptr = m_mesh;
                 found = true;
             }
         }
