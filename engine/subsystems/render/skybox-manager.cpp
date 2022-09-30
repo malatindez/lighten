@@ -1,4 +1,3 @@
-#pragma once
 #include "skybox-manager.hpp"
 #include "../core/shader-manager.hpp"
 namespace engine
@@ -53,8 +52,8 @@ namespace engine
     {
         auto path = std::filesystem::current_path();
 
-        auto vs = core::ShaderManager::instance()->CompileVertexShader(path / skybox_shader_path);
-        auto ps = core::ShaderManager::instance()->CompilePixelShader(path / skybox_shader_path);
+        auto vs = core::ShaderManager::instance()->CompileVertexShader(path / skybox_vs_shader_path);
+        auto ps = core::ShaderManager::instance()->CompilePixelShader(path / skybox_ps_shader_path);
 
         skybox_shader_.SetVertexShader(vs).SetPixelShader(ps);
         skybox_buffer_ = std::make_unique<direct3d::DynamicUniformBuffer<core::math::mat4x3>>();
