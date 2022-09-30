@@ -120,21 +120,23 @@ namespace engine::core
             }
             return image;
         }
-
     }
 
     TextureId TextureManager::LoadTexture(std::filesystem::path const &path, bool generate_mipmaps)
     {
         utils::AlwaysAssert(path.is_absolute(), "Paths provided to texture manager should be absolute!");
         utils::Assert(path.has_extension(), "Path to texture should have an extension");
-        if (auto it = instance_->hash_ids_.find(std::filesystem::hash_value(path));
-            it != instance_->hash_ids_.end())
+        if (auto it = instance_->texture_hashes_.find(std::filesystem::hash_value(path));
+            it != instance_->texture_hashes_.end())
         {
             return it->second;
         }
         auto shader_resource_view = LoadTextureFromPath(path, generate_mipmaps);
+        std::filesystem::path relative_path = path.lexically_relative(std::filesystem::current_path());
+        if (relative_path.empty()) relative_path = path;
+        instance_->texture_paths_.emplace(std::make_pair(instance_->current_id_, relative_path));
         instance_->textures_.emplace(std::make_pair(instance_->current_id_, shader_resource_view));
-        instance_->hash_ids_.emplace(std::make_pair(std::filesystem::hash_value(path), instance_->current_id_));
+        instance_->texture_hashes_.emplace(std::make_pair(std::filesystem::hash_value(path), instance_->current_id_));
         return instance_->current_id_++;
     }
 
@@ -142,8 +144,8 @@ namespace engine::core
     {
         std::string extension = utils::as_lowercase(path.extension().string());
         utils::Assert(extension == ".dds", "Single-file cubemap has to be in dds format");
-        if (auto it = instance_->hash_ids_.find(std::filesystem::hash_value(path));
-            it != instance_->hash_ids_.end())
+        if (auto it = instance_->texture_hashes_.find(std::filesystem::hash_value(path));
+            it != instance_->texture_hashes_.end())
         {
             return it->second;
         }
@@ -165,7 +167,10 @@ namespace engine::core
             "Failed to load dds texture from file @" + path.string());
 
         instance_->textures_.emplace(std::make_pair(instance_->current_id_, shader_resource_view));
-        instance_->hash_ids_.emplace(std::make_pair(std::filesystem::hash_value(path), instance_->current_id_));
+        std::filesystem::path relative_path = path.lexically_relative(std::filesystem::current_path());
+        if (relative_path.empty()) relative_path = path;
+        instance_->texture_paths_.emplace(std::make_pair(instance_->current_id_, relative_path));
+        instance_->texture_hashes_.emplace(std::make_pair(std::filesystem::hash_value(path), instance_->current_id_));
         return instance_->current_id_++;
     }
     TextureId TextureManager::LoadCubemap(std::array<std::filesystem::path, 6> const &cubemap_textures, bool generate_mipmaps)
@@ -227,6 +232,5 @@ namespace engine::core
         if (generate_mipmaps) direct3d::api().devcon->GenerateMips(shader_resource_view);
         instance_->textures_.emplace(std::make_pair(instance_->current_id_, shader_resource_view));
         return instance_->current_id_++;
-
     }
 }
