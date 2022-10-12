@@ -26,13 +26,23 @@ namespace engine::direct3d
 
         ReadOnlyDepthStencilState geq_depth;
         ReadOnlyDepthStencilState geq_depth_no_write;
+        ReadOnlyDepthStencilState no_depth_no_write;
 
         ReadOnlySamplerState point_wrap_sampler;
         ReadOnlySamplerState point_clamp_sampler;
-        ReadOnlySamplerState linear_wrap_sampler;
-        ReadOnlySamplerState linear_clamp_sampler;
+        ReadOnlySamplerState bilinear_wrap_sampler;
+        ReadOnlySamplerState bilinear_clamp_sampler;
+        ReadOnlySamplerState trilinear_wrap_sampler;
+        ReadOnlySamplerState trilinear_clamp_sampler;
         ReadOnlySamplerState anisotropic_wrap_sampler;
         ReadOnlySamplerState anisotropic_clamp_sampler;
+        ReadOnlySamplerState comparison_point_wrap_sampler;
+        ReadOnlySamplerState comparison_point_clamp_sampler;
+        ReadOnlySamplerState comparison_linear_wrap_sampler;
+        ReadOnlySamplerState comparison_linear_clamp_sampler;
+        ReadOnlySamplerState comparison_anisotropic_wrap_sampler;
+        ReadOnlySamplerState comparison_anisotropic_clamp_sampler;
+
 
         [[nodiscard]] static inline States &instance() { utils::Assert(instance_ != nullptr, "States not initialized"); return *instance_; }
     private:

@@ -87,7 +87,7 @@ namespace engine::components
         core::math::mat4 inv_projection{ 1 };
         core::math::mat4 inv_view_projection{ 1 };
         float fovy_ = core::math::radians(45.0f);
-        float z_near_ = 200.0f;
+        float z_near_ = 20000.0f;
         float z_far_ = 0.002f;
     };
     struct PointLight final
@@ -110,8 +110,7 @@ namespace engine::components
         DirectionalLight &operator=(const DirectionalLight &) = default;
         DirectionalLight &operator=(DirectionalLight &&) = default;
         ~DirectionalLight() = default;
-
-        core::math::vec3 direction;
+        // direction is determined by transform
         float solid_angle;
         core::math::vec3 color;
         float power;

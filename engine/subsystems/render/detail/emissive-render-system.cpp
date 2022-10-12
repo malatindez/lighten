@@ -20,6 +20,7 @@ namespace engine::render::_emissive_detail
          { "ROWY",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1 * sizeof(core::math::vec4), D3D11_INPUT_PER_INSTANCE_DATA, 1},
          { "ROWZ",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 2 * sizeof(core::math::vec4), D3D11_INPUT_PER_INSTANCE_DATA, 1},
          { "ROWW",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 3 * sizeof(core::math::vec4), D3D11_INPUT_PER_INSTANCE_DATA, 1},
+         {"EMISSION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 4 * sizeof(core::math::vec4), D3D11_INPUT_PER_INSTANCE_DATA, 1},
         };
         auto vs = core::ShaderManager::instance()->CompileVertexShader(path / emissive_vs_shader_path);
         auto ps = core::ShaderManager::instance()->CompilePixelShader(path / emissive_ps_shader_path);
@@ -34,7 +35,7 @@ namespace engine::render::_emissive_detail
 
         direct3d::api().devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         direct3d::api().devcon4->RSSetState(direct3d::states().cull_back);
-        direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().point_wrap_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
         direct3d::api().devcon4->PSSetSamplers(1, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
         direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth, 0);
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
@@ -63,12 +64,8 @@ namespace engine::render::_emissive_detail
                         buffer.use_emissive_texture)
                     {
                         direct3d::api().devcon4->PSSetShaderResources(0, 1, &material.emissive_texture);
+                        buffer.power = material.power;
                     }
-                    else
-                    {
-                        buffer.emissive_color = material.emissive_color;
-                    }
-                    buffer.power = material.power;
                     emissive_shader_buffer_.Update(buffer);
                     uint32_t numInstances = uint32_t(perMaterial.instances.size());
                     direct3d::api().devcon4->DrawIndexedInstanced(mesh_range.index_count, numInstances, mesh_range.index_offset, mesh_range.vertex_offset, renderedInstances);
@@ -103,7 +100,11 @@ namespace engine::render::_emissive_detail
                     auto &instances = perMaterial.instances;
                     for (auto entity : instances)
                     {
-                        dst[copiedNum++] = EmissiveInstance{ .world_transform = instance_group.get<components::TransformComponent>(entity).model };
+                        dst[copiedNum++] = EmissiveInstance
+                        { 
+                            .world_transform = instance_group.get<components::TransformComponent>(entity).model, 
+                            .emissive_color = perMaterial.material.emissive_color * perMaterial.material.power 
+                        };
                     }
                 }
             }

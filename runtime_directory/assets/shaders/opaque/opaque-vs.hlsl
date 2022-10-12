@@ -31,9 +31,9 @@ VS_OUTPUT vs_main(VS_INPUT input) {
   output.fragment_position = output.pos.xyz;
   output.pos = mul(output.pos, g_view_projection);
   output.texcoord = input.texcoord;
-  output.normal = mul(normalize(input.normal), (float3x3)world_transform);
-  output.tangent = mul(normalize(input.tangent), (float3x3)world_transform);
-  output.bitangent = mul(normalize(input.bitangent), (float3x3)world_transform);
+  output.normal = normalize(mul(normalize(input.normal), (float3x3)world_transform));
+  output.tangent = normalize(mul(normalize(input.tangent), (float3x3)world_transform));
+  output.bitangent = normalize(mul(normalize(input.bitangent), (float3x3)world_transform));
   output.world_transform = world_transform;
   return output;
 }

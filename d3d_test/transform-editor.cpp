@@ -234,6 +234,7 @@ namespace object_editor
             ImGui::SameLine();
             ImGui::Text("UV multiplier");
             ImGui::Checkbox("Reverse normal y", &material->reverse_normal_y);
+            ImGui::Checkbox("Normal map is sRGB", &material->normal_map_srgb);
             if (!ambient_texture_enabled)
                 ambient_texture_id = kInvalidTextureId;
             if (!albedo_map_texture_enabled)
@@ -309,7 +310,7 @@ namespace object_editor
             ImGui::InputScalar("Texture ID", ImGuiDataType_U64, &texture_id, nullptr, nullptr, "%llu");
             ImGui::EndDisabled();
             ImGui::ColorEdit3("Emissive color", material->emissive_color.data.data());
-            ImGui::SliderFloat("Emissive power", &material->power, -10.0f, 100.0f);
+            ImGui::SliderFloat("Power", &material->power, 0, 1e6f);
             if (!texture_enabled)
                 texture_id = kInvalidTextureId;
             if (saved_texture_id != texture_id)
@@ -421,7 +422,6 @@ namespace object_editor
             ImGui::Text("Directional light");
             ImGui::ColorEdit3("Color", directional_light->color.data.data());
             ImGui::SliderFloat("Power", &directional_light->power, 0, 1e6f);
-            ImGui::InputFloat3("Direction", directional_light->direction.data.data());
             ImGui::InputFloat("Solid angle", &directional_light->solid_angle);
         }
     }

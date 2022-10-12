@@ -21,7 +21,7 @@ namespace engine::core
             {
                 direct3d::AlwaysAssert(
                     DirectX::CreateDDSTextureFromFile(direct3d::api().device5, direct3d::api().devcon4, path.wstring().c_str(), &texture_resource.reset(), &shader_resource_view.reset()),
-                    "Failed to load dds texture from file @" + path.string());
+                    "Failed to load DDS texture from file @" + path.string());
             }
             else if (extension == ".hdr")
             {
@@ -94,7 +94,7 @@ namespace engine::core
                                                       path.wstring().c_str(),
                                                       &texture_resource.reset(),
                                                       &shader_resource_view.reset()),
-                    "Failed to load wic texture from file @" + path.string());
+                    "Failed to load WIC texture from file @" + path.string());
             }
             return shader_resource_view;
         }
@@ -143,7 +143,7 @@ namespace engine::core
     TextureId TextureManager::LoadCubemap(std::filesystem::path const &path)
     {
         std::string extension = utils::as_lowercase(path.extension().string());
-        utils::Assert(extension == ".dds", "Single-file cubemap has to be in dds format");
+        utils::Assert(extension == ".dds", "Single-file cubemap has to be in DDS format");
         if (auto it = instance_->texture_hashes_.find(std::filesystem::hash_value(path));
             it != instance_->texture_hashes_.end())
         {
@@ -164,7 +164,7 @@ namespace engine::core
                                                 DirectX::DDS_LOADER_DEFAULT,
                                                 &texture_resource.reset(),
                                                 &shader_resource_view.reset()),
-            "Failed to load dds texture from file @" + path.string());
+            "Failed to load DDS texture from file @" + path.string());
 
         instance_->textures_.emplace(std::make_pair(instance_->current_id_, shader_resource_view));
         std::filesystem::path relative_path = path.lexically_relative(std::filesystem::current_path());

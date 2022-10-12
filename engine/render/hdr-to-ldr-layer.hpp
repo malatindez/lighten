@@ -41,7 +41,7 @@ namespace engine::render
     private:
         static constexpr auto vs_shader_path = "assets/shaders/post-processing/hdr-to-ldr-vs.hlsl";
         static constexpr auto ps_shader_path = "assets/shaders/post-processing/hdr-to-ldr-ps.hlsl";
-        float exposure_ = 1.0f;
+        float exposure_ = -1.0f;
         GraphicsShaderProgram shader_;
         direct3d::DynamicUniformBuffer<Buffer> constant_buffer_;
         direct3d::SwapchainRenderTarget &window_render_target_;

@@ -21,7 +21,7 @@ float3 AcesHdrToLdr(float3 hdr) {
   float3 ldr = clamp(mul(a / b, m2), 0.0f, 1.0f);
   return ldr;
 }
-float3 AdjustGamma(float3 color, float gamma) {
+float3 ApplyGammaCorrection(float3 color, float gamma) {
   return pow(color, gamma);
 }
 

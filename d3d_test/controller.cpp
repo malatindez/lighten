@@ -83,7 +83,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
             cobblestone_material.shininess_value = 0;
             cobblestone_material.reflectance_value = 0;
             cobblestone_material.UpdateTextureFlags();
-            cobblestone_material.uv_multiplier = vec2{ 5 };
+            cobblestone_material.uv_multiplier = vec2{ 1 };
         }
         {
             crystal_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Crystal\\Crystal_COLOR.png");
@@ -95,7 +95,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
             crystal_material.roughness_value = 0.001f;
             crystal_material.reflectance_value = 0;
             crystal_material.UpdateTextureFlags();
-            crystal_material.uv_multiplier = vec2{ 5 };
+            crystal_material.uv_multiplier = vec2{ 1 };
         }
         {
             mud_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Mud\\Mud_Albedo.png");
@@ -107,7 +107,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
             mud_material.shininess_value = 0;
             mud_material.reflectance_value = 0;
             mud_material.UpdateTextureFlags();
-            mud_material.uv_multiplier = vec2{ 5 };
+            mud_material.uv_multiplier = vec2{ 1 };
         }
         {
             mudroad_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\MudRoad\\MudRoad_albedo.tif");
@@ -119,7 +119,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
             mudroad_material.shininess_value = 0;
             mudroad_material.reflectance_value = 0;
             mudroad_material.UpdateTextureFlags();
-            mudroad_material.uv_multiplier = vec2{ 5 };
+            mudroad_material.uv_multiplier = vec2{ 1 };
         }
         {
             stone_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Stone\\Stone_COLOR.png");
@@ -131,7 +131,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
             stone_material.shininess_value = 0;
             stone_material.reflectance_value = 0;
             stone_material.UpdateTextureFlags();
-            stone_material.uv_multiplier = vec2{ 5 };
+            stone_material.uv_multiplier = vec2{ 1 };
         }
     }
     {
@@ -141,8 +141,8 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
             auto model_id = render::ModelSystem::GetUnitCube();
             auto cube = registry.create();
             auto &transform = registry.emplace<TransformComponent>(cube);
-            transform.position = vec3{ 2 * i - (int32_t)materials.size() / 2, 0, -8 };
-            transform.scale = vec3{ 0.01f };
+            transform.position = vec3{ i - (int32_t)materials.size() / 2, 0, -8 };
+            transform.scale = vec3{ 1 };
             transform.UpdateMatrices();
             render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, cube, { materials[i] });
         }
@@ -153,7 +153,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
         auto cube = registry.create();
         auto &transform = registry.emplace<TransformComponent>(cube);
         transform.position = vec3{ 0, -0.5f, 0 };
-        transform.scale = vec3{ 0.05f,0.001f,0.05f };
+        transform.scale = vec3{ 10,0.1,10 };
         transform.UpdateMatrices();
         render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, cube, { stone_material });
     }
@@ -162,7 +162,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
         auto cube = registry.create();
         auto &transform = registry.emplace<TransformComponent>(cube);
         transform.position = vec3{ -5, 4.5f, 0 };
-        transform.scale = vec3{ 0.05f,0.001f,0.05f };
+        transform.scale = vec3{ 10,0.1,10 };
         transform.rotation = QuaternionFromEuler(0.0f, 0.0f, radians(90.0f));
         transform.UpdateMatrices();
         render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, cube, { stone_material });
@@ -177,8 +177,8 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
         transform.UpdateMatrices();
         auto &point_light = registry.emplace<PointLight>(entity);
         point_light.color = vec3{ 0.988, 0.933, 0.655 };
-        point_light.power = 1e4f;
-        render::ModelSystem::instance().AddEmissiveInstance(model_id, registry, entity, { render::EmissiveMaterial(vec3{0.988, 0.933, 0.655}, 5) });
+        point_light.power = 1e3f;
+        render::ModelSystem::instance().AddEmissiveInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
     }
     if (false) {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
@@ -189,8 +189,8 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
         transform.UpdateMatrices();
         auto &point_light = registry.emplace<PointLight>(entity);
         point_light.color = vec3{ 0.988, 0.933, 0.655 };
-        point_light.power = 1e4f;
-        render::ModelSystem::instance().AddEmissiveInstance(model_id, registry, entity, { render::EmissiveMaterial(vec3{0.988, 0.933, 0.655}, 5) });
+        point_light.power = 1e3f;
+        render::ModelSystem::instance().AddEmissiveInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
     }
     if (false) {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
@@ -201,8 +201,8 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
         transform.UpdateMatrices();
         auto &point_light = registry.emplace<PointLight>(entity);
         point_light.color = vec3{ 0.988, 0.933, 0.655 };
-        point_light.power = 1e4f;
-        render::ModelSystem::instance().AddEmissiveInstance(model_id, registry, entity, { render::EmissiveMaterial(vec3{0.988, 0.933, 0.655}, 5) });
+        point_light.power = 1e3f;
+        render::ModelSystem::instance().AddEmissiveInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
     }
 
     const auto skybox_path = std::filesystem::current_path() / "assets/textures/skyboxes/yokohama";

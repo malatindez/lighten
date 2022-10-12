@@ -13,10 +13,11 @@ namespace engine::render
         texture_flags |= (normal_map != nullptr) ? 1 << 2 : 0;
         texture_flags |= (shininess_map != nullptr) ? 1 << 3 : 0;
         texture_flags |= (metalness_map != nullptr) ? 1 << 4 : 0;
-        texture_flags |= (ambient_occlusion_map != nullptr) ? 1 << 6 : 0;
         texture_flags |= (roughness_map != nullptr) ? 1 << 5 : 0;
+        texture_flags |= (ambient_occlusion_map != nullptr) ? 1 << 6 : 0;
         texture_flags |= (reflection_map != nullptr) ? 1 << 7 : 0;
         texture_flags |= (reverse_normal_y) ? 1 << 8 : 0;
+        texture_flags |= (normal_map_srgb) ? 1 << 9 : 0;
     }
 
     void OpaqueMaterial::Bind(direct3d::DynamicUniformBuffer<_opaque_detail::OpaquePerMaterial> &uniform_buffer) const
@@ -81,11 +82,11 @@ namespace engine::render
         }
         if (material.diffuse_roughness_textures.size() > 0)
         {
-            metalness_map = material.diffuse_roughness_textures.front();
+            roughness_map = material.diffuse_roughness_textures.front();
         }
         if (material.ambient_occlusion_textures.size() > 0)
         {
-            metalness_map = material.ambient_occlusion_textures.front();
+            ambient_occlusion_map = material.ambient_occlusion_textures.front();
         }
         if (material.reflection_textures.size() > 0)
         {
@@ -133,7 +134,7 @@ namespace engine::render::_opaque_detail
 
         direct3d::api().devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         direct3d::api().devcon4->RSSetState(direct3d::states().cull_back);
-        direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().point_wrap_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
         direct3d::api().devcon4->PSSetSamplers(1, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
         direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth, 0);
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
@@ -152,28 +153,42 @@ namespace engine::render::_opaque_detail
                 auto &opaque_point_light = opaque_per_frame.point_lights[opaque_per_frame.num_point_lights];
                 auto &registry_point_light = registry.get<components::PointLight>(entity);
                 auto &registry_transform = registry.get<components::TransformComponent>(entity);
-                opaque_point_light.color = registry_point_light.color;
-                opaque_point_light.power = registry_point_light.power;
+                opaque_point_light.color = registry_point_light.color * registry_point_light.power;
                 opaque_point_light.position = registry_transform.position;
                 opaque_point_light.radius = length(registry_transform.scale);
 
-                if (++opaque_per_frame.num_point_lights >= 32) { break; }
+                if (++opaque_per_frame.num_point_lights >= kOpaqueShaderMaxPointLights)
+                {
+                    utils::AlwaysAssert(false, "Amount of point lights on the scene went beyond the maximum amount.");
+                    break;
+                }
             }
             for (entt::entity entity : spot_lights)
             {
                 auto &opaque_spot_light = opaque_per_frame.spot_lights[opaque_per_frame.num_spot_lights];
-                auto &registry_point_light = registry.get<components::PointLight>(entity);
+                auto &registry_spot_light = registry.get<components::SpotLight>(entity);
                 auto &registry_transform = registry.get<components::TransformComponent>(entity);
-                opaque_spot_light.color = registry_point_light.color;
-                opaque_spot_light.power = registry_point_light.power;
+                opaque_spot_light.color = registry_spot_light.color * registry_spot_light.power;
                 opaque_spot_light.position = registry_transform.position;
-                opaque_spot_light.radius = length(registry_transform.scale);
-                if (++opaque_per_frame.num_spot_lights >= 32) { break; }
+                if (++opaque_per_frame.num_spot_lights >= kOpaqueShaderMaxSpotLights)
+                {
+                    utils::AlwaysAssert(false, "Amount of spot lights on the scene went beyond the maximum amount.");
+                    break;
+                }
             }
             for (entt::entity entity : directional_lights)
             {
-                opaque_per_frame.directional_lights[opaque_per_frame.num_directional_lights] = registry.get<components::DirectionalLight>(entity);
-                if (++opaque_per_frame.num_directional_lights >= 4) { break; }
+                auto &opaque_directional_light = opaque_per_frame.directional_lights[opaque_per_frame.num_directional_lights];
+                auto &registry_directional_light = registry.get<components::DirectionalLight>(entity);
+                auto &registry_transform = registry.get<components::TransformComponent>(entity);
+                opaque_directional_light.color = registry_directional_light.color * registry_directional_light.power;
+                opaque_directional_light.direction = registry_transform.rotation * core::math::vec3{ 0,1,0 };
+                opaque_directional_light.solid_angle = registry_directional_light.solid_angle;
+                if (++opaque_per_frame.num_directional_lights >= kOpaqueShaderMaxDirectionalLights)
+                {
+                    utils::AlwaysAssert(false, "Amount of directional lights on the scene went beyond the maximum amount.");
+                    break;
+                }
             }
         }
         opaque_per_frame_buffer_.Bind(direct3d::ShaderType::PixelShader, 1);

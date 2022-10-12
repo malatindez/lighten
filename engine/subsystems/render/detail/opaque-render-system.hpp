@@ -30,6 +30,7 @@ namespace engine::render
         float reflectance_value;
         uint32_t texture_flags;
         bool reverse_normal_y = false;
+        bool normal_map_srgb = false;
         core::math::vec2 uv_multiplier{ 1 };
         void UpdateTextureFlags();
         OpaqueMaterial() = default;
@@ -82,24 +83,31 @@ namespace engine::render::_opaque_detail
     struct OpaquePointLight
     {
         core::math::vec3 color;
-        float power;
+        float padding;
         core::math::vec3 position;
         float radius;
     };
     struct OpaqueSpotLight
     {
         core::math::vec3 color;
-        float power;
+        float padding0;
         core::math::vec3 direction;
-        float cut_off;
+        float padding1;
         core::math::vec3 position;
-        float radius;
+        float cut_off;
+    };
+    struct OpaqueDirectionalLight
+    {
+        core::math::vec3 color;
+        float padding;
+        core::math::vec3 direction;
+        float solid_angle;
     };
     struct OpaquePerFrame
     {
         std::array<OpaquePointLight, kOpaqueShaderMaxPointLights> point_lights;
         std::array<OpaqueSpotLight, kOpaqueShaderMaxSpotLights> spot_lights;
-        std::array<::engine::components::DirectionalLight, kOpaqueShaderMaxDirectionalLights> directional_lights;
+        std::array<OpaqueDirectionalLight, kOpaqueShaderMaxDirectionalLights> directional_lights;
         uint32_t num_point_lights;
         uint32_t num_spot_lights;
         uint32_t num_directional_lights;

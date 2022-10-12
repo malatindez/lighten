@@ -43,14 +43,14 @@ namespace engine::render::_emissive_detail
     struct EmissiveInstance
     {
         core::math::mat4 world_transform;
+        core::math::vec3 emissive_color;
     };
     struct EmissiveShaderBuffer
     {
         core::math::mat4 mesh_to_model;
-        core::math::vec3 emissive_color;
         int use_emissive_texture = 0; // if != 0 then use emissive texture
         float power;
-        core::math::vec3 padding;
+        core::math::vec2 padding;
     };
     struct MaterialInstance
     {
