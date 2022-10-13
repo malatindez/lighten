@@ -101,9 +101,9 @@ namespace engine::render::_emissive_detail
                     for (auto entity : instances)
                     {
                         dst[copiedNum++] = EmissiveInstance
-                        { 
-                            .world_transform = instance_group.get<components::TransformComponent>(entity).model, 
-                            .emissive_color = perMaterial.material.emissive_color * perMaterial.material.power 
+                        {
+                            .world_transform = instance_group.get<components::TransformComponent>(entity).model,
+                            .emissive_color = perMaterial.material.emissive_color * perMaterial.material.power
                         };
                     }
                 }

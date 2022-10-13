@@ -15,7 +15,6 @@ namespace camera_movement
     float selected_distance = 0.0f;
     vec3 selected_object_offset{ 0.0f };
 
-
     void RegisterKeyCallbacks()
     {
         auto input = InputLayer::instance();
@@ -96,7 +95,6 @@ namespace camera_movement
                 }
                 else if (selected_scene)
                 {
-
                     auto &input = *InputLayer::instance();
                     auto scene = Engine::scene();
                     Ray b = scene->main_camera->PixelRaycast(vec2{ input.mouse_position() });

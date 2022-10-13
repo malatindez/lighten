@@ -29,6 +29,6 @@ namespace engine::utils
     template<typename T>
     void hash_combine(size_t &seed, T const &hash)
     {
-        seed ^= std::hash<T>{}(hash) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        seed ^= std::hash<T>{}(hash)+0x9e3779b9 + (seed << 6) + (seed >> 2);
     }
 } // namespace engine::utils

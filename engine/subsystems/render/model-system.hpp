@@ -2,7 +2,7 @@
 #include "detail/opaque-render-system.hpp"
 #include "detail/emissive-render-system.hpp"
 #include "components/components.hpp"
-#include "core/math/ray.hpp"
+#include "core/math.hpp"
 #include "render/model.hpp"
 namespace engine::core
 {
