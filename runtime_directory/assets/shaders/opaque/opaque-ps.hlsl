@@ -21,6 +21,8 @@ cbuffer OpaquePerFrame : register(b1)
     uint g_num_point_lights;
     uint g_num_directional_lights;
     uint g_num_spot_lights;
+    uint g_prefiltered_map_mip_levels;
+    float g_default_ambient_occlusion_value;
 };
 
 cbuffer OpaquePerMaterial : register(b2)
@@ -43,11 +45,11 @@ Texture2D<float> g_shininess : register(t3);
 Texture2D<float> g_metalness : register(t4);
 Texture2D<float> g_roughness : register(t5);
 Texture2D<float> g_ambient_occlusion : register(t6);
-Texture2D<float> g_reflection : register(t7);
+Texture2D<float> g_reflectance : register(t7);
 
 TextureCube<float3> g_irradiance_map : register(t8);
 TextureCube<float3> g_prefiltered_map : register(t9);
-Texture2D<float3> g_brdf_lut : register(t10);
+Texture2D<float2> g_brdf_lut : register(t10);
 
 static const uint TEXTURE_ENABLED_AMBIENT = 1;
 static const uint TEXTURE_ENABLED_ALBEDO = 1 << 1;
@@ -152,23 +154,50 @@ float4 ps_main(PS_IN input)
     float3 color = float3(0, 0, 0);
     color += ComputePointLightsEnergy(material, common_data);
     color = ambient * material.albedo + color;
+
+    float reflectance_modifier = g_reflectance_value;
+    if (g_enabled_texture_flags & TEXTURE_ENABLED_REFLECTION)
+    {
+        reflectance_modifier = g_reflectance.Sample(g_default_sampler, input.texcoord).r;
+    }
+    float ambient_occlusion = g_default_ambient_occlusion_value;
+    if (g_enabled_texture_flags & TEXTURE_ENABLED_AMBIENT_OCCLUSION)
+    {
+        ambient_occlusion = g_ambient_occlusion.Sample(g_default_sampler, input.texcoord).r;
+    }
+#if 1
+
+    float ndotv = max(dot(common_data.normal, common_data.view_dir_normalized), clampVal);
     
-    float3 F = F_SchlickRoughness(max(dot(common_data.view_dir_normalized, common_data.normal), clampVal), material.f0, material.roughness);
+    float3 F = F_SchlickRoughness(ndotv, material.f0, material.roughness);
     float3 kS = F;
     float3 kD = 1.0 - kS;
     kD *= 1.0 - material.metalness;
 
-    float3 irradiance = g_irradiance_map.SampleLevel(g_default_sampler, common_data.normal, 0).rgb;
-    float3 diffuse = irradiance * material.albedo;
+    float3 irradiance = g_irradiance_map.SampleLevel(g_linear_clamp_sampler, common_data.normal, 0).rgb;
+    float3 diffuse = irradiance * material.albedo * kD;
 
-    float3 prefilteredColor = g_prefiltered_map.SampleLevel(g_default_sampler, common_data.normal, material.roughness * 6.0).rgb;
-    float2 envBRDF = g_brdf_lut.SampleLevel(g_default_sampler, float2(max(dot(common_data.normal, common_data.view_dir_normalized), clampVal), material.roughness), 0).rg;
-    float3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
-
-    ambient += (kD * diffuse + specular);
+    float3 prefilteredColor = g_prefiltered_map.SampleLevel(g_linear_clamp_sampler, common_data.normal, material.roughness * g_prefiltered_map_mip_levels).rgb;
 
 
-    color += ambient;
+    float2 envBRDF = g_brdf_lut.SampleLevel(g_linear_clamp_sampler, float2(material.roughness, 1 - ndotv), 0).rg;
+    float3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y) * reflectance_modifier;
+
+#else	
+    float3 R = reflect(-common_data.view_dir_normalized, common_data.normal);
+    float3 diffuse = material.albedo * (1.0 - material.metalness) * g_irradiance_map.SampleLevel(g_linear_clamp_sampler, common_data.normal, 0.0);
+
+	float2 reflectanceLUT = g_brdf_lut.Sample(g_linear_clamp_sampler, float2(material.roughness, max(dot(common_data.normal, common_data.view_dir_normalized), clampVal))).rg;
+    float3 reflectance = reflectanceLUT.x * material.f0 + reflectanceLUT.y;
+    reflectance *= reflectance_modifier;
+	float3 specular = reflectance * g_prefiltered_map.SampleLevel(g_linear_clamp_sampler, R, material.roughness * g_prefiltered_map_mip_levels);
+#endif
+
+
+    ambient += diffuse + specular;
+
+
+    color += ambient * ambient_occlusion;
 
     return float4(color, 1);
 }

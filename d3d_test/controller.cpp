@@ -25,8 +25,8 @@ void Controller::OnGuiRender()
     ImGui::Text("Camera inv view matrix");
     ImGui::Text("%s", utils::FormatToString(Engine::scene()->main_camera->camera().inv_view).c_str());
     ImGui::SliderFloat("Exposure", &exposure_, -20.0f, 20.0f);
-    static std::string camera_name; camera_name.resize(64); camera_name = "";
-    ImGui::InputText("Camera name", camera_name.data(), 64);
+    ImGui::SliderFloat("Default AO", &render::ModelSystem::instance().opaque_render_system().ambient_occlusion(), 0.0f, 1.0f);
+
     ImGui::End();
     object_editor::OnGuiRender(window_pos, window_size);
 }
@@ -76,81 +76,49 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
     render::OpaqueMaterial mudroad_material;
     render::OpaqueMaterial stone_material;
     render::OpaqueMaterial stone_material2;
+    cobblestone_material.reset();
+    crystal_material.reset();
+    mud_material.reset();
+    mudroad_material.reset();
+    stone_material.reset();
+    stone_material2.reset();
     {
         {
             cobblestone_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_albedo.dds");
             cobblestone_material.normal_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_normal.dds");
             cobblestone_material.roughness_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_roughness.dds");
-            cobblestone_material.reflective_color = vec3{ 0 };
-            cobblestone_material.ambient_color = vec3{ 0 };
-            cobblestone_material.metalness_value = 0.0f;
-            cobblestone_material.shininess_value = 0;
-            cobblestone_material.reflectance_value = 0;
-            cobblestone_material.UpdateTextureFlags();
-            cobblestone_material.uv_multiplier = vec2{ 1 };
             cobblestone_material.reverse_normal_y = true;
+            cobblestone_material.UpdateTextureFlags();
         }
         {
             crystal_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Crystal\\Crystal_albedo.dds");
             crystal_material.normal_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Crystal\\Crystal_normal.dds");
-            crystal_material.reflective_color = vec3{ 0 };
-            crystal_material.ambient_color = vec3{ 0 };
-            crystal_material.metalness_value = 0.0f;
-            crystal_material.shininess_value = 0;
-            crystal_material.roughness_value = 0.001f;
-            crystal_material.reflectance_value = 0;
             crystal_material.UpdateTextureFlags();
-            crystal_material.uv_multiplier = vec2{ 1 };
-            crystal_material.reverse_normal_y = true;
         }
         {
             mud_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Mud\\Mud_albedo.dds");
             mud_material.normal_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Mud\\Mud_normal.dds");
             mud_material.roughness_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Mud\\Mud_roughness.dds");
-            mud_material.reflective_color = vec3{ 0 };
-            mud_material.ambient_color = vec3{ 0 };
-            mud_material.metalness_value = 0.0f;
-            mud_material.shininess_value = 0;
-            mud_material.reflectance_value = 0;
             mud_material.UpdateTextureFlags();
-            mud_material.uv_multiplier = vec2{ 1 };
         }
         {
             mudroad_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\MudRoad\\MudRoad_albedo.dds");
             mudroad_material.normal_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\MudRoad\\MudRoad_normal.dds");
             mudroad_material.roughness_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\MudRoad\\MudRoad_roughness.dds");
-            mudroad_material.reflective_color = vec3{ 0 };
-            mudroad_material.ambient_color = vec3{ 0 };
-            mudroad_material.metalness_value = 0.0f;
-            mudroad_material.shininess_value = 0;
-            mudroad_material.reflectance_value = 0;
-            mudroad_material.UpdateTextureFlags();
-            mudroad_material.uv_multiplier = vec2{ 1 };
             mudroad_material.reverse_normal_y = true;
+            mudroad_material.UpdateTextureFlags();
         }
         {
             stone_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Stone\\Stone_albedo.dds");
             stone_material.normal_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Stone\\Stone_normal.dds");
             stone_material.roughness_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Stone\\Stone_roughness.dds");
-            stone_material.reflective_color = vec3{ 0 };
-            stone_material.ambient_color = vec3{ 0 };
-            stone_material.metalness_value = 0.0f;
-            stone_material.shininess_value = 0;
-            stone_material.reflectance_value = 0;
             stone_material.UpdateTextureFlags();
-            stone_material.uv_multiplier = vec2{ 1 };
         }
         {
             stone_material2.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Stone\\Stone_COLOR.png");
             stone_material2.normal_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Stone\\Stone_NORM.png");
             stone_material2.roughness_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Stone\\Stone_ROUGH.png");
-            stone_material2.reflective_color = vec3{ 0 };
-            stone_material2.ambient_color = vec3{ 0 };
-            stone_material2.metalness_value = 0.0f;
-            stone_material2.shininess_value = 0;
-            stone_material2.reflectance_value = 0;
             stone_material2.UpdateTextureFlags();
-            stone_material2.uv_multiplier = vec2{ 1 };
         }
     }
     {
@@ -179,7 +147,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
                 transform.UpdateMatrices();
                 render::OpaqueMaterial material;
                 material.reset();
-                material.albedo_color = vec3{ 1, 0, 0 };
+                material.albedo_color = vec3{ 1 };
                 material.reflective_color = vec3{ 0 };
                 material.metalness_value = mix(0.001f, 1.0f, float(i) / 9.0f);
                 material.roughness_value = mix(0.001f, 1.0f, float(j) / 9.0f);

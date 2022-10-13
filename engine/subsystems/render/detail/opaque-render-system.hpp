@@ -50,9 +50,9 @@ namespace engine::render
             albedo_color = core::math::vec3{ 0.0f };
             reflective_color = core::math::vec3{ 0.0f };
             shininess_value = 0.0f;
-            metalness_value = 0.0f;
-            roughness_value = 0.0f;
-            reflectance_value = 0.0f;
+            metalness_value = 0.01f;
+            roughness_value = 0.01f;
+            reflectance_value = 1.0f;
             texture_flags = 0;
             reverse_normal_y = false;
             normal_map_srgb = false;
@@ -153,6 +153,8 @@ namespace engine::render::_opaque_detail
         uint32_t num_point_lights;
         uint32_t num_spot_lights;
         uint32_t num_directional_lights;
+        uint32_t prefiltered_map_mip_levels;
+        float default_ambient_occulsion_value;
     };
     struct OpaquePerMaterial
     {
@@ -177,9 +179,12 @@ namespace engine::render::_opaque_detail
         void SetIrradianceTexture(ID3D11ShaderResourceView *texture) { irradiance_texture_ = texture; }
         void SetPrefilteredTexture(ID3D11ShaderResourceView *texture) { prefiltered_texture_ = texture; }
         void SetBrdfTexture(ID3D11ShaderResourceView *texture) { brdf_texture_ = texture; }
+        void SetAmbientOcclusionValue(float value) { ambient_occlusion_value_ = value; }
         [[nodiscard]] ID3D11ShaderResourceView *GetIrradianceTexture() const { return irradiance_texture_; }
         [[nodiscard]] ID3D11ShaderResourceView *GetPrefilteredTexture() const { return prefiltered_texture_; }
         [[nodiscard]] ID3D11ShaderResourceView *GetBrdfTexture() const { return brdf_texture_; }
+        [[nodiscard]] float const &ambient_occlusion() const { return ambient_occlusion_value_; }
+        [[nodiscard]] float &ambient_occlusion() { return ambient_occlusion_value_; }
     private:
         friend class ::engine::render::ModelSystem;
 
@@ -201,5 +206,6 @@ namespace engine::render::_opaque_detail
         ID3D11ShaderResourceView *irradiance_texture_;
         ID3D11ShaderResourceView *prefiltered_texture_;
         ID3D11ShaderResourceView *brdf_texture_;
+        float ambient_occlusion_value_;
     };
 } // namespace engine::render::_opaque_detail

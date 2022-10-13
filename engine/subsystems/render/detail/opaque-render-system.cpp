@@ -136,6 +136,7 @@ namespace engine::render::_opaque_detail
         direct3d::api().devcon4->RSSetState(direct3d::states().cull_back);
         direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
         direct3d::api().devcon4->PSSetSamplers(1, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(2, 1, &direct3d::states().bilinear_clamp_sampler.ptr());
         direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth, 0);
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 
@@ -144,6 +145,10 @@ namespace engine::render::_opaque_detail
         instance_buffer_.Bind(1);
 
         OpaquePerFrame opaque_per_frame;
+        D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+        prefiltered_texture_->GetDesc(&desc);
+        opaque_per_frame.prefiltered_map_mip_levels = desc.TextureCube.MipLevels;
+        opaque_per_frame.default_ambient_occulsion_value = ambient_occlusion_value_;
         {
             auto point_lights = registry.view<components::TransformComponent, components::PointLight>();
             auto spot_lights = registry.view<components::TransformComponent, components::SpotLight>();
