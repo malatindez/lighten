@@ -26,4 +26,9 @@ namespace engine::utils
         auto t = std::equal_range(range.begin(), range.end(), value, comparator);
         range.erase(t.first, t.second);
     }
+    template<typename T>
+    void hash_combine(size_t &seed, T const &hash)
+    {
+        seed ^= std::hash<T>{}(hash) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    }
 } // namespace engine::utils

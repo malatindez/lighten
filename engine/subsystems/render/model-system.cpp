@@ -1,5 +1,6 @@
 #include "model-system.hpp"
 #include "../core/model-loader.hpp"
+#include "../core/texture-manager.hpp"
 namespace engine::render
 {
     using namespace core::math;
@@ -139,28 +140,62 @@ namespace engine::render
                         dst.position[sideMasks[side][2]] = position.z * sideSigns[side][2];
                         dst.position = normalize(dst.position);
                     };
+                    auto setTexCoord = [] (Vertex &dst)
+                    {
+                        // todo
+                        // dst.tex_coord.u = ((-dst.position.z / core::math::abs(dst.position.x)) + 1) / 2;
+                        // dst.tex_coord.v = ((-dst.position.y / core::math::abs(dst.position.x)) + 1) / 2;
+                    };
+                    auto calculateTangents = [] (Vertex &dst)
+                    {
+                        // todo
+                        // vec3 tangent = cross(dst.normal, vec3{ 0, 1, 0 });
+                        // if (length(tangent) < 0.0001f)
+                        // {
+                        //     tangent = cross(dst.normal, vec3{ 1, 0, 0 });
+                        // }
+                        // tangent = normalize(tangent);
+                        // dst.tangent = tangent;
+                        // dst.bitangent = cross(dst.normal, tangent);
+                    };
 
                     setPos(side, vertex[0], quad[0]);
                     setPos(side, vertex[1], quad[1]);
                     setPos(side, vertex[2], quad[2]);
-
+                    setTexCoord(vertex[0]);
+                    setTexCoord(vertex[1]);
+                    setTexCoord(vertex[2]);
                     {
                         vec3 AB = vertex[1].position - vertex[0].position;
                         vec3 AC = vertex[2].position - vertex[0].position;
                         vertex[0].normal = vertex[1].normal = vertex[2].normal = normalize(cross(AC, AB));
+                        vertex[0].normal = vertex[0].position;
+                        vertex[1].normal = vertex[1].position;
+                        vertex[2].normal = vertex[2].position;
                     }
-
+                    calculateTangents(vertex[0]);
+                    calculateTangents(vertex[1]);
+                    calculateTangents(vertex[2]);
                     vertex += 3;
 
                     setPos(side, vertex[0], quad[1]);
                     setPos(side, vertex[1], quad[3]);
                     setPos(side, vertex[2], quad[2]);
+                    setTexCoord(vertex[0]);
+                    setTexCoord(vertex[1]);
+                    setTexCoord(vertex[2]);
 
                     {
                         vec3 AB = vertex[1].position - vertex[0].position;
                         vec3 AC = vertex[2].position - vertex[0].position;
                         vertex[0].normal = vertex[1].normal = vertex[2].normal = normalize(cross(AC, AB));
+                        vertex[0].normal = vertex[0].position;
+                        vertex[1].normal = vertex[1].position;
+                        vertex[2].normal = vertex[2].position;
                     }
+                    calculateTangents(vertex[0]);
+                    calculateTangents(vertex[1]);
+                    calculateTangents(vertex[2]);
 
                     vertex += 3;
                 }

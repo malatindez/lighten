@@ -163,6 +163,29 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
             render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, cube, { materials[i] });
         }
     }
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                auto model_id = render::ModelSystem::GetUnitSphereFlat();
+                auto sphere = registry.create();
+                auto &transform = registry.emplace<TransformComponent>(sphere);
+                transform.position = vec3{ i - 5, j, 5 };
+                transform.scale = vec3{ 0.375f };
+                transform.UpdateMatrices();
+                render::OpaqueMaterial material;
+                material.reset();
+                material.albedo_color = vec3{ 1, 0, 0 };
+                material.reflective_color = vec3{ 0 };
+                material.metalness_value = mix(0.001f, 1.0f, float(i) / 10.0f);
+                material.roughness_value = mix(0.001f, 1.0f, float(j) / 10.0f);
+                material.UpdateTextureFlags();
+                material.uv_multiplier = vec2{ 1 };
+                render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, sphere, { material });
+            }
+        }
+    }
     // ------------------------- CUBES -------------------------
     {
         auto model_id = render::ModelSystem::GetUnitCube();
@@ -220,17 +243,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
         point_light.power = 2e2f;
         render::ModelSystem::instance().AddEmissiveInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
     }
-    /*
-    const auto skybox_path = std::filesystem::current_path() / "assets/textures/skyboxes/yokohama";
-    SkyboxManager::LoadSkybox(registry, std::array<std::filesystem::path, 6> {
-        skybox_path / "posx.jpg",
-            skybox_path / "negx.jpg",
-            skybox_path / "posy.jpg",
-            skybox_path / "negy.jpg",
-            skybox_path / "posz.jpg",
-            skybox_path / "negz.jpg",
-    });*/
-    SkyboxManager::LoadSkybox(registry, std::filesystem::current_path() / "assets/textures/skyboxes/skybox.dds");
+    SkyboxManager::LoadSkybox(registry, std::filesystem::current_path() / "assets/textures/skyboxes/grass_field.dds");
     render::ModelSystem::instance().OnInstancesUpdated(registry);
     camera_movement::RegisterKeyCallbacks();
     object_editor::RegisterKeyCallbacks();

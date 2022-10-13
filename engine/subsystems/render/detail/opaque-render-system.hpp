@@ -36,6 +36,28 @@ namespace engine::render
         OpaqueMaterial() = default;
         void Bind(direct3d::DynamicUniformBuffer<_opaque_detail::OpaquePerMaterial> &uniform_buffer) const;
         explicit OpaqueMaterial(Material const &material);
+        void reset()
+        {
+            ambient = nullptr;
+            albedo_map = nullptr;
+            normal_map = nullptr;
+            shininess_map = nullptr;
+            metalness_map = nullptr;
+            roughness_map = nullptr;
+            ambient_occlusion_map = nullptr;
+            reflection_map = nullptr;
+            ambient_color = core::math::vec3{ 0.0f };
+            albedo_color = core::math::vec3{ 0.0f };
+            reflective_color = core::math::vec3{ 0.0f };
+            shininess_value = 0.0f;
+            metalness_value = 0.0f;
+            roughness_value = 0.0f;
+            reflectance_value = 0.0f;
+            texture_flags = 0;
+            reverse_normal_y = false;
+            normal_map_srgb = false;
+            uv_multiplier = core::math::vec2{ 1 };
+        }
     };
 }
 namespace std {
@@ -44,7 +66,27 @@ namespace std {
     {
         std::size_t operator()(engine::render::OpaqueMaterial const &material) const
         {
-            return std::hash<size_t>()(reinterpret_cast<size_t>(material.albedo_map));
+            size_t seed = 0;
+            engine::utils::hash_combine(seed, material.ambient);
+            engine::utils::hash_combine(seed, material.albedo_map);
+            engine::utils::hash_combine(seed, material.normal_map);
+            engine::utils::hash_combine(seed, material.shininess_map);
+            engine::utils::hash_combine(seed, material.metalness_map);
+            engine::utils::hash_combine(seed, material.roughness_map);
+            engine::utils::hash_combine(seed, material.ambient_occlusion_map);
+            engine::utils::hash_combine(seed, material.reflection_map);
+            engine::utils::hash_combine(seed, material.ambient_color);
+            engine::utils::hash_combine(seed, material.albedo_color);
+            engine::utils::hash_combine(seed, material.reflective_color);
+            engine::utils::hash_combine(seed, material.shininess_value);
+            engine::utils::hash_combine(seed, material.metalness_value);
+            engine::utils::hash_combine(seed, material.roughness_value);
+            engine::utils::hash_combine(seed, material.reflectance_value);
+            engine::utils::hash_combine(seed, material.texture_flags);
+            engine::utils::hash_combine(seed, material.reverse_normal_y);
+            engine::utils::hash_combine(seed, material.normal_map_srgb);
+            engine::utils::hash_combine(seed, material.uv_multiplier);
+            return seed;
         }
     };
 }
