@@ -122,6 +122,55 @@ namespace engine::core
         }
     }
 
+    TextureId TextureManager::LoadTexture(uint8_t *data, size_t width, size_t height, size_t channels, bool generate_mipmaps)
+    {
+        D3D11_TEXTURE2D_DESC desc{};
+        desc.ArraySize = 1;
+        desc.SampleDesc.Count = 1;
+        desc.Usage = D3D11_USAGE_DEFAULT;
+        desc.BindFlags = generate_mipmaps ? D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET : D3D11_BIND_SHADER_RESOURCE;
+        desc.MiscFlags = generate_mipmaps ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
+        desc.Width = (uint32_t)width;
+        desc.Height = (uint32_t)height;
+        desc.MipLevels = generate_mipmaps ? MipmapLevels((uint32_t)width, (uint32_t)height) : 1;
+        switch (channels)
+        {
+        case 1: desc.Format = DXGI_FORMAT_R8_UNORM; break;
+        case 2: desc.Format = DXGI_FORMAT_R8G8_UNORM; break;
+        case 3: desc.Format = DXGI_FORMAT_B8G8R8X8_UNORM_SRGB; break;
+        case 4: desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; break;
+        default: utils::AlwaysAssert(false, "Invalid number of channels");
+        }
+        direct3d::Texture2D texture;
+        D3D11_SUBRESOURCE_DATA srd;
+        srd.pSysMem = data;
+        srd.SysMemPitch = (uint32_t)width * (uint32_t)channels;
+        srd.SysMemSlicePitch = 0;
+        if (generate_mipmaps)
+        {
+            direct3d::AlwaysAssert(direct3d::api().device->CreateTexture2D(&desc, nullptr, &texture.reset()), "Failed to create texture");
+            direct3d::api().devcon->UpdateSubresource(texture,
+                                                      D3D11CalcSubresource(0, 0, desc.MipLevels),
+                                                      nullptr,
+                                                      srd.pSysMem,
+                                                      srd.SysMemPitch,
+                                                      1);
+        }
+        else
+        {
+            direct3d::AlwaysAssert(direct3d::api().device->CreateTexture2D(&desc, &srd, &texture.reset()), "Failed to create texture resource");
+        }
+        D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc{};
+        srv_desc.Format = desc.Format;
+        srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+        srv_desc.Texture2D.MipLevels = std::numeric_limits<UINT>::max();
+        srv_desc.Texture2D.MostDetailedMip = 0;
+        direct3d::ShaderResourceView shader_resource_view;
+        direct3d::AlwaysAssert(direct3d::api().device->CreateShaderResourceView(texture, &srv_desc, &shader_resource_view.reset()), "Failed to create shader resource view");
+        if (generate_mipmaps) direct3d::api().devcon->GenerateMips(shader_resource_view);
+        instance_->textures_.emplace(std::make_pair(instance_->current_id_, shader_resource_view));
+        return instance_->current_id_++;
+    }
     TextureId TextureManager::LoadTexture(std::filesystem::path const &path, bool generate_mipmaps)
     {
         utils::AlwaysAssert(path.is_absolute(), "Paths provided to texture manager should be absolute!");
@@ -177,7 +226,6 @@ namespace engine::core
     {
         D3D11_TEXTURE2D_DESC desc{};
         desc.ArraySize = 6;
-        desc.SampleDesc.Count = 1;
         desc.SampleDesc.Count = 1;
         desc.Usage = D3D11_USAGE_DEFAULT;
         desc.BindFlags = generate_mipmaps ? D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET : D3D11_BIND_SHADER_RESOURCE;
