@@ -180,7 +180,7 @@ float4 ps_main(PS_IN input)
     float3 prefilteredColor = g_prefiltered_map.SampleLevel(g_linear_clamp_sampler, common_data.normal, material.roughness * g_prefiltered_map_mip_levels).rgb;
 
 
-    float2 envBRDF = g_brdf_lut.SampleLevel(g_linear_clamp_sampler, float2(material.roughness, 1 - ndotv), 0).rg;
+    float2 envBRDF = g_brdf_lut.SampleLevel(g_linear_clamp_sampler, float2(material.roughness, ndotv), 0).rg;
     float3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y) * reflectance_modifier;
 
 #else	
