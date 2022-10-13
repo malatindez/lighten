@@ -42,11 +42,13 @@ namespace engine::direct3d
     class RenderTarget : public RenderTargetBase
     {
     public:
-        using RenderTargetBase::RenderTargetBase;
+        RenderTarget(DXGI_FORMAT format, uint32_t sample_count = 1) : RenderTargetBase(format), sample_count(sample_count) {}
         void init();
         void deinit() noexcept;
         static RenderTarget empty() noexcept { return RenderTarget(DXGI_FORMAT_UNKNOWN); }
+        void ForceSizeResources(core::math::ivec2 const &size);
         void SizeResources(core::math::ivec2 const &size) override;
+        uint32_t sample_count = 1;
     };
 
     class SwapchainRenderTarget final : public RenderTargetBase

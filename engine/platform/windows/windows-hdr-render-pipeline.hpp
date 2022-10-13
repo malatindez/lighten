@@ -22,6 +22,13 @@ namespace engine::platform::windows
         void OnRender() override;
         void OnUpdate() override;
         void OnEvent(core::events::Event &) override;
+        void SetSampleCount(uint32_t sample_count)
+        {
+            hdr_target_.sample_count = sample_count;
+            hdr_target_.ForceSizeResources(window_->size());
+            windowSizeChanged();
+        }
+        [[nodiscard]] uint32_t GetSampleCount() const noexcept { return hdr_target_.sample_count; }
     private:
         void initialize_d3d();
         void windowSizeChanged()
@@ -33,6 +40,8 @@ namespace engine::platform::windows
             desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
             desc.Width = static_cast<uint32_t>(window()->size().x);
             desc.Height = static_cast<uint32_t>(window()->size().y);
+            desc.SampleDesc.Count = hdr_target_.render_target_description().SampleDesc.Count;
+            desc.SampleDesc.Quality = hdr_target_.render_target_description().SampleDesc.Quality;
             depth_stencil_.init(&desc, nullptr);
 
             // Set up the viewport.

@@ -12,7 +12,9 @@ namespace engine::render
         struct Buffer
         {
             float exposure = 1.0f;
-            core::math::vec3 padding;
+            float gamma = 1.0f;
+            uint32_t sample_count = 1;
+            float padding;
         };
         HDRtoLDRLayer(direct3d::SwapchainRenderTarget &window_render_target) : PostProcessingLayer(0), window_render_target_{ window_render_target }
         {
@@ -27,21 +29,25 @@ namespace engine::render
             direct3d::api().devcon4->OMSetRenderTargets(0, nullptr, nullptr);
             direct3d::api().devcon4->PSSetShaderResources(0, 1, &source.shader_resource_view());
             direct3d::api().devcon4->OMSetRenderTargets(1, &window_render_target_.render_target_view(), nullptr);
+            direct3d::api().devcon4->RSSetState(direct3d::states().cull_none.ptr());
             shader_.Bind();
-            constant_buffer_.Update(Buffer{ exposure_ , {0} });
+            buffer_.sample_count = source.render_target_description().SampleDesc.Count;
+            constant_buffer_.Update(buffer_);
             constant_buffer_.Bind(direct3d::ShaderType::PixelShader, 1);
             direct3d::api().devcon4->Draw(3, 0);
             ID3D11ShaderResourceView *temp = nullptr;
             direct3d::api().devcon4->PSSetShaderResources(0, 1, &temp);
             return window_render_target_;
         }
-        [[nodiscard]] float &exposure() noexcept { return exposure_; }
-        [[nodiscard]] float const &exposure() const noexcept { return exposure_; }
+        [[nodiscard]] float &exposure() noexcept { return buffer_.exposure; }
+        [[nodiscard]] float const &exposure() const noexcept { return buffer_.exposure; }
+        [[nodiscard]] float &gamma() noexcept { return buffer_.gamma; }
+        [[nodiscard]] float const &gamma() const noexcept { return buffer_.gamma; }
 
     private:
         static constexpr auto vs_shader_path = "assets/shaders/post-processing/hdr-to-ldr-vs.hlsl";
         static constexpr auto ps_shader_path = "assets/shaders/post-processing/hdr-to-ldr-ps.hlsl";
-        float exposure_ = -1.0f;
+        Buffer buffer_;
         GraphicsShaderProgram shader_;
         direct3d::DynamicUniformBuffer<Buffer> constant_buffer_;
         direct3d::SwapchainRenderTarget &window_render_target_;

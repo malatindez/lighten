@@ -5,7 +5,7 @@ namespace engine::platform::windows
 {
     HDRRenderPipeline::HDRRenderPipeline()
         : core::RenderPipeline(),
-        hdr_target_{ DXGI_FORMAT_R16G16B16A16_FLOAT },
+        hdr_target_{ DXGI_FORMAT_R16G16B16A16_FLOAT, 4 },
         ldr_target_{ DXGI_FORMAT_UNKNOWN }
     {
         window_ = std::make_shared<Window>();

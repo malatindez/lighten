@@ -30,12 +30,8 @@ namespace engine::direct3d
         }
         initialized = true;
     }
-
-    void RenderTarget::SizeResources(core::math::ivec2 const &size)
+    void RenderTarget::ForceSizeResources(core::math::ivec2 const &size)
     {
-        if (size == size_)
-            return;
-
         if (size.x < 0 || size.y < 0)
         {
             throw std::out_of_range("Invalid width/height");
@@ -43,42 +39,55 @@ namespace engine::direct3d
 
         size_ = core::math::ivec2{ 0 };
 
-        // Create a render target
-        CD3D11_TEXTURE2D_DESC renderTargetDesc(
-            format_,
-            static_cast<UINT>(size.x),
-            static_cast<UINT>(size.y),
-            1, // The render target view has only one texture.
-            1, // Use a single mipmap level.
-            D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE,
-            D3D11_USAGE_DEFAULT,
-            0,
-            1
-        );
+        render_target_description_.Format = format_;
+        render_target_description_.Width = static_cast<UINT>(size.x);
+        render_target_description_.Height = static_cast<UINT>(size.y);
+        render_target_description_.MipLevels = 1;
+        render_target_description_.ArraySize = 1;
+        render_target_description_.SampleDesc.Count = sample_count;
+        render_target_description_.SampleDesc.Quality = D3D11_STANDARD_MULTISAMPLE_PATTERN;
+        render_target_description_.Usage = D3D11_USAGE_DEFAULT;
+        render_target_description_.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+        render_target_description_.CPUAccessFlags = 0;
+        render_target_description_.MiscFlags = 0;
         Assert(api().device->CreateTexture2D(
-            &renderTargetDesc,
+            &render_target_description_,
             nullptr,
             &render_target_.reset()
         ));
 
-        CD3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc(D3D11_RTV_DIMENSION_TEXTURE2D, format_);
+        D3D11_RENDER_TARGET_VIEW_DESC render_target_view_desc;
+        render_target_view_desc.Format = render_target_description_.Format;
+        render_target_view_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+        render_target_view_desc.Texture2D.MipSlice = 0;
 
         Assert(api().device->CreateRenderTargetView(
             render_target_.ptr(),
-            &renderTargetViewDesc,
+            &render_target_view_desc,
             &render_target_view_.reset()
         ));
 
         // Create SRV.
-        CD3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc(D3D11_SRV_DIMENSION_TEXTURE2D, format_);
+        D3D11_SHADER_RESOURCE_VIEW_DESC shader_resource_view_desc;
+        shader_resource_view_desc.Format = render_target_description_.Format;
+        shader_resource_view_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+        shader_resource_view_desc.Texture2D.MostDetailedMip = 0;
+        shader_resource_view_desc.Texture2D.MipLevels = 1;
 
         Assert(api().device->CreateShaderResourceView(
             render_target_.ptr(),
-            &shaderResourceViewDesc,
+            &shader_resource_view_desc,
             &shader_resource_view_.reset()
         ));
 
         size_ = size;
+    }
+
+    void RenderTarget::SizeResources(core::math::ivec2 const &size)
+    {
+        if (size == size_)
+            return;
+        ForceSizeResources(size);
     }
 
     void RenderTarget::deinit() noexcept

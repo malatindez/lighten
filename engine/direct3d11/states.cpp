@@ -30,6 +30,7 @@ namespace
         desc.FillMode = fillMode;
         desc.DepthClipEnable = TRUE;
         desc.MultisampleEnable = TRUE;
+        desc.FrontCounterClockwise = false;
 
         return desc;
     }

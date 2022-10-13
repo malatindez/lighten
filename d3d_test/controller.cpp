@@ -24,15 +24,36 @@ void Controller::OnGuiRender()
     ImGui::Text("%s", utils::FormatToString(Engine::scene()->main_camera->transform().model).c_str());
     ImGui::Text("Camera inv view matrix");
     ImGui::Text("%s", utils::FormatToString(Engine::scene()->main_camera->camera().inv_view).c_str());
-    ImGui::SliderFloat("Exposure", &exposure_, -20.0f, 20.0f);
+    auto hdr_to_ldr = hdr_render_pipeline_->hdr_to_ldr_layer();
+    ImGui::SliderFloat("Exposure", &hdr_to_ldr->exposure(), -20.0f, 20.0f);
+    ImGui::SliderFloat("Gamma", &hdr_to_ldr->gamma(), 0.0f, 20.0f);
     ImGui::SliderFloat("Default AO", &render::ModelSystem::instance().opaque_render_system().ambient_occlusion(), 0.0f, 1.0f);
-
+    static int sample_count = 4;
+    if (ImGui::BeginCombo("MSAA sample count", std::to_string(sample_count).c_str()))
+    {
+        if (ImGui::Selectable("1x")) sample_count = 1;
+        if (ImGui::Selectable("2x")) sample_count = 2;
+        if (ImGui::Selectable("4x")) sample_count = 4;
+        if (ImGui::Selectable("8x")) sample_count = 8;
+        if (ImGui::Selectable("16x")) sample_count = 16;
+        if (ImGui::Selectable("32x")) sample_count = 32;
+        ImGui::EndCombo();
+    }
+    UINT quality_levels;
+    direct3d::api().device->CheckMultisampleQualityLevels(DXGI_FORMAT_R16G16B16A16_FLOAT, sample_count, &quality_levels);
+    uint32_t current_sample_count = hdr_render_pipeline_->GetSampleCount();
+    if (quality_levels == 0)
+    {
+        spdlog::warn("MSAA sample count {} is not supported", sample_count);
+        sample_count = current_sample_count;
+    }
+    if (sample_count != current_sample_count) { hdr_render_pipeline_->SetSampleCount(sample_count); }
     ImGui::End();
-    object_editor::OnGuiRender(window_pos, window_size);
+    object_editor::OnGuiRender(hdr_render_pipeline_->window()->position(), hdr_render_pipeline_->window()->size());
 }
 
-Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &window_size, math::ivec2 const &window_pos, float &exposure)
-    : exposure_{ exposure }, window_size{ window_size }, window_pos{ window_pos }, renderer_{ renderer }
+Controller::Controller(std::shared_ptr<Renderer> renderer, std::shared_ptr<platform::windows::HDRRenderPipeline> hdr_render_pipeline)
+    : hdr_render_pipeline_{ hdr_render_pipeline }, renderer_{ renderer }
 {
     first_scene = std::make_shared<Scene>();
     auto &ors = render::ModelSystem::instance().opaque_render_system();
@@ -43,6 +64,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
     main_camera_entity = registry.create();
     registry.emplace<CameraComponent>(main_camera_entity, CameraComponent());
     registry.emplace<TransformComponent>(main_camera_entity, TransformComponent());
+    auto &window_size = hdr_render_pipeline_->window()->size();
     first_scene->main_camera = std::make_unique<CameraController>(&registry, main_camera_entity, window_size);
     Engine::SetScene(first_scene);
     Engine::scene()->main_camera->SetWorldOffset(core::math::vec3{ 0.0f, 0.0f, 0.0f });
@@ -219,10 +241,11 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
     camera_movement::RegisterKeyCallbacks();
     object_editor::RegisterKeyCallbacks();
     auto &input = *InputLayer::instance();
-    input.AddTickKeyCallback({ Key::KEY_PLUS }, [this] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure_ += dt; });
-    input.AddTickKeyCallback({ Key::KEY_MINUS }, [this] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure_ -= dt; });
-    input.AddTickKeyCallback({ Key::KEY_NUMPAD_MINUS }, [this] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure_ -= dt; });
-    input.AddTickKeyCallback({ Key::KEY_NUMPAD_PLUS }, [this] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure_ += dt; });
+    auto &exposure = hdr_render_pipeline_->hdr_to_ldr_layer()->exposure();
+    input.AddTickKeyCallback({ Key::KEY_PLUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure += dt; });
+    input.AddTickKeyCallback({ Key::KEY_MINUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure -= dt; });
+    input.AddTickKeyCallback({ Key::KEY_NUMPAD_MINUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure -= dt; });
+    input.AddTickKeyCallback({ Key::KEY_NUMPAD_PLUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure += dt; });
 }
 void Controller::OnTick([[maybe_unused]] float delta_time)
 {
