@@ -117,6 +117,8 @@ struct PBR_CommonData
     float3 fragment_position;
 };
 
+float clampVal = 0.001f;
+
 float3 Lambert(PBR_Material material, float ndotl, float solid_angle)
 {
     float3 diffuse = saturate(F_Schlick(ndotl, material.f0));
@@ -128,56 +130,55 @@ float3 Lambert(PBR_Material material, float ndotl, float solid_angle)
 float3 CookTorrance(PBR_Material material, float3 V_norm, float3 normal, float3 specL, float solid_angle)
 {
     float3 H = normalize(specL + V_norm);
-    float ndotl = dot(normal, specL);
-    float ndotv = dot(normal, V_norm);
-    float ndoth = dot(normal, H);
+    float ndotl = max(dot(normal, specL), clampVal);
+    float ndotv = max(dot(normal, V_norm), clampVal);
+    float ndoth = max(dot(normal, H), clampVal);
     float3 F = F_Schlick(dot(specL, H), material.f0);
     float rough2 = material.roughness * material.roughness;
     float G = Smith(rough2, ndotv, ndotl);
     float D = GGX(rough2, ndoth);
-    return F * G * max(D * solid_angle / (4 * ndotv), 0.0f);
+    return F * G * min(D * solid_angle / (4 * ndotv), 1.0f);
 }
 float3 Illuminate(PBR_Material material,
           float3 light_energy,
           float3 V_norm, float3 normal, 
-          float3 L, float3 specL, float solid_angle) {
-  float ndotl = dot(normal, L);
+          float3 L, float3 specL, float ndotl, float solid_angle) {
 
   float3 diffuse = Lambert(material, ndotl, solid_angle);
-
+//  float3 spec = float3(0,0,0);
   float3 spec = CookTorrance(material, V_norm, normal, specL, solid_angle);
 
   return (diffuse * ndotl + spec) * light_energy;   
 }
-
 float3 ComputePointLightEnergy(PBR_Material material, PBR_CommonData common_data, PointLight point_light)
 {
-    float3 sphereRelPos = point_light.position - common_data.fragment_position;
-    float distance = length(sphereRelPos);
-    float3 L = normalize(sphereRelPos);
-    float ndotl = dot(common_data.normal, L);
-   // return material.albedo * saturate(ndotl) / PI / (distance * distance) * point_light.power * point_light.color;
-    float radius = point_light.radius;
-    float gndotl = dot(common_data.geometry_normal, L);
-    if(gndotl < -radius)
-    {
-      return float3(0,0,0);
-    }
-    distance = max(distance, radius);
-    float sina = radius / distance;
-    float cosa = sqrt(1.0f - sina * sina);
-    float solid_angle = (1.0f - cosa) * 2.0f * PI; // solid_angle / 2.0f * float(std::numbers::pi)
-    const float3 R = normalize(reflect(common_data.view_dir_normalized, common_data.normal));
-
-    float3 specL = approximateClosestSphereDir(R, cosa, sphereRelPos, L, distance, radius);
+    float3 light_dir = point_light.position - common_data.fragment_position;
+    float light_dist = length(light_dir);
+    float3 light_dir_normalized = light_dir / light_dist;
     
-    clampDirToHorizon(specL, ndotl, common_data.normal, 0.005f);
-    float lightMicroHeight = dot(common_data.normal, sphereRelPos); // or = dot(N, lightDelta); // or = dot(N, lightDir) * lightDist;
-    float lightMacroHeight = gndotl * distance; // GN is geometry normal, not the texture normal
-    float fadingMicro = saturate( (lightMicroHeight + radius) / (2.0 * radius) );
-    float fadingMacro = saturate( (lightMacroHeight + radius) / (2.0 * radius) );
-    return Illuminate(material, point_light.color, common_data.view_dir_normalized, common_data.normal, L, specL, solid_angle)
-        * fadingMacro * fadingMicro;
+    float3 H = normalize(light_dir_normalized + common_data.view_dir_normalized);
+    
+    float ndotl = max(dot(common_data.normal, light_dir_normalized), clampVal );
+
+    float sina = point_light.radius / light_dist;
+    float cosa = sqrt(1 - sina * sina);
+    float solid_angle = 2 * PI * (1 - cosa);
+
+    float gndotl = dot(common_data.geometry_normal, light_dir_normalized);
+    
+    if(gndotl < -point_light.radius) { return float3(0,0,0); }
+
+    float lightMicroHeight = ndotl * light_dist;
+    float lightMacroHeight = gndotl * light_dist;
+    float fadingMicro = saturate ((lightMicroHeight + point_light.radius) / (2 * point_light.radius));
+    float fadingMacro = saturate ((lightMacroHeight + point_light.radius) / (2 * point_light.radius));
+    float fading = fadingMicro * fadingMacro;
+    
+    ndotl = max(ndotl, fadingMicro * sina);
+    float3 specL = approximateClosestSphereDir(light_dir_normalized, cosa, light_dir, light_dir_normalized, light_dist, point_light.radius);
+    clampDirToHorizon(specL, ndotl, common_data.normal, clampVal );
+
+    return fading * Illuminate(material, point_light.color, common_data.view_dir_normalized, common_data.normal, specL,light_dir_normalized, max(dot(common_data.normal, light_dir_normalized), clampVal), solid_angle);
 }
 
 #endif // PS_HELPERS_HLSLI

@@ -45,6 +45,11 @@ Texture2D<float> g_roughness : register(t5);
 Texture2D<float> g_ambient_occlusion : register(t6);
 Texture2D<float> g_reflection : register(t7);
 
+TextureCube<float3> g_irradiance_map : register(t8);
+TextureCube<float3> g_prefiltered_map : register(t9);
+Texture2D<float3> g_brdf_lut : register(t10);
+
+
 static const uint TEXTURE_ENABLED_AMBIENT = 1;
 static const uint TEXTURE_ENABLED_ALBEDO = 1 << 1;
 static const uint TEXTURE_ENABLED_NORMAL = 1 << 2;
