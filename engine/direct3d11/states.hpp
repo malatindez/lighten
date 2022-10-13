@@ -43,7 +43,6 @@ namespace engine::direct3d
         ReadOnlySamplerState comparison_anisotropic_wrap_sampler;
         ReadOnlySamplerState comparison_anisotropic_clamp_sampler;
 
-
         [[nodiscard]] static inline States &instance() { utils::Assert(instance_ != nullptr, "States not initialized"); return *instance_; }
     private:
         friend class Api;

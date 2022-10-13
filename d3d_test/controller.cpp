@@ -35,7 +35,10 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
     : exposure_{ exposure }, window_size{ window_size }, window_pos{ window_pos }, renderer_{ renderer }
 {
     first_scene = std::make_shared<Scene>();
-
+    auto &ors = render::ModelSystem::instance().opaque_render_system();
+    ors.SetBrdfTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/IBL/ibl_brdf_lut.dds"));
+    ors.SetIrradianceTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/grass_field.dds"));
+    ors.SetPrefilteredTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/grass_field.dds"));
     auto &registry = first_scene->registry;
     main_camera_entity = registry.create();
     registry.emplace<CameraComponent>(main_camera_entity, CameraComponent());
@@ -178,8 +181,8 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
                 material.reset();
                 material.albedo_color = vec3{ 1, 0, 0 };
                 material.reflective_color = vec3{ 0 };
-                material.metalness_value = mix(0.001f, 1.0f, float(i) / 10.0f);
-                material.roughness_value = mix(0.001f, 1.0f, float(j) / 10.0f);
+                material.metalness_value = mix(0.001f, 1.0f, float(i) / 9.0f);
+                material.roughness_value = mix(0.001f, 1.0f, float(j) / 9.0f);
                 material.UpdateTextureFlags();
                 material.uv_multiplier = vec2{ 1 };
                 render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, sphere, { material });

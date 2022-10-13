@@ -142,6 +142,7 @@ namespace engine::render::_opaque_detail
         mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 1);
 
         instance_buffer_.Bind(1);
+
         OpaquePerFrame opaque_per_frame;
         {
             auto point_lights = registry.view<components::TransformComponent, components::PointLight>();
@@ -195,6 +196,10 @@ namespace engine::render::_opaque_detail
         opaque_per_frame_buffer_.Update(opaque_per_frame);
         opaque_per_material_buffer_.Bind(direct3d::ShaderType::PixelShader, 2);
         uint32_t renderedInstances = 0;
+        direct3d::api().devcon4->PSSetShaderResources(8, 1, &irradiance_texture_);
+        direct3d::api().devcon4->PSSetShaderResources(9, 1, &prefiltered_texture_);
+        direct3d::api().devcon4->PSSetShaderResources(10, 1, &brdf_texture_);
+
         for (const auto &model_instance : model_instances_)
         {
             model_instance.model.vertices.Bind(0);

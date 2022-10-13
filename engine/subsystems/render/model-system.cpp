@@ -4,7 +4,7 @@
 namespace engine::render
 {
     using namespace core::math;
-    std::shared_ptr<ModelSystem> ModelSystem::instance_;
+    std::shared_ptr<ModelSystem> ModelSystem::instance_ = nullptr;
     namespace
     {
         bool CheckForIntersection(Model const &model,

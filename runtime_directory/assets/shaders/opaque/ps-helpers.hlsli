@@ -84,6 +84,10 @@ float3 F_Schlick(float ndotl, float3 F0)
 {
   return F0 + (1.0f - F0) * pow(1.0f - ndotl, 5.0f);
 }
+float3 F_SchlickRoughness(float ndotl, float3 F0, float roughness) 
+{
+  return F0 + (max(1.0f - roughness, F0) - F0) * pow(1.0f - ndotl, 5.0f);
+}
 float Smith(float rough2, float NoV, float NoL) 
 {
     NoV *= NoV;

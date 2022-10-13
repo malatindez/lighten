@@ -12,7 +12,7 @@ extern "C"
 
 namespace engine::direct3d
 {
-    std::unique_ptr<Api> Api::instance_;
+    std::unique_ptr<Api> Api::instance_ = nullptr;
     void Api::Init()
     {
         instance_ = std::unique_ptr<Api>(new Api());

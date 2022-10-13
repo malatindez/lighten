@@ -4,7 +4,7 @@
 // TODO EVENT SUBSCRIPTIONS
 namespace engine::core
 {
-    std::shared_ptr<InputLayer> InputLayer::instance_;
+    std::shared_ptr<InputLayer> InputLayer::instance_ = nullptr;
     using namespace events;
     void InputLayer::OnEvent(Event &event)
     {

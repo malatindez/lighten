@@ -432,5 +432,5 @@ namespace engine::core
         }
         return return_value;
     }
-    std::shared_ptr<ModelLoader> ModelLoader::instance_;
+    std::shared_ptr<ModelLoader> ModelLoader::instance_ = nullptr;
 } // namespace engine::core

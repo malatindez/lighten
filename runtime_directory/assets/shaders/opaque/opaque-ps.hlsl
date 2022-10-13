@@ -49,7 +49,6 @@ TextureCube<float3> g_irradiance_map : register(t8);
 TextureCube<float3> g_prefiltered_map : register(t9);
 Texture2D<float3> g_brdf_lut : register(t10);
 
-
 static const uint TEXTURE_ENABLED_AMBIENT = 1;
 static const uint TEXTURE_ENABLED_ALBEDO = 1 << 1;
 static const uint TEXTURE_ENABLED_NORMAL = 1 << 2;
@@ -136,12 +135,8 @@ float4 ps_main(PS_IN input)
             common_data.normal = pow(common_data.normal, 2.2f);
             common_data.normal = sRGB_to_lRGB(common_data.normal);
         }
-
         common_data.normal = normalize(common_data.normal * 2 - 1);
-        if(g_enabled_texture_flags & TEXTURE_NORMAL_REVERSE_Y)
-            {
-                common_data.normal.y = -common_data.normal.y;
-            }
+        if(g_enabled_texture_flags & TEXTURE_NORMAL_REVERSE_Y) { common_data.normal.y = -common_data.normal.y; }
         float3x3 TBN = float3x3(input.tangent, input.bitangent, input.normal);
         common_data.normal = normalize(mul(common_data.normal, TBN));
     }
@@ -154,7 +149,26 @@ float4 ps_main(PS_IN input)
     common_data.bitangent = input.bitangent;
     common_data.camera_position = fetch_position_row_major(g_inv_view);
     common_data.fragment_position = input.fragment_position;
-    float3 light_energy = float3(0, 0, 0);
-    light_energy += ComputePointLightsEnergy(material, common_data);
-    return float4(ambient * material.albedo + light_energy, 1);
+    float3 color = float3(0, 0, 0);
+    color += ComputePointLightsEnergy(material, common_data);
+    color = ambient * material.albedo + color;
+    
+    float3 F = F_SchlickRoughness(max(dot(common_data.view_dir_normalized, common_data.normal), clampVal), material.f0, material.roughness);
+    float3 kS = F;
+    float3 kD = 1.0 - kS;
+    kD *= 1.0 - material.metalness;
+
+    float3 irradiance = g_irradiance_map.SampleLevel(g_default_sampler, common_data.normal, 0).rgb;
+    float3 diffuse = irradiance * material.albedo;
+
+    float3 prefilteredColor = g_prefiltered_map.SampleLevel(g_default_sampler, common_data.normal, material.roughness * 6.0).rgb;
+    float2 envBRDF = g_brdf_lut.SampleLevel(g_default_sampler, float2(max(dot(common_data.normal, common_data.view_dir_normalized), clampVal), material.roughness), 0).rg;
+    float3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
+
+    ambient += (kD * diffuse + specular);
+
+
+    color += ambient;
+
+    return float4(color, 1);
 }

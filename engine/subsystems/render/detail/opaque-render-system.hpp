@@ -174,6 +174,12 @@ namespace engine::render::_opaque_detail
     {
     public:
         ModelInstance *GetInstancePtr(uint64_t model_id);
+        void SetIrradianceTexture(ID3D11ShaderResourceView *texture) { irradiance_texture_ = texture; }
+        void SetPrefilteredTexture(ID3D11ShaderResourceView *texture) { prefiltered_texture_ = texture; }
+        void SetBrdfTexture(ID3D11ShaderResourceView *texture) { brdf_texture_ = texture; }
+        [[nodiscard]] ID3D11ShaderResourceView *GetIrradianceTexture() const { return irradiance_texture_; }
+        [[nodiscard]] ID3D11ShaderResourceView *GetPrefilteredTexture() const { return prefiltered_texture_; }
+        [[nodiscard]] ID3D11ShaderResourceView *GetBrdfTexture() const { return brdf_texture_; }
     private:
         friend class ::engine::render::ModelSystem;
 
@@ -192,5 +198,8 @@ namespace engine::render::_opaque_detail
         direct3d::DynamicUniformBuffer<OpaquePerMaterial> opaque_per_material_buffer_;
         direct3d::DynamicUniformBuffer<OpaqueInstance> mesh_to_model_buffer_;
         direct3d::DynamicVertexBuffer<OpaqueInstance> instance_buffer_;
+        ID3D11ShaderResourceView *irradiance_texture_;
+        ID3D11ShaderResourceView *prefiltered_texture_;
+        ID3D11ShaderResourceView *brdf_texture_;
     };
 } // namespace engine::render::_opaque_detail

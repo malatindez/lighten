@@ -55,7 +55,7 @@ namespace
 }
 namespace engine::direct3d
 {
-    std::unique_ptr<States> States::instance_;
+    std::unique_ptr<States> States::instance_ = nullptr;
     States::States()
     {
         D3D11_RASTERIZER_DESC raster_desc = CreateRasterizerState(D3D11_CULL_NONE, D3D11_FILL_SOLID);
