@@ -24,7 +24,7 @@ target_include_directories(d3d_test PRIVATE ${D3D_SOURCES_DIR})
 target_include_directories(d3d_test PRIVATE ${ENGINE_SOURCES_DIR})
 
 # target_link_libraries(d3d_test engine)
-target_add_libraries(d3d_test "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console" "directxtex" "dds_texture_loader11" "wic_texture_loader11")
+target_add_libraries(d3d_test "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console" "directxtex" "dds_texture_loader11" "wic_texture_loader11" "math")
 #target_precompile_headers(d3d_test PRIVATE "${ENGINE_SOURCES_DIR}/include/library-pch.hpp")
 
 file(GLOB RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/resources/*")
