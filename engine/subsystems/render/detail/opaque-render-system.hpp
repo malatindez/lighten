@@ -206,6 +206,6 @@ namespace engine::render::_opaque_detail
         ID3D11ShaderResourceView *irradiance_texture_;
         ID3D11ShaderResourceView *prefiltered_texture_;
         ID3D11ShaderResourceView *brdf_texture_;
-        float ambient_occlusion_value_;
+        float ambient_occlusion_value_ = 1.0f;
     };
 } // namespace engine::render::_opaque_detail
