@@ -256,7 +256,14 @@ void Controller::OnTick([[maybe_unused]] float delta_time)
     auto &input = *InputLayer::instance();
     auto scene = Engine::scene();
     camera_movement::UpdateCamera(delta_time);
-
+    auto const &camera = Engine::scene()->main_camera->camera();
+    renderer_->per_frame.view = camera.view;
+    renderer_->per_frame.projection = camera.projection;
+    renderer_->per_frame.view_projection = camera.view_projection;
+    renderer_->per_frame.inv_view = camera.inv_view;
+    renderer_->per_frame.inv_projection = camera.inv_projection;
+    renderer_->per_frame.inv_view_projection = camera.inv_view_projection;
+    renderer_->per_frame.mouse_position = vec2{ InputLayer::instance()->mouse_position() };
     if (input.mouse_scrolled())
     {
         auto &move_speed = scene->main_camera->move_speed();
