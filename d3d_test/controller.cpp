@@ -234,8 +234,6 @@ void Controller::OnTick([[maybe_unused]] float delta_time)
     auto scene = Engine::scene();
     camera_movement::UpdateCamera(delta_time);
 
-    renderer_->per_frame.view_projection = scene->main_camera->camera().view_projection;
-
     if (input.mouse_scrolled())
     {
         auto &move_speed = scene->main_camera->move_speed();

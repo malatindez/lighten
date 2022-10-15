@@ -165,6 +165,7 @@ float4 ps_main(PS_IN input)
     {
         ambient_occlusion = g_ambient_occlusion.Sample(g_default_sampler, input.texcoord).r;
     }
+    float3 R = reflect(-common_data.view_dir_normalized, common_data.normal);
 #if 1
 
     float ndotv = max(dot(common_data.normal, common_data.view_dir_normalized), clampVal);
@@ -177,14 +178,13 @@ float4 ps_main(PS_IN input)
     float3 irradiance = g_irradiance_map.SampleLevel(g_linear_clamp_sampler, common_data.normal, 0).rgb;
     float3 diffuse = irradiance * material.albedo * kD;
 
-    float3 prefilteredColor = g_prefiltered_map.SampleLevel(g_linear_clamp_sampler, common_data.normal, material.roughness * g_prefiltered_map_mip_levels).rgb;
+    float3 prefilteredColor = g_prefiltered_map.SampleLevel(g_linear_clamp_sampler, R, material.roughness * g_prefiltered_map_mip_levels).rgb;
 
 
     float2 envBRDF = g_brdf_lut.SampleLevel(g_linear_clamp_sampler, float2(material.roughness, ndotv), 0).rg;
     float3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y) * reflectance_modifier;
 
 #else	
-    float3 R = reflect(-common_data.view_dir_normalized, common_data.normal);
     float3 diffuse = material.albedo * (1.0 - material.metalness) * g_irradiance_map.SampleLevel(g_linear_clamp_sampler, common_data.normal, 0.0);
 
 	float2 reflectanceLUT = g_brdf_lut.Sample(g_linear_clamp_sampler, float2(material.roughness, max(dot(common_data.normal, common_data.view_dir_normalized), clampVal))).rg;
