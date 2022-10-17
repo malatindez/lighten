@@ -18,12 +18,9 @@ float4 ps_main(PS_INPUT input) : SV_TARGET
 	float3 emission = input.emission;
 	if(input.use_emissive_texture)
 	{
-		emission = (g_EmissiveTexture.Sample(g_normal_sampler, input.texcoord.xy)).xyz * input.power;
+		emission = (g_EmissiveTexture.Sample(g_anisotropic_wrap_sampler, input.texcoord.xy)).xyz * input.power;
 	}
 	return float4(emission, 1.0f);
-	// WORKAROUND FOR SPHERES
-
-	input.normal = input.world_position - input.world_transform[3].xyz;
 
 	float3 normal = normalize(input.normal);
 	float3 cameraDir = normalize(GetCameraPosition() - input.world_transform[3].xyz);

@@ -13,7 +13,7 @@ struct PS_INPUT {
   float2 tex_coords : TEXCOORD;
 };
 float4 ps_main(PS_INPUT vout) : SV_Target {
-  float3 ldr = g_texture.Sample(g_default_sampler, vout.tex_coords).rgb;
+  float3 ldr = g_texture.Sample(g_bilinear_wrap_sampler, vout.tex_coords).rgb;
   ldr = AdjustExposure(ldr, g_EV100);
   ldr = AcesHdrToLdr(ldr);
  // ldr = ApplyGammaCorrection(ldr, g_gamma);

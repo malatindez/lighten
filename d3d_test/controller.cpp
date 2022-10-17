@@ -75,24 +75,22 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
     render::OpaqueMaterial mud_material;
     render::OpaqueMaterial mudroad_material;
     render::OpaqueMaterial stone_material;
-    render::OpaqueMaterial stone_material2;
     cobblestone_material.reset();
     crystal_material.reset();
     mud_material.reset();
     mudroad_material.reset();
     stone_material.reset();
-    stone_material2.reset();
     {
         {
             cobblestone_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_albedo.dds");
             cobblestone_material.normal_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_normal.dds");
             cobblestone_material.roughness_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_roughness.dds");
-            cobblestone_material.reverse_normal_y = true;
             cobblestone_material.UpdateTextureFlags();
         }
         {
             crystal_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Crystal\\Crystal_albedo.dds");
             crystal_material.normal_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Crystal\\Crystal_normal.dds");
+            crystal_material.reverse_normal_y = true;
             crystal_material.UpdateTextureFlags();
         }
         {
@@ -114,15 +112,9 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
             stone_material.roughness_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Stone\\Stone_roughness.dds");
             stone_material.UpdateTextureFlags();
         }
-        {
-            stone_material2.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Stone\\Stone_COLOR.png");
-            stone_material2.normal_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Stone\\Stone_NORM.png");
-            stone_material2.roughness_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Stone\\Stone_ROUGH.png");
-            stone_material2.UpdateTextureFlags();
-        }
     }
     {
-        std::vector<render::OpaqueMaterial> materials = { cobblestone_material, crystal_material, mud_material, mudroad_material, stone_material, stone_material2 };
+        std::vector<render::OpaqueMaterial> materials = { cobblestone_material, crystal_material, mud_material, mudroad_material, stone_material };
         for (size_t i = 0; i < materials.size(); i++)
         {
             auto model_id = render::ModelSystem::GetUnitCube();
@@ -148,7 +140,6 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
                 render::OpaqueMaterial material;
                 material.reset();
                 material.albedo_color = vec3{ 1 };
-                material.reflective_color = vec3{ 0 };
                 material.metalness_value = mix(0.001f, 1.0f, float(i) / 9.0f);
                 material.roughness_value = mix(0.001f, 1.0f, float(j) / 9.0f);
                 material.UpdateTextureFlags();

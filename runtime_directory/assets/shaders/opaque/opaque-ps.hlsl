@@ -27,40 +27,27 @@ cbuffer OpaquePerFrame : register(b1)
 
 cbuffer OpaquePerMaterial : register(b2)
 {
-    float3 g_ambient_color;
-    float g_shininess_value;
     float3 g_albedo_color;
     float g_metalness_value;
-    float3 g_reflective_color;
     float g_roughness_value;
-    float g_reflectance_value;
     uint g_enabled_texture_flags;
     float2 g_uv_multiplier;
 };
 
-Texture2D<float3> g_ambient : register(t0);
-Texture2D<float3> g_albedo : register(t1);
-Texture2D<float3> g_normal : register(t2);
-Texture2D<float> g_shininess : register(t3);
-Texture2D<float> g_metalness : register(t4);
-Texture2D<float> g_roughness : register(t5);
-Texture2D<float> g_ambient_occlusion : register(t6);
-Texture2D<float> g_reflectance : register(t7);
+Texture2D<float3> g_albedo : register(t0);
+Texture2D<float3> g_normal : register(t1);
+Texture2D<float> g_metalness : register(t2);
+Texture2D<float> g_roughness : register(t3);
 
-TextureCube<float3> g_irradiance_map : register(t8);
-TextureCube<float3> g_prefiltered_map : register(t9);
-Texture2D<float2> g_brdf_lut : register(t10);
+TextureCube<float3> g_irradiance_map : register(t5);
+TextureCube<float3> g_prefiltered_map : register(t6);
+Texture2D<float2> g_brdf_lut : register(t7);
 
-static const uint TEXTURE_ENABLED_AMBIENT = 1;
-static const uint TEXTURE_ENABLED_ALBEDO = 1 << 1;
-static const uint TEXTURE_ENABLED_NORMAL = 1 << 2;
-static const uint TEXTURE_ENABLED_SHININESS = 1 << 3;
-static const uint TEXTURE_ENABLED_METALNESS = 1 << 4;
-static const uint TEXTURE_ENABLED_ROUGHNESS = 1 << 5;
-static const uint TEXTURE_ENABLED_AMBIENT_OCCLUSION = 1 << 6;
-static const uint TEXTURE_ENABLED_REFLECTION = 1 << 7;
-static const uint TEXTURE_NORMAL_REVERSE_Y = 1 << 8;
-static const uint TEXTURE_NORMAL_SRGB = 1 << 9;
+static const uint TEXTURE_ENABLED_ALBEDO = 1;
+static const uint TEXTURE_ENABLED_NORMAL = 1 << 1;
+static const uint TEXTURE_ENABLED_METALNESS = 1 << 2;
+static const uint TEXTURE_ENABLED_ROUGHNESS = 1 << 3;
+static const uint TEXTURE_NORMAL_REVERSE_Y = 1 << 4;
 
 struct PS_IN
 {
@@ -82,21 +69,46 @@ float3 ComputePointLightsEnergy(PBR_Material material, PBR_CommonData common_dat
     }
     return rv;
 }
+float3 ComputeEnvironmentEnergy(PBR_Material material, PBR_CommonData common_data)
+{
+    float3 R = reflect(-common_data.view_dir_normalized, common_data.normal);
+    float ndotv = max(dot(common_data.normal, common_data.view_dir_normalized), clampVal);
+#if 0
+
+    
+    float3 F = F_SchlickRoughness(ndotv, material.f0, material.roughness);
+    float3 kS = F;
+    float3 kD = 1.0 - kS;
+    kD *= 1.0 - material.metalness;
+
+    float3 irradiance = g_irradiance_map.SampleLevel(g_normal_sampler, common_data.normal, 0).rgb;
+    float3 diffuse = irradiance * material.albedo * kD;
+
+    float3 prefilteredColor = g_prefiltered_map.SampleLevel(g_normal_sampler, R, material.roughness * g_prefiltered_map_mip_levels).rgb;
+
+
+    float2 envBRDF = g_brdf_lut.SampleLevel(g_linear_clamp_sampler, float2(material.roughness, 1 - ndotv), 0).rg;
+    float3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
+
+#else	
+    float3 diffuse = material.albedo * (1.0 - material.metalness) * g_irradiance_map.SampleLevel(g_bilinear_clamp_sampler, common_data.normal, 0.0);
+
+	float2 reflectanceLUT = g_brdf_lut.Sample(g_bilinear_clamp_sampler, float2(material.roughness, 1 - max(ndotv, clampVal))).rg;
+    float3 reflectance = reflectanceLUT.x * material.f0 + reflectanceLUT.y;
+	float3 specular = reflectance * g_prefiltered_map.SampleLevel(g_bilinear_clamp_sampler, R, material.roughness * g_prefiltered_map_mip_levels);
+#endif
+    return diffuse + specular;
+}
 
 float4 ps_main(PS_IN input)
     : SV_TARGET
 {
     float3 ambient = float3(0, 0, 0);
     input.texcoord = input.texcoord * g_uv_multiplier;
-    if (g_enabled_texture_flags & TEXTURE_ENABLED_AMBIENT)
-    {
-        ambient += g_ambient.Sample(g_default_sampler, input.texcoord).rgb;
-    }
-    ambient += g_ambient_color;
     PBR_Material material;
     if (g_enabled_texture_flags & TEXTURE_ENABLED_ALBEDO)
     {
-        material.albedo = g_albedo.Sample(g_default_sampler, input.texcoord).rgb;
+        material.albedo = g_albedo.Sample(g_bilinear_wrap_sampler, input.texcoord).rgb;
     }
     else
     {
@@ -106,7 +118,7 @@ float4 ps_main(PS_IN input)
 
     if (g_enabled_texture_flags & TEXTURE_ENABLED_ROUGHNESS)
     {
-        material.roughness = g_roughness.Sample(g_default_sampler, input.texcoord).r;
+        material.roughness = g_roughness.Sample(g_bilinear_wrap_sampler, input.texcoord).r;
     }
     else
     {
@@ -114,7 +126,7 @@ float4 ps_main(PS_IN input)
     }
     if (g_enabled_texture_flags & TEXTURE_ENABLED_METALNESS)
     {
-        material.metalness = g_metalness.Sample(g_default_sampler, input.texcoord).r;
+        material.metalness = g_metalness.Sample(g_bilinear_wrap_sampler, input.texcoord).r;
     }
     else
     {
@@ -131,12 +143,7 @@ float4 ps_main(PS_IN input)
     common_data.view_dir_normalized = normalize(common_data.view_dir);
     if (g_enabled_texture_flags & TEXTURE_ENABLED_NORMAL)
     {
-        common_data.normal = g_normal.Sample(g_normal_sampler, input.texcoord);
-        if(g_enabled_texture_flags & TEXTURE_NORMAL_SRGB)
-        {
-            common_data.normal = pow(common_data.normal, 2.2f);
-            common_data.normal = sRGB_to_lRGB(common_data.normal);
-        }
+        common_data.normal = g_normal.Sample(g_bilinear_clamp_sampler, input.texcoord);
         common_data.normal = normalize(common_data.normal * 2 - 1);
         if(g_enabled_texture_flags & TEXTURE_NORMAL_REVERSE_Y) { common_data.normal.y = -common_data.normal.y; }
         float3x3 TBN = float3x3(input.tangent, input.bitangent, input.normal);
@@ -153,50 +160,11 @@ float4 ps_main(PS_IN input)
     common_data.fragment_position = input.fragment_position;
     float3 color = float3(0, 0, 0);
     color += ComputePointLightsEnergy(material, common_data);
-    color = ambient * material.albedo + color;
+    color = color;
 
-    float reflectance_modifier = g_reflectance_value;
-    if (g_enabled_texture_flags & TEXTURE_ENABLED_REFLECTION)
-    {
-        reflectance_modifier = g_reflectance.Sample(g_default_sampler, input.texcoord).r;
-    }
-    float ambient_occlusion = g_default_ambient_occlusion_value;
-    if (g_enabled_texture_flags & TEXTURE_ENABLED_AMBIENT_OCCLUSION)
-    {
-        ambient_occlusion = g_ambient_occlusion.Sample(g_default_sampler, input.texcoord).r;
-    }
-    float3 R = reflect(-common_data.view_dir_normalized, common_data.normal);
-#if 0
+    ambient += ComputeEnvironmentEnergy(material, common_data);
 
-    float ndotv = max(dot(common_data.normal, common_data.view_dir_normalized), clampVal);
-    
-    float3 F = F_SchlickRoughness(ndotv, material.f0, material.roughness);
-    float3 kS = F;
-    float3 kD = 1.0 - kS;
-    kD *= 1.0 - material.metalness;
-
-    float3 irradiance = g_irradiance_map.SampleLevel(g_normal_sampler, common_data.normal, 0).rgb;
-    float3 diffuse = irradiance * material.albedo * kD;
-
-    float3 prefilteredColor = g_prefiltered_map.SampleLevel(g_normal_sampler, R, material.roughness * g_prefiltered_map_mip_levels).rgb;
-
-
-    float2 envBRDF = g_brdf_lut.SampleLevel(g_linear_clamp_sampler, float2(material.roughness, ndotv), 0).rg;
-    float3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
-
-#else	
-    float3 diffuse = material.albedo * (1.0 - material.metalness) * g_irradiance_map.SampleLevel(g_normal_sampler, common_data.normal, 0.0);
-
-	float2 reflectanceLUT = g_brdf_lut.Sample(g_normal_sampler, float2(material.roughness, max(dot(common_data.normal, common_data.view_dir_normalized), clampVal))).rg;
-    float3 reflectance = reflectanceLUT.x * material.f0 + reflectanceLUT.y;
-	float3 specular = reflectance * g_prefiltered_map.SampleLevel(g_linear_clamp_sampler, R, material.roughness * g_prefiltered_map_mip_levels);
-#endif
-
-
-    ambient += diffuse + specular * reflectance_modifier;
-
-
-    color += ambient * ambient_occlusion;
+    color += ambient * g_default_ambient_occlusion_value * material.albedo;
 
     return float4(color, 1);
 }

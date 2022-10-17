@@ -1,6 +1,7 @@
 #ifndef PS_HELPERS_HLSLI
 #define PS_HELPERS_HLSLI
 #define PI 3.1415926535897932384626433832795
+static const float clampVal = 0.001f;
 
 struct PointLight 
 {
@@ -121,7 +122,6 @@ struct PBR_CommonData
     float3 fragment_position;
 };
 
-float clampVal = 0.001f;
 
 float3 Lambert(PBR_Material material, float ndotl, float solid_angle)
 {

@@ -144,9 +144,6 @@ namespace object_editor
         if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_SpanAvailWidth))
         {
             static entt::entity entity;
-            static uint64_t ambient_texture_id = 0;
-            static uint64_t saved_ambient_texture_id = 0;
-            static bool ambient_texture_enabled = false;
             static uint64_t albedo_map_texture_id = 0;
             static uint64_t saved_albedo_map_texture_id = 0;
             static bool albedo_map_texture_enabled = false;
@@ -159,34 +156,18 @@ namespace object_editor
             static uint64_t metallic_map_texture_id = 0;
             static uint64_t saved_metallic_map_texture_id = 0;
             static bool metallic_map_texture_enabled = false;
-            static uint64_t ao_map_texture_id = 0;
-            static uint64_t saved_ao_map_texture_id = 0;
-            static bool ao_map_texture_enabled = false;
-            static uint64_t reflection_texture_id = 0;
-            static uint64_t saved_reflection_texture_id = 0;
-            static bool reflection_texture_enabled = false;
             if (entity != selected_entity)
             {
                 entity = selected_entity;
-                saved_ambient_texture_id = ambient_texture_id = TextureManager::GetTextureIdByPointer(material->ambient);
                 saved_albedo_map_texture_id = albedo_map_texture_id = TextureManager::GetTextureIdByPointer(material->albedo_map);
                 saved_normal_map_texture_id = normal_map_texture_id = TextureManager::GetTextureIdByPointer(material->normal_map);
                 saved_roughness_map_texture_id = roughness_map_texture_id = TextureManager::GetTextureIdByPointer(material->roughness_map);
                 saved_metallic_map_texture_id = metallic_map_texture_id = TextureManager::GetTextureIdByPointer(material->metalness_map);
-                saved_ao_map_texture_id = ao_map_texture_id = TextureManager::GetTextureIdByPointer(material->ambient_occlusion_map);
-                saved_reflection_texture_id = reflection_texture_id = TextureManager::GetTextureIdByPointer(material->reflection_map);
-                ambient_texture_enabled = ambient_texture_id != kInvalidTextureId;
                 albedo_map_texture_enabled = albedo_map_texture_id != kInvalidTextureId;
                 normal_map_texture_enabled = normal_map_texture_id != kInvalidTextureId;
                 roughness_map_texture_enabled = roughness_map_texture_id != kInvalidTextureId;
                 metallic_map_texture_enabled = metallic_map_texture_id != kInvalidTextureId;
-                ao_map_texture_enabled = ao_map_texture_id != kInvalidTextureId;
-                reflection_texture_enabled = reflection_texture_id != kInvalidTextureId;
             }
-            ImGui::Checkbox("##ambient_enabled", &ambient_texture_enabled);
-            ImGui::SameLine();
-            ImGui::BeginDisabled(!ambient_texture_enabled);
-            ImGui::InputScalar("Ambient texture ID", ImGuiDataType_U64, &ambient_texture_id, nullptr, nullptr, "%llu");
             ImGui::EndDisabled();
             ImGui::Checkbox("##albedo_map_enabled", &albedo_map_texture_enabled);
             ImGui::SameLine();
@@ -208,23 +189,9 @@ namespace object_editor
             ImGui::BeginDisabled(!metallic_map_texture_enabled);
             ImGui::InputScalar("Metallic map texture ID", ImGuiDataType_U64, &metallic_map_texture_id, nullptr, nullptr, "%llu");
             ImGui::EndDisabled();
-            ImGui::Checkbox("##ao_map_enabled", &ao_map_texture_enabled);
-            ImGui::SameLine();
-            ImGui::BeginDisabled(!ao_map_texture_enabled);
-            ImGui::InputScalar("AO map texture ID", ImGuiDataType_U64, &ao_map_texture_id, nullptr, nullptr, "%llu");
-            ImGui::EndDisabled();
-            ImGui::Checkbox("##reflection_enabled", &reflection_texture_enabled);
-            ImGui::SameLine();
-            ImGui::BeginDisabled(!reflection_texture_enabled);
-            ImGui::InputScalar("Reflection texture ID", ImGuiDataType_U64, &reflection_texture_id, nullptr, nullptr, "%llu");
-            ImGui::EndDisabled();
-            ImGui::ColorEdit3("Ambient color", material->ambient_color.data.data());
             ImGui::ColorEdit3("Albedo color", material->albedo_color.data.data());
-            ImGui::ColorEdit3("Reflective color [ not used ]", material->reflective_color.data.data());
-            ImGui::SliderFloat("Shininess [ not used ]", &material->shininess_value, 0.0f, 1.0f);
             ImGui::SliderFloat("Metalness", &material->metalness_value, 0.001f, 1.0f);
             ImGui::SliderFloat("Roughness", &material->roughness_value, 0.001f, 1.0f);
-            ImGui::SliderFloat("Reflectance [ not used ]", &material->reflectance_value, 0.0f, 1.0f);
             auto width = ::ImGui::GetContentRegionMax().x - 200;
             ImGui::PushItemWidth(width / 2);
             ImGui::SliderFloat("X", &material->uv_multiplier.x, 1, 100);
@@ -234,9 +201,6 @@ namespace object_editor
             ImGui::SameLine();
             ImGui::Text("UV multiplier");
             ImGui::Checkbox("Reverse normal y", &material->reverse_normal_y);
-            ImGui::Checkbox("Normal map is sRGB", &material->normal_map_srgb);
-            if (!ambient_texture_enabled)
-                ambient_texture_id = kInvalidTextureId;
             if (!albedo_map_texture_enabled)
                 albedo_map_texture_id = kInvalidTextureId;
             if (!normal_map_texture_enabled)
@@ -245,15 +209,6 @@ namespace object_editor
                 roughness_map_texture_id = kInvalidTextureId;
             if (!metallic_map_texture_enabled)
                 metallic_map_texture_id = kInvalidTextureId;
-            if (!ao_map_texture_enabled)
-                ao_map_texture_id = kInvalidTextureId;
-            if (!reflection_texture_enabled)
-                reflection_texture_id = kInvalidTextureId;
-            if (saved_ambient_texture_id != ambient_texture_id)
-            {
-                material->ambient = TextureManager::GetTextureView(ambient_texture_id);
-                saved_ambient_texture_id = ambient_texture_id;
-            }
             if (saved_albedo_map_texture_id != albedo_map_texture_id)
             {
                 material->albedo_map = TextureManager::GetTextureView(albedo_map_texture_id);
@@ -273,16 +228,6 @@ namespace object_editor
             {
                 material->metalness_map = TextureManager::GetTextureView(metallic_map_texture_id);
                 saved_metallic_map_texture_id = metallic_map_texture_id;
-            }
-            if (saved_ao_map_texture_id != ao_map_texture_id)
-            {
-                material->ambient_occlusion_map = TextureManager::GetTextureView(ao_map_texture_id);
-                saved_ao_map_texture_id = ao_map_texture_id;
-            }
-            if (saved_reflection_texture_id != reflection_texture_id)
-            {
-                material->reflection_map = TextureManager::GetTextureView(reflection_texture_id);
-                saved_reflection_texture_id = reflection_texture_id;
             }
             material->UpdateTextureFlags();
         }

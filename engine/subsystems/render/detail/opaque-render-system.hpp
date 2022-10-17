@@ -12,25 +12,15 @@ namespace engine::render
     }
     struct OpaqueMaterial
     {
-        ID3D11ShaderResourceView *ambient = nullptr;
         ID3D11ShaderResourceView *albedo_map = nullptr;
         ID3D11ShaderResourceView *normal_map = nullptr;
-        ID3D11ShaderResourceView *shininess_map = nullptr;
         ID3D11ShaderResourceView *metalness_map = nullptr;
         ID3D11ShaderResourceView *roughness_map = nullptr;
-        ID3D11ShaderResourceView *ambient_occlusion_map = nullptr;
-        ID3D11ShaderResourceView *reflection_map = nullptr;
-        // opacity ?
-        core::math::vec3 ambient_color;
         core::math::vec3 albedo_color;
-        core::math::vec3 reflective_color;
-        float shininess_value;
         float metalness_value;
         float roughness_value;
-        float reflectance_value;
         uint32_t texture_flags;
         bool reverse_normal_y = false;
-        bool normal_map_srgb = false;
         core::math::vec2 uv_multiplier{ 1 };
         void UpdateTextureFlags();
         OpaqueMaterial() = default;
@@ -38,24 +28,15 @@ namespace engine::render
         explicit OpaqueMaterial(Material const &material);
         void reset()
         {
-            ambient = nullptr;
             albedo_map = nullptr;
             normal_map = nullptr;
-            shininess_map = nullptr;
             metalness_map = nullptr;
             roughness_map = nullptr;
-            ambient_occlusion_map = nullptr;
-            reflection_map = nullptr;
-            ambient_color = core::math::vec3{ 0.0f };
             albedo_color = core::math::vec3{ 0.0f };
-            reflective_color = core::math::vec3{ 0.0f };
-            shininess_value = 0.0f;
             metalness_value = 0.01f;
             roughness_value = 0.01f;
-            reflectance_value = 1.0f;
             texture_flags = 0;
             reverse_normal_y = false;
-            normal_map_srgb = false;
             uv_multiplier = core::math::vec2{ 1 };
         }
     };
@@ -67,24 +48,15 @@ namespace std {
         std::size_t operator()(engine::render::OpaqueMaterial const &material) const
         {
             size_t seed = 0;
-            engine::utils::hash_combine(seed, material.ambient);
             engine::utils::hash_combine(seed, material.albedo_map);
             engine::utils::hash_combine(seed, material.normal_map);
-            engine::utils::hash_combine(seed, material.shininess_map);
             engine::utils::hash_combine(seed, material.metalness_map);
             engine::utils::hash_combine(seed, material.roughness_map);
-            engine::utils::hash_combine(seed, material.ambient_occlusion_map);
-            engine::utils::hash_combine(seed, material.reflection_map);
-            engine::utils::hash_combine(seed, material.ambient_color);
             engine::utils::hash_combine(seed, material.albedo_color);
-            engine::utils::hash_combine(seed, material.reflective_color);
-            engine::utils::hash_combine(seed, material.shininess_value);
             engine::utils::hash_combine(seed, material.metalness_value);
             engine::utils::hash_combine(seed, material.roughness_value);
-            engine::utils::hash_combine(seed, material.reflectance_value);
             engine::utils::hash_combine(seed, material.texture_flags);
             engine::utils::hash_combine(seed, material.reverse_normal_y);
-            engine::utils::hash_combine(seed, material.normal_map_srgb);
             engine::utils::hash_combine(seed, material.uv_multiplier);
             return seed;
         }
@@ -158,13 +130,9 @@ namespace engine::render::_opaque_detail
     };
     struct OpaquePerMaterial
     {
-        core::math::vec3 ambient_color;
-        float shininess;
         core::math::vec3 albedo_color;
         float metalness;
-        core::math::vec3 reflective_color;
         float roughness;
-        float reflectance;
         uint32_t enabled_texture_flags;
         core::math::vec2 uv_multiplier;
     };

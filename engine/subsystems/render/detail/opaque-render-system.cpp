@@ -8,52 +8,31 @@ namespace engine::render
 {
     void OpaqueMaterial::UpdateTextureFlags() {
         texture_flags = 0;
-        texture_flags |= (ambient != nullptr) ? 1 : 0;
-        texture_flags |= (albedo_map != nullptr) ? 1 << 1 : 0;
-        texture_flags |= (normal_map != nullptr) ? 1 << 2 : 0;
-        texture_flags |= (shininess_map != nullptr) ? 1 << 3 : 0;
-        texture_flags |= (metalness_map != nullptr) ? 1 << 4 : 0;
-        texture_flags |= (roughness_map != nullptr) ? 1 << 5 : 0;
-        texture_flags |= (ambient_occlusion_map != nullptr) ? 1 << 6 : 0;
-        texture_flags |= (reflection_map != nullptr) ? 1 << 7 : 0;
-        texture_flags |= (reverse_normal_y) ? 1 << 8 : 0;
-        texture_flags |= (normal_map_srgb) ? 1 << 9 : 0;
+        texture_flags |= (albedo_map != nullptr) ? 1 << 0 : 0;
+        texture_flags |= (normal_map != nullptr) ? 1 << 1 : 0;
+        texture_flags |= (metalness_map != nullptr) ? 1 << 2 : 0;
+        texture_flags |= (roughness_map != nullptr) ? 1 << 3 : 0;
+        texture_flags |= (reverse_normal_y) ? 1 << 4 : 0;
     }
 
     void OpaqueMaterial::Bind(direct3d::DynamicUniformBuffer<_opaque_detail::OpaquePerMaterial> &uniform_buffer) const
     {
-        if (ambient != nullptr) {
-            direct3d::api().devcon4->PSSetShaderResources(0, 1, &ambient);
-        }
         if (albedo_map != nullptr) {
-            direct3d::api().devcon4->PSSetShaderResources(1, 1, &albedo_map);
+            direct3d::api().devcon4->PSSetShaderResources(0, 1, &albedo_map);
         }
         if (normal_map != nullptr) {
-            direct3d::api().devcon4->PSSetShaderResources(2, 1, &normal_map);
-        }
-        if (shininess_map != nullptr) {
-            direct3d::api().devcon4->PSSetShaderResources(3, 1, &shininess_map);
+            direct3d::api().devcon4->PSSetShaderResources(1, 1, &normal_map);
         }
         if (metalness_map != nullptr) {
-            direct3d::api().devcon4->PSSetShaderResources(4, 1, &metalness_map);
+            direct3d::api().devcon4->PSSetShaderResources(2, 1, &metalness_map);
         }
         if (roughness_map != nullptr) {
-            direct3d::api().devcon4->PSSetShaderResources(5, 1, &roughness_map);
-        }
-        if (ambient_occlusion_map != nullptr) {
-            direct3d::api().devcon4->PSSetShaderResources(6, 1, &ambient_occlusion_map);
-        }
-        if (reflection_map != nullptr) {
-            direct3d::api().devcon4->PSSetShaderResources(7, 1, &reflection_map);
+            direct3d::api().devcon4->PSSetShaderResources(3, 1, &roughness_map);
         }
         _opaque_detail::OpaquePerMaterial temporary;
-        temporary.ambient_color = ambient_color;
         temporary.albedo_color = albedo_color;
-        temporary.reflective_color = reflective_color;
-        temporary.shininess = shininess_value;
         temporary.metalness = metalness_value;
         temporary.roughness = roughness_value;
-        temporary.reflectance = reflectance_value;
         temporary.enabled_texture_flags = texture_flags;
         temporary.uv_multiplier = uv_multiplier;
         uniform_buffer.Update(temporary);
@@ -72,10 +51,6 @@ namespace engine::render
         {
             normal_map = material.normal_textures.front();
         }
-        if (material.shininess_textures.size() > 0)
-        {
-            shininess_map = material.shininess_textures.front();
-        }
         if (material.metalness_textures.size() > 0)
         {
             metalness_map = material.metalness_textures.front();
@@ -84,23 +59,11 @@ namespace engine::render
         {
             roughness_map = material.diffuse_roughness_textures.front();
         }
-        if (material.ambient_occlusion_textures.size() > 0)
-        {
-            ambient_occlusion_map = material.ambient_occlusion_textures.front();
-        }
-        if (material.reflection_textures.size() > 0)
-        {
-            reflection_map = material.reflection_textures.front();
-        }
         texture_flags = 0;
         UpdateTextureFlags();
-        ambient_color = material.ambient_color;
         albedo_color = material.diffuse_color;
-        reflective_color = material.reflective_color;
-        shininess_value = material.shininess;
         metalness_value = material.metalness;
         roughness_value = material.roughness;
-        reflectance_value = material.reflectivity;
     }
 }
 namespace engine::render::_opaque_detail
@@ -201,9 +164,9 @@ namespace engine::render::_opaque_detail
         opaque_per_frame_buffer_.Update(opaque_per_frame);
         opaque_per_material_buffer_.Bind(direct3d::ShaderType::PixelShader, 2);
         uint32_t renderedInstances = 0;
-        direct3d::api().devcon4->PSSetShaderResources(8, 1, &irradiance_texture_);
-        direct3d::api().devcon4->PSSetShaderResources(9, 1, &prefiltered_texture_);
-        direct3d::api().devcon4->PSSetShaderResources(10, 1, &brdf_texture_);
+        direct3d::api().devcon4->PSSetShaderResources(5, 1, &irradiance_texture_);
+        direct3d::api().devcon4->PSSetShaderResources(6, 1, &prefiltered_texture_);
+        direct3d::api().devcon4->PSSetShaderResources(7, 1, &brdf_texture_);
 
         for (const auto &model_instance : model_instances_)
         {
