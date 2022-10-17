@@ -168,7 +168,6 @@ namespace object_editor
                 roughness_map_texture_enabled = roughness_map_texture_id != kInvalidTextureId;
                 metallic_map_texture_enabled = metallic_map_texture_id != kInvalidTextureId;
             }
-            ImGui::EndDisabled();
             ImGui::Checkbox("##albedo_map_enabled", &albedo_map_texture_enabled);
             ImGui::SameLine();
             ImGui::BeginDisabled(!albedo_map_texture_enabled);

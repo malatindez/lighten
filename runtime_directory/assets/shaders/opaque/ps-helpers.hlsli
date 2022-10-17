@@ -146,7 +146,7 @@ float3 CookTorrance(PBR_Material material, float3 V_norm, float3 normal, float3 
 float3 Illuminate(PBR_Material material,
           float3 light_energy,
           float3 V_norm, float3 normal, 
-          float3 L, float3 specL, float ndotl, float solid_angle) {
+          float3 specL, float ndotl, float solid_angle) {
 
   float3 diffuse = Lambert(material, ndotl, solid_angle);
 //  float3 spec = float3(0,0,0);
@@ -179,10 +179,10 @@ float3 ComputePointLightEnergy(PBR_Material material, PBR_CommonData common_data
     float fading = fadingMicro * fadingMacro;
     
     ndotl = max(ndotl, fadingMicro * sina);
-    float3 specL = approximateClosestSphereDir(light_dir_normalized, cosa, light_dir, light_dir_normalized, light_dist, point_light.radius);
+    float3 specL = approximateClosestSphereDir(reflect(-common_data.view_dir_normalized, common_data.normal), cosa, light_dir, light_dir_normalized, light_dist, point_light.radius);
     clampDirToHorizon(specL, ndotl, common_data.normal, clampVal );
 
-    return fading * Illuminate(material, point_light.color, common_data.view_dir_normalized, common_data.normal, specL,light_dir_normalized, max(dot(common_data.normal, light_dir_normalized), clampVal), solid_angle);
+    return fading * Illuminate(material, point_light.color, common_data.view_dir_normalized, common_data.normal, specL, ndotl, solid_angle);
 }
 
 #endif // PS_HELPERS_HLSLI
