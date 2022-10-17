@@ -81,13 +81,13 @@ float3 ComputeEnvironmentEnergy(PBR_Material material, PBR_CommonData common_dat
     float3 kD = 1.0 - kS;
     kD *= 1.0 - material.metalness;
 
-    float3 irradiance = g_irradiance_map.SampleLevel(g_normal_sampler, common_data.normal, 0).rgb;
+    float3 irradiance = g_irradiance_map.SampleLevel(g_bilinear_clamp_sampler, common_data.normal, 0).rgb;
     float3 diffuse = irradiance * material.albedo * kD;
 
-    float3 prefilteredColor = g_prefiltered_map.SampleLevel(g_normal_sampler, R, material.roughness * g_prefiltered_map_mip_levels).rgb;
+    float3 prefilteredColor = g_prefiltered_map.SampleLevel(g_bilinear_clamp_sampler, R, material.roughness * g_prefiltered_map_mip_levels).rgb;
 
 
-    float2 envBRDF = g_brdf_lut.SampleLevel(g_linear_clamp_sampler, float2(material.roughness, 1 - ndotv), 0).rg;
+    float2 envBRDF = g_brdf_lut.SampleLevel(g_bilinear_clamp_sampler, float2(material.roughness, 1 - ndotv), 0).rg;
     float3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
 
 #else	
