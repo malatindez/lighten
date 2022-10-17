@@ -93,7 +93,7 @@ float3 ComputeEnvironmentEnergy(PBR_Material material, PBR_CommonData common_dat
 #else	
     float3 diffuse = material.albedo * (1.0 - material.metalness) * g_irradiance_map.SampleLevel(g_bilinear_clamp_sampler, common_data.normal, 0.0);
 
-	float2 reflectanceLUT = g_brdf_lut.Sample(g_bilinear_clamp_sampler, float2(material.roughness, 1 - max(ndotv, clampVal))).rg;
+	float2 reflectanceLUT = g_brdf_lut.SampleLevel(g_bilinear_clamp_sampler, float2(material.roughness, 1 - max(ndotv, clampVal)), 0).rg;
     float3 reflectance = reflectanceLUT.x * material.f0 + reflectanceLUT.y;
 	float3 specular = reflectance * g_prefiltered_map.SampleLevel(g_bilinear_clamp_sampler, R, material.roughness * g_prefiltered_map_mip_levels);
 #endif
