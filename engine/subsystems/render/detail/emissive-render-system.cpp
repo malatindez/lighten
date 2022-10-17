@@ -73,6 +73,7 @@ namespace engine::render::_emissive_detail
                 }
             }
         }
+        emissive_shader_.Unbind();
     }
     void EmissiveRenderSystem::OnInstancesUpdated(entt::registry &registry)
     {

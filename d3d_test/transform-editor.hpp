@@ -12,5 +12,7 @@ namespace object_editor
 
     void RegisterKeyCallbacks();
 
-    void OnGuiRender(engine::core::math::ivec2 const &window_pos, engine::core::math::ivec2 const &window_size);
+    void OnGuiRender();
+
+    void OnRender(engine::core::math::ivec2 const &window_pos, engine::core::math::ivec2 const &window_size);
 }

@@ -1,6 +1,7 @@
 #ifndef PS_HELPERS_HLSLI
 #define PS_HELPERS_HLSLI
 #define PI 3.1415926535897932384626433832795
+static const float clampVal = 0.001f;
 
 struct PointLight 
 {
@@ -12,11 +13,11 @@ struct PointLight
 struct SpotLight 
 {
   float3 color;
-  float padding0;
-  float3 direction;
-  float padding1;
+  float radius;
+  float3 cone_direction;
+  float inner_cutoff;
   float3 position;
-  float cut_off;
+  float outer_cutoff;
 };
 
 struct DirectionalLight 
@@ -121,7 +122,6 @@ struct PBR_CommonData
     float3 fragment_position;
 };
 
-float clampVal = 0.001f;
 
 float3 Lambert(PBR_Material material, float ndotl, float solid_angle)
 {
@@ -146,7 +146,7 @@ float3 CookTorrance(PBR_Material material, float3 V_norm, float3 normal, float3 
 float3 Illuminate(PBR_Material material,
           float3 light_energy,
           float3 V_norm, float3 normal, 
-          float3 L, float3 specL, float ndotl, float solid_angle) {
+          float3 specL, float ndotl, float solid_angle) {
 
   float3 diffuse = Lambert(material, ndotl, solid_angle);
 //  float3 spec = float3(0,0,0);
@@ -179,10 +179,53 @@ float3 ComputePointLightEnergy(PBR_Material material, PBR_CommonData common_data
     float fading = fadingMicro * fadingMacro;
     
     ndotl = max(ndotl, fadingMicro * sina);
-    float3 specL = approximateClosestSphereDir(light_dir_normalized, cosa, light_dir, light_dir_normalized, light_dist, point_light.radius);
+    float3 specL = approximateClosestSphereDir(reflect(-common_data.view_dir_normalized, common_data.normal), cosa, light_dir, light_dir_normalized, light_dist, point_light.radius);
     clampDirToHorizon(specL, ndotl, common_data.normal, clampVal );
 
-    return fading * Illuminate(material, point_light.color, common_data.view_dir_normalized, common_data.normal, specL,light_dir_normalized, max(dot(common_data.normal, light_dir_normalized), clampVal), solid_angle);
+    return fading * Illuminate(material, point_light.color, common_data.view_dir_normalized, common_data.normal, specL, ndotl, solid_angle);
+}
+ 
+float3 ComputeSpotLightEnergy(PBR_Material material, PBR_CommonData common_data, SpotLight spot_light)
+{
+    float3 light_dir = spot_light.position - common_data.fragment_position;
+    float light_dist = length(light_dir);
+    float3 light_dir_normalized = light_dir / light_dist;
+    
+    float3 H = normalize(light_dir_normalized + common_data.view_dir_normalized);
+    
+    float ndotl = max(dot(common_data.normal, light_dir_normalized), clampVal );
+
+    float3 cone_dir_normalized = normalize(spot_light.cone_direction);
+    float cos_angle = dot(cone_dir_normalized, light_dir_normalized);
+    float cos_cutoff = cos(spot_light.inner_cutoff);
+    float cos_outer_cutoff = cos(spot_light.outer_cutoff);
+    if (cos_angle < cos_outer_cutoff) { return float3(0,0,0); }
+    float lightMicroHeight = ndotl * light_dist;
+    float lightMacroHeight = dot(common_data.geometry_normal, light_dir_normalized) * light_dist;
+    float fadingMicro = saturate ((lightMicroHeight + spot_light.radius) / (2 * spot_light.radius));
+    float fadingMacro = saturate ((lightMacroHeight + spot_light.radius) / (2 * spot_light.radius));
+    float fading = fadingMicro * fadingMacro;
+    ndotl = max(ndotl, fadingMicro * (cos_angle - cos_outer_cutoff) / (cos_cutoff - cos_outer_cutoff));
+    float3 specL = approximateClosestSphereDir(reflect(-common_data.view_dir_normalized, common_data.normal), cos_angle, light_dir, light_dir_normalized, light_dist, spot_light.radius);
+    clampDirToHorizon(specL, ndotl, common_data.normal, clampVal );
+
+    float attenuation = saturate((cos_angle - cos_outer_cutoff) / (cos_cutoff - cos_outer_cutoff));
+    attenuation *= attenuation;
+
+    float solid_angle = 2 * PI * (1 - cos_outer_cutoff);
+    return fading * attenuation * Illuminate(material, spot_light.color, common_data.view_dir_normalized, common_data.normal, specL, ndotl, solid_angle);
+}
+ 
+float3 ComputeDirectionalLightEnergy(PBR_Material material, PBR_CommonData common_data, DirectionalLight directional_light)
+{
+    float3 light_dir = -directional_light.direction;
+    float3 light_dir_normalized = light_dir;
+    
+    float3 H = normalize(light_dir_normalized + common_data.view_dir_normalized);
+    float ndotl = max(dot(common_data.normal, light_dir_normalized), clampVal );
+    float3 specL = approximateClosestSphereDir(reflect(-common_data.view_dir_normalized, common_data.normal), 0, light_dir, light_dir_normalized, 0, 0);
+    clampDirToHorizon(specL, ndotl, common_data.normal, clampVal );
+    return Illuminate(material, directional_light.color, common_data.view_dir_normalized, common_data.normal, light_dir, ndotl, directional_light.solid_angle);
 }
 
 #endif // PS_HELPERS_HLSLI

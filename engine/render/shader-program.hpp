@@ -14,6 +14,15 @@ namespace engine::render
         virtual ~ShaderProgram() = default;
         virtual void Bind() = 0;
         virtual void Unbind() = 0;
+        static void UnbindAll()
+        {
+            direct3d::api().devcon->IASetInputLayout(nullptr);
+            direct3d::api().devcon->VSSetShader(nullptr, nullptr, 0);
+            direct3d::api().devcon->PSSetShader(nullptr, nullptr, 0);
+            direct3d::api().devcon->HSSetShader(nullptr, nullptr, 0);
+            direct3d::api().devcon->DSSetShader(nullptr, nullptr, 0);
+            direct3d::api().devcon->GSSetShader(nullptr, nullptr, 0);
+        }
     };
 
     class GraphicsShaderProgram final : public ShaderProgram

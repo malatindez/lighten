@@ -30,7 +30,6 @@ namespace
         desc.FillMode = fillMode;
         desc.DepthClipEnable = TRUE;
         desc.MultisampleEnable = TRUE;
-        desc.FrontCounterClockwise = false;
 
         return desc;
     }
@@ -51,6 +50,13 @@ namespace
         desc.MaxLOD = D3D11_FLOAT32_MAX;
         desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 
+        return desc;
+    }
+
+    D3D11_SAMPLER_DESC CreateComparisonState(D3D11_FILTER filter, D3D11_TEXTURE_ADDRESS_MODE addressMode, D3D11_COMPARISON_FUNC comparisonFunc)
+    {
+        D3D11_SAMPLER_DESC desc = CreateSamplerState(filter, addressMode);
+        desc.ComparisonFunc = comparisonFunc;
         return desc;
     }
 }
@@ -78,17 +84,11 @@ namespace engine::direct3d
         sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP);
         api().device5->CreateSamplerState(&sampler_desc, &point_clamp_sampler.reset());
 
-        sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_TEXTURE_ADDRESS_WRAP);
+        sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_WRAP);
         api().device5->CreateSamplerState(&sampler_desc, &bilinear_wrap_sampler.reset());
 
-        sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP);
-        api().device5->CreateSamplerState(&sampler_desc, &bilinear_clamp_sampler.reset());
-
-        sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_WRAP);
-        api().device5->CreateSamplerState(&sampler_desc, &trilinear_wrap_sampler.reset());
-
         sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_CLAMP);
-        api().device5->CreateSamplerState(&sampler_desc, &trilinear_clamp_sampler.reset());
+        api().device5->CreateSamplerState(&sampler_desc, &bilinear_clamp_sampler.reset());
 
         sampler_desc = CreateSamplerState(D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP);
         api().device5->CreateSamplerState(&sampler_desc, &anisotropic_wrap_sampler.reset());
@@ -96,22 +96,22 @@ namespace engine::direct3d
         sampler_desc = CreateSamplerState(D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_CLAMP);
         api().device5->CreateSamplerState(&sampler_desc, &anisotropic_clamp_sampler.reset());
 
-        sampler_desc = CreateSamplerState(D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_WRAP);
+        sampler_desc = CreateComparisonState(D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_LESS_EQUAL);
         api().device5->CreateSamplerState(&sampler_desc, &comparison_point_wrap_sampler.reset());
 
-        sampler_desc = CreateSamplerState(D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP);
+        sampler_desc = CreateComparisonState(D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_COMPARISON_LESS_EQUAL);
         api().device5->CreateSamplerState(&sampler_desc, &comparison_point_clamp_sampler.reset());
 
-        sampler_desc = CreateSamplerState(D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_WRAP);
+        sampler_desc = CreateComparisonState(D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_LESS_EQUAL);
         api().device5->CreateSamplerState(&sampler_desc, &comparison_linear_wrap_sampler.reset());
 
-        sampler_desc = CreateSamplerState(D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_CLAMP);
+        sampler_desc = CreateComparisonState(D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_COMPARISON_LESS_EQUAL);
         api().device5->CreateSamplerState(&sampler_desc, &comparison_linear_clamp_sampler.reset());
 
-        sampler_desc = CreateSamplerState(D3D11_FILTER_COMPARISON_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP);
+        sampler_desc = CreateComparisonState(D3D11_FILTER_COMPARISON_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_LESS_EQUAL);
         api().device5->CreateSamplerState(&sampler_desc, &comparison_anisotropic_wrap_sampler.reset());
 
-        sampler_desc = CreateSamplerState(D3D11_FILTER_COMPARISON_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_CLAMP);
+        sampler_desc = CreateComparisonState(D3D11_FILTER_COMPARISON_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_COMPARISON_LESS_EQUAL);
         api().device5->CreateSamplerState(&sampler_desc, &comparison_anisotropic_clamp_sampler.reset());
     }
 }

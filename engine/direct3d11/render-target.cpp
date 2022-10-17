@@ -1,11 +1,10 @@
 #include "render-target.hpp"
-#include "direct3d11/d3d-debug.hpp"
 #include "direct3d11/api.hpp"
+#include "direct3d11/d3d-debug.hpp"
 
 namespace engine::direct3d
 {
-    RenderTargetBase::RenderTargetBase(DXGI_FORMAT format) noexcept :
-        format_(format),
+    RenderTargetBase::RenderTargetBase(DXGI_FORMAT format) noexcept : format_(format),
         size_(0, 0)
     {
     }
@@ -38,14 +37,13 @@ namespace engine::direct3d
         }
 
         size_ = core::math::ivec2{ 0 };
-
         render_target_description_.Format = format_;
         render_target_description_.Width = static_cast<UINT>(size.x);
         render_target_description_.Height = static_cast<UINT>(size.y);
         render_target_description_.MipLevels = 1;
         render_target_description_.ArraySize = 1;
         render_target_description_.SampleDesc.Count = sample_count;
-        render_target_description_.SampleDesc.Quality = D3D11_STANDARD_MULTISAMPLE_PATTERN;
+        render_target_description_.SampleDesc.Quality = (UINT)D3D11_STANDARD_MULTISAMPLE_PATTERN;
         render_target_description_.Usage = D3D11_USAGE_DEFAULT;
         render_target_description_.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
         render_target_description_.CPUAccessFlags = 0;
@@ -99,13 +97,32 @@ namespace engine::direct3d
         initialized = false;
     }
 
-    void SwapchainRenderTarget::init(SwapChain1 const &swapchain)
+    void SwapchainRenderTarget::init(HWND hWnd, core::math::ivec2 const &window_size)
     {
         if (swapchain_.valid())
         {
             deinit();
         }
-        swapchain_ = swapchain;
+        DXGI_SWAP_CHAIN_DESC1 desc;
+        ZeroMemory(&desc, sizeof(DXGI_SWAP_CHAIN_DESC1));
+        desc.Width = window_size.x;
+        desc.Height = window_size.y;
+        desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        desc.Stereo = FALSE;
+        desc.SampleDesc.Count = 1;
+        desc.SampleDesc.Quality = 0;
+        desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        desc.BufferCount = 2;
+        desc.Scaling = DXGI_SCALING_NONE;
+        desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+        desc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+        desc.Flags = 0;
+
+        IDXGISwapChain1 *swapchain = nullptr;
+        SetLastError(0);
+        AlwaysAssert(api().factory5->CreateSwapChainForHwnd(api().device, hWnd, &desc, nullptr, nullptr, &swapchain),
+                     "Failed to create the swapchain");
+        swapchain_ = SwapChain1{ swapchain };
         SizeResources(core::math::ivec2{ 0 });
         initialized = true;
     }

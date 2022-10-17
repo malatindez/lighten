@@ -14,6 +14,7 @@ namespace camera_movement
     entt::entity selected_entity = entt::null;
     float selected_distance = 0.0f;
     vec3 selected_object_offset{ 0.0f };
+    bool moving = false;
 
     void RegisterKeyCallbacks()
     {
@@ -67,6 +68,17 @@ namespace camera_movement
                 if (count == std::numeric_limits<uint32_t>::max() || InputLayer::instance()->key_state(engine::core::Key::KEY_CONTROL))
                 {
                     rb_saved_mouse_position = core::math::ivec2{ -1 };
+                    if (moving)
+                    {
+                        moving = false;
+                        if (Engine::scene()->registry.try_get<components::OpaqueComponent>(selected_entity) != nullptr ||
+                            Engine::scene()->registry.try_get<components::PointLight>(selected_entity) != nullptr ||
+                            Engine::scene()->registry.try_get<components::SpotLight>(selected_entity) != nullptr ||
+                            Engine::scene()->registry.try_get<components::DirectionalLight>(selected_entity) != nullptr)
+                        {
+                            Engine::scene()->renderer->light_render_system().RenderShadowMaps(Engine::scene().get());
+                        }
+                    }
                     return;
                 }
                 if (rb_saved_mouse_position == core::math::vec2{ -1 })
@@ -103,7 +115,7 @@ namespace camera_movement
                     auto &transform = scene->registry.get<TransformComponent>(selected_entity);
                     transform.position = selected_object_offset + obj_offset + scene->main_camera->position();
                     transform.UpdateMatrices();
-                    render::ModelSystem::instance().OnInstancesUpdated(scene->registry);
+                    scene->OnInstancesUpdated();
                 }
             });
     }

@@ -3,34 +3,32 @@
 #include "render/shader-program.hpp"
 #include "entt/entt.hpp"
 #include "components/components.hpp"
+namespace engine::core
+{
+    class Scene;
+}
 namespace engine::render
 {
     class ModelSystem;
+    namespace _light_detail
+    {
+        class LightRenderSystem;
+    }
     namespace _opaque_detail
     {
         struct OpaquePerMaterial;
     }
     struct OpaqueMaterial
     {
-        ID3D11ShaderResourceView *ambient = nullptr;
         ID3D11ShaderResourceView *albedo_map = nullptr;
         ID3D11ShaderResourceView *normal_map = nullptr;
-        ID3D11ShaderResourceView *shininess_map = nullptr;
         ID3D11ShaderResourceView *metalness_map = nullptr;
         ID3D11ShaderResourceView *roughness_map = nullptr;
-        ID3D11ShaderResourceView *ambient_occlusion_map = nullptr;
-        ID3D11ShaderResourceView *reflection_map = nullptr;
-        // opacity ?
-        core::math::vec3 ambient_color;
         core::math::vec3 albedo_color;
-        core::math::vec3 reflective_color;
-        float shininess_value;
         float metalness_value;
         float roughness_value;
-        float reflectance_value;
         uint32_t texture_flags;
         bool reverse_normal_y = false;
-        bool normal_map_srgb = false;
         core::math::vec2 uv_multiplier{ 1 };
         void UpdateTextureFlags();
         OpaqueMaterial() = default;
@@ -38,24 +36,15 @@ namespace engine::render
         explicit OpaqueMaterial(Material const &material);
         void reset()
         {
-            ambient = nullptr;
             albedo_map = nullptr;
             normal_map = nullptr;
-            shininess_map = nullptr;
             metalness_map = nullptr;
             roughness_map = nullptr;
-            ambient_occlusion_map = nullptr;
-            reflection_map = nullptr;
-            ambient_color = core::math::vec3{ 0.0f };
             albedo_color = core::math::vec3{ 0.0f };
-            reflective_color = core::math::vec3{ 0.0f };
-            shininess_value = 0.0f;
             metalness_value = 0.01f;
             roughness_value = 0.01f;
-            reflectance_value = 1.0f;
             texture_flags = 0;
             reverse_normal_y = false;
-            normal_map_srgb = false;
             uv_multiplier = core::math::vec2{ 1 };
         }
     };
@@ -67,24 +56,15 @@ namespace std {
         std::size_t operator()(engine::render::OpaqueMaterial const &material) const
         {
             size_t seed = 0;
-            engine::utils::hash_combine(seed, material.ambient);
             engine::utils::hash_combine(seed, material.albedo_map);
             engine::utils::hash_combine(seed, material.normal_map);
-            engine::utils::hash_combine(seed, material.shininess_map);
             engine::utils::hash_combine(seed, material.metalness_map);
             engine::utils::hash_combine(seed, material.roughness_map);
-            engine::utils::hash_combine(seed, material.ambient_occlusion_map);
-            engine::utils::hash_combine(seed, material.reflection_map);
-            engine::utils::hash_combine(seed, material.ambient_color);
             engine::utils::hash_combine(seed, material.albedo_color);
-            engine::utils::hash_combine(seed, material.reflective_color);
-            engine::utils::hash_combine(seed, material.shininess_value);
             engine::utils::hash_combine(seed, material.metalness_value);
             engine::utils::hash_combine(seed, material.roughness_value);
-            engine::utils::hash_combine(seed, material.reflectance_value);
             engine::utils::hash_combine(seed, material.texture_flags);
             engine::utils::hash_combine(seed, material.reverse_normal_y);
-            engine::utils::hash_combine(seed, material.normal_map_srgb);
             engine::utils::hash_combine(seed, material.uv_multiplier);
             return seed;
         }
@@ -128,15 +108,17 @@ namespace engine::render::_opaque_detail
         float padding;
         core::math::vec3 position;
         float radius;
+        std::array<core::math::mat4, 6> view_projection;
     };
     struct OpaqueSpotLight
     {
         core::math::vec3 color;
-        float padding0;
+        float radius;
         core::math::vec3 direction;
-        float padding1;
+        float inner_cutoff;
         core::math::vec3 position;
-        float cut_off;
+        float outer_cutoff;
+        core::math::mat4 view_projection;
     };
     struct OpaqueDirectionalLight
     {
@@ -144,6 +126,7 @@ namespace engine::render::_opaque_detail
         float padding;
         core::math::vec3 direction;
         float solid_angle;
+        core::math::mat4 view_projection;
     };
     struct OpaquePerFrame
     {
@@ -155,23 +138,36 @@ namespace engine::render::_opaque_detail
         uint32_t num_directional_lights;
         uint32_t prefiltered_map_mip_levels;
         float default_ambient_occulsion_value;
+        uint32_t point_light_shadow_resolution;
+        uint32_t spot_light_shadow_resolution;
+        uint32_t directional_light_shadow_resolution;
     };
     struct OpaquePerMaterial
     {
-        core::math::vec3 ambient_color;
-        float shininess;
         core::math::vec3 albedo_color;
         float metalness;
-        core::math::vec3 reflective_color;
         float roughness;
-        float reflectance;
         uint32_t enabled_texture_flags;
         core::math::vec2 uv_multiplier;
+    };
+    struct OpaquePerDepthCubemap
+    {
+        std::array<core::math::mat4, 6> g_view_projection;
+        uint32_t g_slice_offset;
+        core::math::vec3 padding0;
+    };
+    struct OpaquePerDepthTexture
+    {
+        core::math::mat4 g_view_projection;
+        uint32_t g_slice_offset;
+        core::math::vec3 padding0;
     };
 
     auto constexpr opaque_vs_shader_path = "assets/shaders/opaque/opaque-vs.hlsl";
     auto constexpr opaque_ps_shader_path = "assets/shaders/opaque/opaque-ps.hlsl";
-    // This class can only be used as a member of ModelSystem
+    auto constexpr opaque_vs_depth_only_shader_path = "assets/shaders/opaque/opaque-depth-only-vs.hlsl";
+    auto constexpr opaque_gs_depth_only_cubemap_shader_path = "assets/shaders/opaque/opaque-depth-only-cubemap-gs.hlsl";
+    auto constexpr opaque_gs_depth_only_texture_shader_path = "assets/shaders/opaque/opaque-depth-only-texture-gs.hlsl";
     class OpaqueRenderSystem
     {
     public:
@@ -185,18 +181,24 @@ namespace engine::render::_opaque_detail
         [[nodiscard]] ID3D11ShaderResourceView *GetBrdfTexture() const { return brdf_texture_; }
         [[nodiscard]] float const &ambient_occlusion() const { return ambient_occlusion_value_; }
         [[nodiscard]] float &ambient_occlusion() { return ambient_occlusion_value_; }
-    private:
-        friend class ::engine::render::ModelSystem;
 
         OpaqueRenderSystem();
-        void Render(entt::registry &registry);
+        void Render(core::Scene *scene);
+        void RenderDepthOnly(std::vector<OpaquePerDepthCubemap> const &cubemaps);
+        void RenderDepthOnly(std::vector<OpaquePerDepthTexture> const &textures);
 
         ModelInstance &GetInstance(uint64_t model_id);
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity);
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, std::vector<OpaqueMaterial> const &materials);
 
         void OnInstancesUpdated(entt::registry &registry);
+    private:
         std::vector<ModelInstance> model_instances_;
+
+        GraphicsShaderProgram opaque_cubemap_shader_;
+        GraphicsShaderProgram opaque_texture_shader_;
+        direct3d::DynamicUniformBuffer<OpaquePerDepthCubemap> opaque_per_cubemap_buffer_;
+        direct3d::DynamicUniformBuffer<OpaquePerDepthTexture> opaque_per_texture_buffer_;
 
         GraphicsShaderProgram opaque_shader_;
         direct3d::DynamicUniformBuffer<OpaquePerFrame> opaque_per_frame_buffer_;
@@ -206,6 +208,6 @@ namespace engine::render::_opaque_detail
         ID3D11ShaderResourceView *irradiance_texture_;
         ID3D11ShaderResourceView *prefiltered_texture_;
         ID3D11ShaderResourceView *brdf_texture_;
-        float ambient_occlusion_value_;
+        float ambient_occlusion_value_ = 1.0f;
     };
 } // namespace engine::render::_opaque_detail

@@ -126,7 +126,8 @@ namespace engine::components
 
         core::math::vec3 color;
         float power;
-        core::math::vec3 direction; // should be normalized
-        float cut_off;
+        // direction is determined by transform
+        float inner_cutoff;
+        float outer_cutoff;
     };
 } // namespace engine::components

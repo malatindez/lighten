@@ -14,14 +14,14 @@ namespace object_editor
     float selected_distance = 0.0f;
     ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::ROTATE);
     ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
+    bool useSnap(false);
+    vec4 snap;
 
-    void EditTransform(CameraController const &camera, TransformComponent &transform, Box const &bounding_box, bool enabled, ivec2 const &window_pos, ivec2 const &window_size)
+    void EditTransform(CameraController const &camera, TransformComponent &transform)
     {
-        static bool useSnap(false);
         mat4 &matrix = transform.model;
         float matrixTranslation[3], matrixRotation[3], matrixScale[3];
         ImGuizmo::DecomposeMatrixToComponents(matrix.arr.data(), matrixTranslation, matrixRotation, matrixScale);
-        vec4 snap;
         if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_SpanAvailWidth))
         {
             if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
@@ -32,9 +32,10 @@ namespace object_editor
             ImGui::SameLine();
             if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
                 mCurrentGizmoOperation = ImGuizmo::SCALE;
-            ImGui::InputFloat3("Tr", matrixTranslation, "%.3f", 3);
-            ImGui::InputFloat3("Rt", matrixRotation, "%.3f", 3);
-            ImGui::InputFloat3("Sc", matrixScale, "%.3f", 3);
+            bool changed = false;
+            changed |= ImGui::InputFloat3("Tr", matrixTranslation, "%.3f", 3);
+            changed |= ImGui::InputFloat3("Rt", matrixRotation, "%.3f", 3);
+            changed |= ImGui::InputFloat3("Sc", matrixScale, "%.3f", 3);
             ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, matrix.arr.data());
             if (mCurrentGizmoOperation != ImGuizmo::SCALE)
             {
@@ -65,48 +66,96 @@ namespace object_editor
             }
             if (ImGui::Button("Reset"))
             {
+                changed = true;
                 matrix = mat4::identity();
                 ImGuizmo::DecomposeMatrixToComponents(matrix.arr.data(), matrixTranslation, matrixRotation, matrixScale);
             }
             if (ImGui::Button("Reset scale"))
             {
+                changed = true;
                 matrixScale[0] = matrixScale[1] = matrixScale[2] = 1;
                 ImGuizmo::DecomposeMatrixToComponents(matrix.arr.data(), matrixTranslation, matrixRotation, matrixScale);
             }
             ImGui::SameLine();
             if (ImGui::Button("Reset rotation"))
             {
+                changed = true;
                 matrixRotation[0] = matrixRotation[1] = matrixRotation[2] = 0;
             }
             ImGui::SameLine();
             if (ImGui::Button("Reset rotation and scale"))
             {
+                changed = true;
                 matrixScale[0] = matrixScale[1] = matrixScale[2] = 1;
                 matrixRotation[0] = matrixRotation[1] = matrixRotation[2] = 0;
             }
+            if (changed)
+            {
+                ImGuizmo::DecomposeMatrixToComponents(matrix.arr.data(), matrixTranslation, matrixRotation, matrixScale);
+                transform.position = vec3{ matrixTranslation[0], matrixTranslation[1], matrixTranslation[2] };
+                transform.scale = vec3{ matrixScale[0], matrixScale[1], matrixScale[2] };
+                transform.rotation = QuaternionFromRotationMatrix(scale(matrix, 1.0f / transform.scale).as_rmat<3, 3>());
+                transform.UpdateMatrices();
+            }
         }
+    }
+    void RenderGizmo(CameraController const &camera, TransformComponent &transform, ivec2 const &window_pos, ivec2 const &window_size, Box const &bounding_box)
+    {
+        mat4 &matrix = transform.model;
+        float matrixTranslation[3], matrixRotation[3], matrixScale[3];
+        ImGuizmo::DecomposeMatrixToComponents(matrix.arr.data(), matrixTranslation, matrixRotation, matrixScale);
         ImGuizmo::SetRect((float)window_pos.x, (float)window_pos.y, (float)window_size.x, (float)window_size.y);
-        if (enabled)
-        {
-            static float boundsSnap[] = { 0.1f, 0.1f, 0.1f };
-            ImGuizmo::Manipulate(camera.camera().view.arr.data(),
+        static float boundsSnap[] = { 0.1f, 0.1f, 0.1f };
+        if (ImGuizmo::Manipulate(camera.camera().view.arr.data(),
                                  camera.camera().projection.arr.data(),
                                  mCurrentGizmoOperation,
                                  mCurrentGizmoMode,
                                  matrix.arr.data(),
                                  nullptr,
-                                 useSnap ? &snap.x : nullptr, Box{ .min = -bounding_box.min, .max = -bounding_box.max }.min.data.data(), boundsSnap);
+                                 useSnap ? &snap.x : nullptr, Box{ .min = -bounding_box.min, .max = -bounding_box.max }.min.data.data(), boundsSnap))
+        {
             ImGuizmo::DecomposeMatrixToComponents(matrix.arr.data(), matrixTranslation, matrixRotation, matrixScale);
+            transform.position = vec3{ matrixTranslation[0], matrixTranslation[1], matrixTranslation[2] };
+            transform.scale = vec3{ matrixScale[0], matrixScale[1], matrixScale[2] };
+            transform.rotation = QuaternionFromRotationMatrix(scale(matrix, 1.0f / transform.scale).as_rmat<3, 3>());
+            transform.UpdateMatrices();
         }
-        transform.position = vec3{ matrixTranslation[0], matrixTranslation[1], matrixTranslation[2] };
-        transform.scale = vec3{ matrixScale[0], matrixScale[1], matrixScale[2] };
-        transform.rotation = QuaternionFromRotationMatrix(scale(matrix, 1.0f / transform.scale).as_rmat<3, 3>());
-        transform.UpdateMatrices();
     }
-    void EditTransform(ivec2 const &window_pos, ivec2 const &window_size)
+    void EditTransform()
     {
         static TransformComponent empty;
         if (selected_entity != entt::null && selected_scene == Engine::scene())
+        {
+            TransformComponent &transform = Engine::scene()->registry.get<TransformComponent>(selected_entity);
+            EditTransform(*Engine::scene()->main_camera, transform);
+            auto *emissive = Engine::scene()->registry.try_get<components::EmissiveComponent>(selected_entity);
+            auto *directional = Engine::scene()->registry.try_get<components::DirectionalLight>(selected_entity);
+            auto *point = Engine::scene()->registry.try_get<components::PointLight>(selected_entity);
+            auto *spot = Engine::scene()->registry.try_get<components::SpotLight>(selected_entity);
+            auto *opaque = Engine::scene()->registry.try_get<components::OpaqueComponent>(selected_entity);
+            if (emissive != nullptr)
+            {
+                Engine::scene()->renderer->emissive_render_system().OnInstancesUpdated(Engine::scene()->registry);
+            }
+            if (directional != nullptr || point != nullptr || spot != nullptr)
+            {
+                Engine::scene()->renderer->light_render_system().OnInstancesUpdated(Engine::scene().get());
+            }
+            if (opaque != nullptr)
+            {
+                Engine::scene()->renderer->opaque_render_system().OnInstancesUpdated(Engine::scene()->registry);
+            }
+        }
+        else
+        {
+            ImGui::BeginDisabled();
+            EditTransform(*Engine::scene()->main_camera, empty);
+            ImGui::EndDisabled();
+        }
+    }
+    void OnRender(ivec2 const &window_pos, ivec2 const &window_size)
+    {
+        if (selected_entity != entt::null && selected_scene == Engine::scene() && InputLayer::instance()->key_state(engine::core::Key::KEY_CONTROL))
         {
             TransformComponent &transform = Engine::scene()->registry.get<TransformComponent>(selected_entity);
             uint64_t id = 0;
@@ -122,14 +171,7 @@ namespace object_editor
                 id = emissive->model_id;
             }
             auto const &model = render::ModelSystem::GetModel(id);
-            EditTransform(*Engine::scene()->main_camera, transform, model.bounding_box, InputLayer::instance()->key_state(engine::core::Key::KEY_CONTROL), window_pos, window_size);
-            render::ModelSystem::instance().OnInstancesUpdated(Engine::scene()->registry);
-        }
-        else
-        {
-            ImGui::BeginDisabled();
-            EditTransform(*Engine::scene()->main_camera, empty, Box::empty(), false, window_pos, window_size);
-            ImGui::EndDisabled();
+            RenderGizmo(*Engine::scene()->main_camera, transform, window_pos, window_size, model.bounding_box);
         }
     }
     void EditMaterialEmpty()
@@ -144,9 +186,6 @@ namespace object_editor
         if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_SpanAvailWidth))
         {
             static entt::entity entity;
-            static uint64_t ambient_texture_id = 0;
-            static uint64_t saved_ambient_texture_id = 0;
-            static bool ambient_texture_enabled = false;
             static uint64_t albedo_map_texture_id = 0;
             static uint64_t saved_albedo_map_texture_id = 0;
             static bool albedo_map_texture_enabled = false;
@@ -159,35 +198,18 @@ namespace object_editor
             static uint64_t metallic_map_texture_id = 0;
             static uint64_t saved_metallic_map_texture_id = 0;
             static bool metallic_map_texture_enabled = false;
-            static uint64_t ao_map_texture_id = 0;
-            static uint64_t saved_ao_map_texture_id = 0;
-            static bool ao_map_texture_enabled = false;
-            static uint64_t reflection_texture_id = 0;
-            static uint64_t saved_reflection_texture_id = 0;
-            static bool reflection_texture_enabled = false;
             if (entity != selected_entity)
             {
                 entity = selected_entity;
-                saved_ambient_texture_id = ambient_texture_id = TextureManager::GetTextureIdByPointer(material->ambient);
                 saved_albedo_map_texture_id = albedo_map_texture_id = TextureManager::GetTextureIdByPointer(material->albedo_map);
                 saved_normal_map_texture_id = normal_map_texture_id = TextureManager::GetTextureIdByPointer(material->normal_map);
                 saved_roughness_map_texture_id = roughness_map_texture_id = TextureManager::GetTextureIdByPointer(material->roughness_map);
                 saved_metallic_map_texture_id = metallic_map_texture_id = TextureManager::GetTextureIdByPointer(material->metalness_map);
-                saved_ao_map_texture_id = ao_map_texture_id = TextureManager::GetTextureIdByPointer(material->ambient_occlusion_map);
-                saved_reflection_texture_id = reflection_texture_id = TextureManager::GetTextureIdByPointer(material->reflection_map);
-                ambient_texture_enabled = ambient_texture_id != kInvalidTextureId;
                 albedo_map_texture_enabled = albedo_map_texture_id != kInvalidTextureId;
                 normal_map_texture_enabled = normal_map_texture_id != kInvalidTextureId;
                 roughness_map_texture_enabled = roughness_map_texture_id != kInvalidTextureId;
                 metallic_map_texture_enabled = metallic_map_texture_id != kInvalidTextureId;
-                ao_map_texture_enabled = ao_map_texture_id != kInvalidTextureId;
-                reflection_texture_enabled = reflection_texture_id != kInvalidTextureId;
             }
-            ImGui::Checkbox("##ambient_enabled", &ambient_texture_enabled);
-            ImGui::SameLine();
-            ImGui::BeginDisabled(!ambient_texture_enabled);
-            ImGui::InputScalar("Ambient texture ID", ImGuiDataType_U64, &ambient_texture_id, nullptr, nullptr, "%llu");
-            ImGui::EndDisabled();
             ImGui::Checkbox("##albedo_map_enabled", &albedo_map_texture_enabled);
             ImGui::SameLine();
             ImGui::BeginDisabled(!albedo_map_texture_enabled);
@@ -208,23 +230,9 @@ namespace object_editor
             ImGui::BeginDisabled(!metallic_map_texture_enabled);
             ImGui::InputScalar("Metallic map texture ID", ImGuiDataType_U64, &metallic_map_texture_id, nullptr, nullptr, "%llu");
             ImGui::EndDisabled();
-            ImGui::Checkbox("##ao_map_enabled", &ao_map_texture_enabled);
-            ImGui::SameLine();
-            ImGui::BeginDisabled(!ao_map_texture_enabled);
-            ImGui::InputScalar("AO map texture ID", ImGuiDataType_U64, &ao_map_texture_id, nullptr, nullptr, "%llu");
-            ImGui::EndDisabled();
-            ImGui::Checkbox("##reflection_enabled", &reflection_texture_enabled);
-            ImGui::SameLine();
-            ImGui::BeginDisabled(!reflection_texture_enabled);
-            ImGui::InputScalar("Reflection texture ID", ImGuiDataType_U64, &reflection_texture_id, nullptr, nullptr, "%llu");
-            ImGui::EndDisabled();
-            ImGui::ColorEdit3("Ambient color", material->ambient_color.data.data());
             ImGui::ColorEdit3("Albedo color", material->albedo_color.data.data());
-            ImGui::ColorEdit3("Reflective color [ not used ]", material->reflective_color.data.data());
-            ImGui::SliderFloat("Shininess [ not used ]", &material->shininess_value, 0.0f, 1.0f);
             ImGui::SliderFloat("Metalness", &material->metalness_value, 0.001f, 1.0f);
             ImGui::SliderFloat("Roughness", &material->roughness_value, 0.001f, 1.0f);
-            ImGui::SliderFloat("Reflectance [ not used ]", &material->reflectance_value, 0.0f, 1.0f);
             auto width = ::ImGui::GetContentRegionMax().x - 200;
             ImGui::PushItemWidth(width / 2);
             ImGui::SliderFloat("X", &material->uv_multiplier.x, 1, 100);
@@ -234,9 +242,6 @@ namespace object_editor
             ImGui::SameLine();
             ImGui::Text("UV multiplier");
             ImGui::Checkbox("Reverse normal y", &material->reverse_normal_y);
-            ImGui::Checkbox("Normal map is sRGB", &material->normal_map_srgb);
-            if (!ambient_texture_enabled)
-                ambient_texture_id = kInvalidTextureId;
             if (!albedo_map_texture_enabled)
                 albedo_map_texture_id = kInvalidTextureId;
             if (!normal_map_texture_enabled)
@@ -245,15 +250,6 @@ namespace object_editor
                 roughness_map_texture_id = kInvalidTextureId;
             if (!metallic_map_texture_enabled)
                 metallic_map_texture_id = kInvalidTextureId;
-            if (!ao_map_texture_enabled)
-                ao_map_texture_id = kInvalidTextureId;
-            if (!reflection_texture_enabled)
-                reflection_texture_id = kInvalidTextureId;
-            if (saved_ambient_texture_id != ambient_texture_id)
-            {
-                material->ambient = TextureManager::GetTextureView(ambient_texture_id);
-                saved_ambient_texture_id = ambient_texture_id;
-            }
             if (saved_albedo_map_texture_id != albedo_map_texture_id)
             {
                 material->albedo_map = TextureManager::GetTextureView(albedo_map_texture_id);
@@ -273,16 +269,6 @@ namespace object_editor
             {
                 material->metalness_map = TextureManager::GetTextureView(metallic_map_texture_id);
                 saved_metallic_map_texture_id = metallic_map_texture_id;
-            }
-            if (saved_ao_map_texture_id != ao_map_texture_id)
-            {
-                material->ambient_occlusion_map = TextureManager::GetTextureView(ao_map_texture_id);
-                saved_ao_map_texture_id = ao_map_texture_id;
-            }
-            if (saved_reflection_texture_id != reflection_texture_id)
-            {
-                material->reflection_map = TextureManager::GetTextureView(reflection_texture_id);
-                saved_reflection_texture_id = reflection_texture_id;
             }
             material->UpdateTextureFlags();
         }
@@ -332,7 +318,7 @@ namespace object_editor
         bool flag = false;
         if (auto *component = registry.try_get<components::OpaqueComponent>(selected_entity); component)
         {
-            auto *model_instance = render::ModelSystem::instance().opaque_render_system().GetInstancePtr(component->model_id);
+            auto *model_instance = Engine::scene()->renderer->opaque_render_system().GetInstancePtr(component->model_id);
             if (model_instance)
             {
                 uint32_t mesh_id = std::numeric_limits<uint32_t>::max();
@@ -359,7 +345,7 @@ namespace object_editor
         }
         else if (auto *component = registry.try_get<components::EmissiveComponent>(selected_entity); component)
         {
-            auto *model_instance = render::ModelSystem::instance().emissive_render_system().GetInstancePtr(component->model_id);
+            auto *model_instance = Engine::scene()->renderer->emissive_render_system().GetInstancePtr(component->model_id);
             if (model_instance)
             {
                 uint32_t mesh_id = std::numeric_limits<uint32_t>::max();
@@ -411,8 +397,8 @@ namespace object_editor
             ImGui::Text("Spot light");
             ImGui::ColorEdit3("Color", spot_light->color.data.data());
             ImGui::SliderFloat("Power", &spot_light->power, 0, 1e6f);
-            ImGui::InputFloat3("Direction", spot_light->direction.data.data());
-            ImGui::SliderFloat("Cut off", &spot_light->cut_off, -std::numbers::pi, std::numbers::pi);
+            ImGui::SliderFloat("Inner cutoff", &spot_light->inner_cutoff, -std::numbers::pi, std::numbers::pi);
+            ImGui::SliderFloat("Outer cutoff", &spot_light->outer_cutoff, -std::numbers::pi, std::numbers::pi);
         }
     }
     void EditLightDirectional(components::DirectionalLight *directional_light)
@@ -474,10 +460,10 @@ namespace object_editor
             ImGui::EndTable();
         }
     }
-    void OnGuiRender(ivec2 const &window_pos, ivec2 const &window_size)
+    void OnGuiRender()
     {
         ImGui::Begin("Component editor");
-        EditTransform(window_pos, window_size);
+        EditTransform();
         ImGui::Spacing();
         EditMaterial();
         ImGui::Spacing();

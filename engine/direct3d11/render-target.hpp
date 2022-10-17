@@ -56,9 +56,11 @@ namespace engine::direct3d
     public:
         using RenderTargetBase::RenderTargetBase;
         SwapchainRenderTarget() : RenderTargetBase(DXGI_FORMAT_UNKNOWN) {}
-        void init(SwapChain1 const &swapchain);
+        void init(HWND hWnd, core::math::ivec2 const &window_size);
         void deinit() noexcept;
         void SizeResources(core::math::ivec2 const &size) override;
+        [[nodiscard]] SwapChain1 const &swapchain() const noexcept { return swapchain_; }
+        [[nodiscard]] SwapChain1 &swapchain() noexcept { return swapchain_; }
     private:
         SwapChain1 swapchain_ = nullptr;
     };

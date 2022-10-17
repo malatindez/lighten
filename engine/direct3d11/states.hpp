@@ -32,8 +32,6 @@ namespace engine::direct3d
         ReadOnlySamplerState point_clamp_sampler;
         ReadOnlySamplerState bilinear_wrap_sampler;
         ReadOnlySamplerState bilinear_clamp_sampler;
-        ReadOnlySamplerState trilinear_wrap_sampler;
-        ReadOnlySamplerState trilinear_clamp_sampler;
         ReadOnlySamplerState anisotropic_wrap_sampler;
         ReadOnlySamplerState anisotropic_clamp_sampler;
         ReadOnlySamplerState comparison_point_wrap_sampler;

@@ -29,7 +29,7 @@ if(test)
   target_include_directories(runUnitTests PRIVATE ${ENGINE_SOURCES_DIR})
 
   target_compile_options(runUnitTests PRIVATE /bigobj)
-  target_add_libraries(runUnitTests "benchmark" "gtest" "entt" "spdlog" "directx" "assimp" "glm" "imgui" "imguizmo" "imgui_console" "directxtex" "dds_texture_loader11" "wic_texture_loader11" "glm")
+  target_add_libraries(runUnitTests "benchmark" "math" "gtest" "entt" "spdlog" "directx" "assimp" "glm" "imgui" "imguizmo" "imgui_console" "directxtex" "dds_texture_loader11" "wic_texture_loader11" "glm")
 
   add_test(NAME TEST COMMAND runUnitTests)
 
