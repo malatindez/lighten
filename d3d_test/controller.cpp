@@ -75,11 +75,20 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
     render::OpaqueMaterial mud_material;
     render::OpaqueMaterial mudroad_material;
     render::OpaqueMaterial stone_material;
+    render::OpaqueMaterial blue_metal;
+    render::OpaqueMaterial white_half_metal;
+    render::OpaqueMaterial white_porcelain;
+    render::OpaqueMaterial blue_rubber;
+
     cobblestone_material.reset();
     crystal_material.reset();
     mud_material.reset();
     mudroad_material.reset();
     stone_material.reset();
+    blue_metal.reset();
+    white_half_metal.reset();
+    white_porcelain.reset();
+    blue_rubber.reset();
     {
         {
             cobblestone_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_albedo.dds");
@@ -112,9 +121,29 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
             stone_material.roughness_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Stone\\Stone_roughness.dds");
             stone_material.UpdateTextureFlags();
         }
+        {
+            blue_metal.albedo_color = vec3{ 0.1f, 0.1f, 1.0f };
+            blue_metal.metalness_value = 1.0f;
+            blue_metal.roughness_value = 0.1f;
+        }
+        {
+            white_half_metal.albedo_color = vec3{ 0.9f, 0.9f, 0.9f };
+            white_half_metal.metalness_value = 0.5f;
+            white_half_metal.roughness_value = 0.25f;
+        }
+        {
+            white_porcelain.albedo_color = vec3{ 0.9f, 0.9f, 0.9f };
+            white_porcelain.metalness_value = 0.0f;
+            white_porcelain.roughness_value = 0.15f;
+        }
+        {
+            blue_rubber.albedo_color = vec3{ 0.1f, 0.1f, 1.0f };
+            blue_rubber.metalness_value = 0.0f;
+            blue_rubber.roughness_value = 0.7f;
+        }
     }
     {
-        std::vector<render::OpaqueMaterial> materials = { cobblestone_material, crystal_material, mud_material, mudroad_material, stone_material };
+        std::vector<render::OpaqueMaterial> materials = { cobblestone_material, crystal_material, mud_material, mudroad_material, stone_material, blue_metal, white_half_metal, white_porcelain, blue_rubber };
         for (size_t i = 0; i < materials.size(); i++)
         {
             auto model_id = render::ModelSystem::GetUnitCube();
@@ -150,13 +179,16 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
     }
     // ------------------------- CUBES -------------------------
     {
-        auto model_id = render::ModelSystem::GetUnitCube();
-        auto cube = registry.create();
-        auto &transform = registry.emplace<TransformComponent>(cube);
-        transform.position = vec3{ 0, -0.5f, 0 };
-        transform.scale = vec3{ 10,0.1,10 };
-        transform.UpdateMatrices();
-        render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, cube, { stone_material });
+        for (int i = 0; i < 4; i++)
+        {
+            auto model_id = render::ModelSystem::GetUnitCube();
+            auto cube = registry.create();
+            auto &transform = registry.emplace<TransformComponent>(cube);
+            transform.position = vec3{ 0, -0.5f, 0 } + vec3{ i < 2 ? -1 : 1, 0, i % 2 == 0 ? -1 : 1 } *2.5f;
+            transform.scale = vec3{ 5,0.1,5 };
+            transform.UpdateMatrices();
+            render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, cube, { stone_material });
+        }
     }
     {
         auto model_id = render::ModelSystem::GetUnitCube();
@@ -189,7 +221,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
         transform.position = vec3{ 0, 3, 2 };
         transform.UpdateMatrices();
         auto &point_light = registry.emplace<PointLight>(entity);
-        point_light.color = vec3{ 0.988, 0.733, 0.555 };
+        point_light.color = vec3{ 0.988, 0.233, 0.255 };
         point_light.power = 1.5e2f;
         render::ModelSystem::instance().AddEmissiveInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
     }
@@ -201,7 +233,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
         transform.position = vec3{ 0, 2, -8 };
         transform.UpdateMatrices();
         auto &point_light = registry.emplace<PointLight>(entity);
-        point_light.color = vec3{ 0.988, 0.933, 0.455 };
+        point_light.color = vec3{ 0.01, 0.933, 0.255 };
         point_light.power = 2e2f;
         render::ModelSystem::instance().AddEmissiveInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
     }

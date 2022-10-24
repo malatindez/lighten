@@ -16,6 +16,6 @@ float4 ps_main(PS_INPUT vout) : SV_Target {
   float3 ldr = g_texture.Sample(g_bilinear_wrap_sampler, vout.tex_coords).rgb;
   ldr = AdjustExposure(ldr, g_EV100);
   ldr = AcesHdrToLdr(ldr);
- // ldr = ApplyGammaCorrection(ldr, g_gamma);
+  ldr = ApplyGammaCorrection(ldr, 2.2f);
   return float4(ldr, 1.f);
 }

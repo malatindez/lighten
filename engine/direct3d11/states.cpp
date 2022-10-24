@@ -77,17 +77,11 @@ namespace engine::direct3d
         sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP);
         api().device5->CreateSamplerState(&sampler_desc, &point_clamp_sampler.reset());
 
-        sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_TEXTURE_ADDRESS_WRAP);
+        sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_WRAP);
         api().device5->CreateSamplerState(&sampler_desc, &bilinear_wrap_sampler.reset());
 
-        sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP);
-        api().device5->CreateSamplerState(&sampler_desc, &bilinear_clamp_sampler.reset());
-
-        sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_WRAP);
-        api().device5->CreateSamplerState(&sampler_desc, &trilinear_wrap_sampler.reset());
-
         sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_CLAMP);
-        api().device5->CreateSamplerState(&sampler_desc, &trilinear_clamp_sampler.reset());
+        api().device5->CreateSamplerState(&sampler_desc, &bilinear_clamp_sampler.reset());
 
         sampler_desc = CreateSamplerState(D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP);
         api().device5->CreateSamplerState(&sampler_desc, &anisotropic_wrap_sampler.reset());

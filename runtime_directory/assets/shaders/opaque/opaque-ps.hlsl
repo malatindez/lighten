@@ -114,7 +114,6 @@ float4 ps_main(PS_IN input)
     {
         material.albedo = g_albedo_color;
     }
-    material.albedo = pow(material.albedo, 2.2f);
 
     if (g_enabled_texture_flags & TEXTURE_ENABLED_ROUGHNESS)
     {
@@ -132,6 +131,7 @@ float4 ps_main(PS_IN input)
     {
         material.metalness = g_metalness_value;
     }
+    material.roughness = max(material.roughness, 0.01f);
     input.bitangent = normalize(input.bitangent);
     input.tangent = normalize(input.tangent);
     input.normal = normalize(input.normal);

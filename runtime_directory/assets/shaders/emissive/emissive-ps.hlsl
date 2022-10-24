@@ -6,8 +6,8 @@ struct PS_INPUT {
 	float4 pos : SV_POSITION;
     float2 texcoord : TEXCOORD;
 	float3 emission : EMISSION;
-	bool use_emissive_texture : USE_EMISSIVE_TEXTURE;
-	float power : POWER;
+	nointerpolation bool use_emissive_texture : USE_EMISSIVE_TEXTURE;
+	nointerpolation float power : POWER;
 	float3 normal : NORMAL;
 	float3 world_position : WORLD_POSITION;
 	float4x4 world_transform : WORLD_TRANSFORM;
@@ -20,7 +20,6 @@ float4 ps_main(PS_INPUT input) : SV_TARGET
 	{
 		emission = (g_EmissiveTexture.Sample(g_anisotropic_wrap_sampler, input.texcoord.xy)).xyz * input.power;
 	}
-	return float4(emission, 1.0f);
 
 	float3 normal = normalize(input.normal);
 	float3 cameraDir = normalize(GetCameraPosition() - input.world_transform[3].xyz);

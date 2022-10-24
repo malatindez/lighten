@@ -171,10 +171,16 @@ namespace engine::core
         instance_->textures_.emplace(std::make_pair(instance_->current_id_, shader_resource_view));
         return instance_->current_id_++;
     }
-    TextureId TextureManager::LoadTexture(std::filesystem::path const &path, bool generate_mipmaps)
+    TextureId TextureManager::LoadTexture(std::filesystem::path const &input_path, bool generate_mipmaps)
     {
-        utils::AlwaysAssert(path.is_absolute(), "Paths provided to texture manager should be absolute!");
-        utils::Assert(path.has_extension(), "Path to texture should have an extension");
+        utils::AlwaysAssert(input_path.is_absolute(), "Paths provided to texture manager should be absolute!");
+        utils::Assert(input_path.has_extension(), "Path to texture should have an extension");
+        auto path = input_path.parent_path().parent_path() / "dds" / (input_path.stem().string() + ".dds");
+        if (!std::filesystem::exists(path))
+        {
+            path = input_path;
+        }
+
         if (auto it = instance_->texture_hashes_.find(std::filesystem::hash_value(path));
             it != instance_->texture_hashes_.end())
         {

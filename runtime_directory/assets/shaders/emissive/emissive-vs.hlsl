@@ -11,8 +11,8 @@ struct VS_OUTPUT {
 	float4 pos : SV_POSITION;
     float2 texcoord : TEXCOORD;
 	float3 emission : EMISSION;
-	bool use_emissive_texture : USE_EMISSIVE_TEXTURE;
-	float power : POWER;
+	nointerpolation bool use_emissive_texture : USE_EMISSIVE_TEXTURE;
+	nointerpolation float power : POWER;
 	float3 normal : NORMAL;
 	float3 world_position : WORLD_POSITION;
 	float4x4 world_transform : WORLD_TRANSFORM;

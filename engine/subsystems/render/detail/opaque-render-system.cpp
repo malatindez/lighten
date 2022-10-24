@@ -124,7 +124,7 @@ namespace engine::render::_opaque_detail
                 auto &registry_transform = registry.get<components::TransformComponent>(entity);
                 opaque_point_light.color = registry_point_light.color * registry_point_light.power;
                 opaque_point_light.position = registry_transform.position;
-                opaque_point_light.radius = length(registry_transform.scale) / sqrt(3.0f);
+                opaque_point_light.radius = length(registry_transform.scale) / sqrt(3.05f);
 
                 if (++opaque_per_frame.num_point_lights >= kOpaqueShaderMaxPointLights)
                 {
