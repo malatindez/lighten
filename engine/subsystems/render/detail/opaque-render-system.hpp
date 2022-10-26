@@ -153,8 +153,6 @@ namespace engine::render::_opaque_detail
         [[nodiscard]] ID3D11ShaderResourceView *GetBrdfTexture() const { return brdf_texture_; }
         [[nodiscard]] float const &ambient_occlusion() const { return ambient_occlusion_value_; }
         [[nodiscard]] float &ambient_occlusion() { return ambient_occlusion_value_; }
-    private:
-        friend class ::engine::render::ModelSystem;
 
         OpaqueRenderSystem();
         void Render(entt::registry &registry);
@@ -164,6 +162,7 @@ namespace engine::render::_opaque_detail
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, std::vector<OpaqueMaterial> const &materials);
 
         void OnInstancesUpdated(entt::registry &registry);
+    private:
         std::vector<ModelInstance> model_instances_;
 
         GraphicsShaderProgram opaque_shader_;

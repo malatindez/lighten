@@ -55,11 +55,11 @@ namespace engine::render
             layer->OnFrameBegin();
         }
     }
-    void PostProcessing::OnFrameEnd()
+    void PostProcessing::OnFrameEnd(direct3d::RenderTargetBase &target)
     {
         for (auto &layer : frame_end_)
         {
-            layer->OnFrameEnd();
+            layer->OnFrameEnd(target);
         }
     }
     direct3d::RenderTargetBase &PostProcessing::OnProcess(direct3d::RenderTargetBase &source)

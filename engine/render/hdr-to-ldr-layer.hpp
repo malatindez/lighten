@@ -14,7 +14,7 @@ namespace engine::render
             float exposure = 1.0f;
             core::math::vec3 padding;
         };
-        HDRtoLDRLayer(direct3d::SwapchainRenderTarget &window_render_target) : PostProcessingLayer(0), window_render_target_{ window_render_target }
+        HDRtoLDRLayer(std::shared_ptr<direct3d::RenderTargetBase> window_render_target) : PostProcessingLayer(0), window_render_target_{ window_render_target }
         {
             auto path = std::filesystem::current_path();
             auto vs = core::ShaderManager::instance()->CompileVertexShader(path / vs_shader_path);
@@ -23,20 +23,22 @@ namespace engine::render
         }
         direct3d::RenderTargetBase &OnProcess(direct3d::RenderTargetBase &source) override
         {
-            window_render_target_.SizeResources(source.size());
+            window_render_target_->SizeResources(source.size());
             direct3d::api().devcon4->OMSetRenderTargets(0, nullptr, nullptr);
             direct3d::api().devcon4->PSSetShaderResources(0, 1, &source.shader_resource_view());
-            direct3d::api().devcon4->OMSetRenderTargets(1, &window_render_target_.render_target_view(), nullptr);
+            direct3d::api().devcon4->OMSetRenderTargets(1, &window_render_target_->render_target_view(), nullptr);
             shader_.Bind();
             constant_buffer_.Update(Buffer{ exposure_ , {0} });
             constant_buffer_.Bind(direct3d::ShaderType::PixelShader, 1);
             direct3d::api().devcon4->Draw(3, 0);
             ID3D11ShaderResourceView *temp = nullptr;
             direct3d::api().devcon4->PSSetShaderResources(0, 1, &temp);
-            return window_render_target_;
+            return *window_render_target_;
         }
         [[nodiscard]] float &exposure() noexcept { return exposure_; }
         [[nodiscard]] float const &exposure() const noexcept { return exposure_; }
+
+        void SetRenderTarget(std::shared_ptr < direct3d::RenderTargetBase> render_target) { window_render_target_ = render_target; }
 
     private:
         static constexpr auto vs_shader_path = "assets/shaders/post-processing/hdr-to-ldr-vs.hlsl";
@@ -44,6 +46,6 @@ namespace engine::render
         float exposure_ = -1.0f;
         GraphicsShaderProgram shader_;
         direct3d::DynamicUniformBuffer<Buffer> constant_buffer_;
-        direct3d::SwapchainRenderTarget &window_render_target_;
+        std::shared_ptr<direct3d::RenderTargetBase> window_render_target_;
     };
 }

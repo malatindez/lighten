@@ -123,7 +123,7 @@ namespace object_editor
             }
             auto const &model = render::ModelSystem::GetModel(id);
             EditTransform(*Engine::scene()->main_camera, transform, model.bounding_box, InputLayer::instance()->key_state(engine::core::Key::KEY_CONTROL), window_pos, window_size);
-            render::ModelSystem::instance().OnInstancesUpdated(Engine::scene()->registry);
+            Engine::scene()->OnInstancesUpdated();
         }
         else
         {
@@ -276,7 +276,7 @@ namespace object_editor
         bool flag = false;
         if (auto *component = registry.try_get<components::OpaqueComponent>(selected_entity); component)
         {
-            auto *model_instance = render::ModelSystem::instance().opaque_render_system().GetInstancePtr(component->model_id);
+            auto *model_instance = Engine::scene()->renderer->opaque_render_system().GetInstancePtr(component->model_id);
             if (model_instance)
             {
                 uint32_t mesh_id = std::numeric_limits<uint32_t>::max();
@@ -303,7 +303,7 @@ namespace object_editor
         }
         else if (auto *component = registry.try_get<components::EmissiveComponent>(selected_entity); component)
         {
-            auto *model_instance = render::ModelSystem::instance().emissive_render_system().GetInstancePtr(component->model_id);
+            auto *model_instance = Engine::scene()->renderer->emissive_render_system().GetInstancePtr(component->model_id);
             if (model_instance)
             {
                 uint32_t mesh_id = std::numeric_limits<uint32_t>::max();

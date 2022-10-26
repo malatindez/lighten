@@ -44,11 +44,11 @@ namespace engine::platform::windows
         // display the window on the screen
         ShowWindow(handle(), 10);
     }
-    bool Window::OnUpdate()
+    void Window::OnUpdate()
     {
         if (!alive_)
         {
-            return false;
+            return;
         }
         MSG msg;
         while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -66,7 +66,7 @@ namespace engine::platform::windows
             core::events::WindowCloseEvent wce{ handle() };
             event_callback_(wce);
         }
-        return true;
+        return;
     }
     LRESULT CALLBACK Window::WindowProcCallback(HWND handle, UINT message,
                                                 WPARAM w_param, LPARAM l_param)

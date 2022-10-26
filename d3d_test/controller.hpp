@@ -1,6 +1,6 @@
 #pragma once
-#include "renderer.hpp"
 #include "misc/camera-controller.hpp"
+#include "direct3d11/hdr-render-pipeline.hpp"
 class Controller
     : public engine::core::Layer,
     public engine::core::Layer::HandleTick,
@@ -13,7 +13,7 @@ public:
     entt::entity main_camera_entity;
     entt::entity last_created_knight;
 
-    Controller(std::shared_ptr<Renderer> renderer, engine::core::math::ivec2 const &window_size, engine::core::math::ivec2 const &window_pos, float &exposure);
+    Controller(engine::core::math::ivec2 const &window_size, engine::core::math::ivec2 const &window_pos, float &exposure);
     std::vector<std::function<void(float)>> &update_callbacks() { return update_callbacks_; }
     void OnTick(float delta_time) override;
     void OnEvent(engine::core::events::Event &e) override;
@@ -26,5 +26,4 @@ private:
     engine::core::math::ivec2 const &window_size;
     engine::core::math::ivec2 const &window_pos;
     std::vector<UpdateCallback> update_callbacks_;
-    std::shared_ptr<Renderer> renderer_;
 };

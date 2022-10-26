@@ -65,7 +65,10 @@ namespace engine::core
             while (running_)
             {
                 OnUpdate();
-
+                if (!running_)
+                {
+                    break;
+                }
                 if (tick_.elapsed() > kTickDuration)
                 {
                     float dt = tick_.elapsed();

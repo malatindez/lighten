@@ -75,11 +75,6 @@ namespace engine::render::_emissive_detail
     public:
         ModelInstance *GetInstancePtr(uint64_t model_id);
 
-    private:
-        static auto constexpr emissive_vs_shader_path = "assets/shaders/emissive/emissive-vs.hlsl";
-        static auto constexpr emissive_ps_shader_path = "assets/shaders/emissive/emissive-ps.hlsl";
-        friend class ::engine::render::ModelSystem;
-
         EmissiveRenderSystem();
         void Render();
         ModelInstance &GetInstance(uint64_t model_id);
@@ -87,6 +82,10 @@ namespace engine::render::_emissive_detail
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, std::vector<EmissiveMaterial> const &materials);
 
         void OnInstancesUpdated(entt::registry &registry);
+
+    private:
+        static auto constexpr emissive_vs_shader_path = "assets/shaders/emissive/emissive-vs.hlsl";
+        static auto constexpr emissive_ps_shader_path = "assets/shaders/emissive/emissive-ps.hlsl";
         std::vector<ModelInstance> model_instances_;
 
         GraphicsShaderProgram emissive_shader_;

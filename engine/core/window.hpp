@@ -1,11 +1,13 @@
 #pragma once
 #include "core/events.hpp"
-
+#include "core/layers/layer.hpp"
+#include "utils/utils.hpp"
 namespace engine::core
 {
-    class Window
+    class Window : public Layer, public Layer::HandleUpdate
     {
     public:
+
         struct Props
         {
             std::string title;
@@ -22,9 +24,7 @@ namespace engine::core
         [[nodiscard]] inline bool const &alive() const noexcept { return alive_; }
 
         [[nodiscard]] virtual void *native() = 0;
-
         void SetEventCallback(core::EventCallbackFn const &event_fn) noexcept { event_callback_ = event_fn; }
-
     protected:
         core::EventCallbackFn event_callback_;
         std::string title_;

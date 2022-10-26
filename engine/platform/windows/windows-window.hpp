@@ -3,6 +3,7 @@
 #include "include/win.hpp"
 
 #include "core/window.hpp"
+#include "utils/utils.hpp"
 
 namespace engine::platform::windows
 {
@@ -28,10 +29,10 @@ namespace engine::platform::windows
         [[nodiscard]] void *native() override { return handle(); };
         // TODO(malatindez) make this method private and handle events using GetMessage
         // save main-thread dependant events in event pool and pass them if Window->OnUpdate is called
-        bool OnUpdate();
+        void OnUpdate();
+
 
     private:
-
         // remove copy and move semantics because the callback system is bound to the
         // address of the window
         Window(Window &&Window) = delete;

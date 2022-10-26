@@ -21,7 +21,7 @@ namespace engine::render
         class HandleFrameEnd
         {
         public:
-            virtual void OnFrameEnd() = 0;
+            virtual void OnFrameEnd(direct3d::RenderTargetBase &) = 0;
         };
         // Each layer will receive the RenderTarget from that is the result of execution of previous layer
         class HandleProcess
@@ -90,7 +90,7 @@ namespace engine::render
         void OnGuiRender() override;
         void OnTick(float delta_time) override;
         void OnFrameBegin() override;
-        void OnFrameEnd() override;
+        void OnFrameEnd(direct3d::RenderTargetBase &) override;
         direct3d::RenderTargetBase &OnProcess(direct3d::RenderTargetBase &source) override;
 
     protected:

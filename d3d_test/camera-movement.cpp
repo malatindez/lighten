@@ -103,7 +103,7 @@ namespace camera_movement
                     auto &transform = scene->registry.get<TransformComponent>(selected_entity);
                     transform.position = selected_object_offset + obj_offset + scene->main_camera->position();
                     transform.UpdateMatrices();
-                    render::ModelSystem::instance().OnInstancesUpdated(scene->registry);
+                    scene->OnInstancesUpdated();
                 }
             });
     }

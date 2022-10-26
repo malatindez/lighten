@@ -1,6 +1,7 @@
 #include "controller.hpp"
 #include "camera-movement.hpp"
 #include "transform-editor.hpp"
+#include "render/renderer.hpp"
 using namespace engine;
 using namespace core;
 using namespace events;
@@ -25,17 +26,19 @@ void Controller::OnGuiRender()
     ImGui::Text("Camera inv view matrix");
     ImGui::Text("%s", utils::FormatToString(Engine::scene()->main_camera->camera().inv_view).c_str());
     ImGui::SliderFloat("Exposure", &exposure_, -20.0f, 20.0f);
-    ImGui::SliderFloat("Default AO", &render::ModelSystem::instance().opaque_render_system().ambient_occlusion(), 0.0f, 1.0f);
-
+    ImGui::SliderFloat("Default AO", &Engine::scene()->renderer->opaque_render_system().ambient_occlusion(), 0.0f, 1.0f);
     ImGui::End();
     object_editor::OnGuiRender(window_pos, window_size);
 }
 
-Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &window_size, math::ivec2 const &window_pos, float &exposure)
-    : exposure_{ exposure }, window_size{ window_size }, window_pos{ window_pos }, renderer_{ renderer }
+Controller::Controller(math::ivec2 const &window_size, math::ivec2 const &window_pos, float &exposure)
+    : exposure_{ exposure }, window_size{ window_size }, window_pos{ window_pos }
 {
     first_scene = std::make_shared<Scene>();
-    auto &ors = render::ModelSystem::instance().opaque_render_system();
+    first_scene->renderer = std::make_unique<render::Renderer>();
+
+    auto &ors = first_scene->renderer->opaque_render_system();
+    auto &ers = first_scene->renderer->emissive_render_system();
     ors.SetBrdfTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/IBL/ibl_brdf_lut.dds"));
     ors.SetIrradianceTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_irradiance.dds"));
     ors.SetPrefilteredTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_reflection.dds"));
@@ -59,7 +62,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
         if (i % 4 == 1) model_id = ModelLoader::Load("assets\\models\\Samurai\\Samurai.fbx").value();
         else if (i % 4 == 2) model_id = ModelLoader::Load("assets\\models\\KnightHorse\\KnightHorse.fbx").value();
         else if (i % 4 == 3) model_id = ModelLoader::Load("assets\\models\\SunCityWall\\SunCityWall.fbx").value();
-        render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, knight);
+        ors.AddInstance(model_id, registry, knight);
         transform.position = vec3
         {
             std::sin(float(i) / amount * 2 * (float)std::numbers::pi),
@@ -152,7 +155,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
             transform.position = vec3{ (int32_t)i - (int32_t)materials.size() / 2, 0, -8 };
             transform.scale = vec3{ 1 };
             transform.UpdateMatrices();
-            render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, cube, { materials[i] });
+            ors.AddInstance(model_id, registry, cube, { materials[i] });
         }
     }
     {
@@ -173,7 +176,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
                 material.roughness_value = mix(0.001f, 1.0f, float(j) / 9.0f);
                 material.UpdateTextureFlags();
                 material.uv_multiplier = vec2{ 1 };
-                render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, sphere, { material });
+                ors.AddInstance(model_id, registry, sphere, { material });
             }
         }
     }
@@ -187,7 +190,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
             transform.position = vec3{ 0, -0.5f, 0 } + vec3{ i < 2 ? -1 : 1, 0, i % 2 == 0 ? -1 : 1 } *2.5f;
             transform.scale = vec3{ 5,0.1,5 };
             transform.UpdateMatrices();
-            render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, cube, { stone_material });
+            ors.AddInstance(model_id, registry, cube, { stone_material });
         }
     }
     {
@@ -198,7 +201,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
         transform.scale = vec3{ 10,0.1,10 };
         transform.rotation = QuaternionFromEuler(0.0f, 0.0f, radians(90.0f));
         transform.UpdateMatrices();
-        render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, cube, { stone_material });
+        ors.AddInstance(model_id, registry, cube, { stone_material });
     }
     // ------------------------- LIGHTS -------------------------
     {
@@ -211,7 +214,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
         auto &point_light = registry.emplace<PointLight>(entity);
         point_light.color = vec3{ 0.988, 0.933, 0.655 };
         point_light.power = 4e1f;
-        render::ModelSystem::instance().AddEmissiveInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
+        ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
     }
     if (true) {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
@@ -223,7 +226,7 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
         auto &point_light = registry.emplace<PointLight>(entity);
         point_light.color = vec3{ 0.988, 0.233, 0.255 };
         point_light.power = 1.5e2f;
-        render::ModelSystem::instance().AddEmissiveInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
+        ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
     }
     if (true) {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
@@ -235,10 +238,10 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
         auto &point_light = registry.emplace<PointLight>(entity);
         point_light.color = vec3{ 0.01, 0.933, 0.255 };
         point_light.power = 2e2f;
-        render::ModelSystem::instance().AddEmissiveInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
+        ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
     }
     SkyboxManager::LoadSkybox(registry, std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street.dds");
-    render::ModelSystem::instance().OnInstancesUpdated(registry);
+    first_scene->OnInstancesUpdated();
     camera_movement::RegisterKeyCallbacks();
     object_editor::RegisterKeyCallbacks();
     auto &input = *InputLayer::instance();
@@ -257,14 +260,6 @@ void Controller::OnTick([[maybe_unused]] float delta_time)
     auto scene = Engine::scene();
     camera_movement::UpdateCamera(delta_time);
 
-    auto const &camera = Engine::scene()->main_camera->camera();
-    renderer_->per_frame.view = camera.view;
-    renderer_->per_frame.projection = camera.projection;
-    renderer_->per_frame.view_projection = camera.view_projection;
-    renderer_->per_frame.inv_view = camera.inv_view;
-    renderer_->per_frame.inv_projection = camera.inv_projection;
-    renderer_->per_frame.inv_view_projection = camera.inv_view_projection;
-    renderer_->per_frame.mouse_position = vec2{ InputLayer::instance()->mouse_position() };
     if (input.mouse_scrolled())
     {
         auto &move_speed = scene->main_camera->move_speed();
