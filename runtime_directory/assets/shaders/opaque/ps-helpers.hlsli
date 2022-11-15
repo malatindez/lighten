@@ -2,6 +2,7 @@
 #define PS_HELPERS_HLSLI
 #define PI 3.1415926535897932384626433832795
 static const float clampVal = 0.001f;
+static const float depthOffset = 0.005f;
 
 struct PointLight 
 {
@@ -9,6 +10,7 @@ struct PointLight
   float padding;
   float3 position;
   float radius;
+  row_major float4x4 view_projection[6];
 };
 struct SpotLight 
 {
@@ -18,6 +20,7 @@ struct SpotLight
   float inner_cutoff;
   float3 position;
   float outer_cutoff;
+  row_major float4x4 view_projection;
 };
 
 struct DirectionalLight 
@@ -26,6 +29,7 @@ struct DirectionalLight
   float padding;
   float3 direction;
   float solid_angle;
+  row_major float4x4 view_projection;
 };
 
 
@@ -120,6 +124,16 @@ struct PBR_CommonData
     float3 bitangent;
     float3 camera_position;
     float3 fragment_position;
+    TextureCubeArray g_point_shadow_maps;
+    Texture2DArray g_spot_shadow_maps;
+    Texture2DArray g_directional_shadow_maps;
+    SamplerComparisonState g_point_shadow_maps_sampler;
+    SamplerComparisonState g_spot_shadow_maps_sampler;
+    SamplerComparisonState g_directional_shadow_maps_sampler;
+    SamplerState g_bilinear_sampler;
+    uint g_point_light_shadow_resolution;
+    uint g_spot_light_shadow_resolution;
+    uint g_directional_light_shadow_resolution;
 };
 
 
@@ -154,8 +168,83 @@ float3 Illuminate(PBR_Material material,
 
   return (diffuse * ndotl + spec) * light_energy;   
 }
-float3 ComputePointLightEnergy(PBR_Material material, PBR_CommonData common_data, PointLight point_light)
+uint selectCubeFace(float3 unitDir)
 {
+    float maxVal = max(abs(unitDir.x), max(abs(unitDir.y), abs(unitDir.z)));
+    uint index = abs(unitDir.x) == maxVal ? 0 : (abs(unitDir.y) == maxVal ? 2 : 4);
+    return index + (asuint(unitDir[index / 2]) >> 31);
+}
+
+bool shadowed(PBR_CommonData common_data, PointLight point_light, uint point_light_index)
+{
+    float3 light_dir = point_light.position - common_data.fragment_position;
+    float light_dist = length(light_dir);
+    light_dir /= light_dist;
+    
+    float3 posWS = common_data.fragment_position + light_dir * depthOffset;
+
+    uint face = selectCubeFace(-light_dir);
+
+    float4 posCS = mul(float4(posWS, 1.0f), point_light.view_projection[face]);
+
+    float depth = posCS.z / posCS.w;
+
+    float linearDepth = posCS.w;
+    float texelWorldSize = linearDepth * 2.0f / common_data.g_point_light_shadow_resolution;
+
+    float3 sampleDir = posWS - point_light.position;
+
+    float visible = common_data.g_point_shadow_maps.SampleCmp(common_data.g_point_shadow_maps_sampler, float4(sampleDir, point_light_index), depth);
+
+    return visible > 0.5f;
+}
+bool shadowed(PBR_CommonData common_data, SpotLight spot_light, uint spot_light_index)
+{
+  float3 light_dir = spot_light.position - common_data.fragment_position;
+
+  float3 posWS = common_data.fragment_position + light_dir * depthOffset;
+
+  float4 posCS = mul(float4(posWS, 1.0f), spot_light.view_projection);
+
+  float depth = posCS.z;
+
+  posCS.xy *= 0.5f;
+  posCS.xy += 0.5f;
+
+  posCS.y *= -1;
+
+  float visible = common_data.g_directional_shadow_maps.SampleCmp(common_data.g_directional_shadow_maps_sampler, float3(posCS.xy, spot_light_index), depth);
+
+  return visible > 0.5f;
+}
+bool shadowed(PBR_CommonData common_data, DirectionalLight directional_light, uint directional_light_index)
+{
+  float light_dir = directional_light.direction;
+
+  float3 posWS = common_data.fragment_position - light_dir * depthOffset * 20;
+
+  float4 posCS = mul(float4(posWS, 1.0f), directional_light.view_projection);
+
+  float depth = posCS.z;
+
+  posCS.xy *= 0.5f;
+  posCS.xy += 0.5f;
+
+  posCS.y *= -1;
+
+  float shadowmap_depth = common_data.g_directional_shadow_maps.Sample(common_data.g_bilinear_sampler, float3(posCS.xy, directional_light_index)).r;
+  return depth < shadowmap_depth;
+  // doesn't work for some reason
+  float visible = common_data.g_directional_shadow_maps.SampleCmp(common_data.g_directional_shadow_maps_sampler, float3(posCS.xy, directional_light_index), depth);
+  return visible > 0.5f;
+}
+
+float3 ComputePointLightEnergy(PBR_Material material, PBR_CommonData common_data, PointLight point_light, uint point_light_index)
+{
+    if (shadowed(common_data, point_light, point_light_index))
+    {
+        return float3(0,0,0);
+    }
     float3 light_dir = point_light.position - common_data.fragment_position;
     float light_dist = length(light_dir);
     float3 light_dir_normalized = light_dir / light_dist;
@@ -185,8 +274,13 @@ float3 ComputePointLightEnergy(PBR_Material material, PBR_CommonData common_data
     return fading * Illuminate(material, point_light.color, common_data.view_dir_normalized, common_data.normal, specL, ndotl, solid_angle);
 }
  
-float3 ComputeSpotLightEnergy(PBR_Material material, PBR_CommonData common_data, SpotLight spot_light)
+float3 ComputeSpotLightEnergy(PBR_Material material, PBR_CommonData common_data, SpotLight spot_light, uint spot_light_index)
 {
+    if (shadowed(common_data, spot_light, spot_light_index))
+    {
+        return float3(0,0,0);
+    }
+
     float3 light_dir = spot_light.position - common_data.fragment_position;
     float light_dist = length(light_dir);
     float3 light_dir_normalized = light_dir / light_dist;
@@ -213,11 +307,16 @@ float3 ComputeSpotLightEnergy(PBR_Material material, PBR_CommonData common_data,
     attenuation *= attenuation;
 
     float solid_angle = 2 * PI * (1 - cos_outer_cutoff);
+    
     return fading * attenuation * Illuminate(material, spot_light.color, common_data.view_dir_normalized, common_data.normal, specL, ndotl, solid_angle);
 }
  
-float3 ComputeDirectionalLightEnergy(PBR_Material material, PBR_CommonData common_data, DirectionalLight directional_light)
+float3 ComputeDirectionalLightEnergy(PBR_Material material, PBR_CommonData common_data, DirectionalLight directional_light, uint directional_light_index)
 {
+    if (shadowed(common_data, directional_light, directional_light_index))
+    {
+        return float3(0,0,0);
+    }
     float3 light_dir = -directional_light.direction;
     float3 light_dir_normalized = light_dir;
     
