@@ -43,9 +43,17 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
         render_pipeline = nullptr;
         app.Run();
     }
+    catch (std::exception e)
+    {
+        spdlog::critical(e.what());
+        spdlog::critical("Exception occurred within the engine. Shutting down.");
+        std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+        app.Exit();
+    }
     catch (...)
     {
-        spdlog::critical("Exception occurred within the engine. Shutting down.");
+        spdlog::critical("Unknown exception occurred within the engine. Shutting down.");
+        std::this_thread::sleep_for(std::chrono::milliseconds(5000));
         app.Exit();
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(250));
