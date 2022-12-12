@@ -48,7 +48,7 @@ void Controller::OnGuiRender()
         spdlog::warn("MSAA sample count {} is not supported", sample_count);
         sample_count = current_sample_count;
     }
-    if (sample_count != current_sample_count) { hdr_render_pipeline_->SetSampleCount(sample_count); }
+    if ((uint32_t)(sample_count) != current_sample_count) { hdr_render_pipeline_->SetSampleCount(sample_count); }
     auto &lrs = Engine::scene()->renderer->light_render_system();
     auto const &point_lights = lrs.point_light_entities();
     auto const &spot_lights = lrs.spot_light_entities();
@@ -330,6 +330,7 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
 }
 void Controller::OnTick([[maybe_unused]] float delta_time)
 {
+    Engine::scene()->renderer->OnInstancesUpdated(Engine::scene().get());
     for (auto const &func : update_callbacks_)
     {
         func(delta_time);

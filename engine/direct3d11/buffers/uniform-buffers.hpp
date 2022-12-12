@@ -64,6 +64,10 @@ namespace engine::direct3d
     class DynamicUniformBuffer : private DynamicBuffer<T>
     {
     public:
+        using DynamicBuffer<T>::buffer;
+        using DynamicBuffer<T>::description;
+    
+    public:
         static constexpr size_t kSize = _uniform_buffer_detail::RoundBufferSizeTo16Boundary(sizeof(T));
 
         DynamicUniformBuffer(uint32_t cpu_access_flags = D3D11_CPU_ACCESS_WRITE, uint32_t misc_flags = 0)

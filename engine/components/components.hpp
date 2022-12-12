@@ -130,4 +130,104 @@ namespace engine::components
         float inner_cutoff;
         float outer_cutoff;
     };
+
+    struct ParticleEmitter final
+    {
+        ParticleEmitter() = default;
+        ParticleEmitter(const ParticleEmitter &) = default;
+        ParticleEmitter(ParticleEmitter &&) = default;
+        ParticleEmitter &operator=(const ParticleEmitter &) = default;
+        ParticleEmitter &operator=(ParticleEmitter &&) = default;
+        ~ParticleEmitter() = default;
+        
+        // All the angles are relative to the transform.forward of the particle emitter
+        // It means that if you want to emit particles in a cone, you need to rotate the transform
+
+        // The position yaw range is a vector with the following format: (x, y, z, w) = (min_yaw, min_pitch, max_yaw, max_pitch)
+        // range in which the yaw and pitch will be randomized to rotate the base position vector
+        core::math::vec4 position_yaw_pitch_range;
+        // range in which the position will be randomized
+        core::math::vec2 position_range;
+        
+        // The velocity yaw range is a vector with the following format: (x, y, z, w) = (min_yaw, min_pitch, max_yaw, max_pitch)
+        // range in which the yaw and pitch will be randomized to rotate the base velocity vector
+        core::math::vec4 velocity_yaw_pitch_range; 
+        // range in which the velocity will be randomized
+        core::math::vec2 velocity_range;
+        
+        // Base HDR color of the generated particle
+        core::math::vec4 base_diffuse_value;
+        // Basically works like this: base_diffuse_value + (random_color_v4 * diffuse_variation)
+        core::math::vec4 diffuse_variation;
+
+        // range in which the particle life span will be randomized
+        core::math::vec2 particle_lifespan_range;
+        
+        // range in which the start size will be randomized
+        core::math::vec2 start_size_range;
+        // range in which the end size will be randomized
+        core::math::vec2 end_size_range; 
+
+        // range in which the mass will be randomized
+        // mass is used to calculate the drag force
+        core::math::vec2 mass_range; 
+        
+        // range in which the emit rate will be randomized
+        core::math::vec2 emit_rate_range; 
+
+        // Maximum amount of particles that can be alive at the same time for this particle emitter
+        int maximum_amount_of_particles = 1000;
+        core::math::vec2 spawn_rate_range;
+    };
+
+    struct ForceField final
+    {
+        enum class Type : uint8_t
+        {
+            // Point force field is a sphere that applies a force to all the particles inside it
+            // Basically works like this: force * (1 - (distance / radius) ^ falloff)
+            Point = 0,
+            // Directional force field is a plane that applies a force to all the particles in front of it
+            // Basically works like this: direction * force * (1 - (dot(normal, particle_position) / radius) ^ falloff)
+            // where direction = transform.forward
+            Directional = 1
+        };
+        
+        ForceField() = default;
+        ForceField(const ForceField &) = default;
+        ForceField(ForceField &&) = default;
+        ForceField &operator=(const ForceField &) = default;
+        ForceField &operator=(ForceField &&) = default;
+        ~ForceField() = default;
+
+        Type type;
+        // negative -> repel, positive -> attract
+        float force = 0;
+        // radius of the force field
+        float radius;
+        // how fast the force decreases with distance
+        float falloff;
+    };
+    
+    struct Collider final
+    {
+        enum class Type : uint8_t
+        {
+            Sphere = 0,
+            Box = 1
+        };
+
+        Collider() = default;
+        Collider(const Collider &) = default;
+        Collider(Collider &&) = default;
+        Collider &operator=(const Collider &) = default;
+        Collider &operator=(Collider &&) = default;
+        ~Collider() = default;
+
+        Type type;
+        // half extents of the box collider
+        core::math::vec3 half_extents;
+        // radius of the sphere collider
+        float radius;
+    };
 } // namespace engine::components

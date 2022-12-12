@@ -38,7 +38,7 @@ namespace engine::utils
             size_t entries_amount = entries.size() - index;
             index = entries.size() - 1;
 
-            float avg = avg();
+            float average = avg();
             float avg_over_the_flush = avg(entries_amount);
 
             std::stringstream out;
@@ -50,16 +50,18 @@ namespace engine::utils
             out << std::setprecision(7) << avg_over_the_flush * entries_amount / flush.elapsed() * 100;
             out << std::endl;
             out << "Average time the function took over " << entries.size() << " calls: ";
-            out << std::setprecision(7) << avg * 1000 << " milliseconds" << std::endl;
-            out << "Average time the function took over the last " << entries_amount.size() << " calls: ";
+            out << std::setprecision(7) << average * 1000 << " milliseconds" << std::endl;
+            out << "Average time the function took over the last " << entries_amount << " calls: ";
             out << std::setprecision(7) << avg_over_the_flush * 1000 << " milliseconds" << std::endl;
+
+            spdlog::info(out.str());
         }
 
         float avg(size_t last_n_entries = std::numeric_limits<size_t>::max())
         {
             float rv = 0;
             size_t counter = 0;
-            for (size_t i = entries.size() - 1;
+            for (int64_t i = int64_t(entries.size()) - 1;
                  counter < last_n_entries && i >= 0;
                  ++counter, --i)
             {
@@ -68,7 +70,7 @@ namespace engine::utils
             return rv / counter;
         }
 
-        float time_to_flush = 1; // every second
+        float time_to_flush = 30; // every second
         size_t maximum_entries = std::numeric_limits<size_t>::max();
         bool log_automatically = true;
 

@@ -17,7 +17,7 @@ namespace object_editor
     bool useSnap(false);
     vec4 snap;
 
-    void EditTransform(CameraController const &camera, TransformComponent &transform)
+    void EditTransform([[maybe_unused]] CameraController const &camera, TransformComponent &transform)
     {
         mat4 &matrix = transform.model;
         float matrixTranslation[3], matrixRotation[3], matrixScale[3];
@@ -316,9 +316,9 @@ namespace object_editor
             return;
         }
         bool flag = false;
-        if (auto *component = registry.try_get<components::OpaqueComponent>(selected_entity); component)
+        if (auto * opaque_component = registry.try_get<components::OpaqueComponent>(selected_entity); opaque_component)
         {
-            auto *model_instance = Engine::scene()->renderer->opaque_render_system().GetInstancePtr(component->model_id);
+            auto *model_instance = Engine::scene()->renderer->opaque_render_system().GetInstancePtr(opaque_component->model_id);
             if (model_instance)
             {
                 uint32_t mesh_id = std::numeric_limits<uint32_t>::max();
@@ -343,9 +343,9 @@ namespace object_editor
                 }
             }
         }
-        else if (auto *component = registry.try_get<components::EmissiveComponent>(selected_entity); component)
+        else if (auto *emissive_component = registry.try_get<components::EmissiveComponent>(selected_entity); emissive_component)
         {
-            auto *model_instance = Engine::scene()->renderer->emissive_render_system().GetInstancePtr(component->model_id);
+            auto *model_instance = Engine::scene()->renderer->emissive_render_system().GetInstancePtr(emissive_component->model_id);
             if (model_instance)
             {
                 uint32_t mesh_id = std::numeric_limits<uint32_t>::max();
@@ -397,8 +397,8 @@ namespace object_editor
             ImGui::Text("Spot light");
             ImGui::ColorEdit3("Color", spot_light->color.data.data());
             ImGui::SliderFloat("Power", &spot_light->power, 0, 1e6f);
-            ImGui::SliderFloat("Inner cutoff", &spot_light->inner_cutoff, -std::numbers::pi, std::numbers::pi);
-            ImGui::SliderFloat("Outer cutoff", &spot_light->outer_cutoff, -std::numbers::pi, std::numbers::pi);
+            ImGui::SliderFloat("Inner cutoff", &spot_light->inner_cutoff, static_cast<float>(-std::numbers::pi), static_cast<float>(std::numbers::pi));
+            ImGui::SliderFloat("Outer cutoff", &spot_light->outer_cutoff, static_cast<float>(-std::numbers::pi), static_cast<float>(std::numbers::pi));
         }
     }
     void EditLightDirectional(components::DirectionalLight *directional_light)

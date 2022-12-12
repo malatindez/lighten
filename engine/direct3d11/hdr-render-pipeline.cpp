@@ -49,7 +49,6 @@ namespace engine::direct3d
         }
         // Render frame
         LayerStack::OnRender();
-
         PostProcess();
         imgui_layer_->Begin();
         OnGuiRender();

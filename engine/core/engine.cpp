@@ -75,12 +75,14 @@ namespace engine::core
                     tick_.reset();
                     OnTick(dt);
                 }
-
-                if (render_.elapsed() > kFrameDuration)
+                static utils::Measurer<std::chrono::high_resolution_clock> measurer1{ "Engine::Render()" };
+                measurer1.begin();
+                if (render_.elapsed() > 0)
                 {
                     render_.reset();
                     OnRender();
                 }
+                measurer1.end();
 
                 direct3d::LogDebugInfoQueue();
 

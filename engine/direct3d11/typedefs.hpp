@@ -33,8 +33,10 @@ namespace engine::direct3d
     using Blob = d3d_resource_wrapper<ID3D10Blob>;
     using Buffer = d3d_resource_wrapper<ID3D11Buffer>;
     using ShaderResourceView = d3d_resource_wrapper<ID3D11ShaderResourceView>;
+    using UnorderedAccessView = d3d_resource_wrapper<ID3D11UnorderedAccessView>;
     using Resource = d3d_resource_wrapper<ID3D11Resource>;
-
+    using BlendState = d3d_resource_wrapper<ID3D11BlendState>;
+    
     using Factory = d3d_resource_wrapper<IDXGIFactory>;
     using Factory5 = d3d_resource_wrapper<IDXGIFactory5>;
     using Device = d3d_resource_wrapper<ID3D11Device>;
