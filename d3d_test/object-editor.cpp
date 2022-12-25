@@ -649,6 +649,17 @@ namespace object_editor
                 if (emitter->rotation_speed_range.x > emitter->rotation_speed_range.y) { emitter->rotation_speed_range.x = emitter->rotation_speed_range.y; }
                 if (emitter->rotation_speed_range.y < emitter->rotation_speed_range.x) { emitter->rotation_speed_range.y = emitter->rotation_speed_range.x; }
 
+                ImGui::Text("Thickness ");
+                ImGui::Text("Min: ");
+                ImGui::SameLine();
+                ImGui::SliderFloat("##min-thickness", &emitter->thickness_range.x, 0, 100, "%.3f");
+                ImGui::Text("Max: ");
+                ImGui::SameLine();
+                ImGui::SliderFloat("##max-thickness", &emitter->thickness_range.y, 0, 100, "%.3f");
+
+                if (emitter->thickness_range.x > emitter->thickness_range.y) { emitter->thickness_range.x = emitter->thickness_range.y; }
+                if (emitter->thickness_range.y < emitter->thickness_range.x) { emitter->thickness_range.y = emitter->thickness_range.x; }
+
                 // acceleration
 
                 ImGui::Text("Particle acceleration ");

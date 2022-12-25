@@ -394,6 +394,8 @@ namespace engine::components
         // TODO: Add a drag force field
         core::math::vec2 mass_range;
 
+        core::math::vec2 thickness_range;
+
         float emit_rate;
 
         core::math::vec2 rotation_range;
@@ -423,6 +425,7 @@ namespace engine::components
             float life_end;
             float rotation;
             float rotation_speed;
+            float thickness;
         };
         std::vector<Particle> particles;
         // Counts up to 1 second and then resets

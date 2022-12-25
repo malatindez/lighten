@@ -91,6 +91,9 @@ namespace engine::direct3d
         per_frame_.screen_resolution = core::math::vec2{ viewport_.Width, viewport_.Height };
         per_frame_.mouse_position = core::math::vec2{ core::InputLayer::instance()->mouse_position() };
         per_frame_.time_now = core::Engine::TimeFromStart();
+        per_frame_.time_since_last_frame = timer.elapsed();
+        per_frame_.sample_count = hdr_target_.sample_count;
+        timer.reset();
 
         per_frame_buffer_.Update(per_frame_);
         per_frame_buffer_.Bind(ShaderType::VertexShader, 0);

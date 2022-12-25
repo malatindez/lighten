@@ -14,7 +14,9 @@ namespace engine::render
         core::math::vec2 screen_resolution;
         core::math::vec2 mouse_position;
         float time_now;
-        core::math::vec3 padding0;
+        float time_since_last_frame;
+        uint32_t sample_count;
+        float padding0;
     };
     struct GPUPointLight
     {

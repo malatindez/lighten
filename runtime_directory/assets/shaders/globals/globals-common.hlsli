@@ -25,7 +25,9 @@ cbuffer PerFrame : register(b0)
 	float2 g_screen_resolution;
 	float2 g_mouse_position;
 	float g_time_now;
-	float3 g_per_frame_padding_0;
+  float g_time_since_last_frame;
+  uint g_sample_count;
+	float g_per_frame_padding_0;
 }
 float3 GetCameraPosition()
 {

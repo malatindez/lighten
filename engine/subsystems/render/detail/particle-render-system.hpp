@@ -40,6 +40,7 @@ namespace engine::render
             float rotation;
             float rotation_speed;
             float lifespan;
+            float thickness;
         };
 
         struct ParticlePerFrame
@@ -54,7 +55,8 @@ namespace engine::render
             float time_since_last_tick;
             uint32_t atlas_size_x;
             uint32_t atlas_size_y;
-            core::math::vec2 padding;
+            uint32_t use_dms_depth_texture;
+            float padding;
         };
     }
     // TODO:
@@ -63,7 +65,7 @@ namespace engine::render
 
     namespace _particle_detail
     {
-       auto constexpr particle_vs_shader_path = "assets/shaders/particle/particle-vs.hlsl";
+        auto constexpr particle_vs_shader_path = "assets/shaders/particle/particle-vs.hlsl";
         auto constexpr particle_ps_shader_path = "assets/shaders/particle/particle-ps.hlsl";
         class ParticleRenderSystem
         {
@@ -82,9 +84,6 @@ namespace engine::render
             ID3D11ShaderResourceView *emva1 = nullptr;
             ID3D11ShaderResourceView *emva2 = nullptr;
             ID3D11ShaderResourceView *rlt = nullptr;
-
-            direct3d::ShaderResourceView *depth_texture_srv;
-            direct3d::Texture2D *depth_texture_buffer;
 
             core::math::uivec2 atlas_size = { 1, 1 };
         private:

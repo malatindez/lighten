@@ -49,7 +49,8 @@ namespace engine::render::_particle_detail
             { "END_SIZE",        0, DXGI_FORMAT_R32_FLOAT,           1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
             { "ROTATION",        0, DXGI_FORMAT_R32_FLOAT,           1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
             { "ROTATION_SPEED",  0, DXGI_FORMAT_R32_FLOAT,           1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-            { "LIFESPAN",        0, DXGI_FORMAT_R32_FLOAT,           1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1}
+            { "LIFESPAN",        0, DXGI_FORMAT_R32_FLOAT,           1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            { "THICKNESS",       0, DXGI_FORMAT_R32_FLOAT,           1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1}
         };
 
         auto vs = core::ShaderManager::instance()->CompileVertexShader(path / particle_vs_shader_path);
@@ -87,7 +88,7 @@ namespace engine::render::_particle_detail
                     particle.rotation,
                     emitter.freeze ? 0.0f : particle.rotation_speed,
                     1.0f - (particle.life_end - render_start_timestamp) / (particle.life_end - particle.life_begin),
-                                    });
+                    particle.thickness });
                 amount_of_particles++;
             }
         }
@@ -175,20 +176,44 @@ namespace engine::render::_particle_detail
         direct3d::api().devcon4->OMGetRenderTargets(1, &render_target, &depth_target);
         direct3d::api().devcon4->OMSetRenderTargets(1, &render_target, nullptr);
 
-        ID3D11ShaderResourceView *depth_srv = nullptr;
         ID3D11Texture2D *depth_texture = nullptr;
         depth_target->GetResource(reinterpret_cast<ID3D11Resource **>(&depth_texture));
+
+        D3D11_TEXTURE2D_DESC depth_texture_desc = {};
+        depth_texture->GetDesc(&depth_texture_desc);
+        depth_texture_desc.Format = DXGI_FORMAT_R24G8_TYPELESS;
+        depth_texture_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+        depth_texture_desc.MiscFlags = 0;
+
+        ID3D11Texture2D *depth_texture_buffer = nullptr;
+        direct3d::AlwaysAssert(direct3d::api().device5->CreateTexture2D(&depth_texture_desc, nullptr, &depth_texture_buffer), "Failed to create texture2D");
+
+        direct3d::api().devcon4->CopyResource(depth_texture_buffer, depth_texture);
 
         // srv desc
         D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
         srv_desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-        srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-        srv_desc.Texture2D.MipLevels = 1u;
-        direct3d::api().device5->CreateShaderResourceView(depth_texture, &srv_desc, &depth_srv);
+        if (depth_texture_desc.SampleDesc.Count > 1)
+        {
+            srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+        }
+        else
+        {
+            srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+            srv_desc.Texture2D.MipLevels = 1;
+            srv_desc.Texture2D.MostDetailedMip = 0;
+        }
+
+        ID3D11ShaderResourceView *depth_srv = nullptr;
+        direct3d::api().device5->CreateShaderResourceView(depth_texture_buffer, &srv_desc, &depth_srv);
+
+        // render particles
 
         per_frame.time_since_last_tick = core::Engine::TimeFromStart() - last_tick_time_;
         per_frame.atlas_size_x = atlas_size.x;
         per_frame.atlas_size_y = atlas_size.y;
+        per_frame.use_dms_depth_texture = depth_texture_desc.SampleDesc.Count > 1;
         particle_per_frame_buffer_.Update(per_frame);
 
         particle_per_frame_buffer_.Bind(direct3d::ShaderType::VertexShader, 1);
@@ -201,17 +226,23 @@ namespace engine::render::_particle_detail
 
         particle_shader_.Bind();
 
-        direct3d::api().devcon4->PSSetShaderResources(0, 1, &botbf);
-        direct3d::api().devcon4->PSSetShaderResources(1, 1, &scatter);
-        direct3d::api().devcon4->PSSetShaderResources(2, 1, &emva1);
-        direct3d::api().devcon4->PSSetShaderResources(3, 1, &emva2);
-        direct3d::api().devcon4->PSSetShaderResources(4, 1, &rlt);
-        direct3d::api().devcon4->PSSetShaderResources(5, 1, &depth_srv);
+        direct3d::api().devcon4->PSSetShaderResources(7, 1, &botbf);
+        direct3d::api().devcon4->PSSetShaderResources(8, 1, &scatter);
+        direct3d::api().devcon4->PSSetShaderResources(9, 1, &emva1);
+        direct3d::api().devcon4->PSSetShaderResources(10, 1, &emva2);
+        direct3d::api().devcon4->PSSetShaderResources(11, 1, &rlt);
+
+        uint32_t const depth_offset = depth_texture_desc.SampleDesc.Count > 1 ? 1u : 0u;
+        direct3d::api().devcon4->PSSetShaderResources(12 + depth_offset, 1, &depth_srv);
 
         direct3d::api().devcon4->DrawInstanced(6, particle_buffer_.size(), 0, 0);
-        direct3d::api().devcon4->PSSetShaderResources(5, 1, &direct3d::null_srv);
+
+        direct3d::api().devcon4->PSSetShaderResources(12 + depth_offset, 1, &direct3d::null_srv);
 
         direct3d::api().devcon4->OMSetRenderTargets(1, &render_target, depth_target);
+
+        depth_texture_buffer->Release();
+        depth_srv->Release();
     }
 
     void ParticleRenderSystem::Tick(core::Scene *scene, float delta_time)
@@ -306,6 +337,7 @@ namespace engine::render::_particle_detail
                 particle.life_end = time_now + Randomize(random_engine_, emitter.particle_lifespan_range);
                 particle.rotation = Randomize(random_engine_, emitter.rotation_range);
                 particle.rotation_speed = Randomize(random_engine_, emitter.rotation_speed_range);
+                particle.thickness = Randomize(random_engine_, emitter.thickness_range);
             }
             emitter.particles.shrink_to_fit();
         }

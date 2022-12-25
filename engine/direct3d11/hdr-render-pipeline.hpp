@@ -43,6 +43,7 @@ namespace engine::direct3d
         void FrameBegin() override;
         void PostProcess();
         void FrameEnd() override;
+        utils::HighResolutionTimer timer;
         core::math::vec4 sky_color_{ core::math::vec3{0.25f}, 0.0f };
         render::PerFrame per_frame_;
         DynamicUniformBuffer<engine::render::PerFrame> per_frame_buffer_{};

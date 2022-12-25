@@ -11,6 +11,7 @@ struct VS_INPUT
     float rotation : ROTATION;
     float rotation_speed : ROTATION_SPEED;
     float lifespan : LIFESPAN;
+    float thickness : THICKNESS;
 };
 
 struct VS_OUTPUT
@@ -20,6 +21,7 @@ struct VS_OUTPUT
     nointerpolation float size : SIZE;
     nointerpolation float4 color : COLOR;
     nointerpolation float lifespan : LIFESPAN;
+    nointerpolation float thickness : THICKNESS;
     float2 this_uv : THIS_UV;
     float2 next_uv : NEXT_UV;
 };
@@ -34,7 +36,8 @@ cbuffer ParticlePerFrame : register(b1)
     uint num_directional_lights;
     float g_time_since_last_tick;
     uint2 g_atlas_size;
-    float g_padding;
+    uint use_dms_depth_texture;
+    float padding;
 };
 float2 calculate_uv(uint vertex_id, uint index)
 {
@@ -96,5 +99,6 @@ VS_OUTPUT vs_main(uint vertex_id : SV_VERTEXID, VS_INPUT input)
     output.this_uv = calculate_uv(vertex_id, index);
     output.next_uv = calculate_uv(vertex_id, index + 1);
     output.lifespan = input.lifespan;
+    output.thickness = input.thickness;
     return output;
 }

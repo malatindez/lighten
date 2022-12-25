@@ -17,6 +17,7 @@ struct PS_INPUT
     nointerpolation float size : SIZE;
     nointerpolation float4 color : COLOR;
     nointerpolation float lifespan : LIFESPAN;
+    nointerpolation float thickness : THICKNESS;
     float2 this_uv : THIS_UV;
     float2 next_uv : NEXT_UV;
 };
@@ -31,15 +32,17 @@ cbuffer ParticlePerFrame : register(b1)
     uint num_directional_lights;
     float g_time_since_last_tick;
     uint2 g_atlas_size;
-    float g_padding;
+    uint use_dms_depth_texture;
+    float padding;
 };
 
-Texture2D<float4> g_botbf : register(t0);
-Texture2D<float4> g_scatter : register(t1);
-Texture2D<float4> g_emva1 : register(t2);
-Texture2D<float4> g_emva2 : register(t3);
-Texture2D<float4> g_rlt : register(t4);
-Texture2D<float> g_depth : register(t5);
+Texture2D<float4> g_botbf : register(t7);
+Texture2D<float4> g_scatter : register(t8);
+Texture2D<float4> g_emva1 : register(t9);
+Texture2D<float4> g_emva2 : register(t10);
+Texture2D<float4> g_rlt : register(t11);
+Texture2D<float> g_depth : register(t12);
+Texture2DMS<float> g_depthMS : register(t13);
 
 static const float g_mvScale = 0.001f; // find such constant that frame transition becomes correct and smooth
 
@@ -194,5 +197,21 @@ float4 ps_main(PS_INPUT input)
 //    float depth_normalized = (depth - g_camera_near) / depth_range;
 //    float depth_value = saturate(depth_normalized);
 
-    return result * input.color;
+    float depth = 0;
+    if (use_dms_depth_texture != 0)
+    {
+        depth = g_depthMS.Load(int2(input.posVS.xy), 0);
+        for (int i = 1; i < g_sample_count; i++)
+            {
+                float depth_sample = g_depthMS.Load(int2(input.posVS.xy), i);
+                depth = min(depth, depth_sample);
+            }
+    }
+    else
+    {
+        depth = g_depth.Load(int3(int2(input.posVS.xy), 0));
+    }
+    float4 rv = result * input.color;
+    rv.a *= saturate((input.posVS.z - depth) / input.thickness * length(GetCameraPosition() - input.posWS.xyz));
+    return rv;
 }
