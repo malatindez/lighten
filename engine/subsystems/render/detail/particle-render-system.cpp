@@ -2,215 +2,312 @@
 #include "direct3d11/direct3d11.hpp"
 #include "components/components.hpp"
 #include "core/scene.hpp"
-
-namespace engine::render::_particle_detail
+#include "core/engine.hpp"
+using namespace engine::core::math;
+namespace
 {
-    void ParticleRenderSystem::Render(core::Scene *scene)
+    float Randomize(std::mt19937 &engine, vec2 range)
     {
-        ID3D11RenderTargetView *rtv = nullptr;
-        ID3D11DepthStencilView *dsv = nullptr;
-        
-        direct3d::api().devcon4->OMGetRenderTargets(1, &rtv, &dsv);
-        direct3d::api().devcon4->OMSetRenderTargets(0, nullptr, nullptr);
-
+        std::uniform_real_distribution<float> distribution(range.x, range.y);
+        return distribution(engine);
     }
 
-    void ParticleRenderSystem::OnInstancesUpdated(core::Scene *scene)
+    vec3 CreateDirectionVector(std::mt19937 &engine,
+                               quat transform_rotation,
+                               vec4 yaw_pitch_range,
+                               vec2 radius_range)
     {
-        auto &registry = scene->registry;
-        auto instance_group = registry.group<components::ParticleEmitter>(entt::get<components::TransformComponent>);
-        auto instance_count = instance_group.size();
-        if (instance_count == 0)
+        std::uniform_real_distribution<float> yaw_distribution(yaw_pitch_range.x, yaw_pitch_range.z);
+        std::uniform_real_distribution<float> pitch_distribution(yaw_pitch_range.y, yaw_pitch_range.w);
+        std::uniform_real_distribution<float> radius_distribution(radius_range.x, radius_range.y);
+
+        float yaw = yaw_distribution(engine);
+        float pitch = pitch_distribution(engine);
+        float radius = radius_distribution(engine);
+
+        vec3 direction = radius * vec3(
+            std::cos(yaw) * std::cos(pitch),
+            std::sin(yaw) * std::cos(pitch),
+            std::sin(pitch)
+        );
+
+        return direction * transform_rotation;
+    }
+}
+namespace engine::render::_particle_detail
+{
+    ParticleRenderSystem::ParticleRenderSystem()
+    {
+        random_engine_.seed(std::random_device()());
+        auto path = std::filesystem::current_path();
+        std::vector<D3D11_INPUT_ELEMENT_DESC> d3d_input_desc{
+            { "POSITION",        0, DXGI_FORMAT_R32G32B32_FLOAT,     1, 0,                            D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            { "VELOCITY",        0, DXGI_FORMAT_R32G32B32_FLOAT,     1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            { "ACCELERATION",    0, DXGI_FORMAT_R32G32B32_FLOAT,     1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            { "COLOR",           0, DXGI_FORMAT_R32G32B32A32_FLOAT,  1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            { "BEGIN_SIZE",      0, DXGI_FORMAT_R32_FLOAT,           1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            { "END_SIZE",        0, DXGI_FORMAT_R32_FLOAT,           1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            { "ROTATION",        0, DXGI_FORMAT_R32_FLOAT,           1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            { "ROTATION_SPEED",  0, DXGI_FORMAT_R32_FLOAT,           1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            { "LIFESPAN",        0, DXGI_FORMAT_R32_FLOAT,           1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1}
+        };
+
+        auto vs = core::ShaderManager::instance()->CompileVertexShader(path / particle_vs_shader_path);
+        auto ps = core::ShaderManager::instance()->CompilePixelShader(path / particle_ps_shader_path);
+        auto il = std::make_shared<InputLayout>(vs->blob(), d3d_input_desc);
+        particle_shader_.SetVertexShader(vs).SetPixelShader(ps).SetInputLayout(il);
+    }
+    void ParticleRenderSystem::Render(core::Scene *scene)
+    {
+        auto view = scene->registry.view<components::TransformComponent, components::ParticleEmitter>();
+        if (view.size_hint() == 0)
         {
             return;
         }
-        for(auto entity : instance_group)
+
+        uint32_t amount_of_particles = 0;
+        std::vector<GPUParticle> particles;
+        float render_start_timestamp = core::Engine::TimeFromStart();
+        for (auto entity : view)
         {
-            auto &emitter = instance_group.get<components::ParticleEmitter>(entity);
-            auto &transform = instance_group.get<components::TransformComponent>(entity);
-         
-            GPUParticleEmitter particle_emitter_;
-            
-            particle_emitter_.position_yaw_pitch_range = emitter.position_yaw_pitch_range;
-            particle_emitter_.velocity_yaw_pitch_range = emitter.velocity_yaw_pitch_range;
+            auto &transform = view.get<components::TransformComponent>(entity);
+            auto &emitter = view.get<components::ParticleEmitter>(entity);
 
-            particle_emitter_.base_diffuse_value = emitter.base_diffuse_value;
-            particle_emitter_.diffuse_variation = emitter.diffuse_variation;
+            particles.reserve(particles.size() + emitter.particles.size());
 
-            particle_emitter_.position_range = emitter.position_range;
-            particle_emitter_.velocity_range = emitter.velocity_range;
-
-            particle_emitter_.lifespan_range = emitter.particle_lifespan_range;
-
-            particle_emitter_.start_size_range = emitter.start_size_range;
-            particle_emitter_.end_size_range = emitter.end_size_range;
-
-            particle_emitter_.mass_range = emitter.mass_range;
-
-            particle_emitter_.maximum_amount_of_particles = emitter.maximum_amount_of_particles;
-            particle_emitter_.spawn_rate_range = emitter.spawn_rate_range;
-
-            particle_emitter_.rotation_matrix = transform.rotation.as_mat4();
-            particle_emitter_.world_transform = transform.model;
-            
+            for (auto &particle : emitter.particles)
+            {
+                particles.push_back({
+                    particle.position,
+                    emitter.freeze ? vec3(0.0f) : particle.velocity,
+                    emitter.freeze ? vec3(0.0f) : particle.acceleration,
+                    particle.color,
+                    particle.begin_size,
+                    particle.end_size,
+                    particle.rotation,
+                    emitter.freeze ? 0.0f : particle.rotation_speed,
+                    1.0f - (particle.life_end - render_start_timestamp) / (particle.life_end - particle.life_begin),
+                                    });
+                amount_of_particles++;
+            }
         }
-    }
-    void ParticleRenderSystem::Init(uint32_t max_particle_count, uint32_t random_texture_size)
-    {
-        max_particle_count_ = max_particle_count;
-        random_texture_size_ = random_texture_size;
+        if (particles.size() == 0)
+        {
+            return;
+        }
+        auto &camera_transform = scene->main_camera->transform();
 
-        D3D11_BUFFER_DESC buffer_desc = {};
-        buffer_desc.ByteWidth = sizeof(GPUParticlePartA) * max_particle_count_;
-        buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-        buffer_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
-        buffer_desc.CPUAccessFlags = 0;
-        buffer_desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-        buffer_desc.StructureByteStride = sizeof(GPUParticlePartA);
+        std::sort(particles.begin(), particles.end(), [&camera_transform] (const GPUParticle &a, const GPUParticle &b) {
+            return length(a.position - camera_transform.position) > length(b.position - camera_transform.position);
+                  });
 
-        particle_a_buffer_.Init(D3D11_BUFFER_DESC(buffer_desc));
+        particle_buffer_.Init(std::span<GPUParticle>(particles));
+        ParticlePerFrame per_frame;
+        auto &registry = scene->registry;
+        using namespace engine::core::math;
+        auto &lrs = scene->renderer->light_render_system();
+        {
+            auto const &point_lights = lrs.point_light_entities();
+            auto const &spot_lights = lrs.spot_light_entities();
+            auto const &directional_lights = lrs.directional_light_entities();
+            auto const &point_light_matrices = lrs.point_light_shadow_matrices();
+            auto const &spot_light_matrices = lrs.spot_light_shadow_matrices();
+            auto const &directional_light_matrices = lrs.directional_light_shadow_matrices();
 
-        buffer_desc.ByteWidth = sizeof(GPUParticlePartB) * max_particle_count_;
-        buffer_desc.StructureByteStride = sizeof(GPUParticlePartB);
+            per_frame.num_point_lights = per_frame.num_spot_lights = per_frame.num_directional_lights = 0;
+            for (entt::entity entity : point_lights)
+            {
+                auto &opaque_point_light = per_frame.point_lights[per_frame.num_point_lights];
+                auto &registry_point_light = registry.get<components::PointLight>(entity);
+                auto &registry_transform = registry.get<components::TransformComponent>(entity);
+                opaque_point_light.color = registry_point_light.color * registry_point_light.power;
+                opaque_point_light.position = registry_transform.position;
+                opaque_point_light.radius = length(registry_transform.scale) / sqrt(3.1f);
+                opaque_point_light.view_projection = point_light_matrices.at(entity);
+                if (++per_frame.num_point_lights >= kParticleShaderMaxPointLights)
+                {
+                    utils::AlwaysAssert(false, "Amount of point lights on the scene went beyond the maximum amount.");
+                    break;
+                }
+            }
+            for (entt::entity entity : spot_lights)
+            {
+                auto &opaque_spot_light = per_frame.spot_lights[per_frame.num_spot_lights];
+                auto &registry_spot_light = registry.get<components::SpotLight>(entity);
+                auto &registry_transform = registry.get<components::TransformComponent>(entity);
+                opaque_spot_light.color = registry_spot_light.color * registry_spot_light.power;
+                opaque_spot_light.position = registry_transform.position;
+                opaque_spot_light.direction = registry_transform.rotation * core::math::vec3(0, 0, 1);
+                opaque_spot_light.radius = length(registry_transform.scale) / sqrt(3.1f);
+                opaque_spot_light.inner_cutoff = registry_spot_light.inner_cutoff;
+                opaque_spot_light.outer_cutoff = registry_spot_light.outer_cutoff;
+                opaque_spot_light.view_projection = spot_light_matrices.at(entity);
+                if (++per_frame.num_spot_lights >= kParticleShaderMaxSpotLights)
+                {
+                    utils::AlwaysAssert(false, "Amount of spot lights on the scene went beyond the maximum amount.");
+                    break;
+                }
+            }
+            for (entt::entity entity : directional_lights)
+            {
+                auto &opaque_directional_light = per_frame.directional_lights[per_frame.num_directional_lights];
+                auto &registry_directional_light = registry.get<components::DirectionalLight>(entity);
+                auto &registry_transform = registry.get<components::TransformComponent>(entity);
+                opaque_directional_light.color = registry_directional_light.color * registry_directional_light.power;
+                opaque_directional_light.direction = registry_transform.rotation * core::math::vec3{ 0, 1, 0 };
+                opaque_directional_light.solid_angle = registry_directional_light.solid_angle;
+                opaque_directional_light.view_projection = directional_light_matrices.at(entity);
 
-        particle_b_buffer_.Init(D3D11_BUFFER_DESC(buffer_desc));
+                if (++per_frame.num_directional_lights >= kParticleShaderMaxDirectionalLights)
+                {
+                    utils::AlwaysAssert(false, "Amount of directional lights on the scene went beyond the maximum amount.");
+                    break;
+                }
+            }
+        }
 
+        // get depth and render targets
+        // It would be better to create srv once and reuse it, but this is quick and dirty solution
+
+        ID3D11RenderTargetView *render_target = nullptr;
+        ID3D11DepthStencilView *depth_target = nullptr;
+
+        direct3d::api().devcon4->OMGetRenderTargets(1, &render_target, &depth_target);
+        direct3d::api().devcon4->OMSetRenderTargets(1, &render_target, nullptr);
+
+        ID3D11ShaderResourceView *depth_srv = nullptr;
+        ID3D11Texture2D *depth_texture = nullptr;
+        depth_target->GetResource(reinterpret_cast<ID3D11Resource **>(&depth_texture));
+
+        // srv desc
         D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
-        ZeroMemory(&srv_desc, sizeof(srv_desc));
-        srv_desc.Format = DXGI_FORMAT_UNKNOWN;
-        srv_desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
-        srv_desc.Buffer.ElementOffset = 0;
-        srv_desc.Buffer.ElementWidth = max_particle_count_;
-        direct3d::api().device5->CreateShaderResourceView(particle_a_buffer_.buffer(), &srv_desc, &particle_a_srv_.reset());
+        srv_desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+        srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+        srv_desc.Texture2D.MipLevels = 1u;
+        direct3d::api().device5->CreateShaderResourceView(depth_texture, &srv_desc, &depth_srv);
 
-        D3D11_UNORDERED_ACCESS_VIEW_DESC uav_desc = {};
-        ZeroMemory(&uav_desc, sizeof(uav_desc));
-        uav_desc.Format = DXGI_FORMAT_UNKNOWN;
-        uav_desc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
-        uav_desc.Buffer.FirstElement = 0;
-        uav_desc.Buffer.NumElements = max_particle_count_;
-        uav_desc.Buffer.Flags = 0;
-        direct3d::api().device5->CreateUnorderedAccessView(particle_a_buffer_.buffer(), &uav_desc, &particle_a_uav_.reset());
-        direct3d::api().device5->CreateUnorderedAccessView(particle_b_buffer_.buffer(), &uav_desc, &particle_b_uav_.reset());
+        per_frame.time_since_last_tick = core::Engine::TimeFromStart() - last_tick_time_;
+        per_frame.atlas_size_x = atlas_size.x;
+        per_frame.atlas_size_y = atlas_size.y;
+        particle_per_frame_buffer_.Update(per_frame);
 
-        buffer_desc.ByteWidth = 16 * max_particle_count_;
-        buffer_desc.StructureByteStride = 16;
-        viewspace_particle_positions_buffer_.Init(D3D11_BUFFER_DESC(buffer_desc));
-        direct3d::api().device5->CreateShaderResourceView(viewspace_particle_positions_buffer_.buffer(), &srv_desc, &viewspace_particle_positions_srv_.reset());
-        direct3d::api().device5->CreateUnorderedAccessView(viewspace_particle_positions_buffer_.buffer(), &uav_desc, &viewspace_particle_positions_uav_.reset());
+        particle_per_frame_buffer_.Bind(direct3d::ShaderType::VertexShader, 1);
+        particle_per_frame_buffer_.Bind(direct3d::ShaderType::PixelShader, 1);
 
-        buffer_desc.ByteWidth = sizeof(uint32_t) * max_particle_count_;
-        buffer_desc.StructureByteStride = sizeof(uint32_t);
-        dead_list_buffer_.Init(D3D11_BUFFER_DESC(buffer_desc));
-        direct3d::api().device5->CreateShaderResourceView(dead_list_buffer_.buffer(), &srv_desc, &dead_list_srv_.reset());
+        direct3d::api().devcon4->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        direct3d::api().devcon4->OMSetBlendState(direct3d::states().additive_blend_state.ptr(), nullptr, 0xffffffff);
 
-        uav_desc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_APPEND;
-        direct3d::api().device5->CreateUnorderedAccessView(dead_list_buffer_.buffer(), &uav_desc, &dead_list_uav_.reset());
-#if _DEBUG
-        ZeroMemory(&buffer_desc, sizeof(buffer_desc));
-        buffer_desc.Usage = D3D11_USAGE_STAGING;
-        buffer_desc.BindFlags = 0;
-        buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-        buffer_desc.ByteWidth = sizeof(uint32_t);
-        debug_counter_buffer_.Init(D3D11_BUFFER_DESC(buffer_desc));
-#endif
+        particle_buffer_.Bind(1);
 
-        // Create constant buffers to copy the dead and alive list counters into
-        ZeroMemory(&buffer_desc, sizeof(buffer_desc));
-        buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-        buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        buffer_desc.CPUAccessFlags = 0;
-        buffer_desc.ByteWidth = sizeof(core::math::uivec4);
-        dead_list_constant_buffer_.Init(D3D11_BUFFER_DESC(buffer_desc));
-        alive_list_constant_buffer_.Init(D3D11_BUFFER_DESC(buffer_desc));
+        particle_shader_.Bind();
 
-        ZeroMemory(&buffer_desc, sizeof(buffer_desc));
-        buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-        buffer_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
-        buffer_desc.CPUAccessFlags = 0;
-        buffer_desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-        buffer_desc.StructureByteStride = sizeof(AliveParticle);
+        direct3d::api().devcon4->PSSetShaderResources(0, 1, &botbf);
+        direct3d::api().devcon4->PSSetShaderResources(1, 1, &scatter);
+        direct3d::api().devcon4->PSSetShaderResources(2, 1, &emva1);
+        direct3d::api().devcon4->PSSetShaderResources(3, 1, &emva2);
+        direct3d::api().devcon4->PSSetShaderResources(4, 1, &rlt);
+        direct3d::api().devcon4->PSSetShaderResources(5, 1, &depth_srv);
 
-        alive_list_buffer_.Init(D3D11_BUFFER_DESC(buffer_desc));
+        direct3d::api().devcon4->DrawInstanced(6, particle_buffer_.size(), 0, 0);
+        direct3d::api().devcon4->PSSetShaderResources(5, 1, &direct3d::null_srv);
 
-        ZeroMemory(&srv_desc, sizeof(srv_desc));
-        srv_desc.Format = DXGI_FORMAT_UNKNOWN;
-        srv_desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
-        srv_desc.Buffer.ElementOffset = 0;
-        srv_desc.Buffer.ElementWidth = max_particle_count_;
-
-        direct3d::api().device5->CreateShaderResourceView(alive_list_buffer_.buffer(), &srv_desc, &alive_list_srv_.reset());
-
-        ZeroMemory(&uav_desc, sizeof(uav_desc));
-        uav_desc.Format = DXGI_FORMAT_UNKNOWN;
-        uav_desc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
-        uav_desc.Buffer.FirstElement = 0;
-        uav_desc.Buffer.NumElements = max_particle_count_;
-        uav_desc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_COUNTER;
-
-        direct3d::api().device5->CreateUnorderedAccessView(alive_list_buffer_.buffer(), &uav_desc, &alive_list_uav_.reset());
-
-        D3D11_BLEND_DESC blend_desc = {};
-        ZeroMemory(&blend_desc, sizeof(blend_desc));
-        blend_desc.AlphaToCoverageEnable = false;
-        blend_desc.IndependentBlendEnable = false;
-        blend_desc.RenderTarget[0].BlendEnable = true;
-        blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
-        blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-        blend_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-        blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
-        blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-        blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-        blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-
-        direct3d::api().device5->CreateBlendState(&blend_desc, &blend_state_.reset());
-
-        sort_lib_.Init();
-
-        FillRandomTexture();
+        direct3d::api().devcon4->OMSetRenderTargets(1, &render_target, depth_target);
     }
-    void ParticleRenderSystem::FillRandomTexture()
+
+    void ParticleRenderSystem::Tick(core::Scene *scene, float delta_time)
     {
-        D3D11_TEXTURE2D_DESC desc;
-        ZeroMemory(&desc, sizeof(desc));
-        desc.Width = random_texture_size_;
-        desc.Height = random_texture_size_;
-        desc.ArraySize = 1;
-        desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-        desc.Usage = D3D11_USAGE_IMMUTABLE;
-        desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-        desc.MipLevels = 1;
-        desc.SampleDesc.Count = 1;
-        desc.SampleDesc.Quality = 0;
+        auto view = scene->registry.view<components::TransformComponent, components::ParticleEmitter>();
+        float time_now = core::Engine::TimeFromStart();
 
-        float *values = new float[desc.Width * desc.Height * 4];
-        core::math::vec4 *ptr = reinterpret_cast<core::math::vec4 *>(values);
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        for (UINT i = 0; i < desc.Width * desc.Height; i++)
+        last_tick_time_ = time_now;
+
+        for (auto entity : view)
         {
-            ptr[0] =
-                core::math::random::RandomVector4(gen,
-                                                  core::math::vec4(0.0f),
-                                                  core::math::vec4(1.0f));
-            ptr += 1;
+            auto &transform = view.get<components::TransformComponent>(entity);
+            auto &emitter = view.get<components::ParticleEmitter>(entity);
+            if (emitter.freeze)
+            {
+                for (auto &particle : emitter.particles)
+                {
+                    particle.life_begin += delta_time;
+                }
+                continue;
+            }
+
+            if (emitter.last_second_count < std::max(1.0f / emitter.emit_rate, 1.0f))
+            {
+                emitter.last_second_count += delta_time;
+            }
+            else
+            {
+                emitter.last_second_count = delta_time;
+                emitter.particles_last_second_count = 0;
+            }
+
+            if (emitter.particles.size() > emitter.maximum_amount_of_particles)
+            {
+                emitter.particles.resize(emitter.maximum_amount_of_particles);
+            }
+
+            for (auto it = emitter.particles.begin(); it != emitter.particles.end();)
+            {
+                if (it->life_end < time_now)
+                {
+                    it = emitter.particles.erase(it);
+                }
+                else
+                {
+                    it++;
+                }
+            }
+
+            for (auto &particle : emitter.particles)
+            {
+                particle.position += particle.velocity * delta_time;
+                particle.velocity += particle.acceleration * delta_time;
+                particle.rotation += particle.rotation_speed * delta_time;
+            }
+            if (emitter.particles_last_second_count >= emitter.emit_rate)
+            {
+                continue;
+            }
+            int32_t amount_of_particles = emitter.emit_rate * emitter.last_second_count - emitter.particles_last_second_count;
+
+            amount_of_particles = std::min((int64_t)amount_of_particles, (int64_t)(emitter.maximum_amount_of_particles - emitter.particles.size()));
+            if (amount_of_particles <= 0)
+            {
+                continue;
+            }
+            emitter.particles_last_second_count += amount_of_particles;
+
+            emitter.particles.reserve(emitter.particles.size() + amount_of_particles);
+
+            for (uint32_t i = 0; i < amount_of_particles; i++)
+            {
+                emitter.particles.emplace_back();
+                auto &particle = emitter.particles.back();
+                particle.position = transform.position +
+                    CreateDirectionVector(random_engine_,
+                                          transform.rotation,
+                                          emitter.position_yaw_pitch_range,
+                                          emitter.position_radius);
+                particle.velocity = CreateDirectionVector(random_engine_,
+                                                          transform.rotation,
+                                                          emitter.velocity_yaw_pitch_range,
+                                                          emitter.velocity_radius);
+
+                particle.acceleration = emitter.particle_acceleration;
+
+                particle.color = emitter.base_diffuse_color +
+                    random::RandomVector4(random_engine_, vec4(-1), vec4(1)) * emitter.diffuse_variation;
+                particle.begin_size = Randomize(random_engine_, emitter.begin_size_range);
+                particle.end_size = Randomize(random_engine_, emitter.end_size_range);
+                particle.life_begin = time_now;
+                particle.life_end = time_now + Randomize(random_engine_, emitter.particle_lifespan_range);
+                particle.rotation = Randomize(random_engine_, emitter.rotation_range);
+                particle.rotation_speed = Randomize(random_engine_, emitter.rotation_speed_range);
+            }
+            emitter.particles.shrink_to_fit();
         }
-
-        D3D11_SUBRESOURCE_DATA data;
-        data.pSysMem = values;
-        data.SysMemPitch = desc.Width * 16;
-        data.SysMemSlicePitch = 0;
-
-        direct3d::api().device->CreateTexture2D(&desc, &data, &random_texture_.reset());
-
-        delete[] values;
-
-        D3D11_SHADER_RESOURCE_VIEW_DESC srv;
-        srv.Format = desc.Format;
-        srv.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-        srv.Texture2D.MipLevels = 1;
-        srv.Texture2D.MostDetailedMip = 0;
-
-        direct3d::api().device->CreateShaderResourceView(random_texture_, &srv, &random_texture_srv_.reset());
     }
 }
