@@ -53,9 +53,9 @@ namespace engine::utils::endianness
     inline uint16_t betole16(uint16_t x)
     {
         if constexpr (kIsLittleEndian)
-        {   
+        {
             return ((x & 0xFF00u) >> 8u) |
-                    ((x & 0x00FFu) << 8u);
+                ((x & 0x00FFu) << 8u);
         }
 #if ENGINE_UTILS_DETAIL_ENDIANNES_ICC
         return _bswap16(x);
@@ -64,8 +64,8 @@ namespace engine::utils::endianness
 #elif ENGINE_UTILS_DETAIL_ENDIANNES_MSVC
         return _byteswap_ushort(x);
 #else
-            return ((x & 0xFF00u) >> 8u) |
-                    ((x & 0x00FFu) << 8u);
+        return ((x & 0xFF00u) >> 8u) |
+            ((x & 0x00FFu) << 8u);
 #endif
     }
 
@@ -73,11 +73,10 @@ namespace engine::utils::endianness
     {
         if constexpr (kIsLittleEndian)
         {
-               return ((x & 0xFF000000u) >> 24u) |
-           ((x & 0x00FF0000u) >> 8u) |
-           ((x & 0x0000FF00u) << 8u) |
-           ((x & 0x000000FFu) << 24u);
-
+            return ((x & 0xFF000000u) >> 24u) |
+                ((x & 0x00FF0000u) >> 8u) |
+                ((x & 0x0000FF00u) << 8u) |
+                ((x & 0x000000FFu) << 24u);
         }
 #if ENGINE_UTILS_DETAIL_ENDIANNES_ICC
         return _bswap(x);
@@ -86,10 +85,10 @@ namespace engine::utils::endianness
 #elif ENGINE_UTILS_DETAIL_ENDIANNES_MSVC
         return _byteswap_ulong(x);
 #else
-    return ((x & 0xFF000000u) >> 24u) |
-           ((x & 0x00FF0000u) >> 8u) |
-           ((x & 0x0000FF00u) << 8u) |
-           ((x & 0x000000FFu) << 24u);
+        return ((x & 0xFF000000u) >> 24u) |
+            ((x & 0x00FF0000u) >> 8u) |
+            ((x & 0x0000FF00u) << 8u) |
+            ((x & 0x000000FFu) << 24u);
 #endif
     }
 
@@ -97,14 +96,14 @@ namespace engine::utils::endianness
     {
         if constexpr (kIsLittleEndian)
         {
-    return ((x & 0xFF00000000000000u) >> 56u) |
-           ((x & 0x00FF000000000000u) >> 40u) |
-           ((x & 0x0000FF0000000000u) >> 24u) |
-           ((x & 0x000000FF00000000u) >> 8u) |
-           ((x & 0x00000000FF000000u) << 8u) |
-           ((x & 0x0000000000FF0000u) << 24u) |
-           ((x & 0x000000000000FF00u) << 40u) |
-           ((x & 0x00000000000000FFu) << 56u);
+            return ((x & 0xFF00000000000000u) >> 56u) |
+                ((x & 0x00FF000000000000u) >> 40u) |
+                ((x & 0x0000FF0000000000u) >> 24u) |
+                ((x & 0x000000FF00000000u) >> 8u) |
+                ((x & 0x00000000FF000000u) << 8u) |
+                ((x & 0x0000000000FF0000u) << 24u) |
+                ((x & 0x000000000000FF00u) << 40u) |
+                ((x & 0x00000000000000FFu) << 56u);
         }
 #if ENGINE_UTILS_DETAIL_ENDIANNES_ICC
         return _bswap64(x);
@@ -113,14 +112,14 @@ namespace engine::utils::endianness
 #elif ENGINE_UTILS_DETAIL_ENDIANNES_MSVC
         return _byteswap_uint64(x);
 #else
-    return ((x & 0xFF00000000000000u) >> 56u) |
-           ((x & 0x00FF000000000000u) >> 40u) |
-           ((x & 0x0000FF0000000000u) >> 24u) |
-           ((x & 0x000000FF00000000u) >> 8u) |
-           ((x & 0x00000000FF000000u) << 8u) |
-           ((x & 0x0000000000FF0000u) << 24u) |
-           ((x & 0x000000000000FF00u) << 40u) |
-           ((x & 0x00000000000000FFu) << 56u);
+        return ((x & 0xFF00000000000000u) >> 56u) |
+            ((x & 0x00FF000000000000u) >> 40u) |
+            ((x & 0x0000FF0000000000u) >> 24u) |
+            ((x & 0x000000FF00000000u) >> 8u) |
+            ((x & 0x00000000FF000000u) << 8u) |
+            ((x & 0x0000000000FF0000u) << 24u) |
+            ((x & 0x000000000000FF00u) << 40u) |
+            ((x & 0x00000000000000FFu) << 56u);
 #endif
     }
 
@@ -144,5 +143,4 @@ namespace engine::utils::endianness
         const __m256i shuffle = _mm256_set_epi64x(0x0001020304050607, 0x08090a0b0c0d0e0f, 0x0001020304050607, 0x08090a0b0c0d0e0f);
         return _mm256_shuffle_epi8(x, shuffle);
     }
-
 } // namespace engine::utils::endianness
