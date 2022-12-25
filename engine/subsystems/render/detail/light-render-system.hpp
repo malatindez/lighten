@@ -36,6 +36,11 @@ namespace engine::render::_light_detail
         [[nodiscard]] auto const &point_light_shadow_matrices() const noexcept { return point_light_shadow_matrices_; }
         [[nodiscard]] auto const &spot_light_shadow_matrices() const noexcept { return spot_light_shadow_matrices_; }
         [[nodiscard]] auto const &directional_light_shadow_matrices() const noexcept { return directional_light_shadow_matrices_; }
+        [[nodiscard]] auto const &shadow_map_update_interval() const noexcept { return shadow_map_update_interval_; }
+        [[nodiscard]] auto &shadow_map_update_interval() noexcept { return shadow_map_update_interval_; }
+        [[nodiscard]] auto const &point_light_shadow_maps() const noexcept { return point_light_shadow_maps_; }
+        [[nodiscard]] auto const &spot_light_shadow_maps() const noexcept { return spot_light_shadow_maps_; }
+        [[nodiscard]] auto const &directional_light_shadow_maps() const noexcept { return directional_light_shadow_maps_; }
 
         void BindPointShadowMaps(int slot) { point_light_shadow_maps_.BindShaderResource(slot); }
         void BindSpotShadowMaps(int slot) { spot_light_shadow_maps_.BindShaderResource(slot); }
@@ -49,7 +54,28 @@ namespace engine::render::_light_detail
 
         void OnInstancesUpdated(core::Scene *scene);
         void RenderShadowMaps(core::Scene *scene);
+        void Update(core::Scene *scene)
+        {
+            if (should_update && shadow_map_update_timer_.elapsed() > shadow_map_update_interval_)
+            {
+                shadow_map_update_timer_.reset();
+                RenderShadowMaps(scene);
+                should_update = false;
+            }
+        }
+        // Will update shadow maps if the last update was more than shadow_map_update_interval_ seconds ago
+        void ScheduleShadowMapUpdate()
+        {
+            should_update = true;
+        }
+
     private:
+        bool should_update = false;
+        bool refresh_data = false;
+        utils::SteadyTimer shadow_map_update_timer_;
+        float last_update_;
+        float shadow_map_update_interval_ = 0.0f;
+
         void ProcessPointLights(core::Scene *scene);
         void ProcessSpotLights(core::Scene *scene);
         void ProcessDirectionalLights(core::Scene *scene);
@@ -59,6 +85,9 @@ namespace engine::render::_light_detail
         std::vector<entt::entity> point_light_entities_;
         std::vector<entt::entity> spot_light_entities_;
         std::vector<entt::entity> directional_light_entities_;
+        std::vector<entt::entity> point_light_entities_temp_;
+        std::vector<entt::entity> spot_light_entities_temp_;
+        std::vector<entt::entity> directional_light_entities_temp_;
         std::unordered_map<entt::entity, std::array<core::math::mat4, 6>> point_light_shadow_matrices_;
         std::unordered_map<entt::entity, core::math::mat4> spot_light_shadow_matrices_;
         std::unordered_map<entt::entity, core::math::mat4> directional_light_shadow_matrices_;

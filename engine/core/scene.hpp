@@ -9,10 +9,18 @@ namespace engine::core
         entt::registry registry;
         std::unique_ptr<render::Renderer> renderer = nullptr;
         std::unique_ptr<engine::CameraController> main_camera = nullptr;
-        void Render()
+        void Render(render::PerFrame const & per_frame)
         {
             utils::Assert(renderer != nullptr, "Renderer is null");
-            renderer->Render(this);
+            renderer->Render(this, per_frame);
+        }
+        void Tick(float delta_time)
+        {
+            renderer->Tick(this, delta_time);
+        }
+        void Update()
+        {
+            renderer->Update(this);
         }
         void OnInstancesUpdated()
         {

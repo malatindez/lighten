@@ -208,6 +208,9 @@ namespace engine::ini
          *
          * @return std::string const&
          */
+
+        [[nodiscard]] bool to_bool() const noexcept { return as_boolean(); }
+
         std::string const &str() const noexcept { return value_; }
         /**
          * @brief Returns an underlying string value of the entry

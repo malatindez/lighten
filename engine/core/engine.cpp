@@ -58,36 +58,58 @@ namespace engine::core
     }
     void Engine::Run()
     {
+        update_.reset();
         render_.reset();
         tick_.reset();
+#ifndef _DEBUG
         try
         {
+#endif
             while (running_)
             {
-                OnUpdate();
+                if (update_.elapsed() > update_duration_)
+                {
+                    update_.reset();
+#ifdef _DEBUG
+                    update_measurer.begin();
+#endif
+                    OnUpdate();
+#ifdef _DEBUG
+                    update_measurer.end();
+#endif
+                }
                 if (!running_)
                 {
                     break;
                 }
-                if (tick_.elapsed() > kTickDuration)
+                if (tick_.elapsed() > tick_duration_)
                 {
                     float dt = tick_.elapsed();
                     tick_.reset();
+#ifdef _DEBUG
+                    tick_measurer.begin();
+#endif
                     OnTick(dt);
+#ifdef _DEBUG
+                    tick_measurer.end();
+#endif
                 }
-                static utils::Measurer<std::chrono::high_resolution_clock> measurer1{ "Engine::Render()" };
-                measurer1.begin();
-                if (render_.elapsed() > 0)
+                if (render_.elapsed() > frame_duration_)
                 {
                     render_.reset();
+#ifdef _DEBUG
+                    render_measurer.begin();
+#endif
                     OnRender();
+#ifdef _DEBUG
+                    render_measurer.end();
+#endif
                 }
-                measurer1.end();
-
                 direct3d::LogDebugInfoQueue();
 
                 std::this_thread::yield();
             }
+#ifndef _DEBUG
         }
         catch (std::exception e)
         {
@@ -100,6 +122,7 @@ namespace engine::core
             spdlog::critical("Unknown exception occurred within the engine layers. Shutting down.");
             Exit();
         }
+#endif
     }
     Engine::Engine()
     {

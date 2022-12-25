@@ -29,14 +29,12 @@ namespace engine::render::_light_detail
                           { return static_cast<uint32_t>(lhs) < static_cast<uint32_t>(rhs); });
         std::ranges::sort(directional_light_entities, [&registry] (entt::entity const &lhs, entt::entity const &rhs)
                           { return static_cast<uint32_t>(lhs) < static_cast<uint32_t>(rhs); });
-        point_light_entities_ = std::move(point_light_entities);
-        spot_light_entities_ = std::move(spot_light_entities);
-        directional_light_entities_ = std::move(directional_light_entities);
 
-        point_light_shadow_maps_.Resize(resolution_, point_light_entities_.size(), true);
-        spot_light_shadow_maps_.Resize(resolution_, spot_light_entities_.size(), false);
-        directional_light_shadow_maps_.Resize(resolution_, directional_light_entities_.size(), false);
-        RenderShadowMaps(scene);
+        point_light_entities_temp_ = std::move(point_light_entities);
+        spot_light_entities_temp_ = std::move(spot_light_entities);
+        directional_light_entities_temp_ = std::move(directional_light_entities);
+        refresh_data = true;
+        ScheduleShadowMapUpdate();
     }
 
     mat4 CreateViewProjection(vec3 const &position, vec3 const &forward, vec3 const &up, float degrees = radians(90.0f))
@@ -141,6 +139,18 @@ namespace engine::render::_light_detail
     }
     void LightRenderSystem::RenderShadowMaps(core::Scene *scene)
     {
+        if (refresh_data)
+        {
+            point_light_entities_ = std::move(point_light_entities_temp_);
+            spot_light_entities_ = std::move(spot_light_entities_temp_);
+            directional_light_entities_ = std::move(directional_light_entities_temp_);
+
+            point_light_shadow_maps_.Resize(resolution_, point_light_entities_.size(), true);
+            spot_light_shadow_maps_.Resize(resolution_, spot_light_entities_.size(), false);
+            directional_light_shadow_maps_.Resize(resolution_, directional_light_entities_.size(), false);
+            refresh_data = false;
+        }
+        
         D3D11_VIEWPORT viewport;
         viewport.TopLeftX = 0;
         viewport.TopLeftY = 0;

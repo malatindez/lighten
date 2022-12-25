@@ -13,8 +13,10 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 {
     Engine::Init();
     Engine &app = Engine::Get();
+#ifndef _DEBUG
     try
     {
+#endif
         // Initialize in-engine layers that we need
         auto shader_manager = ShaderManager::instance();
         auto input_layer = InputLayer::instance();
@@ -42,6 +44,7 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
         shader_manager = nullptr;
         render_pipeline = nullptr;
         app.Run();
+#ifndef _DEBUG
     }
     catch (std::exception e)
     {
@@ -56,6 +59,7 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
         std::this_thread::sleep_for(std::chrono::milliseconds(5000));
         app.Exit();
     }
+#endif
     std::this_thread::sleep_for(std::chrono::milliseconds(250));
     Engine::Deinit();
     std::this_thread::sleep_for(std::chrono::milliseconds(750));

@@ -3,6 +3,7 @@
 #include "render/shader-program.hpp"
 #include "entt/entt.hpp"
 #include "components/components.hpp"
+#include "render/common.hpp"
 namespace engine::core
 {
     class Scene;
@@ -99,40 +100,14 @@ namespace engine::render::_opaque_detail
     {
         Model &model;
         uint64_t model_id;
-        // Each MeshInstance should correspond the one on the same index in model
+        // Each MeshInstance should correspond the one on                                 the same index in model
         std::vector<MeshInstance> mesh_instances;
-    };
-    struct OpaquePointLight
-    {
-        core::math::vec3 color;
-        float padding;
-        core::math::vec3 position;
-        float radius;
-        std::array<core::math::mat4, 6> view_projection;
-    };
-    struct OpaqueSpotLight
-    {
-        core::math::vec3 color;
-        float radius;
-        core::math::vec3 direction;
-        float inner_cutoff;
-        core::math::vec3 position;
-        float outer_cutoff;
-        core::math::mat4 view_projection;
-    };
-    struct OpaqueDirectionalLight
-    {
-        core::math::vec3 color;
-        float padding;
-        core::math::vec3 direction;
-        float solid_angle;
-        core::math::mat4 view_projection;
     };
     struct OpaquePerFrame
     {
-        std::array<OpaquePointLight, kOpaqueShaderMaxPointLights> point_lights;
-        std::array<OpaqueSpotLight, kOpaqueShaderMaxSpotLights> spot_lights;
-        std::array<OpaqueDirectionalLight, kOpaqueShaderMaxDirectionalLights> directional_lights;
+        std::array<GPUPointLight, kOpaqueShaderMaxPointLights> point_lights;
+        std::array<GPUSpotLight, kOpaqueShaderMaxSpotLights> spot_lights;
+        std::array<GPUDirectionalLight, kOpaqueShaderMaxDirectionalLights> directional_lights;
         uint32_t num_point_lights;
         uint32_t num_spot_lights;
         uint32_t num_directional_lights;
@@ -168,6 +143,27 @@ namespace engine::render::_opaque_detail
     auto constexpr opaque_vs_depth_only_shader_path = "assets/shaders/opaque/opaque-depth-only-vs.hlsl";
     auto constexpr opaque_gs_depth_only_cubemap_shader_path = "assets/shaders/opaque/opaque-depth-only-cubemap-gs.hlsl";
     auto constexpr opaque_gs_depth_only_texture_shader_path = "assets/shaders/opaque/opaque-depth-only-texture-gs.hlsl";
+
+    // TODO:
+    // update opaque, emissive and skybox rendering systems so we don't have to call AddInstance
+    // We will use on_construct and on_destruct to change it
+    // TODO:
+    // We should store list of all available materials as an unordered map of opaque materials in opaque render system.
+    // This way we can avoid creating new materials every time we add a new instance
+    // TODO:
+    // We should create OpaqueComponent and store the vector of size_t hashes of materials in it
+    // and store model_id as well
+
+    // We will probably need to have the private cache variable in it so we can delete instances of materials that aren't used
+    
+    // on_destruct / on_update / on_construct should update the instance tree using these materials
+    // if hash differs -> update material, update cache, delete previous instance
+    // if hash is the same -> do nothing
+
+    // TODO:
+    // Change the system the way that on_destruct / on_construct will set the dirty flag
+    // and add data that should be updated so we can update instances right before the frame if needed
+
     class OpaqueRenderSystem
     {
     public:
@@ -193,6 +189,12 @@ namespace engine::render::_opaque_detail
 
         void OnInstancesUpdated(entt::registry &registry);
     private:
+        // TODO:
+        void on_attach(entt::registry &, entt::entity) {}
+        void on_destroy(entt::registry &, entt::entity) {}
+        
+        
+
         std::vector<ModelInstance> model_instances_;
 
         GraphicsShaderProgram opaque_cubemap_shader_;

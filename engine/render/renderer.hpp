@@ -2,9 +2,11 @@
 #include "subsystems/render/detail/opaque-render-system.hpp"
 #include "subsystems/render/detail/emissive-render-system.hpp"
 #include "subsystems/render/detail/light-render-system.hpp"
+#include "subsystems/render/detail/particle-render-system.hpp"
 #include "components/components.hpp"
 #include "core/math.hpp"
 #include "subsystems/render/model-system.hpp"
+#include "render/common.hpp"
 namespace engine::core
 {
     class Scene;
@@ -27,6 +29,8 @@ namespace engine::render
         [[nodiscard]] auto &emissive_render_system() noexcept { return emissive_render_system_; }
         [[nodiscard]] auto &light_render_system() const noexcept { return light_render_system_; }
         [[nodiscard]] auto &light_render_system() noexcept { return light_render_system_; }
+        [[nodiscard]] auto &particle_render_system() const noexcept { return particle_render_system_; }
+        [[nodiscard]] auto &particle_render_system() noexcept { return particle_render_system_; }
 
         inline void AddOpaqueInstance(uint64_t model_id, entt::registry &registry, entt::entity entity)
         {
@@ -48,13 +52,15 @@ namespace engine::render
             emissive_render_system_.AddInstance(model_id, registry, entity, materials);
         }
 
-        void Render(core::Scene *scene);
-
+        void Render(core::Scene *scene, render::PerFrame const &per_frame);
+        void Tick(core::Scene *scene, float delta_time);
+        void Update(core::Scene *scene);
         void OnInstancesUpdated(core::Scene *scene);
 
     private:
         _opaque_detail::OpaqueRenderSystem opaque_render_system_;
         _emissive_detail::EmissiveRenderSystem emissive_render_system_;
         _light_detail::LightRenderSystem light_render_system_;
+        _particle_detail::ParticleRenderSystem particle_render_system_;
     };
 }

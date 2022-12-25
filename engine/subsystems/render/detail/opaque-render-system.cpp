@@ -156,7 +156,7 @@ namespace engine::render::_opaque_detail
             auto const &point_light_matrices = lrs.point_light_shadow_matrices();
             auto const &spot_light_matrices = lrs.spot_light_shadow_matrices();
             auto const &directional_light_matrices = lrs.directional_light_shadow_matrices();
-
+            
             opaque_per_frame.num_point_lights = opaque_per_frame.num_spot_lights = opaque_per_frame.num_directional_lights = 0;
             for (entt::entity entity : point_lights)
             {
@@ -165,7 +165,7 @@ namespace engine::render::_opaque_detail
                 auto &registry_transform = registry.get<components::TransformComponent>(entity);
                 opaque_point_light.color = registry_point_light.color * registry_point_light.power;
                 opaque_point_light.position = registry_transform.position;
-                opaque_point_light.radius = length(registry_transform.scale) / sqrt(3.05f);
+                opaque_point_light.radius = length(registry_transform.scale) / sqrt(3.1f);
                 opaque_point_light.view_projection = point_light_matrices.at(entity);
                 if (++opaque_per_frame.num_point_lights >= kOpaqueShaderMaxPointLights)
                 {
@@ -181,7 +181,7 @@ namespace engine::render::_opaque_detail
                 opaque_spot_light.color = registry_spot_light.color * registry_spot_light.power;
                 opaque_spot_light.position = registry_transform.position;
                 opaque_spot_light.direction = registry_transform.rotation * core::math::vec3(0, 0, 1);
-                opaque_spot_light.radius = length(registry_transform.scale) / sqrt(3.05f);
+                opaque_spot_light.radius = length(registry_transform.scale) / sqrt(3.1f);
                 opaque_spot_light.inner_cutoff = registry_spot_light.inner_cutoff;
                 opaque_spot_light.outer_cutoff = registry_spot_light.outer_cutoff;
                 opaque_spot_light.view_projection = spot_light_matrices.at(entity);
