@@ -48,11 +48,11 @@ namespace engine::direct3d
         }
         inline void Init(void *ptr, uint32_t width)
         {
-            Init(description(), ptr, width);
+            Init(D3D11_BUFFER_DESC(description()), ptr, width);
         }
         inline void Init(std::span<const T> const &span)
         {
-            Init(description(), span);
+            Init(D3D11_BUFFER_DESC(description()), span);
         }
         inline void Init(uint32_t width)
         {

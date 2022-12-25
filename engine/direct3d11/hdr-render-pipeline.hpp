@@ -27,6 +27,7 @@ namespace engine::direct3d
 
         void OnRender() override;
         void OnUpdate() override;
+        void OnTick(float) override;
         void OnEvent(core::events::Event &) override;
         void WindowSizeChanged(core::math::ivec2 const &size);
 

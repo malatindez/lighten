@@ -1,7 +1,8 @@
 #include "hdr-render-pipeline.hpp"
 #include "components/components.hpp"
-#include "subsystems/render/skybox-manager.hpp"
 #include "subsystems/core/input-layer.hpp"
+#include "subsystems/render/skybox-manager.hpp"
+#include "core/engine.hpp"
 namespace engine::direct3d
 {
     HDRRenderPipeline::HDRRenderPipeline(std::shared_ptr<core::Window> window, std::shared_ptr<SwapchainRenderTarget> const &output_target)
@@ -42,11 +43,7 @@ namespace engine::direct3d
     void HDRRenderPipeline::OnRender()
     {
         FrameBegin();
-        scene_->Render();
-        for (auto entity : scene_->registry.view<components::SkyboxComponent>())
-        {
-            SkyboxManager::RenderSkybox(scene_->registry.get<components::SkyboxComponent>(entity), per_frame_);
-        }
+        scene_->Render(per_frame_);
         // Render frame
         LayerStack::OnRender();
         PostProcess();
@@ -59,6 +56,12 @@ namespace engine::direct3d
     void HDRRenderPipeline::OnUpdate()
     {
         core::RenderPipeline::OnUpdate();
+        scene_->Update();
+    }
+    void HDRRenderPipeline::OnTick(float dt)
+    {
+        core::RenderPipeline::OnTick(dt);
+        scene_->Tick(dt);
     }
     void HDRRenderPipeline::OnEvent(core::events::Event &e)
     {
@@ -86,8 +89,8 @@ namespace engine::direct3d
         per_frame_.inv_projection = camera.inv_projection;
         per_frame_.inv_view_projection = camera.inv_view_projection;
         per_frame_.screen_resolution = core::math::vec2{ viewport_.Width, viewport_.Height };
-
         per_frame_.mouse_position = core::math::vec2{ core::InputLayer::instance()->mouse_position() };
+        per_frame_.time_now = core::Engine::TimeFromStart();
 
         per_frame_buffer_.Update(per_frame_);
         per_frame_buffer_.Bind(ShaderType::VertexShader, 0);

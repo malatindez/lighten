@@ -66,7 +66,7 @@ namespace engine::direct3d
     public:
         using DynamicBuffer<T>::buffer;
         using DynamicBuffer<T>::description;
-    
+
     public:
         static constexpr size_t kSize = _uniform_buffer_detail::RoundBufferSizeTo16Boundary(sizeof(T));
 

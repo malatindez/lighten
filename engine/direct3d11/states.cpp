@@ -1,4 +1,5 @@
 #include "states.hpp"
+#include "d3d-debug.hpp"
 namespace
 {
     D3D11_DEPTH_STENCIL_DESC CreateDepthState(bool enable, bool write_enable)
@@ -66,52 +67,67 @@ namespace engine::direct3d
     States::States()
     {
         D3D11_RASTERIZER_DESC raster_desc = CreateRasterizerState(D3D11_CULL_NONE, D3D11_FILL_SOLID);
-        api().device->CreateRasterizerState(&raster_desc, &cull_none.reset());
+        AlwaysAssert(api().device->CreateRasterizerState(&raster_desc, &cull_none.reset()), "Failed to create cull none rasterizer state");
 
         raster_desc = CreateRasterizerState(D3D11_CULL_BACK, D3D11_FILL_SOLID);
-        api().device->CreateRasterizerState(&raster_desc, &cull_back.reset());
+        AlwaysAssert(api().device->CreateRasterizerState(&raster_desc, &cull_back.reset()), "Failed to create cull back rasterizer state");
 
         D3D11_DEPTH_STENCIL_DESC ds_desc = CreateDepthState(true, true);
-        api().device->CreateDepthStencilState(&ds_desc, &geq_depth.reset());
+        AlwaysAssert(api().device->CreateDepthStencilState(&ds_desc, &geq_depth.reset()), "Failed to create depth state");
         ds_desc = CreateDepthState(true, false);
-        api().device->CreateDepthStencilState(&ds_desc, &geq_depth_no_write.reset());
+        AlwaysAssert(api().device->CreateDepthStencilState(&ds_desc, &geq_depth_no_write.reset()), "Failed to create depth state");
         ds_desc = CreateDepthState(false, false);
-        api().device->CreateDepthStencilState(&ds_desc, &no_depth_no_write.reset());
+        AlwaysAssert(api().device->CreateDepthStencilState(&ds_desc, &no_depth_no_write.reset()), "Failed to create depth state");
 
         D3D11_SAMPLER_DESC sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_WRAP);
-        api().device5->CreateSamplerState(&sampler_desc, &point_wrap_sampler.reset());
+        AlwaysAssert(api().device5->CreateSamplerState(&sampler_desc, &point_wrap_sampler.reset()), "Failed to create sampler state");
 
         sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP);
-        api().device5->CreateSamplerState(&sampler_desc, &point_clamp_sampler.reset());
+        AlwaysAssert(api().device5->CreateSamplerState(&sampler_desc, &point_clamp_sampler.reset()), "Failed to create sampler state");
 
         sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_WRAP);
-        api().device5->CreateSamplerState(&sampler_desc, &bilinear_wrap_sampler.reset());
+        AlwaysAssert(api().device5->CreateSamplerState(&sampler_desc, &bilinear_wrap_sampler.reset()),  "Failed to create sampler state");
 
         sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_CLAMP);
-        api().device5->CreateSamplerState(&sampler_desc, &bilinear_clamp_sampler.reset());
+        AlwaysAssert(api().device5->CreateSamplerState(&sampler_desc, &bilinear_clamp_sampler.reset()), "Failed to create sampler state");
 
         sampler_desc = CreateSamplerState(D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP);
-        api().device5->CreateSamplerState(&sampler_desc, &anisotropic_wrap_sampler.reset());
+        AlwaysAssert(api().device5->CreateSamplerState(&sampler_desc, &anisotropic_wrap_sampler.reset()), "Failed to create sampler state");
 
         sampler_desc = CreateSamplerState(D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_CLAMP);
-        api().device5->CreateSamplerState(&sampler_desc, &anisotropic_clamp_sampler.reset());
+        AlwaysAssert(api().device5->CreateSamplerState(&sampler_desc, &anisotropic_clamp_sampler.reset()), "Failed to create sampler state");
 
         sampler_desc = CreateComparisonState(D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_LESS_EQUAL);
-        api().device5->CreateSamplerState(&sampler_desc, &comparison_point_wrap_sampler.reset());
+        AlwaysAssert(api().device5->CreateSamplerState(&sampler_desc, &comparison_point_wrap_sampler.reset()), "Failed to create sampler state");
 
         sampler_desc = CreateComparisonState(D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_COMPARISON_LESS_EQUAL);
-        api().device5->CreateSamplerState(&sampler_desc, &comparison_point_clamp_sampler.reset());
+        AlwaysAssert(api().device5->CreateSamplerState(&sampler_desc, &comparison_point_clamp_sampler.reset()), "Failed to create sampler state");
 
         sampler_desc = CreateComparisonState(D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_LESS_EQUAL);
-        api().device5->CreateSamplerState(&sampler_desc, &comparison_linear_wrap_sampler.reset());
+        AlwaysAssert(api().device5->CreateSamplerState(&sampler_desc, &comparison_linear_wrap_sampler.reset()), "Failed to create sampler state");
 
         sampler_desc = CreateComparisonState(D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_COMPARISON_LESS_EQUAL);
-        api().device5->CreateSamplerState(&sampler_desc, &comparison_linear_clamp_sampler.reset());
+        AlwaysAssert(api().device5->CreateSamplerState(&sampler_desc, &comparison_linear_clamp_sampler.reset()), "Failed to create sampler state");
 
         sampler_desc = CreateComparisonState(D3D11_FILTER_COMPARISON_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_LESS_EQUAL);
-        api().device5->CreateSamplerState(&sampler_desc, &comparison_anisotropic_wrap_sampler.reset());
+        AlwaysAssert(api().device5->CreateSamplerState(&sampler_desc, &comparison_anisotropic_wrap_sampler.reset()), "Failed to create sampler state");
 
         sampler_desc = CreateComparisonState(D3D11_FILTER_COMPARISON_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_COMPARISON_LESS_EQUAL);
-        api().device5->CreateSamplerState(&sampler_desc, &comparison_anisotropic_clamp_sampler.reset());
+        AlwaysAssert(api().device5->CreateSamplerState(&sampler_desc, &comparison_anisotropic_clamp_sampler.reset()), "Failed to create sampler state");
+
+        D3D11_BLEND_DESC blend_desc;
+        ZeroMemory(&blend_desc, sizeof(blend_desc));
+        blend_desc.RenderTarget[0].BlendEnable = true;
+        blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+        blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+        blend_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+        blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+        blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+        blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+        blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+        
+        AlwaysAssert(api().device->CreateBlendState(&blend_desc, &additive_blend_state.reset()), "Failed to create additive blend state");
+
+        
     }
 }
