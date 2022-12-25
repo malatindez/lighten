@@ -1,17 +1,6 @@
 #include "../globals/globals-ps.hlsli"
 #include "../common/helpers.hlsli"
-#include "ps-helpers.hlsli"
-// You can overwrite these macros by defining them before including this file.
-#ifndef MAX_POINT_LIGHTS
-#define MAX_POINT_LIGHTS 32u
-#endif
-#ifndef MAX_SPOT_LIGHTS
-#define MAX_SPOT_LIGHTS 32u
-#endif
-#ifndef MAX_DIRECTIONAL_LIGHTS
-#define MAX_DIRECTIONAL_LIGHTS 4u
-#endif
-
+#include "../globals/pbr-helpers.hlsli"
 
 cbuffer OpaquePerFrame : register(b1)
 {
