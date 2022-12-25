@@ -1,6 +1,7 @@
 #include "controller.hpp"
 #include "camera-movement.hpp"
-#include "transform-editor.hpp"
+#include "object-editor.hpp"
+#include "scene-viewer.hpp"
 #include "render/renderer.hpp"
 using namespace engine;
 using namespace core;
@@ -13,18 +14,55 @@ void Controller::OnGuiRender()
     ImGui::Begin("Framerate");
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::End();
+#ifdef _DEBUG
+    ImGui::Begin("Debug info");
+    static int calls_amount = 100;
+    ImGui::InputInt("Calls amount", &calls_amount);
+    static float seconds_amount = 1;
+    ImGui::InputFloat("Seconds amount", &seconds_amount);
+    auto &update_measurer = Engine::Get().update_measurer;
+    auto &render_measurer = Engine::Get().render_measurer;
+    auto &tick_measurer = Engine::Get().tick_measurer;
 
-    ImGui::Begin("Camera info");
-    ImGui::Text("Move speed: ");
-    ImGui::Text("%.3f", Engine::scene()->main_camera->move_speed());
-    ImGui::Text("FOV: ");
-    ImGui::Text("%.3f", Engine::scene()->main_camera->fovy());
-    ImGui::Text("Flags: ");
-    ImGui::Text("%u", Engine::scene()->main_camera->flags());
-    ImGui::Text("Camera model matrix");
-    ImGui::Text("%s", utils::FormatToString(Engine::scene()->main_camera->transform().model).c_str());
-    ImGui::Text("Camera inv view matrix");
-    ImGui::Text("%s", utils::FormatToString(Engine::scene()->main_camera->camera().inv_view).c_str());
+    ImGui::Text("Average Engine::Update() time: %.3f ms", 1000 * update_measurer.avg());
+    ImGui::Text("Average Engine::Update() time over the last %d calls: %.3f ms", calls_amount, 1000 * update_measurer.avg(calls_amount));
+    ImGui::Text("Average Engine::Update() time over the last %.2f seconds: %.3f ms", seconds_amount, 1000 * update_measurer.avg(seconds_amount));
+    ImGui::Text("Average Engine::Update() time percentage over the last %.2f seconds: %.3f%%", seconds_amount, update_measurer.avg_over_the_last_limited(seconds_amount) * 100);
+    ImGui::Text("Average Engine::Update() amount of calls over the last %.2f seconds: %llu", std::min(seconds_amount, update_measurer.elapsed()), update_measurer.amount_of_calls(seconds_amount));
+
+    ImGui::Text("Average Engine::Tick() time: %.3f ms", 1000 * tick_measurer.avg());
+    ImGui::Text("Average Engine::Tick() time over the last %d calls: %.3f ms", calls_amount, 1000 * tick_measurer.avg(calls_amount));
+    ImGui::Text("Average Engine::Tick() time over the last %.2f seconds: %.3f ms", seconds_amount, 1000 * tick_measurer.avg(seconds_amount));
+    ImGui::Text("Average Engine::Tick() time percentage over the last %.2f seconds: %.3f%%", seconds_amount, tick_measurer.avg_over_the_last_limited(seconds_amount) * 100);
+    ImGui::Text("Average Engine::Tick() amount of calls over the last %.2f seconds: %llu", std::min(seconds_amount, tick_measurer.elapsed()), tick_measurer.amount_of_calls(seconds_amount));
+
+    ImGui::Text("Average Engine::Render() time: %.3f ms", 1000 * render_measurer.avg());
+    ImGui::Text("Average Engine::Render() time over the last %d calls: %.3f ms", calls_amount, 1000 * render_measurer.avg(calls_amount));
+    ImGui::Text("Average Engine::Render() time over the last %.2f seconds: %.3f ms", seconds_amount, 1000 * render_measurer.avg(seconds_amount));
+    ImGui::Text("Average Engine::Render() time percentage over the last %.2f seconds: %.3f%%", seconds_amount, render_measurer.avg_over_the_last_limited(seconds_amount) * 100);
+    ImGui::Text("Average Engine::Render() amount of calls over the last %.2f seconds: %llu", std::min(seconds_amount, render_measurer.elapsed()), render_measurer.amount_of_calls(seconds_amount));
+    ImGui::End();
+#endif
+    ImGui::Begin("Main settings");
+    ImGui::Checkbox("Dynamic shadows: ", &camera_movement::dynamic_shadows);
+    ImGui::SliderFloat("Shadows update interval##shadows-update-interval",
+                       &Engine::scene()->renderer->light_render_system().shadow_map_update_interval(), 0, 1, "%.3f");
+
+    // make button and text field to set the camera fov
+    static float fov = Engine::scene()->main_camera->fovy();
+    ImGui::SliderFloat("FOV: ", &fov, 0.0f, radians(180.0f));
+    if (Engine::scene()->main_camera->fovy() != fov)
+    {
+        Engine::scene()->main_camera->camera().fovy_ = fov;
+        Engine::scene()->main_camera->UpdateProjectionMatrix();
+    }
+    auto &camera_controller = *Engine::scene()->main_camera;
+    ImGui::Checkbox("Roll enabled##roll-enabled", &camera_controller.roll_enabled());
+    ImGui::SliderFloat("Sensivity##sensivity", &camera_controller.sensivity(), 0, 100, "%.3f");
+    ImGui::SliderFloat("Move speed##move-speed", &camera_controller.move_speed(), 0, 100, "%.3f");
+    ImGui::SliderFloat("Accelerated movement speed##accelerated-speed", &camera_controller.accelerated_speed(), 0, 100, "%.3f");
+    ImGui::SliderFloat("Roll speed##roll-speed", &camera_controller.roll_speed(), 0, 100, "%.3f");
+
     auto hdr_to_ldr = hdr_render_pipeline_->hdr_to_ldr_layer();
     ImGui::SliderFloat("Exposure", &hdr_to_ldr->exposure(), -20.0f, 20.0f);
     ImGui::SliderFloat("Gamma", &hdr_to_ldr->gamma(), 0.0f, 20.0f);
@@ -40,6 +78,25 @@ void Controller::OnGuiRender()
         if (ImGui::Selectable("32x")) sample_count = 32;
         ImGui::EndCombo();
     }
+    static float update_limit = Engine::maximum_update_rate();
+    ImGui::SliderFloat("Update limit", &update_limit, 1.0f, 1000.0f);
+    if (update_limit != Engine::maximum_update_rate())
+    {
+        Engine::SetMaximumUpdateRate(update_limit);
+    }
+    static float render_limit = Engine::maximum_framerate();
+    ImGui::SliderFloat("Render limit", &render_limit, 5.0f, 1000.0f);
+    if (render_limit != Engine::maximum_framerate())
+    {
+        Engine::SetMaximumFramerate(render_limit);
+    }
+    static float tick_limit = Engine::maximum_tickrate();
+    ImGui::SliderFloat("Tick limit", &tick_limit, 1.0f, 1000.0f);
+    if (tick_limit != Engine::maximum_tickrate())
+    {
+        Engine::SetMaximumTickrate(tick_limit);
+    }
+
     UINT quality_levels;
     direct3d::api().device->CheckMultisampleQualityLevels(DXGI_FORMAT_R16G16B16A16_FLOAT, sample_count, &quality_levels);
     uint32_t current_sample_count = hdr_render_pipeline_->GetSampleCount();
@@ -49,33 +106,11 @@ void Controller::OnGuiRender()
         sample_count = current_sample_count;
     }
     if ((uint32_t)(sample_count) != current_sample_count) { hdr_render_pipeline_->SetSampleCount(sample_count); }
-    auto &lrs = Engine::scene()->renderer->light_render_system();
-    auto const &point_lights = lrs.point_light_entities();
-    auto const &spot_lights = lrs.spot_light_entities();
-    auto const &directional_lights = lrs.directional_light_entities();
-    auto const &point_light_matrices = lrs.point_light_shadow_matrices();
-    auto const &spot_light_matrices = lrs.spot_light_shadow_matrices();
-    auto const &directional_light_matrices = lrs.directional_light_shadow_matrices();
-    static UINT view_projection_num = std::numeric_limits<UINT>::max();
-    ImGui::InputScalar("View projection num", ImGuiDataType_U32, &view_projection_num, nullptr, nullptr, "%u", ImGuiInputTextFlags_CharsDecimal);
-    if (view_projection_num < point_lights.size() * 6)
-    {
-        view_proj = point_light_matrices.at(point_lights[view_projection_num / 6])[view_projection_num % 6];
-        Engine::scene()->main_camera->camera().view_projection = view_proj;
-    }
-    else if (view_projection_num < point_lights.size() * 6 + spot_lights.size())
-    {
-        view_proj = spot_light_matrices.at(spot_lights[view_projection_num - point_lights.size() * 6]);
-        Engine::scene()->main_camera->camera().view_projection = view_proj;
-    }
-    else if (view_projection_num < point_lights.size() * 6 + spot_lights.size() + directional_lights.size())
-    {
-        view_proj = directional_light_matrices.at(directional_lights[view_projection_num - point_lights.size() * 6 - spot_lights.size()]);
-        Engine::scene()->main_camera->camera().view_projection = view_proj;
-    }
 
     ImGui::End();
+
     object_editor::OnGuiRender();
+    scene_viewer::OnGuiRender();
 }
 
 struct GizmoOverlay : public Layer, public Layer::HandleRender
@@ -116,12 +151,26 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
     for (int i = 0; i < amount; i++)
     {
         auto knight = registry.create();
+        auto &game_object = registry.emplace<GameObject>(knight);
+
         last_created_knight = knight;
         auto &transform = registry.emplace<TransformComponent>(knight);
         uint64_t model_id = ModelLoader::Load("assets\\models\\Knight\\Knight.fbx").value();
-        if (i % 4 == 1) model_id = ModelLoader::Load("assets\\models\\Samurai\\Samurai.fbx").value();
-        else if (i % 4 == 2) model_id = ModelLoader::Load("assets\\models\\KnightHorse\\KnightHorse.fbx").value();
-        else if (i % 4 == 3) model_id = ModelLoader::Load("assets\\models\\SunCityWall\\SunCityWall.fbx").value();
+        if (i % 4 == 1)
+        {
+            model_id = ModelLoader::Load("assets\\models\\Samurai\\Samurai.fbx").value();
+            game_object.name = "Samurai";
+        }
+        else if (i % 4 == 2)
+        {
+            model_id = ModelLoader::Load("assets\\models\\KnightHorse\\KnightHorse.fbx").value();
+            game_object.name = "KnightHorse";
+        }
+        else if (i % 4 == 3)
+        {
+            model_id = ModelLoader::Load("assets\\models\\SunCityWall\\SunCityWall.fbx").value();
+            game_object.name = "SunCityWall";
+        }
         ors.AddInstance(model_id, registry, knight);
         transform.position = vec3
         {
@@ -206,11 +255,19 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
         }
     }
     {
+        entt::entity cubes = registry.create();
+        auto &cubes_game_object = registry.emplace<GameObject>(cubes);
+        cubes_game_object.name = "Cubes";
         std::vector<render::OpaqueMaterial> materials = { cobblestone_material, crystal_material, mud_material, mudroad_material, stone_material, blue_metal, white_half_metal, white_porcelain, blue_rubber };
+        std::vector<std::string> material_names = { "Cobblestone cube", "Crystal cube", "Mud cube", "MudRoad cube", "Stone cube", "BlueMetal cube", "WhiteHalfMetal cube", "WhitePorcelain cube", "BlueRubber cube" };
         for (size_t i = 0; i < materials.size(); i++)
         {
             auto model_id = render::ModelSystem::GetUnitCube();
             auto cube = registry.create();
+            auto &game_object = registry.emplace<GameObject>(cube);
+            game_object.name = material_names[i];
+            game_object.parent = cubes;
+            cubes_game_object.children.push_back(cube);
             auto &transform = registry.emplace<TransformComponent>(cube);
             transform.position = vec3{ (int32_t)i - (int32_t)materials.size() / 2, 0, -8 };
             transform.scale = vec3{ 1 };
@@ -219,12 +276,19 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
         }
     }
     {
+        entt::entity spheres = registry.create();
+        auto &spheres_game_object = registry.emplace<GameObject>(spheres);
+        spheres_game_object.name = "Spheres";
         for (int i = 0; i < 10; i++)
         {
             for (int j = 0; j < 10; j++)
             {
                 auto model_id = render::ModelSystem::GetUnitSphereFlat();
                 auto sphere = registry.create();
+                auto &game_object = registry.emplace<GameObject>(sphere);
+                game_object.name = "Sphere";
+                game_object.parent = spheres;
+                spheres_game_object.children.push_back(sphere);
                 auto &transform = registry.emplace<TransformComponent>(sphere);
                 transform.position = vec3{ i - 5, j, 5 };
                 transform.scale = vec3{ 0.375f };
@@ -242,10 +306,17 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
     }
     // ------------------------- CUBES -------------------------
     {
+        entt::entity floor = registry.create();
+        auto &floor_game_object = registry.emplace<GameObject>(floor);
+        floor_game_object.name = "Floor";
         for (int i = 0; i < 4; i++)
         {
             auto model_id = render::ModelSystem::GetUnitCube();
             auto cube = registry.create();
+            auto &game_object = registry.emplace<GameObject>(cube);
+            game_object.name = "Floor part #" + std::to_string(i);
+            game_object.parent = floor;
+            floor_game_object.children.push_back(cube);
             auto &transform = registry.emplace<TransformComponent>(cube);
             transform.position = vec3{ 0, -0.5f, 0 } + vec3{ i < 2 ? -1 : 1, 0, i % 2 == 0 ? -1 : 1 } *2.5f;
             transform.scale = vec3{ 5,0.1,5 };
@@ -255,18 +326,26 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
     }
     {
         auto model_id = render::ModelSystem::GetUnitCube();
-        auto cube = registry.create();
-        auto &transform = registry.emplace<TransformComponent>(cube);
+        auto wall = registry.create();
+        auto &wall_game_object = registry.emplace<GameObject>(wall);
+        wall_game_object.name = "Wall";
+        auto &transform = registry.emplace<TransformComponent>(wall);
         transform.position = vec3{ -5, 4.5f, 0 };
         transform.scale = vec3{ 10,0.1,10 };
         transform.rotation = QuaternionFromEuler(0.0f, 0.0f, radians(90.0f));
         transform.UpdateMatrices();
-        ors.AddInstance(model_id, registry, cube, { stone_material });
+        ors.AddInstance(model_id, registry, wall, { stone_material });
     }
     // ------------------------- LIGHTS -------------------------
+    entt::entity lights = registry.create();
+    auto &lights_game_object = registry.emplace<GameObject>(lights);
     if (true) {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
+        auto &game_object = registry.emplace<GameObject>(entity);
+        game_object.name = "White point light";
+        game_object.parent = lights;
+        lights_game_object.children.push_back(entity);
         auto &transform = registry.emplace<TransformComponent>(entity);
         transform.scale = vec3{ 0.15f };
         transform.position = vec3{ 0, 3, -2 };
@@ -279,6 +358,10 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
     if (true) {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
+        auto &game_object = registry.emplace<GameObject>(entity);
+        game_object.name = "Red point light";
+        game_object.parent = lights;
+        lights_game_object.children.push_back(entity);
         auto &transform = registry.emplace<TransformComponent>(entity);
         transform.scale = vec3{ 0.15f };
         transform.position = vec3{ 0, 3, 2 };
@@ -291,6 +374,10 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
     if (true) {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
+        auto &game_object = registry.emplace<GameObject>(entity);
+        game_object.name = "Green point light";
+        game_object.parent = lights;
+        lights_game_object.children.push_back(entity);
         auto &transform = registry.emplace<TransformComponent>(entity);
         transform.scale = vec3{ 0.15f };
         transform.position = vec3{ 0, 2, -8 };
@@ -306,6 +393,10 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
         auto &transform = registry.emplace<TransformComponent>(entity);
+        auto &game_object = registry.emplace<GameObject>(entity);
+        game_object.name = "Directional light";
+        game_object.parent = lights;
+        lights_game_object.children.push_back(entity);
         transform.scale = vec3{ 0.15f };
         transform.position = vec3{ 0, 10, 0 };
         transform.rotation = QuaternionFromEuler(vec3{ radians(-120.0f), radians(-30.0f), radians(-60.0f) });
@@ -313,10 +404,99 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
         auto &directional_light = registry.emplace<DirectionalLight>(entity);
         directional_light.color = vec3{ 0.988, 0.933, 0.455 };
         directional_light.power = 10;
-        directional_light.solid_angle = 1.0f;
+        directional_light.solid_angle = 0.25f;
         ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(directional_light.color, directional_light.power) });
     }
+    // add spot light
+    if (false)
+    {
+        auto model_id = render::ModelSystem::GetUnitSphereFlat();
+        auto entity = registry.create();
+        auto &transform = registry.emplace<TransformComponent>(entity);
 
+        auto &game_object = registry.emplace<GameObject>(entity);
+        game_object.name = "Spot light";
+        game_object.parent = lights;
+        lights_game_object.children.push_back(entity);
+
+        transform.scale = vec3{ 0.15f };
+        transform.position = vec3{ 0, 3, 0 };
+        transform.rotation = QuaternionFromEuler(vec3{ radians(-120.0f), radians(-30.0f), radians(-60.0f) });
+        transform.UpdateMatrices();
+        auto &spot_light = registry.emplace<SpotLight>(entity);
+        spot_light.color = vec3{ 0.988, 0.933, 0.455 };
+        spot_light.power = 10;
+        spot_light.inner_cutoff = radians(10.0f);
+        spot_light.outer_cutoff = radians(20.0f);
+        ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(spot_light.color, spot_light.power) });
+    }
+    auto prs_texture_path = std::filesystem::current_path() / "assets/textures/smoke";
+    first_scene->renderer->particle_render_system().botbf = TextureManager::GetTextureView(prs_texture_path / "BotBF.tga");
+    first_scene->renderer->particle_render_system().scatter = TextureManager::GetTextureView(prs_texture_path / "emission+scatter.tga");
+    first_scene->renderer->particle_render_system().emva1 = TextureManager::GetTextureView(prs_texture_path / "EMVA1.tga");
+    first_scene->renderer->particle_render_system().emva2 = TextureManager::GetTextureView(prs_texture_path / "EMVA2.tga");
+    first_scene->renderer->particle_render_system().rlt = TextureManager::GetTextureView(prs_texture_path / "RLT.tga");
+    first_scene->renderer->particle_render_system().atlas_size = { 8, 8 };
+
+    // add particle emitters
+    if (true) {
+        auto model_id = render::ModelSystem::GetUnitSphereFlat();
+        auto entity = registry.create();
+        auto &game_object = registry.emplace<GameObject>(entity);
+        game_object.name = "Particle emitter";
+        auto &transform = registry.emplace<TransformComponent>(entity);
+        transform.scale = vec3{ 0.15f };
+        transform.position = vec3{ -3.5, 2, -8 };
+        transform.rotation = QuaternionFromEuler(vec3{ 0, 0, radians(-90.0f) });
+        transform.UpdateMatrices();
+
+        auto &particle_emitter = registry.emplace<ParticleEmitter>(entity);
+        particle_emitter.position_yaw_pitch_range = vec4{ -numbers::pi / 4, -numbers::pi / 4, numbers::pi / 4, numbers::pi / 4 };
+        particle_emitter.position_radius = vec2{ 0.25, 0.5f };
+        particle_emitter.velocity_yaw_pitch_range = vec4{ -numbers::pi / 16, -numbers::pi / 16, numbers::pi / 16, numbers::pi / 16 };
+        particle_emitter.velocity_radius = vec2{ 0.15f, 0.4f };
+        particle_emitter.base_diffuse_color = vec4{ 1.288, 1.133, 1.055, 1.0f };
+        particle_emitter.diffuse_variation = vec4{ 0.2f, 0.2f, 0.2f, 0.0f };
+        particle_emitter.particle_lifespan_range = vec2{ 0.5f, 15.0f };
+        particle_emitter.begin_size_range = vec2{ 0.01f, 0.15f };
+        particle_emitter.end_size_range = vec2{ 0.0f, 0.3f };
+        particle_emitter.mass_range = vec2{ 0.1f, 0.5f };
+        particle_emitter.emit_rate = 10;
+        particle_emitter.rotation_range = vec2{ 0.0f, 2 * numbers::pi };
+        particle_emitter.rotation_speed_range = vec2{ 0.0f, 0.1 * numbers::pi };
+        particle_emitter.particle_acceleration = vec3{ 0.0f };
+        particle_emitter.maximum_amount_of_particles = 200;
+        ors.AddInstance(model_id, registry, entity, { white_porcelain });
+    }
+    if (true) {
+        auto model_id = render::ModelSystem::GetUnitSphereFlat();
+        auto entity = registry.create();
+        auto &game_object = registry.emplace<GameObject>(entity);
+        game_object.name = "Particle emitter";
+        auto &transform = registry.emplace<TransformComponent>(entity);
+        transform.scale = vec3{ 0.15f };
+        transform.position = vec3{ 4, 2, -8 };
+        transform.rotation = QuaternionFromEuler(vec3{ 0, 0, radians(-90.0f) });
+        transform.UpdateMatrices();
+
+        auto &particle_emitter = registry.emplace<ParticleEmitter>(entity);
+        particle_emitter.position_yaw_pitch_range = vec4{ -numbers::pi / 4, -numbers::pi / 4, numbers::pi / 4, numbers::pi / 4 };
+        particle_emitter.position_radius = vec2{ 0.25, 0.5f };
+        particle_emitter.velocity_yaw_pitch_range = vec4{ -numbers::pi / 8, -numbers::pi / 8, numbers::pi / 8, numbers::pi / 8 };
+        particle_emitter.velocity_radius = vec2{ 5.0f, 10.0f };
+        particle_emitter.base_diffuse_color = vec4{ 1.988, 1.933, 1.455, 1.0f };
+        particle_emitter.diffuse_variation = vec4{ 0.8f, 0.5f, 0.5f, 0.0f };
+        particle_emitter.particle_lifespan_range = vec2{ 25.0f, 100.0f };
+        particle_emitter.begin_size_range = vec2{ 0.01f, 0.25f };
+        particle_emitter.end_size_range = vec2{ 4.0f, 10.0f };
+        particle_emitter.mass_range = vec2{ 0.1f, 0.5f };
+        particle_emitter.emit_rate = 3;
+        particle_emitter.rotation_range = vec2{ 0.0f, 2 * numbers::pi };
+        particle_emitter.rotation_speed_range = vec2{ 0.0f, 0.1 * numbers::pi };
+        particle_emitter.particle_acceleration = vec3{ 0.0f };
+        particle_emitter.maximum_amount_of_particles = 300;
+        ors.AddInstance(model_id, registry, entity, { white_porcelain });
+    }
     SkyboxManager::LoadSkybox(registry, std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street.dds");
     first_scene->OnInstancesUpdated();
     camera_movement::RegisterKeyCallbacks();
@@ -330,7 +510,6 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
 }
 void Controller::OnTick([[maybe_unused]] float delta_time)
 {
-    Engine::scene()->renderer->OnInstancesUpdated(Engine::scene().get());
     for (auto const &func : update_callbacks_)
     {
         func(delta_time);
@@ -359,5 +538,4 @@ void Controller::OnEvent(engine::core::events::Event &e)
 }
 void Controller::OnUpdate()
 {
-    //    Engine::scene()->renderer->light_render_system().RenderShadowMaps(Engine::scene().get());
 }

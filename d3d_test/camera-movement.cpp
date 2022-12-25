@@ -7,6 +7,7 @@ using namespace components;
 
 namespace camera_movement
 {
+    bool dynamic_shadows = true;
     ivec2 lb_saved_mouse_position{ -1 };
     ivec2 rb_saved_mouse_position{ -1 };
 
@@ -76,7 +77,7 @@ namespace camera_movement
                             Engine::scene()->registry.try_get<components::SpotLight>(selected_entity) != nullptr ||
                             Engine::scene()->registry.try_get<components::DirectionalLight>(selected_entity) != nullptr)
                         {
-                            Engine::scene()->renderer->light_render_system().RenderShadowMaps(Engine::scene().get());
+                            Engine::scene()->renderer->light_render_system().ScheduleShadowMapUpdate();
                         }
                     }
                     return;
@@ -107,6 +108,7 @@ namespace camera_movement
                 }
                 else if (selected_scene)
                 {
+                    moving = true;
                     auto &input = *InputLayer::instance();
                     auto scene = Engine::scene();
                     Ray b = scene->main_camera->PixelRaycast(vec2{ input.mouse_position() });
@@ -115,7 +117,22 @@ namespace camera_movement
                     auto &transform = scene->registry.get<TransformComponent>(selected_entity);
                     transform.position = selected_object_offset + obj_offset + scene->main_camera->position();
                     transform.UpdateMatrices();
-                    scene->OnInstancesUpdated();
+                    if (Engine::scene()->registry.try_get<components::OpaqueComponent>(selected_entity))
+                    {
+                        Engine::scene()->renderer->opaque_render_system().OnInstancesUpdated(Engine::scene()->registry);
+                    }
+                    if (Engine::scene()->registry.try_get<components::EmissiveComponent>(selected_entity))
+                    {
+                        Engine::scene()->renderer->emissive_render_system().OnInstancesUpdated(Engine::scene()->registry);
+                    }
+
+                    if (dynamic_shadows && (Engine::scene()->registry.try_get<components::OpaqueComponent>(selected_entity) != nullptr ||
+                        Engine::scene()->registry.try_get<components::PointLight>(selected_entity) != nullptr ||
+                        Engine::scene()->registry.try_get<components::SpotLight>(selected_entity) != nullptr ||
+                        Engine::scene()->registry.try_get<components::DirectionalLight>(selected_entity) != nullptr))
+                    {
+                        Engine::scene()->renderer->light_render_system().ScheduleShadowMapUpdate();
+                    }
                 }
             });
     }
