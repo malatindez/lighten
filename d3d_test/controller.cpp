@@ -26,19 +26,19 @@ void Controller::OnGuiRender()
 
     ImGui::Text("Average Engine::Update() time: %.3f ms", 1000 * update_measurer.avg());
     ImGui::Text("Average Engine::Update() time over the last %d calls: %.3f ms", calls_amount, 1000 * update_measurer.avg(calls_amount));
-    ImGui::Text("Average Engine::Update() time over the last %.2f seconds: %.3f ms", seconds_amount, 1000 * update_measurer.avg(seconds_amount));
+    ImGui::Text("Average Engine::Update() time over the last %.2f seconds: %.3f ms", seconds_amount, 1000 * update_measurer.avg_over_the_last(seconds_amount));
     ImGui::Text("Average Engine::Update() time percentage over the last %.2f seconds: %.3f%%", seconds_amount, update_measurer.avg_over_the_last_limited(seconds_amount) * 100);
     ImGui::Text("Average Engine::Update() amount of calls over the last %.2f seconds: %llu", std::min(seconds_amount, update_measurer.elapsed()), update_measurer.amount_of_calls(seconds_amount));
 
     ImGui::Text("Average Engine::Tick() time: %.3f ms", 1000 * tick_measurer.avg());
     ImGui::Text("Average Engine::Tick() time over the last %d calls: %.3f ms", calls_amount, 1000 * tick_measurer.avg(calls_amount));
-    ImGui::Text("Average Engine::Tick() time over the last %.2f seconds: %.3f ms", seconds_amount, 1000 * tick_measurer.avg(seconds_amount));
+    ImGui::Text("Average Engine::Tick() time over the last %.2f seconds: %.3f ms", seconds_amount, 1000 * tick_measurer.avg_over_the_last(seconds_amount));
     ImGui::Text("Average Engine::Tick() time percentage over the last %.2f seconds: %.3f%%", seconds_amount, tick_measurer.avg_over_the_last_limited(seconds_amount) * 100);
     ImGui::Text("Average Engine::Tick() amount of calls over the last %.2f seconds: %llu", std::min(seconds_amount, tick_measurer.elapsed()), tick_measurer.amount_of_calls(seconds_amount));
 
     ImGui::Text("Average Engine::Render() time: %.3f ms", 1000 * render_measurer.avg());
     ImGui::Text("Average Engine::Render() time over the last %d calls: %.3f ms", calls_amount, 1000 * render_measurer.avg(calls_amount));
-    ImGui::Text("Average Engine::Render() time over the last %.2f seconds: %.3f ms", seconds_amount, 1000 * render_measurer.avg(seconds_amount));
+    ImGui::Text("Average Engine::Render() time over the last %.2f seconds: %.3f ms", seconds_amount, 1000 * render_measurer.avg_over_the_last(seconds_amount));
     ImGui::Text("Average Engine::Render() time percentage over the last %.2f seconds: %.3f%%", seconds_amount, render_measurer.avg_over_the_last_limited(seconds_amount) * 100);
     ImGui::Text("Average Engine::Render() amount of calls over the last %.2f seconds: %llu", std::min(seconds_amount, render_measurer.elapsed()), render_measurer.amount_of_calls(seconds_amount));
     ImGui::End();
@@ -132,10 +132,14 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
     hdr_render_pipeline_->PushOverlay(gizmo_overlay);
 
     auto &ors = first_scene->renderer->opaque_render_system();
+    auto &drs = first_scene->renderer->dissolution_render_system();
     auto &ers = first_scene->renderer->emissive_render_system();
     ors.SetBrdfTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/IBL/ibl_brdf_lut.dds"));
     ors.SetIrradianceTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_irradiance.dds"));
     ors.SetPrefilteredTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_reflection.dds"));
+    drs.SetBrdfTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/IBL/ibl_brdf_lut.dds"));
+    drs.SetIrradianceTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_irradiance.dds"));
+    drs.SetPrefilteredTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_reflection.dds"));
     auto &registry = first_scene->registry;
     main_camera_entity = registry.create();
     registry.emplace<CameraComponent>(main_camera_entity, CameraComponent());
@@ -145,7 +149,7 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
     Engine::SetScene(first_scene);
     Engine::scene()->main_camera->SetWorldOffset(core::math::vec3{ 0.0f, 0.0f, 0.0f });
     Engine::scene()->main_camera->SetWorldAngles(0.0f, 0.0f, 0.0f);
-    Engine::scene()->main_camera->SetProjectionMatrix(perspective(45.0f, float(window_size.x) / float(window_size.y), 0.001f, 100.0f));
+    Engine::scene()->main_camera->SetProjectionMatrix(perspective(45.0f, static_cast<float>(window_size.x) / static_cast<float>(window_size.y), 0.001f, 100.0f));
 
     int amount = 10;
     for (int i = 0; i < amount; i++)
@@ -458,7 +462,7 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
         particle_emitter.base_diffuse_color = vec4{ 1.288, 1.133, 1.055, 1.0f };
         particle_emitter.diffuse_variation = vec4{ 0.2f, 0.2f, 0.2f, 0.0f };
         particle_emitter.particle_lifespan_range = vec2{ 0.5f, 15.0f };
-        particle_emitter.thickness_range = vec2{ 0.5f, 1.0f };
+        particle_emitter.thickness_range = vec2{ 0.0f, 0.05f };
         particle_emitter.begin_size_range = vec2{ 0.01f, 0.15f };
         particle_emitter.end_size_range = vec2{ 0.0f, 0.3f };
         particle_emitter.mass_range = vec2{ 0.1f, 0.5f };
@@ -488,7 +492,7 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
         particle_emitter.base_diffuse_color = vec4{ 1.988, 1.933, 1.455, 1.0f };
         particle_emitter.diffuse_variation = vec4{ 0.8f, 0.5f, 0.5f, 0.0f };
         particle_emitter.particle_lifespan_range = vec2{ 25.0f, 100.0f };
-        particle_emitter.thickness_range = vec2{ 0.5f, 1.0f };
+        particle_emitter.thickness_range = vec2{ 0.0f, 0.05f };
         particle_emitter.begin_size_range = vec2{ 0.01f, 0.25f };
         particle_emitter.end_size_range = vec2{ 4.0f, 10.0f };
         particle_emitter.mass_range = vec2{ 0.1f, 0.5f };
@@ -500,7 +504,7 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
         ors.AddInstance(model_id, registry, entity, { white_porcelain });
     }
     SkyboxManager::LoadSkybox(registry, std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street.dds");
-    first_scene->OnInstancesUpdated();
+    first_scene->ScheduleOnInstancesUpdate();
     camera_movement::RegisterKeyCallbacks();
     object_editor::RegisterKeyCallbacks();
     auto &input = *InputLayer::instance();
@@ -518,7 +522,7 @@ void Controller::OnTick([[maybe_unused]] float delta_time)
     }
     auto &input = *InputLayer::instance();
     auto scene = Engine::scene();
-    camera_movement::UpdateCamera(delta_time);
+    camera_movement::OnTick(delta_time);
 
     if (input.mouse_scrolled())
     {
@@ -540,4 +544,5 @@ void Controller::OnEvent(engine::core::events::Event &e)
 }
 void Controller::OnUpdate()
 {
+    camera_movement::OnUpdate();
 }
