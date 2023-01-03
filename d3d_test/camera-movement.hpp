@@ -8,5 +8,7 @@ namespace camera_movement
 
     void RegisterKeyCallbacks();
 
-    void UpdateCamera(float delta_time);
+    void OnTick(float delta_time);
+
+    void OnUpdate();
 }

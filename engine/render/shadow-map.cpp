@@ -1,7 +1,7 @@
 #include "shadow-map.hpp"
 namespace engine::render
 {
-    void ShadowMap::Resize(size_t resolution, size_t size, bool cubemap)
+    void ShadowMap::Resize(uint32_t resolution, uint32_t size, bool cubemap)
     {
         if (resolution == resolution_ && size == size_)
             return;

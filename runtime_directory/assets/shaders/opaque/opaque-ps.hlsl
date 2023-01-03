@@ -56,12 +56,18 @@ struct PS_IN
     float4x4 world_transform : WORLD_TRANSFORM;
 };
 
+
 float3 ComputePointLightsEnergy(PBR_Material material, PBR_CommonData common_data)
 {
     float3 rv = 0;
     for (uint i = 0; i < g_num_point_lights; i++)
     {
-        rv += ComputePointLightEnergy(material, common_data, g_point_lights[i], i);
+        PointLight light = g_point_lights[i];
+        if (shadowed(common_data, light, i))
+        {
+            continue;
+        }
+        rv += ComputePointLightEnergy(material, common_data, light, i);
     }
     return rv;
 }
@@ -71,7 +77,12 @@ float3 ComputeSpotLightsEnergy(PBR_Material material, PBR_CommonData common_data
     float3 rv = 0;
     for (uint i = 0; i < g_num_spot_lights; i++)
     {
-        rv += ComputeSpotLightEnergy(material, common_data, g_spot_lights[i], i);
+        SpotLight light = g_spot_lights[i];
+        if (shadowed(common_data, light, i))
+        {
+            continue;
+        }
+        rv += ComputeSpotLightEnergy(material, common_data,  light, i);
     }
     return rv;
 }
@@ -81,11 +92,15 @@ float3 ComputeDirectionalLightsEnergy(PBR_Material material, PBR_CommonData comm
     float3 rv = 0;
     for (uint i = 0; i < g_num_directional_lights; i++)
     {
-        rv += ComputeDirectionalLightEnergy(material, common_data, g_directional_lights[i], i);
+        DirectionalLight light = g_directional_lights[i];
+        if (shadowed(common_data, light, i))
+        {
+            continue;
+        }
+        rv += ComputeDirectionalLightEnergy(material, common_data, light, i);
     }
     return rv;
 }
-
 float3 ComputeEnvironmentEnergy(PBR_Material material, PBR_CommonData common_data)
 {
     float3 R = reflect(-common_data.view_dir_normalized, common_data.normal);

@@ -16,7 +16,6 @@ namespace scene_viewer
                 return;
             }
             name = game_object->name;
-
         }
         else
         {
@@ -32,10 +31,10 @@ namespace scene_viewer
             }
             if (ImGui::Button("Add child Entity"))
             {
-                auto entity = registry.create();
-                auto &t = registry.emplace<GameObject>(entity);
+                auto new_entity = registry.create();
+                auto &t = registry.emplace<GameObject>(new_entity);
                 t.name = "New Entity";
-                game_object->children.push_back(entity);
+                game_object->children.push_back(new_entity);
                 t.parent = entity;
             }
             ImGui::SameLine();
@@ -54,7 +53,7 @@ namespace scene_viewer
         auto scene = engine::core::Engine::scene();
         auto &registry = scene->registry;
         // draw entity tree
-        ImGui::BeginChild("##entity_tree", ImVec2(0, ImGui::GetWindowHeight() * 0.8), true);
+        ImGui::BeginChild("##entity_tree", ImVec2(0, ImGui::GetWindowHeight() * 0.8f), true);
         std::vector<entt::entity> drawn;
         registry.each([&drawn, &registry] (auto entity) {
             if (std::find(drawn.begin(), drawn.end(), entity) != drawn.end())

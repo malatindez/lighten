@@ -151,7 +151,7 @@ namespace engine::render::_dissolution_detail
     auto constexpr dissolution_gs_depth_only_cubemap_shader_path = "assets/shaders/dissolution/dissolution-depth-only-cubemap-gs.hlsl";
     auto constexpr dissolution_gs_depth_only_texture_shader_path = "assets/shaders/dissolution/dissolution-depth-only-texture-gs.hlsl";
 
-    class DissolutionRenderSystem
+    class DissolutionRenderSystem : public RenderPass
     {
     public:
         ModelInstance *GetInstancePtr(uint64_t model_id);
@@ -164,9 +164,10 @@ namespace engine::render::_dissolution_detail
         [[nodiscard]] ID3D11ShaderResourceView *GetBrdfTexture() const { return brdf_texture_; }
         [[nodiscard]] float const &ambient_occlusion() const { return ambient_occlusion_value_; }
         [[nodiscard]] float &ambient_occlusion() { return ambient_occlusion_value_; }
-
+        [[nodiscard]] auto &update_time() const { return update_time_; }
+        [[nodiscard]] auto &update_time() { return update_time_; }
         DissolutionRenderSystem();
-        void Render(core::Scene *scene);
+        void OnRender(core::Scene *scene) override;
         void RenderDepthOnly(std::vector<DissolutionPerDepthCubemap> const &cubemaps, core::Scene *scene);
         void RenderDepthOnly(std::vector<DissolutionPerDepthTexture> const &textures, core::Scene *scene);
 
@@ -174,13 +175,18 @@ namespace engine::render::_dissolution_detail
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, float lifetime);
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, std::vector<DissolutionMaterial> const &materials, float lifetime);
 
-        void Update([[maybe_unused]] core::Scene *scene) {}
+        void Update([[maybe_unused]] core::Scene *scene);
         void ScheduleOnInstancesUpdate()
         {
             should_update_instances_ = true;
         }
     private:
         void OnInstancesUpdated(core::Scene *scene);
+
+        void TransitInstances(core::Scene *scene);
+
+        utils::SteadyTimer update_timer_;
+        float update_time_ = 0.1f;
 
         // TODO:
         void on_attach(entt::registry &, entt::entity) {}

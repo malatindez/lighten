@@ -85,7 +85,9 @@ namespace engine::render::_light_detail
         {
             direct3d::api().devcon4->OMSetRenderTargets(0, nullptr, point_light_shadow_maps_.depth_stencil().depth_stencil_view());
             direct3d::api().devcon4->ClearDepthStencilView(point_light_shadow_maps_.depth_stencil().depth_stencil_view(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0);
-            scene->renderer->opaque_render_system().RenderDepthOnly(opaque_per_cubemap_);
+            scene->renderer->opaque_render_system().RenderDepthOnly(opaque_per_cubemap_, scene);
+            scene->renderer->dissolution_render_system().RenderDepthOnly(opaque_per_cubemap_, scene);
+            scene->renderer->grass_render_system().RenderDepthOnly(opaque_per_cubemap_, scene);
         }
     }
     void LightRenderSystem::ProcessSpotLights(core::Scene *scene)
@@ -110,7 +112,9 @@ namespace engine::render::_light_detail
         {
             direct3d::api().devcon4->OMSetRenderTargets(0, nullptr, spot_light_shadow_maps_.depth_stencil().depth_stencil_view());
             direct3d::api().devcon4->ClearDepthStencilView(spot_light_shadow_maps_.depth_stencil().depth_stencil_view(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0);
-            scene->renderer->opaque_render_system().RenderDepthOnly(opaque_per_texture_);
+            scene->renderer->opaque_render_system().RenderDepthOnly(opaque_per_texture_, scene);
+            scene->renderer->dissolution_render_system().RenderDepthOnly(opaque_per_texture_, scene);
+            scene->renderer->grass_render_system().RenderDepthOnly(opaque_per_texture_, scene);
         }
     }
     void LightRenderSystem::ProcessDirectionalLights(core::Scene *scene)
@@ -134,23 +138,40 @@ namespace engine::render::_light_detail
         {
             direct3d::api().devcon4->OMSetRenderTargets(0, nullptr, directional_light_shadow_maps_.depth_stencil().depth_stencil_view());
             direct3d::api().devcon4->ClearDepthStencilView(directional_light_shadow_maps_.depth_stencil().depth_stencil_view(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0);
-            scene->renderer->opaque_render_system().RenderDepthOnly(opaque_per_texture_);
+            scene->renderer->opaque_render_system().RenderDepthOnly(opaque_per_texture_, scene);
+            scene->renderer->dissolution_render_system().RenderDepthOnly(opaque_per_texture_, scene);
+            scene->renderer->grass_render_system().RenderDepthOnly(opaque_per_texture_, scene);
         }
     }
-    void LightRenderSystem::RenderShadowMaps(core::Scene *scene)
+    void LightRenderSystem::OnRender(core::Scene *scene)
     {
+        if (should_update_instances_)
+        {
+            OnInstancesUpdated(scene);
+            should_update_instances_ = false;
+        }
+        if (should_update && shadow_map_update_timer_.elapsed() > shadow_map_update_interval_)
+        {
+            shadow_map_update_timer_.reset();
+            should_update = false;
+        }
+        else
+        {
+            return;
+        }
+
         if (refresh_data)
         {
             point_light_entities_ = std::move(point_light_entities_temp_);
             spot_light_entities_ = std::move(spot_light_entities_temp_);
             directional_light_entities_ = std::move(directional_light_entities_temp_);
 
-            point_light_shadow_maps_.Resize(resolution_, point_light_entities_.size(), true);
-            spot_light_shadow_maps_.Resize(resolution_, spot_light_entities_.size(), false);
-            directional_light_shadow_maps_.Resize(resolution_, directional_light_entities_.size(), false);
+            point_light_shadow_maps_.Resize(resolution_, static_cast<uint32_t>(point_light_entities_.size()), true);
+            spot_light_shadow_maps_.Resize(resolution_, static_cast<uint32_t>(spot_light_entities_.size()), false);
+            directional_light_shadow_maps_.Resize(resolution_, static_cast<uint32_t>(directional_light_entities_.size()), false);
             refresh_data = false;
         }
-        
+
         D3D11_VIEWPORT viewport;
         viewport.TopLeftX = 0;
         viewport.TopLeftY = 0;
@@ -158,6 +179,12 @@ namespace engine::render::_light_detail
         viewport.Height = static_cast<float>(resolution_);
         viewport.MinDepth = 0.0f;
         viewport.MaxDepth = 1.0f;
+        ID3D11RenderTargetView *render_target = nullptr;
+        ID3D11DepthStencilView *depth_target = nullptr;
+        direct3d::api().devcon4->OMGetRenderTargets(1, &render_target, &depth_target);
+        UINT viewport_count = 1;
+        D3D11_VIEWPORT saved_viewport;
+        direct3d::api().devcon4->RSGetViewports(&viewport_count, &saved_viewport);
 
         direct3d::api().devcon4->RSSetViewports(1, &viewport);
         direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth, 0);
@@ -165,6 +192,7 @@ namespace engine::render::_light_detail
         ProcessPointLights(scene);
         ProcessSpotLights(scene);
         ProcessDirectionalLights(scene);
-        direct3d::api().devcon4->OMSetRenderTargets(0, nullptr, nullptr);
+        direct3d::api().devcon4->RSSetViewports(viewport_count, &saved_viewport);
+        direct3d::api().devcon4->OMSetRenderTargets(1, &render_target, depth_target);
     }
 }

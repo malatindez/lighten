@@ -1,7 +1,6 @@
 #ifndef PBR_HELPERS_HLSLI
 #define PBR_HELPERS_HLSLI
 #include "../globals/globals-common.hlsli"
-#define PI 3.1415926535897932384626433832795
 static const float clampVal = 0.001f;
 static const float depthOffset = 0.015f;
 static const float normalOffset = 0.0025f;
@@ -225,12 +224,9 @@ bool shadowed(PBR_CommonData common_data, DirectionalLight directional_light, ui
   return visible > 0.5f;
 }
 
-float3 ComputePointLightEnergy(PBR_Material material, PBR_CommonData common_data, PointLight point_light, uint point_light_index)
+float3 ComputePointLightEnergy(PBR_Material material, PBR_CommonData common_data, PointLight point_light, uint point_light_index,
+  out float fading, out float solid_angle)
 {
-    if (shadowed(common_data, point_light, point_light_index))
-    {
-        return float3(0,0,0);
-    }
     float3 light_dir = point_light.position - common_data.fragment_position;
     float light_dist = length(light_dir);
     float3 light_dir_normalized = light_dir / light_dist;
@@ -240,18 +236,18 @@ float3 ComputePointLightEnergy(PBR_Material material, PBR_CommonData common_data
     float ndotl = max(dot(common_data.normal, light_dir_normalized), clampVal );
     float sina;
     float cosa;
-    float solid_angle = CalculateSolidAngle(light_dist, point_light.radius, sina, cosa);
+    solid_angle = CalculateSolidAngle(light_dist, point_light.radius, sina, cosa);
 
     float gndotl = dot(common_data.geometry_normal, light_dir_normalized);
     
-    if(gndotl < -point_light.radius) { return float3(0,0,0); }
-
     float lightMicroHeight = ndotl * light_dist;
     float lightMacroHeight = gndotl * light_dist;
     float fadingMicro = saturate ((lightMicroHeight + point_light.radius) / (2 * point_light.radius));
     float fadingMacro = saturate ((lightMacroHeight + point_light.radius) / (2 * point_light.radius));
-    float fading = fadingMicro * fadingMacro;
+    fading = fadingMicro * fadingMacro;
     
+    if(gndotl < -point_light.radius) { return float3(0,0,0); }
+
     ndotl = max(ndotl, fadingMicro * sina);
     float3 specL = approximateClosestSphereDir(reflect(-common_data.view_dir_normalized, common_data.normal), cosa, light_dir, light_dir_normalized, light_dist, point_light.radius);
     clampDirToHorizon(specL, ndotl, common_data.normal, clampVal );
@@ -259,13 +255,9 @@ float3 ComputePointLightEnergy(PBR_Material material, PBR_CommonData common_data
     return fading * Illuminate(material, point_light.color, common_data.view_dir_normalized, common_data.normal, specL, ndotl, solid_angle);
 }
  
-float3 ComputeSpotLightEnergy(PBR_Material material, PBR_CommonData common_data, SpotLight spot_light, uint spot_light_index)
+float3 ComputeSpotLightEnergy(PBR_Material material, PBR_CommonData common_data, SpotLight spot_light, uint spot_light_index,
+  out float fading, out float solid_angle)
 {
-    if (shadowed(common_data, spot_light, spot_light_index))
-    {
-        return float3(0,0,0);
-    }
-
     float3 light_dir = spot_light.position - common_data.fragment_position;
     float light_dist = length(light_dir);
     float3 light_dir_normalized = light_dir / light_dist;
@@ -278,12 +270,16 @@ float3 ComputeSpotLightEnergy(PBR_Material material, PBR_CommonData common_data,
     float cos_angle = dot(cone_dir_normalized, light_dir_normalized);
     float cos_cutoff = cos(spot_light.inner_cutoff);
     float cos_outer_cutoff = cos(spot_light.outer_cutoff);
-    if (cos_angle < cos_outer_cutoff) { return float3(0,0,0); }
+    solid_angle = 2 * PI * (1 - cos_outer_cutoff);
+
     float lightMicroHeight = ndotl * light_dist;
     float lightMacroHeight = dot(common_data.geometry_normal, light_dir_normalized) * light_dist;
     float fadingMicro = saturate ((lightMicroHeight + spot_light.radius) / (2 * spot_light.radius));
     float fadingMacro = saturate ((lightMacroHeight + spot_light.radius) / (2 * spot_light.radius));
-    float fading = fadingMicro * fadingMacro;
+    fading = fadingMicro * fadingMacro;
+
+    if (cos_angle < cos_outer_cutoff) { return float3(0,0,0); }
+
     ndotl = max(ndotl, fadingMicro * (cos_angle - cos_outer_cutoff) / (cos_cutoff - cos_outer_cutoff));
     float3 specL = approximateClosestSphereDir(reflect(-common_data.view_dir_normalized, common_data.normal), cos_angle, light_dir, light_dir_normalized, light_dist, spot_light.radius);
     clampDirToHorizon(specL, ndotl, common_data.normal, clampVal );
@@ -291,17 +287,12 @@ float3 ComputeSpotLightEnergy(PBR_Material material, PBR_CommonData common_data,
     float attenuation = saturate((cos_angle - cos_outer_cutoff) / (cos_cutoff - cos_outer_cutoff));
     attenuation *= attenuation;
 
-    float solid_angle = 2 * PI * (1 - cos_outer_cutoff);
     
     return fading * attenuation * Illuminate(material, spot_light.color, common_data.view_dir_normalized, common_data.normal, specL, ndotl, solid_angle);
 }
  
 float3 ComputeDirectionalLightEnergy(PBR_Material material, PBR_CommonData common_data, DirectionalLight directional_light, uint directional_light_index)
 {
-    if (shadowed(common_data, directional_light, directional_light_index))
-    {
-        return float3(0,0,0);
-    }
     float3 light_dir = -directional_light.direction;
     float3 light_dir_normalized = light_dir;
     
@@ -310,6 +301,21 @@ float3 ComputeDirectionalLightEnergy(PBR_Material material, PBR_CommonData commo
     float3 specL = approximateClosestSphereDir(reflect(-common_data.view_dir_normalized, common_data.normal), 0, light_dir, light_dir_normalized, 0, 0);
     clampDirToHorizon(specL, ndotl, common_data.normal, clampVal );
     return Illuminate(material, directional_light.color, common_data.view_dir_normalized, common_data.normal, light_dir, ndotl, directional_light.solid_angle);
+}
+
+
+float3 ComputePointLightEnergy(PBR_Material material, PBR_CommonData common_data, PointLight point_light, uint point_light_index)
+{
+  float fading;
+  float solid_angle;
+  return ComputePointLightEnergy(material, common_data, point_light, point_light_index, fading, solid_angle);
+}
+ 
+float3 ComputeSpotLightEnergy(PBR_Material material, PBR_CommonData common_data, SpotLight spot_light, uint spot_light_index)
+{
+  float fading;
+  float solid_angle;
+  return ComputeSpotLightEnergy(material, common_data, spot_light, spot_light_index, fading, solid_angle);
 }
 
 #endif // PS_HELPERS_HLSLI

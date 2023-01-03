@@ -50,6 +50,7 @@ float2 calculate_uv(uint vertex_id, uint index)
     return rv;
 }
 
+
 VS_OUTPUT vs_main(uint vertex_id : SV_VERTEXID, VS_INPUT input)
 {
     VS_OUTPUT output;

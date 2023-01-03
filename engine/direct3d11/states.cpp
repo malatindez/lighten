@@ -86,7 +86,7 @@ namespace engine::direct3d
         AlwaysAssert(api().device5->CreateSamplerState(&sampler_desc, &point_clamp_sampler.reset()), "Failed to create sampler state");
 
         sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_WRAP);
-        AlwaysAssert(api().device5->CreateSamplerState(&sampler_desc, &bilinear_wrap_sampler.reset()),  "Failed to create sampler state");
+        AlwaysAssert(api().device5->CreateSamplerState(&sampler_desc, &bilinear_wrap_sampler.reset()), "Failed to create sampler state");
 
         sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_CLAMP);
         AlwaysAssert(api().device5->CreateSamplerState(&sampler_desc, &bilinear_clamp_sampler.reset()), "Failed to create sampler state");
@@ -125,9 +125,13 @@ namespace engine::direct3d
         blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
         blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
         blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-        
+
         AlwaysAssert(api().device->CreateBlendState(&blend_desc, &additive_blend_state.reset()), "Failed to create additive blend state");
 
-        
+        ZeroMemory(&blend_desc, sizeof(blend_desc));
+        blend_desc.AlphaToCoverageEnable = true;
+        blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+        AlwaysAssert(api().device->CreateBlendState(&blend_desc, &alpha_to_coverage_blend_state.reset()), "Failed to create alpha to coverage blend state");
     }
 }

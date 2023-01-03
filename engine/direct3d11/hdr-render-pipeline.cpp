@@ -3,6 +3,7 @@
 #include "subsystems/core/input-layer.hpp"
 #include "subsystems/render/skybox-manager.hpp"
 #include "core/engine.hpp"
+#include "core/../../d3d_test/object-editor.hpp"
 namespace engine::direct3d
 {
     HDRRenderPipeline::HDRRenderPipeline(std::shared_ptr<core::Window> window, std::shared_ptr<SwapchainRenderTarget> const &output_target)
@@ -43,10 +44,17 @@ namespace engine::direct3d
     void HDRRenderPipeline::OnRender()
     {
         FrameBegin();
+
+        direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(1, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(2, 1, &direct3d::states().bilinear_clamp_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(3, 1, &direct3d::states().comparison_linear_clamp_sampler.ptr());
+
         scene_->Render(per_frame_);
         // Render frame
         LayerStack::OnRender();
         PostProcess();
+
         imgui_layer_->Begin();
         OnGuiRender();
         imgui_layer_->End();

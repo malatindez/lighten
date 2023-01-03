@@ -63,12 +63,20 @@ struct PS_IN
     float lifetime : LIFETIME;
 };
 
+
+
+
 float3 ComputePointLightsEnergy(PBR_Material material, PBR_CommonData common_data)
 {
     float3 rv = 0;
     for (uint i = 0; i < g_num_point_lights; i++)
     {
-        rv += ComputePointLightEnergy(material, common_data, g_point_lights[i], i);
+        PointLight light = g_point_lights[i];
+        if (shadowed(common_data, light, i))
+        {
+            continue;
+        }
+        rv += ComputePointLightEnergy(material, common_data, light, i);
     }
     return rv;
 }
@@ -78,7 +86,12 @@ float3 ComputeSpotLightsEnergy(PBR_Material material, PBR_CommonData common_data
     float3 rv = 0;
     for (uint i = 0; i < g_num_spot_lights; i++)
     {
-        rv += ComputeSpotLightEnergy(material, common_data, g_spot_lights[i], i);
+        SpotLight light = g_spot_lights[i];
+        if (shadowed(common_data, light, i))
+        {
+            continue;
+        }
+        rv += ComputeSpotLightEnergy(material, common_data,  light, i);
     }
     return rv;
 }
@@ -88,7 +101,12 @@ float3 ComputeDirectionalLightsEnergy(PBR_Material material, PBR_CommonData comm
     float3 rv = 0;
     for (uint i = 0; i < g_num_directional_lights; i++)
     {
-        rv += ComputeDirectionalLightEnergy(material, common_data, g_directional_lights[i], i);
+        DirectionalLight light = g_directional_lights[i];
+        if (shadowed(common_data, light, i))
+        {
+            continue;
+        }
+        rv += ComputeDirectionalLightEnergy(material, common_data, light, i);
     }
     return rv;
 }
@@ -134,6 +152,7 @@ float4 ps_main(PS_IN input)
     float lerpValue = 1.0f;
     if (alpha < alpha_threshold)
     {
+    //    discard;
         return float4(0, 0, 0, 0.0f);
     }
     else if (alpha < alpha_threshold + kClampValue)
@@ -223,5 +242,8 @@ float4 ps_main(PS_IN input)
 
     color += ambient * g_default_ambient_occlusion_value * material.albedo;
     g_directional_shadow_maps.SampleLevel(g_bilinear_clamp_sampler, float3(0, 0, 0), 0);
-    return kEmissiveColor * (1.0f - lerpValue) + float4(color, 1.0f);
+    return kEmissiveColor * (1.0f - lerpValue) + float4(color, 1.0f)
+    // + float4(100,0,0,0) 
+    // just a test to see if the dissolution render system transits models to the opaque system
+    ;
 }

@@ -2,10 +2,10 @@
 #include "../../core/shader-manager.hpp"
 #include "../model-system.hpp"
 #include "components/components.hpp"
-#include "utils/utils.hpp"
-#include "core/scene.hpp"
 #include "core/engine.hpp"
+#include "core/scene.hpp"
 #include "subsystems/core/texture-manager.hpp"
+#include "utils/utils.hpp"
 
 namespace engine::render
 {
@@ -21,16 +21,20 @@ namespace engine::render
 
     void DissolutionMaterial::Bind(direct3d::DynamicUniformBuffer<_dissolution_detail::DissolutionPerMaterial> &uniform_buffer) const
     {
-        if (albedo_map != nullptr) {
+        if (albedo_map != nullptr)
+        {
             direct3d::api().devcon4->PSSetShaderResources(0, 1, &albedo_map);
         }
-        if (normal_map != nullptr) {
+        if (normal_map != nullptr)
+        {
             direct3d::api().devcon4->PSSetShaderResources(1, 1, &normal_map);
         }
-        if (metalness_map != nullptr) {
+        if (metalness_map != nullptr)
+        {
             direct3d::api().devcon4->PSSetShaderResources(2, 1, &metalness_map);
         }
-        if (roughness_map != nullptr) {
+        if (roughness_map != nullptr)
+        {
             direct3d::api().devcon4->PSSetShaderResources(3, 1, &roughness_map);
         }
         _dissolution_detail::DissolutionPerMaterial temporary;
@@ -72,23 +76,23 @@ namespace engine::render
 }
 namespace engine::render::_dissolution_detail
 {
-    DissolutionRenderSystem::DissolutionRenderSystem()
+    DissolutionRenderSystem::DissolutionRenderSystem() : RenderPass(0x10001)
     {
         auto path = std::filesystem::current_path();
         noise_texture_ = core::TextureManager::GetTextureView(path / "assets/dissolution_perlin_noise.dds");
         {
             std::vector<D3D11_INPUT_ELEMENT_DESC> d3d_input_desc{
-             {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             { "ROWX",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA,  1},
-             { "ROWY",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "ROWZ",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "ROWW",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "TIME_BEGIN",    0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "LIFETIME",      0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+                {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+                {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+                {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+                {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+                {"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+                {"ROWX", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+                {"ROWY", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+                {"ROWZ", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+                {"ROWW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+                {"TIME_BEGIN", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+                {"LIFETIME", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
             };
 
             auto vs = core::ShaderManager::instance()->CompileVertexShader(path / dissolution_vs_shader_path);
@@ -98,39 +102,35 @@ namespace engine::render::_dissolution_detail
         }
         {
             std::vector<D3D11_INPUT_ELEMENT_DESC> d3d_input_desc{
-             {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             { "ROWX",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA,  1},
-             { "ROWY",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "ROWZ",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "ROWW",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "TIME_BEGIN",    0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "LIFETIME",      0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+                {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+                {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+                {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+                {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+                {"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+                {"ROWX", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+                {"ROWY", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+                {"ROWZ", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+                {"ROWW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+                {"TIME_BEGIN", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+                {"LIFETIME", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
             };
 
             auto vs = core::ShaderManager::instance()->CompileVertexShader(path / dissolution_vs_depth_only_shader_path);
-            auto gs = core::ShaderManager::instance()->CompileGeometryShader(core::ShaderCompileInput
-                                                                             {
-                                                                                 direct3d::ShaderType::GeometryShader,
-                                                                                 path / dissolution_gs_depth_only_cubemap_shader_path,
-                                                                                 "cubemapGS"
-                                                                             });
-            auto gs2 = core::ShaderManager::instance()->CompileGeometryShader(core::ShaderCompileInput
-                                                                              {
-                                                                                  direct3d::ShaderType::GeometryShader,
-                                                                                  path / dissolution_gs_depth_only_texture_shader_path,
-                                                                                  "cubemapGS"
-                                                                              });
+            auto gs = core::ShaderManager::instance()->CompileGeometryShader(core::ShaderCompileInput{
+                direct3d::ShaderType::GeometryShader,
+                path / dissolution_gs_depth_only_cubemap_shader_path,
+                "cubemapGS" });
+            auto gs2 = core::ShaderManager::instance()->CompileGeometryShader(core::ShaderCompileInput{
+                direct3d::ShaderType::GeometryShader,
+                path / dissolution_gs_depth_only_texture_shader_path,
+                "cubemapGS" });
             auto il = std::make_shared<InputLayout>(vs->blob(), d3d_input_desc);
             dissolution_cubemap_shader_.SetVertexShader(vs).SetGeometryShader(gs).SetInputLayout(il);
             dissolution_texture_shader_.SetVertexShader(vs).SetGeometryShader(gs2).SetInputLayout(il);
         }
     }
 
-    void DissolutionRenderSystem::Render(core::Scene *scene)
+    void DissolutionRenderSystem::OnRender(core::Scene *scene)
     {
         if (should_update_instances_)
         {
@@ -360,6 +360,47 @@ namespace engine::render::_dissolution_detail
             }
         }
         dissolution_texture_shader_.Unbind();
+    }
+
+    void DissolutionRenderSystem::Update(core::Scene *scene)
+    {
+        //        auto &registry = scene->registry;
+        if (update_timer_.elapsed() > update_time_)
+        {
+            update_timer_.reset();
+            TransitInstances(scene);
+        }
+    }
+    void DissolutionRenderSystem::TransitInstances(core::Scene *scene)
+    {
+        auto &registry = scene->registry;
+        auto &ors = scene->renderer->opaque_render_system();
+        for (auto &model_instance : model_instances_)
+            for (auto &mesh_instance : model_instance.mesh_instances)
+                for (auto &material_instance : mesh_instance.material_instances)
+                {
+                    for (auto it = material_instance.instances.begin(); it != material_instance.instances.end();)
+                    {
+                        auto &entity = *it;
+
+                        auto *dissolution = registry.try_get<components::DissolutionComponent>(entity);
+                        if (dissolution != nullptr && dissolution->time_begin + dissolution->lifetime < core::Engine::TimeFromStart())
+                        {
+                            registry.erase<components::DissolutionComponent>(entity);
+                            ors.AddInstance(dissolution->model_id, registry, entity);
+                            ors.ScheduleOnInstancesUpdate();
+                            dissolution = nullptr;
+                            this->ScheduleOnInstancesUpdate();
+                        }
+                        if (dissolution == nullptr)
+                        {
+                            it = material_instance.instances.erase(it);
+                            continue;
+                        }
+
+                        ++it;
+                    }
+                }
     }
     void DissolutionRenderSystem::OnInstancesUpdated(core::Scene *scene)
     {

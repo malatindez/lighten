@@ -5,6 +5,7 @@
 #include "entt/entt.hpp"
 #include "core/math.hpp"
 #include "components/components.hpp"
+#include "render/common.hpp"
 namespace engine
 {
     namespace core
@@ -23,13 +24,13 @@ namespace engine
 }
 namespace engine::render::_light_detail
 {
-    class LightRenderSystem
+    class LightRenderSystem : public RenderPass
     {
     public:
-        void ResizeShadowMaps(size_t resolution) { resolution_ = resolution; }
-        [[nodiscard]] size_t point_light_shadow_resolution() const noexcept { return resolution_; }
-        [[nodiscard]] size_t spot_light_shadow_resolution() const noexcept { return resolution_; }
-        [[nodiscard]] size_t directional_light_shadow_resolution() const noexcept { return resolution_; }
+        void ResizeShadowMaps(uint32_t resolution) { resolution_ = resolution; }
+        [[nodiscard]] uint32_t point_light_shadow_resolution() const noexcept { return resolution_; }
+        [[nodiscard]] uint32_t spot_light_shadow_resolution() const noexcept { return resolution_; }
+        [[nodiscard]] uint32_t directional_light_shadow_resolution() const noexcept { return resolution_; }
         [[nodiscard]] auto const &point_light_entities() const noexcept { return point_light_entities_; }
         [[nodiscard]] auto const &spot_light_entities() const noexcept { return spot_light_entities_; }
         [[nodiscard]] auto const &directional_light_entities() const noexcept { return directional_light_entities_; }
@@ -45,31 +46,29 @@ namespace engine::render::_light_detail
         void BindPointShadowMaps(int slot) { point_light_shadow_maps_.BindShaderResource(slot); }
         void BindSpotShadowMaps(int slot) { spot_light_shadow_maps_.BindShaderResource(slot); }
         void BindDirectionalShadowMaps(int slot) { directional_light_shadow_maps_.BindShaderResource(slot); }
-        LightRenderSystem() = default;
-        ~LightRenderSystem() = default;
+        LightRenderSystem() : RenderPass(0) {}
+        virtual ~LightRenderSystem() = default;
         LightRenderSystem(LightRenderSystem const &) = delete;
         LightRenderSystem(LightRenderSystem &&) = delete;
         LightRenderSystem &operator=(LightRenderSystem const &) = delete;
         LightRenderSystem &operator=(LightRenderSystem &&) = delete;
 
-        void OnInstancesUpdated(core::Scene *scene);
-        void RenderShadowMaps(core::Scene *scene);
-        void Update(core::Scene *scene)
-        {
-            if (should_update && shadow_map_update_timer_.elapsed() > shadow_map_update_interval_)
-            {
-                shadow_map_update_timer_.reset();
-                RenderShadowMaps(scene);
-                should_update = false;
-            }
-        }
+        void OnRender(core::Scene *scene) override;
+        void Update([[maybe_unused]] core::Scene *scene) {}
         // Will update shadow maps if the last update was more than shadow_map_update_interval_ seconds ago
         void ScheduleShadowMapUpdate()
         {
             should_update = true;
         }
+        void ScheduleOnInstancesUpdate()
+        {
+            should_update_instances_ = true;
+        }
 
     private:
+        void OnInstancesUpdated(core::Scene *scene);
+        bool should_update_instances_ = false;
+
         bool should_update = false;
         bool refresh_data = false;
         utils::SteadyTimer shadow_map_update_timer_;
@@ -92,6 +91,6 @@ namespace engine::render::_light_detail
         std::unordered_map<entt::entity, core::math::mat4> spot_light_shadow_matrices_;
         std::unordered_map<entt::entity, core::math::mat4> directional_light_shadow_matrices_;
         GraphicsShaderProgram shadowmap_shader_;
-        size_t resolution_ = 2048;
+        uint32_t resolution_ = 1024;
     };
 } // namespace engine::render::_light_detail

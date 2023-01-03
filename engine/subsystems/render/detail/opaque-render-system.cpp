@@ -70,12 +70,11 @@ namespace engine::render
 }
 namespace engine::render::_opaque_detail
 {
-    OpaqueRenderSystem::OpaqueRenderSystem()
+    OpaqueRenderSystem::OpaqueRenderSystem() : RenderPass(0x10000)
     {
         auto path = std::filesystem::current_path();
 
-        {
-            std::vector<D3D11_INPUT_ELEMENT_DESC> d3d_input_desc{
+        std::vector<D3D11_INPUT_ELEMENT_DESC> d3d_input_desc{
              {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
              {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
              {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -85,26 +84,15 @@ namespace engine::render::_opaque_detail
              { "ROWY",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1},
              { "ROWZ",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1},
              { "ROWW",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1}
-            };
+        };
 
+        {
             auto vs = core::ShaderManager::instance()->CompileVertexShader(path / opaque_vs_shader_path);
             auto ps = core::ShaderManager::instance()->CompilePixelShader(path / opaque_ps_shader_path);
             auto il = std::make_shared<InputLayout>(vs->blob(), d3d_input_desc);
             opaque_shader_.SetVertexShader(vs).SetPixelShader(ps).SetInputLayout(il);
         }
         {
-            std::vector<D3D11_INPUT_ELEMENT_DESC> d3d_input_desc{
-             {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             { "ROWX",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA,  1},
-             { "ROWY",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "ROWZ",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "ROWW",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1}
-            };
-
             auto vs = core::ShaderManager::instance()->CompileVertexShader(path / opaque_vs_depth_only_shader_path);
             auto gs = core::ShaderManager::instance()->CompileGeometryShader(core::ShaderCompileInput
                                                                              {
@@ -123,18 +111,20 @@ namespace engine::render::_opaque_detail
             opaque_texture_shader_.SetVertexShader(vs).SetGeometryShader(gs2).SetInputLayout(il);
         }
     }
-    void OpaqueRenderSystem::Render(core::Scene *scene)
+    void OpaqueRenderSystem::OnRender(core::Scene *scene)
     {
+        if (should_update_instances_)
+        {
+            OnInstancesUpdated(scene->registry);
+            should_update_instances_ = false;
+            scene->renderer->light_render_system().ScheduleShadowMapUpdate();
+        }
         if (instance_buffer_.size() == 0)
             return;
         opaque_shader_.Bind();
 
         direct3d::api().devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         direct3d::api().devcon4->RSSetState(direct3d::states().cull_back);
-        direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
-        direct3d::api().devcon4->PSSetSamplers(1, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
-        direct3d::api().devcon4->PSSetSamplers(2, 1, &direct3d::states().bilinear_clamp_sampler.ptr());
-        direct3d::api().devcon4->PSSetSamplers(3, 1, &direct3d::states().comparison_linear_clamp_sampler.ptr());
         direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth, 0);
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 
@@ -156,7 +146,7 @@ namespace engine::render::_opaque_detail
             auto const &point_light_matrices = lrs.point_light_shadow_matrices();
             auto const &spot_light_matrices = lrs.spot_light_shadow_matrices();
             auto const &directional_light_matrices = lrs.directional_light_shadow_matrices();
-            
+
             opaque_per_frame.num_point_lights = opaque_per_frame.num_spot_lights = opaque_per_frame.num_directional_lights = 0;
             for (entt::entity entity : point_lights)
             {
@@ -248,14 +238,19 @@ namespace engine::render::_opaque_detail
             }
         }
         opaque_shader_.Unbind();
-        ID3D11ShaderResourceView *nullSRV[1] = { nullptr };
-        direct3d::api().devcon4->PSSetShaderResources(8, 1, nullSRV);
-        direct3d::api().devcon4->PSSetShaderResources(9, 1, nullSRV);
-        direct3d::api().devcon4->PSSetShaderResources(10, 1, nullSRV);
+        direct3d::api().devcon4->PSSetShaderResources(8, 1, &direct3d::null_srv);
+        direct3d::api().devcon4->PSSetShaderResources(9, 1, &direct3d::null_srv);
+        direct3d::api().devcon4->PSSetShaderResources(10, 1, &direct3d::null_srv);
     }
 
-    void OpaqueRenderSystem::RenderDepthOnly(std::vector<OpaquePerDepthCubemap> const &cubemaps)
+    void OpaqueRenderSystem::RenderDepthOnly(std::vector<OpaquePerDepthCubemap> const &cubemaps, core::Scene *scene)
     {
+        if (should_update_instances_)
+        {
+            OnInstancesUpdated(scene->registry);
+            scene->renderer->light_render_system().ScheduleShadowMapUpdate();
+            should_update_instances_ = false;
+        }
         if (instance_buffer_.size() == 0)
             return;
         GraphicsShaderProgram::UnbindAll();
@@ -291,8 +286,14 @@ namespace engine::render::_opaque_detail
         opaque_cubemap_shader_.Unbind();
     }
 
-    void OpaqueRenderSystem::RenderDepthOnly(std::vector<OpaquePerDepthTexture> const &textures)
+    void OpaqueRenderSystem::RenderDepthOnly(std::vector<OpaquePerDepthTexture> const &textures, core::Scene *scene)
     {
+        if (should_update_instances_)
+        {
+            OnInstancesUpdated(scene->registry);
+            scene->renderer->light_render_system().ScheduleShadowMapUpdate();
+            should_update_instances_ = false;
+        }
         if (instance_buffer_.size() == 0)
             return;
         GraphicsShaderProgram::UnbindAll();
@@ -328,6 +329,7 @@ namespace engine::render::_opaque_detail
         }
         opaque_texture_shader_.Unbind();
     }
+
     void OpaqueRenderSystem::OnInstancesUpdated(entt::registry &registry)
     {
         uint32_t total_instances = 0;
@@ -416,7 +418,7 @@ namespace engine::render::_opaque_detail
                 mat.instances.push_back(entity);
             }
         }
-        registry.emplace<components::OpaqueComponent>(entity, components::OpaqueComponent{ .model_id = model_id });
+        registry.emplace_or_replace<components::OpaqueComponent>(entity, components::OpaqueComponent{ .model_id = model_id });
     }
 
     void OpaqueRenderSystem::AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, std::vector<OpaqueMaterial> const &materials)

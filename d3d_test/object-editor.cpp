@@ -24,17 +24,22 @@ namespace object_editor
         auto *point = Engine::scene()->registry.try_get<components::PointLight>(selected_entity);
         auto *spot = Engine::scene()->registry.try_get<components::SpotLight>(selected_entity);
         auto *opaque = Engine::scene()->registry.try_get<components::OpaqueComponent>(selected_entity);
+        auto *dissolution = Engine::scene()->registry.try_get<components::DissolutionComponent>(selected_entity);
         if (emissive != nullptr)
         {
-            Engine::scene()->renderer->emissive_render_system().OnInstancesUpdated(Engine::scene()->registry);
+            Engine::scene()->renderer->emissive_render_system().ScheduleOnInstancesUpdate();
         }
         if (directional != nullptr || point != nullptr || spot != nullptr)
         {
-            Engine::scene()->renderer->light_render_system().OnInstancesUpdated(Engine::scene().get());
+            Engine::scene()->renderer->light_render_system().ScheduleOnInstancesUpdate();
         }
         if (opaque != nullptr)
         {
-            Engine::scene()->renderer->opaque_render_system().OnInstancesUpdated(Engine::scene()->registry);
+            Engine::scene()->renderer->opaque_render_system().ScheduleOnInstancesUpdate();
+        }
+        if (dissolution != nullptr)
+        {
+            Engine::scene()->renderer->dissolution_render_system().ScheduleOnInstancesUpdate();
         }
     }
 
@@ -418,7 +423,7 @@ namespace object_editor
             ImGui::SliderAngle("Outer cutoff", &spot_light->outer_cutoff, 0, 180, "%.3f degrees", ImGuiSliderFlags_AlwaysClamp);
             if (spot_light->inner_cutoff >= spot_light->outer_cutoff)
             {
-                spot_light->inner_cutoff = spot_light->outer_cutoff * 0.95;
+                spot_light->inner_cutoff = spot_light->outer_cutoff * 0.95f;
             }
         }
     }
@@ -748,14 +753,13 @@ namespace object_editor
                 };
                 ImGui::Text("Entity id: ");
                 ImGui::SameLine();
-                ImGui::Text("%ull", convert_entity_id(selected_entity));
+                ImGui::Text("%u", convert_entity_id(selected_entity));
                 ImGui::Text("Parent entity id: ");
                 ImGui::SameLine();
-                ImGui::Text("%ull", convert_entity_id(game_object.parent));
+                ImGui::Text("%u", convert_entity_id(game_object.parent));
                 ImGui::Text("Amount of children: ");
                 ImGui::SameLine();
-                ImGui::Text("%ull", game_object.children.size());
-                ImGui::TreeNode("Children: ");
+                ImGui::Text("%u", game_object.children.size());
                 for (auto child : game_object.children)
                 {
                     auto *ptr = registry.try_get<GameObject>(child);
@@ -770,9 +774,69 @@ namespace object_editor
                     ImGui::SameLine();
                     ImGui::Text(". Id: ");
                     ImGui::SameLine();
-                    ImGui::Text("%ull", convert_entity_id(child));
+                    ImGui::Text("%u", convert_entity_id(child));
                 }
-                ImGui::TreePop();
+            }
+        }
+    }
+
+    void EditGrassField()
+    {
+        auto &scene = *Engine::scene();
+        auto &registry = scene.registry;
+        if (selected_entity == entt::null)
+        {
+            ImGui::BeginDisabled();
+            ImGui::CollapsingHeader("Grass field", ImGuiTreeNodeFlags_SpanAvailWidth);
+            ImGui::EndDisabled();
+            return;
+        }
+        auto &grs = scene.renderer->grass_render_system();
+        if (auto *grass_field_ptr = registry.try_get<GrassComponent>(selected_entity); grass_field_ptr)
+        {
+            auto &grass_field = *grass_field_ptr;
+            if (ImGui::CollapsingHeader("Grass field"))
+            {
+                auto &material = grs.GetMaterial(grass_field.material_id);
+                ImGui::Text("Grass material: ");
+                ImGui::InputScalar("planes count ##planes-count", ImGuiDataType_U32, &material.planes_count);
+                ImGui::InputScalar("sections per plane ##section-count", ImGuiDataType_U32, &material.section_count);
+                ImGui::ColorEdit3("albedo color ##albedo-color", material.albedo_color.data.data());
+                ImGui::DragFloat("ambient occlusion value ##ao-value", &material.ao_value, 0.01f, 0.01f, 1.0f);
+                ImGui::DragFloat("roughness value ##roughness-value", &material.roughness_value, 0.01f, 0.01f, 1.0f);
+                ImGui::DragFloat("metalness value ##metalness-value", &material.metalness_value, 0.01f, 0.01f, 1.0f);
+                ImGui::InputFloat3("wind direction ##wind-direction", &material.wind_vector.x);
+                ImGui::SliderAngle("wind amplitude ##wind-amplitude", &material.wind_amplitude, 0.0f, 180.0f);
+                ImGui::SliderFloat("wind wavenumber ##wind-wavenumber", &material.wind_wavenumber, 0.0f, 50.0f);
+                ImGui::SliderFloat("wind frequency ##wind-frequency", &material.wind_frequency, 0.0f, 50.0f);
+
+                
+                ImGui::NewLine();
+                ImGui::Text("Grass field: ");
+                ImGui::InputScalar("material id ##material-id", ImGuiDataType_U64, &grass_field.material_id);
+                ImGui::InputScalar("x spawn range ##width", ImGuiDataType_Float, &grass_field.spawn_range.x);
+                ImGui::InputScalar("z spawn range ##height", ImGuiDataType_Float, &grass_field.spawn_range.y);
+                ImGui::InputScalar("min scale ##x-scale-range", ImGuiDataType_Float, &grass_field.grass_size_range.x);
+                ImGui::InputScalar("max scale ##y-scale-range", ImGuiDataType_Float, &grass_field.grass_size_range.y);
+                ImGui::InputFloat3("initial offset", grass_field.initial_offset.data.data(), "%.3f", 3);
+                ImGui::InputScalar("min distance between instances", ImGuiDataType_Float, &grass_field.min_distance);
+                ImGui::InputScalar("max attempts", ImGuiDataType_U32, &grass_field.max_attempts);
+                if(ImGui::Button("Initialize"))
+                {
+                    try
+                    {
+                        grass_field.Initialize(material.atlas_data);
+                    }
+                    catch(std::exception const &e)
+                    {
+                        spdlog::error("Failed to initialize grass field using the given parameters. Exception: {}", e.what());
+                    }
+                    catch(...)
+                    {
+                        spdlog::error("Failed to initialize grass field using the given parameters. Exception: Unknown");
+                    }
+                    scene.renderer->grass_render_system().ScheduleOnInstancesUpdate();
+                }
             }
         }
     }
@@ -916,7 +980,7 @@ namespace object_editor
                                                                    if (registry.try_get<typename kComponentTypes::type_at<i>::type>(selected_entity))
                                                                    {
                                                                        registry.erase<typename kComponentTypes::type_at<i>::type>(selected_entity);
-                                                                       Engine::scene()->renderer->OnInstancesUpdated(Engine::scene().get());
+                                                                       Engine::scene()->renderer->ScheduleOnInstancesUpdate();
                                                                        return false;
                                                                    }
                                                                    ImGui::OpenPopup("Entity does not have this component");
@@ -939,6 +1003,8 @@ namespace object_editor
         EditLight();
         ImGui::Spacing();
         EditParticleEmitter();
+        ImGui::Spacing();
+        EditGrassField();
         ImGui::Spacing();
         EditSkyboxComponent();
         ImGui::Spacing();

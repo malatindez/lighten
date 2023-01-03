@@ -67,10 +67,10 @@ namespace engine::render
     {
         auto constexpr particle_vs_shader_path = "assets/shaders/particle/particle-vs.hlsl";
         auto constexpr particle_ps_shader_path = "assets/shaders/particle/particle-ps.hlsl";
-        class ParticleRenderSystem
+        class ParticleRenderSystem : public RenderPass
         {
         public:
-            void Render(core::Scene *scene);
+            void OnRender(core::Scene *scene) override;
             void Tick(core::Scene *scene, float delta_time);
             ParticleRenderSystem();
             ~ParticleRenderSystem() = default;

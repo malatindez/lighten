@@ -124,7 +124,7 @@ namespace engine::core
         }
 #endif
     }
-    Engine::Engine()
+    Engine::Engine() : random_engine_(random_device_())
     {
         event_function_ = std::bind_front([this](Event &e) __lambda_force_inline
                                           { OnEvent(e); });

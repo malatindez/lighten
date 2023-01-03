@@ -36,7 +36,7 @@ namespace
 }
 namespace engine::render::_particle_detail
 {
-    ParticleRenderSystem::ParticleRenderSystem()
+    ParticleRenderSystem::ParticleRenderSystem() : RenderPass(0x30000)
     {
         random_engine_.seed(std::random_device()());
         auto path = std::filesystem::current_path();
@@ -58,7 +58,7 @@ namespace engine::render::_particle_detail
         auto il = std::make_shared<InputLayout>(vs->blob(), d3d_input_desc);
         particle_shader_.SetVertexShader(vs).SetPixelShader(ps).SetInputLayout(il);
     }
-    void ParticleRenderSystem::Render(core::Scene *scene)
+    void ParticleRenderSystem::OnRender(core::Scene *scene)
     {
         auto view = scene->registry.view<components::TransformComponent, components::ParticleEmitter>();
         if (view.size_hint() == 0)
@@ -71,7 +71,6 @@ namespace engine::render::_particle_detail
         float render_start_timestamp = core::Engine::TimeFromStart();
         for (auto entity : view)
         {
-            auto &transform = view.get<components::TransformComponent>(entity);
             auto &emitter = view.get<components::ParticleEmitter>(entity);
 
             particles.reserve(particles.size() + emitter.particles.size());
@@ -98,7 +97,7 @@ namespace engine::render::_particle_detail
         }
         auto &camera_transform = scene->main_camera->transform();
 
-        std::sort(particles.begin(), particles.end(), [&camera_transform] (const GPUParticle &a, const GPUParticle &b) {
+        std::sort(particles.begin(), particles.end(), [&camera_transform] (const GPUParticle &a, const GPUParticle &b) constexpr noexcept -> bool {
             return length(a.position - camera_transform.position) > length(b.position - camera_transform.position);
                   });
 
@@ -302,9 +301,9 @@ namespace engine::render::_particle_detail
             {
                 continue;
             }
-            int32_t amount_of_particles = emitter.emit_rate * emitter.last_second_count - emitter.particles_last_second_count;
+            int32_t amount_of_particles = static_cast<uint32_t>(emitter.emit_rate * emitter.last_second_count - emitter.particles_last_second_count);
 
-            amount_of_particles = std::min((int64_t)amount_of_particles, (int64_t)(emitter.maximum_amount_of_particles - emitter.particles.size()));
+            amount_of_particles = int32_t(std::min((int64_t)amount_of_particles, (int64_t)(emitter.maximum_amount_of_particles - emitter.particles.size())));
             if (amount_of_particles <= 0)
             {
                 continue;
@@ -313,7 +312,7 @@ namespace engine::render::_particle_detail
 
             emitter.particles.reserve(emitter.particles.size() + amount_of_particles);
 
-            for (uint32_t i = 0; i < amount_of_particles; i++)
+            for (int32_t i = 0; i < amount_of_particles; i++)
             {
                 emitter.particles.emplace_back();
                 auto &particle = emitter.particles.back();

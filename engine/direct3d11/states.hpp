@@ -41,9 +41,9 @@ namespace engine::direct3d
         ReadOnlySamplerState comparison_linear_clamp_sampler;
         ReadOnlySamplerState comparison_anisotropic_wrap_sampler;
         ReadOnlySamplerState comparison_anisotropic_clamp_sampler;
-        
-        ReadOnlyBlendState additive_blend_state;
 
+        ReadOnlyBlendState additive_blend_state;
+        ReadOnlyBlendState alpha_to_coverage_blend_state;
 
         [[nodiscard]] static inline States &instance() { utils::Assert(instance_ != nullptr, "States not initialized"); return *instance_; }
     private:

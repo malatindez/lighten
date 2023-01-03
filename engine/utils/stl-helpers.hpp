@@ -1,3 +1,4 @@
+#pragma once
 #include "include/library-pch.hpp"
 namespace engine::utils
 {

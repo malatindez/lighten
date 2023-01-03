@@ -106,40 +106,87 @@ void Controller::OnGuiRender()
         sample_count = current_sample_count;
     }
     if ((uint32_t)(sample_count) != current_sample_count) { hdr_render_pipeline_->SetSampleCount(sample_count); }
+#if 0
+    static core::math::uivec2 poisson_disk_size = { 0.5f, 0.5f };
+    ImGui::InputScalar("Poisson disk size x", ImGuiDataType_U32, &poisson_disk_size.x);
+    ImGui::InputScalar("Poisson disk size y", ImGuiDataType_U32, &poisson_disk_size.y);
+    static uint32_t k, r;
+    ImGui::InputScalar("Poisson disk k", ImGuiDataType_U32, &k);
+    ImGui::InputScalar("Poisson disk r", ImGuiDataType_U32, &r);
 
+    if (ImGui::Button("generate poisson texture"))
+    {
+        std::vector<uint8_t> data;
+        data.resize(poisson_disk_size.x * poisson_disk_size.y * 4);
+        for (uint32_t i = 0; i < poisson_disk_size.x * poisson_disk_size.y; i++)
+        {
+            data[i * 4 + 0] = 0;
+            data[i * 4 + 1] = 0;
+            data[i * 4 + 2] = 0;
+            data[i * 4 + 3] = 0;
+        }
+        auto dots = core::math::random::poisson_disc::Generate(poisson_disk_size, k, r);
+        for (auto &dot : dots)
+        {
+            if (dot.y > poisson_disk_size.y - 1 || dot.x > poisson_disk_size.x - 1) continue;
+            data[(uint32_t)(dot.y * poisson_disk_size.x + dot.x) * 4 + 0] = 255;
+            data[(uint32_t)(dot.y * poisson_disk_size.x + dot.x) * 4 + 1] = 255;
+            data[(uint32_t)(dot.y * poisson_disk_size.x + dot.x) * 4 + 2] = 255;
+            data[(uint32_t)(dot.y * poisson_disk_size.x + dot.x) * 4 + 3] = 255;
+        }
+        TextureId id = TextureManager::LoadTexture(data.data(), poisson_disk_size.x, poisson_disk_size.y, 4);
+        spdlog::info("poisson disk texture id: {}", id);
+        if (object_editor::selected_scene)
+        {
+            auto *opaque_component = object_editor::selected_scene->registry.try_get<OpaqueComponent>(object_editor::selected_entity);
+            if (opaque_component)
+            {
+                auto *model_instance = Engine::scene()->renderer->opaque_render_system().GetInstancePtr(opaque_component->model_id);
+                if (model_instance)
+                {
+                    for (size_t i = 0; i < model_instance->model.meshes.size(); i++)
+                    {
+                        for (auto &material_instance : model_instance->mesh_instances[i].material_instances)
+                        {
+                            if (auto it = std::ranges::find(material_instance.instances, object_editor::selected_entity); it != material_instance.instances.end())
+                            {
+                                material_instance.material.albedo_map = TextureManager::GetTextureView(id);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+#endif
     ImGui::End();
 
     object_editor::OnGuiRender();
+    object_editor::OnRender(hdr_render_pipeline_->window()->position(), hdr_render_pipeline_->window()->size());
     scene_viewer::OnGuiRender();
 }
 
-struct GizmoOverlay : public Layer, public Layer::HandleRender
-{
-    std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_pipeline;
-    void OnRender() override
-    {
-        object_editor::OnRender(hdr_render_pipeline->window()->position(), hdr_render_pipeline->window()->size());
-    }
-};
 Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_pipeline)
     : hdr_render_pipeline_{ hdr_render_pipeline }
 {
     first_scene = std::make_shared<Scene>();
     first_scene->renderer = std::make_unique<render::Renderer>();
 
-    auto gizmo_overlay = std::make_shared<GizmoOverlay>();
-    gizmo_overlay->hdr_render_pipeline = hdr_render_pipeline_;
-    hdr_render_pipeline_->PushOverlay(gizmo_overlay);
-
     auto &ors = first_scene->renderer->opaque_render_system();
     auto &drs = first_scene->renderer->dissolution_render_system();
+    auto &grs = first_scene->renderer->grass_render_system();
     auto &ers = first_scene->renderer->emissive_render_system();
+    auto &lrs = first_scene->renderer->light_render_system();
     ors.SetBrdfTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/IBL/ibl_brdf_lut.dds"));
     ors.SetIrradianceTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_irradiance.dds"));
     ors.SetPrefilteredTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_reflection.dds"));
     drs.SetBrdfTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/IBL/ibl_brdf_lut.dds"));
     drs.SetIrradianceTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_irradiance.dds"));
     drs.SetPrefilteredTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_reflection.dds"));
+    grs.SetBrdfTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/IBL/ibl_brdf_lut.dds"));
+    grs.SetIrradianceTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_irradiance.dds"));
+    grs.SetPrefilteredTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_reflection.dds"));
     auto &registry = first_scene->registry;
     main_camera_entity = registry.create();
     registry.emplace<CameraComponent>(main_camera_entity, CameraComponent());
@@ -160,6 +207,8 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
         last_created_knight = knight;
         auto &transform = registry.emplace<TransformComponent>(knight);
         uint64_t model_id = ModelLoader::Load("assets\\models\\Knight\\Knight.fbx").value();
+        game_object.name = "Knight";
+#if 0
         if (i % 4 == 1)
         {
             model_id = ModelLoader::Load("assets\\models\\Samurai\\Samurai.fbx").value();
@@ -175,6 +224,7 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
             model_id = ModelLoader::Load("assets\\models\\SunCityWall\\SunCityWall.fbx").value();
             game_object.name = "SunCityWall";
         }
+#endif
         ors.AddInstance(model_id, registry, knight);
         transform.position = vec3
         {
@@ -279,7 +329,7 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
             ors.AddInstance(model_id, registry, cube, { materials[i] });
         }
     }
-    {
+    if (false) {
         entt::entity spheres = registry.create();
         auto &spheres_game_object = registry.emplace<GameObject>(spheres);
         spheres_game_object.name = "Spheres";
@@ -343,7 +393,7 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
     // ------------------------- LIGHTS -------------------------
     entt::entity lights = registry.create();
     auto &lights_game_object = registry.emplace<GameObject>(lights);
-    if (true) {
+    if (false) {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
         auto &game_object = registry.emplace<GameObject>(entity);
@@ -503,6 +553,70 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
         particle_emitter.maximum_amount_of_particles = 300;
         ors.AddInstance(model_id, registry, entity, { white_porcelain });
     }
+    if (true)
+    {
+        auto grass = registry.create();
+        auto &game_object = registry.emplace<GameObject>(grass);
+        game_object.name = "Grass";
+        auto &transform = registry.emplace<TransformComponent>(grass);
+        transform.scale = vec3{ 2.0f, 0.1f, 2.0f };
+        transform.position = vec3{ 0, 0, -12 };
+        transform.UpdateMatrices();
+
+        render::OpaqueMaterial grass_floor_material;
+        grass_floor_material.reset();
+        grass_floor_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/grass_floor/grass_terrain_surface.dds");
+        grass_floor_material.metalness_value = 0.0001f;
+        grass_floor_material.roughness_value = 1.0f;
+        grass_floor_material.UpdateTextureFlags();
+
+        auto model_id = render::ModelSystem::GetUnitCube();
+        ors.AddInstance(model_id, registry, grass, { grass_floor_material });
+
+        render::GrassMaterial grass_material;
+        grass_material.reset();
+        grass_material.albedo_texture = TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/grass/ribbon_grass/Billboard_4K_Albedo.dds");
+        grass_material.ao_texture = TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/grass/ribbon_grass/Billboard_4K_AO.dds");
+        grass_material.bump_texture = TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/grass/ribbon_grass/Billboard_4K_Bump.dds");
+        grass_material.cavity_texture = TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/grass/ribbon_grass/Billboard_4K_Cavity.dds");
+        grass_material.displacement_texture = TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/grass/ribbon_grass/Billboard_4K_Displacement.dds");
+        grass_material.gloss_texture = TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/grass/ribbon_grass/Billboard_4K_Gloss.dds");
+        grass_material.normal_texture = TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/grass/ribbon_grass/Billboard_4K_Normal.dds");
+        grass_material.opacity_texture = TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/grass/ribbon_grass/Billboard_4K_Opacity.dds");
+        grass_material.roughness_texture = TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/grass/ribbon_grass/Billboard_4K_Roughness.dds");
+        grass_material.specular_texture = TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/grass/ribbon_grass/Billboard_4K_Specular.dds");
+        grass_material.translucency_texture = TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/grass/ribbon_grass/Billboard_4K_Translucency.dds");
+        grass_material.UpdateTextureFlags();
+
+        grass_material.wind_vector = { 1.0f, 0.0f, 1.0f };
+        grass_material.wind_amplitude = math::radians(45.0f);
+        grass_material.wind_wavenumber = 2.0f;
+        grass_material.wind_frequency = 1.0f;
+
+        core::math::vec4 texture_size = { 4096, 4096, 4096, 4096 };
+        grass_material.atlas_data = {
+            core::math::vec4{82, 69, 2277, 1736} / texture_size,
+            core::math::vec4{2474, 90, 4017, 1361} / texture_size,
+            core::math::vec4{377, 1810, 1761, 2697} / texture_size,
+            core::math::vec4{2228, 1480, 3894, 2893} / texture_size,
+            core::math::vec4{76, 2746, 2217, 4065} / texture_size,
+            core::math::vec4{2651, 3005, 3774, 4033} / texture_size,
+        };
+        grass_material.planes_count = 2;
+        grass_material.section_count = 4;
+        auto atlas_data_copy = grass_material.atlas_data;
+        auto material_id = grs.AddMaterial(std::move(grass_material));
+
+        auto &grass_component = registry.emplace<GrassComponent>(grass);
+        grass_component.material_id = material_id;
+        grass_component.spawn_range = { 1.8f, 1.8f };
+        grass_component.grass_size_range = { 0.075f, 0.1f };
+        grass_component.initial_offset = { 0.0f, 0.09f, 0.0f };
+
+        grass_component.min_distance = 0.75f;
+        grass_component.max_attempts = 64;
+        grass_component.Initialize(atlas_data_copy);
+    }
     SkyboxManager::LoadSkybox(registry, std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street.dds");
     first_scene->ScheduleOnInstancesUpdate();
     camera_movement::RegisterKeyCallbacks();
@@ -513,6 +627,7 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
     input.AddTickKeyCallback({ Key::KEY_MINUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure -= dt; });
     input.AddTickKeyCallback({ Key::KEY_NUMPAD_MINUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure -= dt; });
     input.AddTickKeyCallback({ Key::KEY_NUMPAD_PLUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure += dt; });
+    lrs.ScheduleShadowMapUpdate();
 }
 void Controller::OnTick([[maybe_unused]] float delta_time)
 {

@@ -1,6 +1,7 @@
 #ifndef GLOBALS_COMMON_HLSLI
 #define GLOBALS_COMMON_HLSLI
 
+#define PI 3.1415926535897932384626433832795
 
 // You can overwrite these macros by defining them before including this file.
 #ifndef MAX_POINT_LIGHTS
@@ -46,6 +47,81 @@ float3 GetCameraForward()
     return g_inv_view[2].xyz;
 }
 
+
+float4x4 rotate_by_x_axis(float4x4 mat, float angle)
+{
+    float4x4 rot = float4x4(1, 0, 0, 0, 
+                    0, cos(angle), -sin(angle), 0, 
+                    0, sin(angle), cos(angle), 0,
+                    0, 0, 0, 1);
+    return mul(mat, rot);
+}
+float4x4 rotate_by_y_axis(float4x4 mat, float angle)
+{
+    float4x4 rot = float4x4(cos(angle), 0, sin(angle), 0, 
+                    0, 1, 0, 0, 
+                    -sin(angle), 0, cos(angle), 0,
+                    0, 0, 0, 1);
+    return mul(mat, rot);
+}
+float4x4 rotate_by_z_axis(float4x4 mat, float angle)
+{
+    float4x4 rot = float4x4(cos(angle), -sin(angle), 0, 0, 
+                    sin(angle), cos(angle), 0, 0, 
+                    0, 0, 1, 0,
+                    0, 0, 0, 1);
+    return mul(mat, rot);
+}
+
+
+float3x3 rotate_by_x_axis(float3x3 mat, float angle)
+{
+    float3x3 rot = float3x3(1, 0, 0, 
+                    0, cos(angle), -sin(angle), 
+                    0, sin(angle), cos(angle));
+    return mul(mat, rot);
+}
+
+float3x3 rotate_by_y_axis(float3x3 mat, float angle)
+{
+    float3x3 rot = float3x3(cos(angle), 0, sin(angle), 
+                    0, 1, 0, 
+                    -sin(angle), 0, cos(angle));
+    return mul(mat, rot);
+}
+
+float3x3 rotate_by_z_axis(float3x3 mat, float angle)
+{
+    float3x3 rot = float3x3(cos(angle), -sin(angle), 0, 
+                    sin(angle), cos(angle), 0, 
+                    0, 0, 1);
+    return mul(mat, rot);
+}
+
+
+
+float3 rotate_by_x_axis(float3 v, float angle)
+{
+    float3x3 mat = float3x3(1, 0, 0,
+                    0, cos(angle), -sin(angle),
+                    0, sin(angle), cos(angle));
+    return mul(v, mat);
+}
+float3 rotate_by_y_axis(float3 v, float angle)
+{
+    float3x3 mat = float3x3(cos(angle), 0, sin(angle),
+                    0, 1, 0,
+                    -sin(angle), 0, cos(angle));
+    return mul(v, mat);
+}
+float3 rotate_by_z_axis(float3 v, float angle)
+{
+    float3x3 mat = float3x3(cos(angle), -sin(angle), 0,
+                    sin(angle), cos(angle), 0,
+                    0, 0, 1);
+    return mul(v, mat);
+}
+
 struct PointLight 
 {
   float3 color;
@@ -73,7 +149,6 @@ struct DirectionalLight
   float solid_angle;
   row_major float4x4 view_projection;
 };
-
 
 
 #endif // GLOBALS_COMMON_HLSLI

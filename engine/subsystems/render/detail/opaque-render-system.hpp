@@ -100,7 +100,7 @@ namespace engine::render::_opaque_detail
     {
         Model &model;
         uint64_t model_id;
-        // Each MeshInstance should correspond the one on                                 the same index in model
+        // Each MeshInstance should correspond the one on the same index in model
         std::vector<MeshInstance> mesh_instances;
     };
     struct OpaquePerFrame
@@ -155,7 +155,7 @@ namespace engine::render::_opaque_detail
     // and store model_id as well
 
     // We will probably need to have the private cache variable in it so we can delete instances of materials that aren't used
-    
+
     // on_destruct / on_update / on_construct should update the instance tree using these materials
     // if hash differs -> update material, update cache, delete previous instance
     // if hash is the same -> do nothing
@@ -164,7 +164,7 @@ namespace engine::render::_opaque_detail
     // Change the system the way that on_destruct / on_construct will set the dirty flag
     // and add data that should be updated so we can update instances right before the frame if needed
 
-    class OpaqueRenderSystem
+    class OpaqueRenderSystem : public RenderPass
     {
     public:
         ModelInstance *GetInstancePtr(uint64_t model_id);
@@ -179,21 +179,27 @@ namespace engine::render::_opaque_detail
         [[nodiscard]] float &ambient_occlusion() { return ambient_occlusion_value_; }
 
         OpaqueRenderSystem();
-        void Render(core::Scene *scene);
-        void RenderDepthOnly(std::vector<OpaquePerDepthCubemap> const &cubemaps);
-        void RenderDepthOnly(std::vector<OpaquePerDepthTexture> const &textures);
+        void OnRender(core::Scene *scene) override;
+        void RenderDepthOnly(std::vector<OpaquePerDepthCubemap> const &cubemaps, core::Scene *scene);
+        void RenderDepthOnly(std::vector<OpaquePerDepthTexture> const &textures, core::Scene *scene);
 
         ModelInstance &GetInstance(uint64_t model_id);
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity);
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, std::vector<OpaqueMaterial> const &materials);
 
-        void OnInstancesUpdated(entt::registry &registry);
+        void Update([[maybe_unused]] core::Scene *scene) {}
+        void ScheduleOnInstancesUpdate()
+        {
+            should_update_instances_ = true;
+        }
     private:
+        void OnInstancesUpdated(entt::registry &registry);
+
         // TODO:
         void on_attach(entt::registry &, entt::entity) {}
         void on_destroy(entt::registry &, entt::entity) {}
-        
-        
+
+        bool should_update_instances_ = false;
 
         std::vector<ModelInstance> model_instances_;
 

@@ -165,6 +165,9 @@ namespace engine::core
         utils::Measurer<std::chrono::high_resolution_clock> tick_measurer{ "Engine::Tick()", false };
 #endif
 
+        [[nodiscard]] static inline std::random_device &random_device() { return application_->random_device_; }
+        [[nodiscard]] static inline std::mt19937 &random_engine() { return application_->random_engine_; }
+
     private:
         /**
          * @brief Initializes the engine
@@ -199,6 +202,8 @@ namespace engine::core
         Engine(Engine const &) = delete;
         Engine &operator=(Engine &&) = delete;
         Engine &operator=(Engine const &) = delete;
+        std::random_device random_device_;
+        std::mt19937 random_engine_;
 
         std::shared_ptr<Scene> scene_ = nullptr;
 
