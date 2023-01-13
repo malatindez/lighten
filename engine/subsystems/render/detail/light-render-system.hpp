@@ -20,11 +20,38 @@ namespace engine
             struct OpaquePerDepthCubemap;
             struct OpaquePerDepthTexture;
         }
+
+        struct LightsPerFrame
+        {
+            static constexpr uint32_t kMaxPointLights = 32;
+            static constexpr uint32_t kMaxSpotLights = 32;
+            static constexpr uint32_t kMaxDirectionalLights = 4;
+
+            std::array<GPUShadowPointLight, kMaxPointLights> shadow_point_lights;
+            std::array<GPUShadowSpotLight, kMaxSpotLights> shadow_spot_lights;
+            std::array<GPUShadowDirectionalLight, kMaxDirectionalLights> shadow_directional_lights;
+            std::array<GPUPointLight, kMaxPointLights> point_lights;
+            std::array<GPUSpotLight, kMaxSpotLights> spot_lights;
+            std::array<GPUDirectionalLight, kMaxDirectionalLights> directional_lights;
+            uint32_t shadow_num_point_lights;
+            uint32_t shadow_num_spot_lights;
+            uint32_t shadow_num_directional_lights;
+
+            uint32_t num_point_lights;
+            uint32_t num_spot_lights;
+            uint32_t num_directional_lights;
+
+            uint32_t point_light_shadow_resolution;
+            uint32_t spot_light_shadow_resolution;
+            uint32_t directional_light_shadow_resolution;
+
+            core::math::vec3 g_lights_per_frame_padding_0;
+        };
     }
 }
 namespace engine::render::_light_detail
 {
-    class LightRenderSystem : public RenderPass
+    class LightRenderSystem final : public RenderPass
     {
     public:
         void ResizeShadowMaps(uint32_t resolution) { resolution_ = resolution; }
@@ -42,7 +69,24 @@ namespace engine::render::_light_detail
         [[nodiscard]] auto const &point_light_shadow_maps() const noexcept { return point_light_shadow_maps_; }
         [[nodiscard]] auto const &spot_light_shadow_maps() const noexcept { return spot_light_shadow_maps_; }
         [[nodiscard]] auto const &directional_light_shadow_maps() const noexcept { return directional_light_shadow_maps_; }
-
+        [[nodiscard]] int32_t get_point_light_index(entt::entity entity) const noexcept {
+            if (point_light_shadow_map_indices_.contains(entity)) {
+                return point_light_shadow_map_indices_.at(entity);
+            }
+            return -1;
+        }
+        [[nodiscard]] int32_t get_spot_light_index(entt::entity entity) const noexcept {
+            if (spot_light_shadow_map_indices_.contains(entity)) {
+                return spot_light_shadow_map_indices_.at(entity);
+            }
+            return -1;
+        }
+        [[nodiscard]] int32_t get_directional_light_index(entt::entity entity) const noexcept {
+            if (directional_light_shadow_map_indices_.contains(entity)) {
+                return directional_light_shadow_map_indices_.at(entity);
+            }
+            return -1;
+        }
         void BindPointShadowMaps(int slot) { point_light_shadow_maps_.BindShaderResource(slot); }
         void BindSpotShadowMaps(int slot) { spot_light_shadow_maps_.BindShaderResource(slot); }
         void BindDirectionalShadowMaps(int slot) { directional_light_shadow_maps_.BindShaderResource(slot); }
@@ -53,21 +97,21 @@ namespace engine::render::_light_detail
         LightRenderSystem &operator=(LightRenderSystem const &) = delete;
         LightRenderSystem &operator=(LightRenderSystem &&) = delete;
 
-        void OnRender(core::Scene *scene) override;
+        void OnRender(core::Scene *scene);
         void Update([[maybe_unused]] core::Scene *scene) {}
         // Will update shadow maps if the last update was more than shadow_map_update_interval_ seconds ago
         void ScheduleShadowMapUpdate()
         {
             should_update = true;
         }
-        void ScheduleOnInstancesUpdate()
+        void ScheduleInstanceUpdate()
         {
-            should_update_instances_ = true;
+            is_instance_update_scheduled_ = true;
         }
 
     private:
-        void OnInstancesUpdated(core::Scene *scene);
-        bool should_update_instances_ = false;
+        void UpdateInstances(core::Scene *scene);
+        bool is_instance_update_scheduled_ = false;
 
         bool should_update = false;
         bool refresh_data = false;
@@ -90,7 +134,12 @@ namespace engine::render::_light_detail
         std::unordered_map<entt::entity, std::array<core::math::mat4, 6>> point_light_shadow_matrices_;
         std::unordered_map<entt::entity, core::math::mat4> spot_light_shadow_matrices_;
         std::unordered_map<entt::entity, core::math::mat4> directional_light_shadow_matrices_;
+        std::unordered_map<entt::entity, uint32_t> point_light_shadow_map_indices_;
+        std::unordered_map<entt::entity, uint32_t> spot_light_shadow_map_indices_;
+        std::unordered_map<entt::entity, uint32_t> directional_light_shadow_map_indices_;
         GraphicsShaderProgram shadowmap_shader_;
-        uint32_t resolution_ = 1024;
+        LightsPerFrame per_frame;
+        direct3d::DynamicUniformBuffer<LightsPerFrame> lights_per_frame_;
+        uint32_t resolution_ = 2048;
     };
 } // namespace engine::render::_light_detail

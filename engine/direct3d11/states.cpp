@@ -71,6 +71,8 @@ namespace engine::direct3d
 
         raster_desc = CreateRasterizerState(D3D11_CULL_BACK, D3D11_FILL_SOLID);
         AlwaysAssert(api().device->CreateRasterizerState(&raster_desc, &cull_back.reset()), "Failed to create cull back rasterizer state");
+        raster_desc = CreateRasterizerState(D3D11_CULL_FRONT, D3D11_FILL_SOLID);
+        AlwaysAssert(api().device->CreateRasterizerState(&raster_desc, &cull_front.reset()), "Failed to create cull front rasterizer state");
 
         D3D11_DEPTH_STENCIL_DESC ds_desc = CreateDepthState(true, true);
         AlwaysAssert(api().device->CreateDepthStencilState(&ds_desc, &geq_depth.reset()), "Failed to create depth state");
@@ -78,6 +80,19 @@ namespace engine::direct3d
         AlwaysAssert(api().device->CreateDepthStencilState(&ds_desc, &geq_depth_no_write.reset()), "Failed to create depth state");
         ds_desc = CreateDepthState(false, false);
         AlwaysAssert(api().device->CreateDepthStencilState(&ds_desc, &no_depth_no_write.reset()), "Failed to create depth state");
+        ds_desc = CreateDepthState(true, true);
+        ds_desc.DepthFunc = D3D11_COMPARISON_ALWAYS;
+        AlwaysAssert(api().device->CreateDepthStencilState(&ds_desc, &no_depth_write.reset()), "Failed to create depth state");
+        ds_desc = D3D11_DEPTH_STENCIL_DESC{};
+        ds_desc.StencilEnable = true;
+        ds_desc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
+        ds_desc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
+        ds_desc.FrontFace.StencilFunc = D3D11_COMPARISON_EQUAL;
+        ds_desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+        ds_desc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+        ds_desc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+        ds_desc.BackFace = ds_desc.FrontFace;
+        AlwaysAssert(api().device->CreateDepthStencilState(&ds_desc, &stencil_test.reset()), "Failed to create depth state");
 
         D3D11_SAMPLER_DESC sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_WRAP);
         AlwaysAssert(api().device5->CreateSamplerState(&sampler_desc, &point_wrap_sampler.reset()), "Failed to create sampler state");
@@ -126,7 +141,19 @@ namespace engine::direct3d
         blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
         blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-        AlwaysAssert(api().device->CreateBlendState(&blend_desc, &additive_blend_state.reset()), "Failed to create additive blend state");
+        AlwaysAssert(api().device->CreateBlendState(&blend_desc, &additive_blend_state_alpha.reset()), "Failed to create additive blend state");
+
+        ZeroMemory(&blend_desc, sizeof(blend_desc));
+        blend_desc.RenderTarget[0].BlendEnable = true;
+        blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+        blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+        blend_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+        blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+        blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+        blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+        blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+        AlwaysAssert(api().device->CreateBlendState(&blend_desc, &additive_blend_state_no_alpha.reset()), "Failed to create additive blend state");
 
         ZeroMemory(&blend_desc, sizeof(blend_desc));
         blend_desc.AlphaToCoverageEnable = true;

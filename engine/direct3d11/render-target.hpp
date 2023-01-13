@@ -42,10 +42,21 @@ namespace engine::direct3d
     class RenderTarget : public RenderTargetBase
     {
     public:
-        RenderTarget(DXGI_FORMAT format, uint32_t sample_count = 1) : RenderTargetBase(format), sample_count(sample_count) {}
+        RenderTarget(DXGI_FORMAT format) : RenderTargetBase(format) {}
         void init();
         void deinit() noexcept;
         static RenderTarget empty() noexcept { return RenderTarget(DXGI_FORMAT_UNKNOWN); }
+        void ForceSizeResources(core::math::ivec2 const &size);
+        void SizeResources(core::math::ivec2 const &size) override;
+    };
+
+    class RenderTargetMS : public RenderTargetBase
+    {
+    public:
+        RenderTargetMS(DXGI_FORMAT format, uint32_t sample_count = 1) : RenderTargetBase(format), sample_count(sample_count) {}
+        void init();
+        void deinit() noexcept;
+        static RenderTargetMS empty() noexcept { return RenderTargetMS(DXGI_FORMAT_UNKNOWN); }
         void ForceSizeResources(core::math::ivec2 const &size);
         void SizeResources(core::math::ivec2 const &size) override;
         uint32_t sample_count = 1;

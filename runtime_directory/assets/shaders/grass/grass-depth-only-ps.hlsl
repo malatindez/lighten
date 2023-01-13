@@ -1,6 +1,5 @@
 #include "../common/helpers.hlsli"
 #include "../globals/globals-ps.hlsli"
-#include "../globals/pbr-helpers.hlsli"
 cbuffer GrassPerMaterial : register(b2)
 {
     float3 g_albedo_color;
@@ -42,7 +41,6 @@ float ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
 	if(g_opacity.Sample(g_bilinear_clamp_sampler, input.uv).r <= 0.0f)
 	{
 		discard;
-		return 0.0f;
     }
     return input.posVS.z;
 }

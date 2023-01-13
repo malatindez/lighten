@@ -30,11 +30,11 @@ namespace engine::render::_emissive_detail
     }
     void EmissiveRenderSystem::OnRender(core::Scene *scene)
     {
-        if (should_update_instances_)
+        if (is_instance_update_scheduled_)
         {
-            OnInstancesUpdated(scene->registry);
+            UpdateInstances(scene->registry);
             scene->renderer->light_render_system().ScheduleShadowMapUpdate();
-            should_update_instances_ = false;
+            is_instance_update_scheduled_ = false;
         }
         if (instance_buffer_.size() == 0)
             return;
@@ -47,7 +47,7 @@ namespace engine::render::_emissive_detail
         direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth, 0);
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 
-        emissive_shader_buffer_.Bind(direct3d::ShaderType::VertexShader, 1);
+        emissive_shader_buffer_.Bind(direct3d::ShaderType::VertexShader, 2);
 
         instance_buffer_.Bind(1);
         EmissiveShaderBuffer buffer;
@@ -82,7 +82,7 @@ namespace engine::render::_emissive_detail
         }
         emissive_shader_.Unbind();
     }
-    void EmissiveRenderSystem::OnInstancesUpdated(entt::registry &registry)
+    void EmissiveRenderSystem::UpdateInstances(entt::registry &registry)
     {
         uint32_t total_instances = 0;
         for (auto &model_instance : model_instances_)

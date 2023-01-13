@@ -1,5 +1,5 @@
 #include "../globals/globals-vs.hlsli"
-cbuffer SkyboxBuffer : register(b1)
+cbuffer SkyboxBuffer : register(b2)
 {
   float3 g_bl;
   float padding0;

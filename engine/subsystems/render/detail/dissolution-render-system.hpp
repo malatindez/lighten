@@ -48,15 +48,18 @@ namespace engine::render
         ID3D11ShaderResourceView *normal_map = nullptr;
         ID3D11ShaderResourceView *metalness_map = nullptr;
         ID3D11ShaderResourceView *roughness_map = nullptr;
+        ID3D11ShaderResourceView *opacity_map = nullptr;
         core::math::vec3 albedo_color;
         float metalness_value;
         float roughness_value;
         uint32_t texture_flags;
         bool reverse_normal_y = false;
+        bool twosided = false;
         core::math::vec2 uv_multiplier{ 1 };
 
         void UpdateTextureFlags();
         DissolutionMaterial() = default;
+        void BindTextures() const;
         void Bind(direct3d::DynamicUniformBuffer<_dissolution_detail::DissolutionPerMaterial> &uniform_buffer) const;
         explicit DissolutionMaterial(Material const &material);
         void reset()
@@ -65,6 +68,7 @@ namespace engine::render
             normal_map = nullptr;
             metalness_map = nullptr;
             roughness_map = nullptr;
+            opacity_map = nullptr;
             albedo_color = core::math::vec3{ 0.0f };
             metalness_value = 0.01f;
             roughness_value = 0.01f;
@@ -112,12 +116,8 @@ namespace engine::render::_dissolution_detail
         float time_begin;
         float lifetime;
     };
-    using DissolutionPerFrame = _opaque_detail::OpaquePerFrame;
     using DissolutionPerDepthCubemap = _opaque_detail::OpaquePerDepthCubemap;
     using DissolutionPerDepthTexture = _opaque_detail::OpaquePerDepthTexture;
-    using _opaque_detail::kOpaqueShaderMaxPointLights;
-    using _opaque_detail::kOpaqueShaderMaxSpotLights;
-    using _opaque_detail::kOpaqueShaderMaxDirectionalLights;
 
     struct MaterialInstance
     {
@@ -150,24 +150,16 @@ namespace engine::render::_dissolution_detail
     auto constexpr dissolution_vs_depth_only_shader_path = "assets/shaders/dissolution/dissolution-depth-only-vs.hlsl";
     auto constexpr dissolution_gs_depth_only_cubemap_shader_path = "assets/shaders/dissolution/dissolution-depth-only-cubemap-gs.hlsl";
     auto constexpr dissolution_gs_depth_only_texture_shader_path = "assets/shaders/dissolution/dissolution-depth-only-texture-gs.hlsl";
+    auto constexpr dissolution_ps_depth_only_shader_path = "assets/shaders/dissolution/dissolution-depth-only-ps.hlsl";
 
-    class DissolutionRenderSystem : public RenderPass
+    class DissolutionRenderSystem final : public RenderPass
     {
     public:
         ModelInstance *GetInstancePtr(uint64_t model_id);
-        void SetIrradianceTexture(ID3D11ShaderResourceView *texture) { irradiance_texture_ = texture; }
-        void SetPrefilteredTexture(ID3D11ShaderResourceView *texture) { prefiltered_texture_ = texture; }
-        void SetBrdfTexture(ID3D11ShaderResourceView *texture) { brdf_texture_ = texture; }
-        void SetAmbientOcclusionValue(float value) { ambient_occlusion_value_ = value; }
-        [[nodiscard]] ID3D11ShaderResourceView *GetIrradianceTexture() const { return irradiance_texture_; }
-        [[nodiscard]] ID3D11ShaderResourceView *GetPrefilteredTexture() const { return prefiltered_texture_; }
-        [[nodiscard]] ID3D11ShaderResourceView *GetBrdfTexture() const { return brdf_texture_; }
-        [[nodiscard]] float const &ambient_occlusion() const { return ambient_occlusion_value_; }
-        [[nodiscard]] float &ambient_occlusion() { return ambient_occlusion_value_; }
         [[nodiscard]] auto &update_time() const { return update_time_; }
         [[nodiscard]] auto &update_time() { return update_time_; }
         DissolutionRenderSystem();
-        void OnRender(core::Scene *scene) override;
+        void OnRender(core::Scene *scene);
         void RenderDepthOnly(std::vector<DissolutionPerDepthCubemap> const &cubemaps, core::Scene *scene);
         void RenderDepthOnly(std::vector<DissolutionPerDepthTexture> const &textures, core::Scene *scene);
 
@@ -176,12 +168,12 @@ namespace engine::render::_dissolution_detail
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, std::vector<DissolutionMaterial> const &materials, float lifetime);
 
         void Update([[maybe_unused]] core::Scene *scene);
-        void ScheduleOnInstancesUpdate()
+        void ScheduleInstanceUpdate()
         {
-            should_update_instances_ = true;
+            is_instance_update_scheduled_ = true;
         }
     private:
-        void OnInstancesUpdated(core::Scene *scene);
+        void UpdateInstances(core::Scene *scene);
 
         void TransitInstances(core::Scene *scene);
 
@@ -193,7 +185,7 @@ namespace engine::render::_dissolution_detail
         void on_destroy(entt::registry &, entt::entity) {}
         void on_update(entt::registry &, entt::entity) {}
 
-        bool should_update_instances_ = false;
+        bool is_instance_update_scheduled_ = false;
 
         std::vector<ModelInstance> model_instances_;
 
@@ -203,14 +195,9 @@ namespace engine::render::_dissolution_detail
         direct3d::DynamicUniformBuffer<DissolutionPerDepthTexture> dissolution_per_texture_buffer_;
 
         GraphicsShaderProgram dissolution_shader_;
-        direct3d::DynamicUniformBuffer<DissolutionPerFrame> dissolution_per_frame_buffer_;
         direct3d::DynamicUniformBuffer<DissolutionPerMaterial> dissolution_per_material_buffer_;
         direct3d::DynamicUniformBuffer<core::math::mat4> mesh_to_model_buffer_;
         direct3d::DynamicVertexBuffer<DissolutionInstance> instance_buffer_;
-        ID3D11ShaderResourceView *irradiance_texture_;
-        ID3D11ShaderResourceView *prefiltered_texture_;
-        ID3D11ShaderResourceView *brdf_texture_;
         ID3D11ShaderResourceView *noise_texture_;
-        float ambient_occlusion_value_ = 1.0f;
     };
 } // namespace engine::render::_dissolution_detail

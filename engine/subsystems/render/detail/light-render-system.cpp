@@ -5,7 +5,7 @@
 namespace engine::render::_light_detail
 {
     using namespace core::math;
-    void LightRenderSystem::OnInstancesUpdated(core::Scene *scene)
+    void LightRenderSystem::UpdateInstances(core::Scene *scene)
     {
         auto &registry = scene->registry;
         std::vector<entt::entity> point_light_entities;
@@ -67,6 +67,9 @@ namespace engine::render::_light_detail
         uint32_t i = 0;
         for (auto const &entity : point_light_entities_)
         {
+            auto const &point_light = registry.get<components::PointLight>(entity);
+            if (point_light.casts_shadows == false)
+                continue;
             auto const &transform = registry.get<components::TransformComponent>(entity);
             _opaque_detail::OpaquePerDepthCubemap cubemap;
             auto &g_view_projection = cubemap.g_view_projection;
@@ -98,8 +101,10 @@ namespace engine::render::_light_detail
         uint32_t i = 0;
         for (auto const &entity : spot_light_entities_)
         {
-            auto const &transform = registry.get<components::TransformComponent>(entity);
             auto const &spot_light = registry.get<components::SpotLight>(entity);
+            if (spot_light.casts_shadows == false)
+                continue;
+            auto const &transform = registry.get<components::TransformComponent>(entity);
             _opaque_detail::OpaquePerDepthTexture texture;
             vec3 forward = normalize(transform.rotation * core::math::vec3{ 0, 0, -1 });
             vec3 up = normalize(transform.rotation * core::math::vec3{ 0, 1, 0 });
@@ -125,6 +130,9 @@ namespace engine::render::_light_detail
         uint32_t i = 0;
         for (auto const &entity : directional_light_entities_)
         {
+            auto const &directional_light = registry.get<components::DirectionalLight>(entity);
+            if (directional_light.casts_shadows == false)
+                continue;
             auto const &transform = registry.get<components::TransformComponent>(entity);
             _opaque_detail::OpaquePerDepthTexture texture;
             vec3 forward = normalize(transform.rotation * core::math::vec3{ 0, 1, 0 });
@@ -145,11 +153,12 @@ namespace engine::render::_light_detail
     }
     void LightRenderSystem::OnRender(core::Scene *scene)
     {
-        if (should_update_instances_)
+        if (is_instance_update_scheduled_)
         {
-            OnInstancesUpdated(scene);
-            should_update_instances_ = false;
+            UpdateInstances(scene);
+            is_instance_update_scheduled_ = false;
         }
+        bool should_return = false;
         if (should_update && shadow_map_update_timer_.elapsed() > shadow_map_update_interval_)
         {
             shadow_map_update_timer_.reset();
@@ -157,42 +166,195 @@ namespace engine::render::_light_detail
         }
         else
         {
-            return;
+            should_return = true;
         }
 
         if (refresh_data)
         {
+            auto &registry = scene->registry;
             point_light_entities_ = std::move(point_light_entities_temp_);
             spot_light_entities_ = std::move(spot_light_entities_temp_);
             directional_light_entities_ = std::move(directional_light_entities_temp_);
+            uint32_t point_shadow_lights = 0;
+            uint32_t spot_shadow_lights = 0;
+            uint32_t directional_shadow_lights = 0;
+            // for some reason returns 1 less than it should
+            // TODO (look into it):
+            //std::accumulate(point_light_entities_.begin(), point_light_entities_.end(), 0u,
+            //                                         [&registry] (uint32_t value, entt::entity const &entity)
+            //                                        {
+            //                                           return value + registry.get<components::PointLight>(entity).casts_shadows ? 1u : 0u;
+            //                                      });
+            for (auto &entity : point_light_entities_)
+            {
+                point_shadow_lights += registry.get<components::PointLight>(entity).casts_shadows ? 1u : 0u;
+            }
+            for (auto &entity : spot_light_entities_)
+            {
+                spot_shadow_lights += registry.get<components::SpotLight>(entity).casts_shadows ? 1u : 0u;
+            }
+            for (auto &entity : directional_light_entities_)
+            {
+                directional_shadow_lights += registry.get<components::DirectionalLight>(entity).casts_shadows ? 1u : 0u;
+            }
 
-            point_light_shadow_maps_.Resize(resolution_, static_cast<uint32_t>(point_light_entities_.size()), true);
-            spot_light_shadow_maps_.Resize(resolution_, static_cast<uint32_t>(spot_light_entities_.size()), false);
-            directional_light_shadow_maps_.Resize(resolution_, static_cast<uint32_t>(directional_light_entities_.size()), false);
+            point_light_shadow_maps_.Resize(resolution_, point_shadow_lights, true);
+            spot_light_shadow_maps_.Resize(resolution_, spot_shadow_lights, false);
+            directional_light_shadow_maps_.Resize(resolution_, directional_shadow_lights, false);
             refresh_data = false;
         }
+        if (!should_return)
+        {
+            D3D11_VIEWPORT viewport;
+            viewport.TopLeftX = 0;
+            viewport.TopLeftY = 0;
+            viewport.Width = static_cast<float>(resolution_);
+            viewport.Height = static_cast<float>(resolution_);
+            viewport.MinDepth = 0.0f;
+            viewport.MaxDepth = 1.0f;
+            UINT viewport_count = 1;
+            D3D11_VIEWPORT saved_viewport;
+            direct3d::api().devcon4->RSGetViewports(&viewport_count, &saved_viewport);
 
-        D3D11_VIEWPORT viewport;
-        viewport.TopLeftX = 0;
-        viewport.TopLeftY = 0;
-        viewport.Width = static_cast<float>(resolution_);
-        viewport.Height = static_cast<float>(resolution_);
-        viewport.MinDepth = 0.0f;
-        viewport.MaxDepth = 1.0f;
-        ID3D11RenderTargetView *render_target = nullptr;
-        ID3D11DepthStencilView *depth_target = nullptr;
-        direct3d::api().devcon4->OMGetRenderTargets(1, &render_target, &depth_target);
-        UINT viewport_count = 1;
-        D3D11_VIEWPORT saved_viewport;
-        direct3d::api().devcon4->RSGetViewports(&viewport_count, &saved_viewport);
-
-        direct3d::api().devcon4->RSSetViewports(1, &viewport);
-        direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth, 0);
-        direct3d::api().devcon4->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        ProcessPointLights(scene);
-        ProcessSpotLights(scene);
-        ProcessDirectionalLights(scene);
-        direct3d::api().devcon4->RSSetViewports(viewport_count, &saved_viewport);
-        direct3d::api().devcon4->OMSetRenderTargets(1, &render_target, depth_target);
+            direct3d::api().devcon4->RSSetViewports(viewport_count, &viewport);
+            direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth, 0);
+            direct3d::api().devcon4->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+            ProcessPointLights(scene);
+            ProcessSpotLights(scene);
+            ProcessDirectionalLights(scene);
+            direct3d::api().devcon4->RSSetViewports(viewport_count, &saved_viewport);
+        }
+        auto &registry = scene->registry;
+        {
+            auto const &point_lights = point_light_entities();
+            auto const &spot_lights = spot_light_entities();
+            auto const &directional_lights = directional_light_entities();
+            auto const &point_light_matrices = point_light_shadow_matrices();
+            auto const &spot_light_matrices = spot_light_shadow_matrices();
+            auto const &directional_light_matrices = directional_light_shadow_matrices();
+            per_frame.num_point_lights = per_frame.num_spot_lights = per_frame.num_directional_lights = 0;
+            per_frame.shadow_num_point_lights = per_frame.shadow_num_spot_lights = per_frame.shadow_num_directional_lights = 0;
+            point_light_shadow_map_indices_.clear();
+            spot_light_shadow_map_indices_.clear();
+            directional_light_shadow_map_indices_.clear();
+            for (entt::entity entity : point_lights)
+            {
+                auto &registry_point_light = registry.get<components::PointLight>(entity);
+                auto &registry_transform = registry.get<components::TransformComponent>(entity);
+                if (registry_point_light.casts_shadows == false)
+                {
+                    auto &opaque_point_light = per_frame.point_lights[per_frame.num_point_lights];
+                    opaque_point_light.color = registry_point_light.color * registry_point_light.power;
+                    opaque_point_light.position = registry_transform.position;
+                    opaque_point_light.radius = length(registry_transform.scale) / sqrt(3.1f);
+                    if (++per_frame.num_point_lights >= LightsPerFrame::kMaxPointLights)
+                    {
+                        utils::AlwaysAssert(false, "Amount of point lights on the scene went beyond the maximum amount.");
+                        break;
+                    }
+                }
+                else
+                {
+                    if (!point_light_matrices.contains(entity))
+                    {
+                        continue;
+                    }
+                    auto &opaque_point_light = per_frame.shadow_point_lights[per_frame.shadow_num_point_lights];
+                    opaque_point_light.color = registry_point_light.color * registry_point_light.power;
+                    opaque_point_light.position = registry_transform.position;
+                    opaque_point_light.radius = length(registry_transform.scale) / sqrt(3.1f);
+                    opaque_point_light.view_projection = point_light_matrices.at(entity);
+                    point_light_shadow_map_indices_[entity] = per_frame.shadow_num_point_lights;
+                    if (++per_frame.shadow_num_point_lights >= LightsPerFrame::kMaxPointLights)
+                    {
+                        utils::AlwaysAssert(false, "Amount of point lights on the scene went beyond the maximum amount.");
+                        break;
+                    }
+                }
+            }
+            for (entt::entity entity : spot_lights)
+            {
+                auto &registry_spot_light = registry.get<components::SpotLight>(entity);
+                auto &registry_transform = registry.get<components::TransformComponent>(entity);
+                if (registry_spot_light.casts_shadows == false)
+                {
+                    auto &opaque_spot_light = per_frame.spot_lights[per_frame.num_spot_lights];
+                    opaque_spot_light.color = registry_spot_light.color * registry_spot_light.power;
+                    opaque_spot_light.position = registry_transform.position;
+                    opaque_spot_light.direction = registry_transform.rotation * core::math::vec3(0, 0, 1);
+                    opaque_spot_light.radius = length(registry_transform.scale) / sqrt(3.1f);
+                    opaque_spot_light.inner_cutoff = registry_spot_light.inner_cutoff;
+                    opaque_spot_light.outer_cutoff = registry_spot_light.outer_cutoff;
+                    if (++per_frame.num_spot_lights >= LightsPerFrame::kMaxSpotLights)
+                    {
+                        utils::AlwaysAssert(false, "Amount of spot lights on the scene went beyond the maximum amount.");
+                        break;
+                    }
+                }
+                else
+                {
+                    if (!spot_light_matrices.contains(entity))
+                    {
+                        continue;
+                    }
+                    auto &opaque_spot_light = per_frame.shadow_spot_lights[per_frame.shadow_num_spot_lights];
+                    opaque_spot_light.color = registry_spot_light.color * registry_spot_light.power;
+                    opaque_spot_light.position = registry_transform.position;
+                    opaque_spot_light.direction = registry_transform.rotation * core::math::vec3(0, 0, 1);
+                    opaque_spot_light.radius = length(registry_transform.scale) / sqrt(3.1f);
+                    opaque_spot_light.inner_cutoff = registry_spot_light.inner_cutoff;
+                    opaque_spot_light.outer_cutoff = registry_spot_light.outer_cutoff;
+                    opaque_spot_light.view_projection = spot_light_matrices.at(entity);
+                    spot_light_shadow_map_indices_[entity] = per_frame.shadow_num_spot_lights;
+                    if (++per_frame.shadow_num_spot_lights >= LightsPerFrame::kMaxSpotLights)
+                    {
+                        utils::AlwaysAssert(false, "Amount of spot lights on the scene went beyond the maximum amount.");
+                        break;
+                    }
+                }
+            }
+            for (entt::entity entity : directional_lights)
+            {
+                auto &registry_directional_light = registry.get<components::DirectionalLight>(entity);
+                auto &registry_transform = registry.get<components::TransformComponent>(entity);
+                if (registry_directional_light.casts_shadows == false)
+                {
+                    auto &opaque_directional_light = per_frame.directional_lights[per_frame.num_directional_lights];
+                    opaque_directional_light.color = registry_directional_light.color * registry_directional_light.power;
+                    opaque_directional_light.direction = core::math::normalize(registry_transform.rotation * core::math::vec3{ 0, 1, 0 });
+                    opaque_directional_light.solid_angle = registry_directional_light.solid_angle;
+                    if (++per_frame.num_directional_lights >= LightsPerFrame::kMaxDirectionalLights)
+                    {
+                        utils::AlwaysAssert(false, "Amount of directional lights on the scene went beyond the maximum amount.");
+                        break;
+                    }
+                }
+                else
+                {
+                    if (!directional_light_matrices.contains(entity))
+                    {
+                        continue;
+                    }
+                    auto &opaque_directional_light = per_frame.shadow_directional_lights[per_frame.shadow_num_directional_lights];
+                    opaque_directional_light.color = registry_directional_light.color * registry_directional_light.power;
+                    opaque_directional_light.direction = core::math::normalize(registry_transform.rotation * core::math::vec3{ 0, 1, 0 });
+                    opaque_directional_light.solid_angle = registry_directional_light.solid_angle;
+                    opaque_directional_light.view_projection = directional_light_matrices.at(entity);
+                    directional_light_shadow_map_indices_[entity] = per_frame.shadow_num_directional_lights;
+                    if (++per_frame.shadow_num_directional_lights >= LightsPerFrame::kMaxDirectionalLights)
+                    {
+                        utils::AlwaysAssert(false, "Amount of directional lights on the scene went beyond the maximum amount.");
+                        break;
+                    }
+                }
+            }
+        }
+        per_frame.point_light_shadow_resolution = point_light_shadow_resolution();
+        per_frame.spot_light_shadow_resolution = spot_light_shadow_resolution();
+        per_frame.directional_light_shadow_resolution = directional_light_shadow_resolution();
+        lights_per_frame_.Update(per_frame);
+        lights_per_frame_.Bind(direct3d::ShaderType::VertexShader, 1);
+        lights_per_frame_.Bind(direct3d::ShaderType::GeometryShader, 1);
+        lights_per_frame_.Bind(direct3d::ShaderType::PixelShader, 1);
     }
 }

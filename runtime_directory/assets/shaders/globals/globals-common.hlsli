@@ -14,6 +14,58 @@
 #define MAX_DIRECTIONAL_LIGHTS 4u
 #endif
 
+struct ShadowPointLight 
+{
+  float3 color;
+  float padding;
+  float3 position;
+  float radius;
+  row_major float4x4 view_projection[6];
+};
+struct ShadowSpotLight 
+{
+  float3 color;
+  float radius;
+  float3 cone_direction;
+  float inner_cutoff;
+  float3 position;
+  float outer_cutoff;
+  row_major float4x4 view_projection;
+};
+
+struct ShadowDirectionalLight 
+{
+  float3 color;
+  float padding;
+  float3 direction;
+  float solid_angle;
+  row_major float4x4 view_projection;
+};
+
+struct PointLight 
+{
+  float3 color;
+  float padding;
+  float3 position;
+  float radius;
+};
+struct SpotLight 
+{
+  float3 color;
+  float radius;
+  float3 cone_direction;
+  float inner_cutoff;
+  float3 position;
+  float outer_cutoff;
+};
+
+struct DirectionalLight 
+{
+  float3 color;
+  float padding;
+  float3 direction;
+  float solid_angle;
+};
 
 cbuffer PerFrame : register(b0)
 {
@@ -26,10 +78,36 @@ cbuffer PerFrame : register(b0)
 	float2 g_screen_resolution;
 	float2 g_mouse_position;
 	float g_time_now;
-  float g_time_since_last_frame;
-  uint g_sample_count;
+    float g_time_since_last_frame;
+    uint g_sample_count;
 	float g_per_frame_padding_0;
 }
+
+cbuffer LightsPerFrame : register(b1)
+{
+    ShadowPointLight g_shadow_point_lights[MAX_POINT_LIGHTS];
+    ShadowSpotLight g_shadow_spot_lights[MAX_SPOT_LIGHTS];
+    ShadowDirectionalLight g_shadow_directional_lights[MAX_DIRECTIONAL_LIGHTS];
+
+    PointLight g_point_lights[MAX_POINT_LIGHTS];
+    SpotLight g_spot_lights[MAX_SPOT_LIGHTS];
+    DirectionalLight g_directional_lights[MAX_DIRECTIONAL_LIGHTS];
+    
+    uint g_shadow_num_point_lights;
+    uint g_shadow_num_spot_lights;
+    uint g_shadow_num_directional_lights;
+    
+    uint g_num_point_lights;
+    uint g_num_spot_lights;
+    uint g_num_directional_lights;
+
+    uint g_point_light_shadow_resolution;
+    uint g_spot_light_shadow_resolution;
+    uint g_directional_light_shadow_resolution;
+
+    float3 g_lights_per_frame_padding_0;
+}
+
 float3 GetCameraPosition()
 {
     return g_inv_view[3].xyz;
@@ -121,34 +199,24 @@ float3 rotate_by_z_axis(float3 v, float angle)
                     0, 0, 1);
     return mul(v, mat);
 }
+float2 nonZeroSign(float2 v)
+{
+	return float2(v.x >= 0.0 ? 1.0 : -1.0, v.y >= 0.0 ? 1.0 : -1.0);
+}
 
-struct PointLight 
+float2 packOctahedron(float3 v)
 {
-  float3 color;
-  float padding;
-  float3 position;
-  float radius;
-  row_major float4x4 view_projection[6];
-};
-struct SpotLight 
-{
-  float3 color;
-  float radius;
-  float3 cone_direction;
-  float inner_cutoff;
-  float3 position;
-  float outer_cutoff;
-  row_major float4x4 view_projection;
-};
+	float2 p = v.xy / (abs(v.x) + abs(v.y) + abs(v.z));
+	return v.z <= 0.0 ? (float2(1.0f, 1.0f) - abs(p.yx)) * nonZeroSign(p) : p;
+}
 
-struct DirectionalLight 
+float3 unpackOctahedron(float2 oct)
 {
-  float3 color;
-  float padding;
-  float3 direction;
-  float solid_angle;
-  row_major float4x4 view_projection;
-};
+	float3 v = float3(oct, 1.0 - abs(oct.x) - abs(oct.y));
+	if (v.z < 0) v.xy = (float2(1.0f, 1.0f) - abs(v.yx)) * nonZeroSign(v.xy);
+	return normalize(v);
+}
+
 
 
 #endif // GLOBALS_COMMON_HLSLI

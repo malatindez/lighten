@@ -40,13 +40,13 @@ namespace engine::render
         auto group3 = registry.group<components::DissolutionComponent>(entt::get<components::TransformComponent>);
         std::optional<entt::entity> rv = std::nullopt;
         auto const &func = [&rv, &ray, &nearest] (auto const entity, auto const &model_instance, auto const &transform) -> void
-                    {
-                        auto const &model = GetModel(model_instance.model_id);
-                        if (CheckForIntersection(model, transform, ray, nearest))
-                        {
-                            rv = entity;
-                        }
-                    };
+        {
+            auto const &model = GetModel(model_instance.model_id);
+            if (CheckForIntersection(model, transform, ray, nearest))
+            {
+                rv = entity;
+            }
+        };
         group1.each(func);
         group2.each(func);
         group3.each(func);
@@ -205,6 +205,162 @@ namespace engine::render
             rmin(box.min, mesh.vertices[i].position);
             rmax(box.max, mesh.vertices[i].position);
         }
+
+        ModelMesh model_mesh(0, mat4::identity(),
+                             MeshRange{ .vertex_offset = 0, .index_offset = 0,
+                             .vertex_count = (uint32_t)mesh.vertices.size(),
+                             .index_count = (uint32_t)mesh.indices.size(),
+                             .bounding_box = box },
+                             std::move(mesh));
+        Model model{
+            .name = name,
+            .bounding_box = box,
+            .meshes = {},
+            .materials = {render::Material{}},
+            .vertices = direct3d::ImmutableVertexBuffer<Vertex>{model_mesh.mesh.vertices},
+            .indices = direct3d::ImmutableIndexBuffer<uint32_t>{model_mesh.mesh.indices}
+        };
+        model.meshes.push_back(std::move(model_mesh));
+        model.meshes[0].triangle_octree.initialize(model.meshes[0]);
+
+        model_id = instance().AddModel(std::move(model));
+        return model_id;
+    }
+    uint64_t ModelSystem::GetUnitSphereLowPoly()
+    {
+        static uint64_t model_id = std::numeric_limits<uint64_t>::max();
+        if (model_id != std::numeric_limits<uint64_t>::max())
+        {
+            return model_id;
+        }
+        const uint32_t SIDES = 6;
+        const uint32_t GRID_SIZE = 2;
+        const uint32_t TRIS_PER_SIDE = GRID_SIZE * GRID_SIZE * 2;
+        const uint32_t VERT_PER_SIZE = 3 * TRIS_PER_SIDE;
+
+        std::string name = "UNIT_SPHERE_FLAT";
+        Box box = Box::empty();
+        Mesh mesh;
+        mesh.vertices.resize(VERT_PER_SIZE * SIDES);
+        Vertex *vertex = mesh.vertices.data();
+        int sideMasks[6][3] =
+        {
+            { 2, 1, 0 },
+            { 0, 1, 2 },
+            { 2, 1, 0 },
+            { 0, 1, 2 },
+            { 0, 2, 1 },
+            { 0, 2, 1 }
+        };
+        float sideSigns[6][3] =
+        {
+            { +1, +1, +1 },
+            { -1, +1, +1 },
+            { -1, +1, -1 },
+            { +1, +1, -1 },
+            { +1, -1, -1 },
+            { +1, +1, +1 }
+        };
+
+        for (uint32_t side = 0; side < SIDES; ++side)
+        {
+            for (uint32_t row = 0; row < GRID_SIZE; ++row)
+            {
+                for (uint32_t col = 0; col < GRID_SIZE; ++col)
+                {
+                    float left = (col + 0) / float(GRID_SIZE) * 2.f - 1.f;
+                    float right = (col + 1) / float(GRID_SIZE) * 2.f - 1.f;
+                    float bottom = (row + 0) / float(GRID_SIZE) * 2.f - 1.f;
+                    float top = (row + 1) / float(GRID_SIZE) * 2.f - 1.f;
+
+                    vec3 quad[4] =
+                    {
+                        { left, bottom, 1.f },
+                        { right, bottom, 1.f },
+                        { left, top, 1.f },
+                        { right, top, 1.f }
+                    };
+
+                    vertex[0] = vertex[1] = vertex[2] = vertex[3] = Vertex::empty();
+
+                    auto setPos = [sideMasks, sideSigns] (int side, Vertex &dst, const vec3 &position)
+                    {
+                        dst.position[sideMasks[side][0]] = position.x * sideSigns[side][0];
+                        dst.position[sideMasks[side][1]] = position.y * sideSigns[side][1];
+                        dst.position[sideMasks[side][2]] = position.z * sideSigns[side][2];
+                        dst.position = normalize(dst.position);
+                    };
+                    auto setTexCoord = [] ([[maybe_unused]] Vertex &dst)
+                    {
+                        // todo
+                        // dst.tex_coord.u = ((-dst.position.z / core::math::abs(dst.position.x)) + 1) / 2;
+                        // dst.tex_coord.v = ((-dst.position.y / core::math::abs(dst.position.x)) + 1) / 2;
+                    };
+                    auto calculateTangents = [] ([[maybe_unused]] Vertex &dst)
+                    {
+                        // todo
+                        // vec3 tangent = cross(dst.normal, vec3{ 0, 1, 0 });
+                        // if (length(tangent) < 0.0001f)
+                        // {
+                        //     tangent = cross(dst.normal, vec3{ 1, 0, 0 });
+                        // }
+                        // tangent = normalize(tangent);
+                        // dst.tangent = tangent;
+                        // dst.bitangent = cross(dst.normal, tangent);
+                    };
+
+                    setPos(side, vertex[0], quad[0]);
+                    setPos(side, vertex[1], quad[1]);
+                    setPos(side, vertex[2], quad[2]);
+                    setTexCoord(vertex[0]);
+                    setTexCoord(vertex[1]);
+                    setTexCoord(vertex[2]);
+                    {
+                        vec3 AB = vertex[1].position - vertex[0].position;
+                        vec3 AC = vertex[2].position - vertex[0].position;
+                        vertex[0].normal = vertex[1].normal = vertex[2].normal = normalize(cross(AC, AB));
+                        vertex[0].normal = vertex[0].position;
+                        vertex[1].normal = vertex[1].position;
+                        vertex[2].normal = vertex[2].position;
+                    }
+                    calculateTangents(vertex[0]);
+                    calculateTangents(vertex[1]);
+                    calculateTangents(vertex[2]);
+                    vertex += 3;
+
+                    setPos(side, vertex[0], quad[1]);
+                    setPos(side, vertex[1], quad[3]);
+                    setPos(side, vertex[2], quad[2]);
+                    setTexCoord(vertex[0]);
+                    setTexCoord(vertex[1]);
+                    setTexCoord(vertex[2]);
+
+                    {
+                        vec3 AB = vertex[1].position - vertex[0].position;
+                        vec3 AC = vertex[2].position - vertex[0].position;
+                        vertex[0].normal = vertex[1].normal = vertex[2].normal = normalize(cross(AC, AB));
+                        vertex[0].normal = vertex[0].position;
+                        vertex[1].normal = vertex[1].position;
+                        vertex[2].normal = vertex[2].position;
+                    }
+                    calculateTangents(vertex[0]);
+                    calculateTangents(vertex[1]);
+                    calculateTangents(vertex[2]);
+
+                    vertex += 3;
+                }
+            }
+        }
+        for (uint32_t i = 0; i < (int)mesh.vertices.size(); i += 3)
+        {
+            mesh.indices.push_back(i + 2);
+            mesh.indices.push_back(i + 1);
+            mesh.indices.push_back(i);
+            rmin(box.min, mesh.vertices[i].position);
+            rmax(box.max, mesh.vertices[i].position);
+        }
+        box.min = core::math::vec3{ -1 };
+        box.max = core::math::vec3{ +1 };
 
         ModelMesh model_mesh(0, mat4::identity(),
                              MeshRange{ .vertex_offset = 0, .index_offset = 0,

@@ -16,10 +16,10 @@ namespace engine::render
         texture_flags |= (normal_map != nullptr) ? 1 << 1 : 0;
         texture_flags |= (metalness_map != nullptr) ? 1 << 2 : 0;
         texture_flags |= (roughness_map != nullptr) ? 1 << 3 : 0;
-        texture_flags |= (reverse_normal_y) ? 1 << 4 : 0;
+        texture_flags |= (opacity_map != nullptr) ? 1 << 4 : 0;
+        texture_flags |= (reverse_normal_y) ? 1 << 24 : 0;
     }
-
-    void DissolutionMaterial::Bind(direct3d::DynamicUniformBuffer<_dissolution_detail::DissolutionPerMaterial> &uniform_buffer) const
+    void DissolutionMaterial::BindTextures() const
     {
         if (albedo_map != nullptr)
         {
@@ -37,6 +37,13 @@ namespace engine::render
         {
             direct3d::api().devcon4->PSSetShaderResources(3, 1, &roughness_map);
         }
+        if (opacity_map != nullptr)
+        {
+            direct3d::api().devcon4->PSSetShaderResources(4, 1, &opacity_map);
+        }
+    }
+    void DissolutionMaterial::Bind(direct3d::DynamicUniformBuffer<_dissolution_detail::DissolutionPerMaterial> &uniform_buffer) const
+    {
         _dissolution_detail::DissolutionPerMaterial temporary;
         temporary.albedo_color = albedo_color;
         temporary.metalness = metalness_value;
@@ -72,6 +79,7 @@ namespace engine::render
         albedo_color = material.diffuse_color;
         metalness_value = material.metalness;
         roughness_value = material.roughness;
+        twosided = material.twosided;
     }
 }
 namespace engine::render::_dissolution_detail
@@ -79,42 +87,27 @@ namespace engine::render::_dissolution_detail
     DissolutionRenderSystem::DissolutionRenderSystem() : RenderPass(0x10001)
     {
         auto path = std::filesystem::current_path();
+        std::vector<D3D11_INPUT_ELEMENT_DESC> d3d_input_desc{
+            {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+            {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+            {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+            {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+            {"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+            {"ROWX", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ROWY", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ROWZ", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ROWW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"TIME_BEGIN", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"LIFETIME", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+        };
         noise_texture_ = core::TextureManager::GetTextureView(path / "assets/dissolution_perlin_noise.dds");
         {
-            std::vector<D3D11_INPUT_ELEMENT_DESC> d3d_input_desc{
-                {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-                {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-                {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-                {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-                {"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-                {"ROWX", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-                {"ROWY", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-                {"ROWZ", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-                {"ROWW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-                {"TIME_BEGIN", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-                {"LIFETIME", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-            };
-
             auto vs = core::ShaderManager::instance()->CompileVertexShader(path / dissolution_vs_shader_path);
             auto ps = core::ShaderManager::instance()->CompilePixelShader(path / dissolution_ps_shader_path);
             auto il = std::make_shared<InputLayout>(vs->blob(), d3d_input_desc);
             dissolution_shader_.SetVertexShader(vs).SetPixelShader(ps).SetInputLayout(il);
         }
         {
-            std::vector<D3D11_INPUT_ELEMENT_DESC> d3d_input_desc{
-                {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-                {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-                {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-                {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-                {"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-                {"ROWX", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-                {"ROWY", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-                {"ROWZ", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-                {"ROWW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-                {"TIME_BEGIN", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-                {"LIFETIME", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-            };
-
             auto vs = core::ShaderManager::instance()->CompileVertexShader(path / dissolution_vs_depth_only_shader_path);
             auto gs = core::ShaderManager::instance()->CompileGeometryShader(core::ShaderCompileInput{
                 direct3d::ShaderType::GeometryShader,
@@ -124,19 +117,20 @@ namespace engine::render::_dissolution_detail
                 direct3d::ShaderType::GeometryShader,
                 path / dissolution_gs_depth_only_texture_shader_path,
                 "cubemapGS" });
+            auto ps = core::ShaderManager::instance()->CompilePixelShader(path / dissolution_ps_depth_only_shader_path);
             auto il = std::make_shared<InputLayout>(vs->blob(), d3d_input_desc);
-            dissolution_cubemap_shader_.SetVertexShader(vs).SetGeometryShader(gs).SetInputLayout(il);
-            dissolution_texture_shader_.SetVertexShader(vs).SetGeometryShader(gs2).SetInputLayout(il);
+            dissolution_cubemap_shader_.SetVertexShader(vs).SetGeometryShader(gs).SetPixelShader(ps).SetInputLayout(il);
+            dissolution_texture_shader_.SetVertexShader(vs).SetGeometryShader(gs2).SetPixelShader(ps).SetInputLayout(il);
         }
     }
 
     void DissolutionRenderSystem::OnRender(core::Scene *scene)
     {
-        if (should_update_instances_)
+        if (is_instance_update_scheduled_)
         {
-            OnInstancesUpdated(scene);
+            UpdateInstances(scene);
             scene->renderer->light_render_system().ScheduleShadowMapUpdate();
-            should_update_instances_ = false;
+            is_instance_update_scheduled_ = false;
         }
 
         if (instance_buffer_.size() == 0)
@@ -144,7 +138,6 @@ namespace engine::render::_dissolution_detail
         dissolution_shader_.Bind();
 
         direct3d::api().devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        direct3d::api().devcon4->RSSetState(direct3d::states().cull_back);
         direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
         direct3d::api().devcon4->PSSetSamplers(1, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
         direct3d::api().devcon4->PSSetSamplers(2, 1, &direct3d::states().bilinear_clamp_sampler.ptr());
@@ -152,88 +145,13 @@ namespace engine::render::_dissolution_detail
         direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth, 0);
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 
-        mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 1);
+        mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 2);
 
         instance_buffer_.Bind(1);
 
-        DissolutionPerFrame dissolution_per_frame;
-        D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-        prefiltered_texture_->GetDesc(&desc);
-        dissolution_per_frame.prefiltered_map_mip_levels = desc.TextureCube.MipLevels;
-        dissolution_per_frame.default_ambient_occulsion_value = ambient_occlusion_value_;
         auto &registry = scene->registry;
-        auto &lrs = scene->renderer->light_render_system();
-        {
-            auto const &point_lights = lrs.point_light_entities();
-            auto const &spot_lights = lrs.spot_light_entities();
-            auto const &directional_lights = lrs.directional_light_entities();
-            auto const &point_light_matrices = lrs.point_light_shadow_matrices();
-            auto const &spot_light_matrices = lrs.spot_light_shadow_matrices();
-            auto const &directional_light_matrices = lrs.directional_light_shadow_matrices();
 
-            dissolution_per_frame.num_point_lights = dissolution_per_frame.num_spot_lights = dissolution_per_frame.num_directional_lights = 0;
-            for (entt::entity entity : point_lights)
-            {
-                auto &dissolution_point_light = dissolution_per_frame.point_lights[dissolution_per_frame.num_point_lights];
-                auto &registry_point_light = registry.get<components::PointLight>(entity);
-                auto &registry_transform = registry.get<components::TransformComponent>(entity);
-                dissolution_point_light.color = registry_point_light.color * registry_point_light.power;
-                dissolution_point_light.position = registry_transform.position;
-                dissolution_point_light.radius = length(registry_transform.scale) / sqrt(3.1f);
-                dissolution_point_light.view_projection = point_light_matrices.at(entity);
-                if (++dissolution_per_frame.num_point_lights >= kOpaqueShaderMaxPointLights)
-                {
-                    utils::AlwaysAssert(false, "Amount of point lights on the scene went beyond the maximum amount.");
-                    break;
-                }
-            }
-            for (entt::entity entity : spot_lights)
-            {
-                auto &dissolution_spot_light = dissolution_per_frame.spot_lights[dissolution_per_frame.num_spot_lights];
-                auto &registry_spot_light = registry.get<components::SpotLight>(entity);
-                auto &registry_transform = registry.get<components::TransformComponent>(entity);
-                dissolution_spot_light.color = registry_spot_light.color * registry_spot_light.power;
-                dissolution_spot_light.position = registry_transform.position;
-                dissolution_spot_light.direction = registry_transform.rotation * core::math::vec3(0, 0, 1);
-                dissolution_spot_light.radius = length(registry_transform.scale) / sqrt(3.1f);
-                dissolution_spot_light.inner_cutoff = registry_spot_light.inner_cutoff;
-                dissolution_spot_light.outer_cutoff = registry_spot_light.outer_cutoff;
-                dissolution_spot_light.view_projection = spot_light_matrices.at(entity);
-                if (++dissolution_per_frame.num_spot_lights >= kOpaqueShaderMaxSpotLights)
-                {
-                    utils::AlwaysAssert(false, "Amount of spot lights on the scene went beyond the maximum amount.");
-                    break;
-                }
-            }
-            for (entt::entity entity : directional_lights)
-            {
-                auto &dissolution_directional_light = dissolution_per_frame.directional_lights[dissolution_per_frame.num_directional_lights];
-                auto &registry_directional_light = registry.get<components::DirectionalLight>(entity);
-                auto &registry_transform = registry.get<components::TransformComponent>(entity);
-                dissolution_directional_light.color = registry_directional_light.color * registry_directional_light.power;
-                dissolution_directional_light.direction = registry_transform.rotation * core::math::vec3{ 0, 1, 0 };
-                dissolution_directional_light.solid_angle = registry_directional_light.solid_angle;
-                dissolution_directional_light.view_projection = directional_light_matrices.at(entity);
-
-                if (++dissolution_per_frame.num_directional_lights >= kOpaqueShaderMaxDirectionalLights)
-                {
-                    utils::AlwaysAssert(false, "Amount of directional lights on the scene went beyond the maximum amount.");
-                    break;
-                }
-            }
-        }
-        dissolution_per_frame.point_light_shadow_resolution = lrs.point_light_shadow_resolution();
-        dissolution_per_frame.spot_light_shadow_resolution = lrs.spot_light_shadow_resolution();
-        dissolution_per_frame.directional_light_shadow_resolution = lrs.directional_light_shadow_resolution();
-        dissolution_per_frame_buffer_.Bind(direct3d::ShaderType::PixelShader, 1);
-        dissolution_per_frame_buffer_.Update(dissolution_per_frame);
         dissolution_per_material_buffer_.Bind(direct3d::ShaderType::PixelShader, 2);
-        direct3d::api().devcon4->PSSetShaderResources(5, 1, &irradiance_texture_);
-        direct3d::api().devcon4->PSSetShaderResources(6, 1, &prefiltered_texture_);
-        direct3d::api().devcon4->PSSetShaderResources(7, 1, &brdf_texture_);
-        lrs.BindPointShadowMaps(8);
-        lrs.BindSpotShadowMaps(9);
-        lrs.BindDirectionalShadowMaps(10);
         direct3d::api().devcon4->PSSetShaderResources(11, 1, &noise_texture_);
 
         uint32_t renderedInstances = 0;
@@ -242,6 +160,8 @@ namespace engine::render::_dissolution_detail
 
         direct3d::api().devcon4->OMSetBlendState(direct3d::states().alpha_to_coverage_blend_state.ptr(), nullptr, 0xffffffff);
 
+        direct3d::api().devcon->RSSetState(direct3d::states().cull_none);
+        bool current_state_twosided = false;
         for (const auto &model_instance : model_instances_)
         {
             model_instance.model.vertices.Bind(0);
@@ -260,6 +180,13 @@ namespace engine::render::_dissolution_detail
 
                     const auto &material = perMaterial.material;
                     material.Bind(dissolution_per_material_buffer_);
+                    material.BindTextures();
+
+                    if (material.twosided != current_state_twosided)
+                    {
+                        direct3d::api().devcon->RSSetState(material.twosided ? direct3d::states().cull_none : direct3d::states().cull_back);
+                        current_state_twosided = material.twosided;
+                    }
 
                     uint32_t numInstances = uint32_t(perMaterial.instances.size());
                     direct3d::api().devcon4->DrawIndexedInstanced(mesh_range.index_count, numInstances, mesh_range.index_offset, mesh_range.vertex_offset, renderedInstances);
@@ -276,43 +203,54 @@ namespace engine::render::_dissolution_detail
 
     void DissolutionRenderSystem::RenderDepthOnly(std::vector<DissolutionPerDepthCubemap> const &cubemaps, core::Scene *scene)
     {
-        if (should_update_instances_)
+        if (is_instance_update_scheduled_)
         {
-            OnInstancesUpdated(scene);
+            UpdateInstances(scene);
             scene->renderer->light_render_system().ScheduleShadowMapUpdate();
-            should_update_instances_ = false;
+            is_instance_update_scheduled_ = false;
         }
         if (instance_buffer_.size() == 0)
             return;
         GraphicsShaderProgram::UnbindAll();
         dissolution_cubemap_shader_.Bind();
         dissolution_per_cubemap_buffer_.Bind(direct3d::ShaderType::GeometryShader, 0);
-        mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 1);
+        mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 2);
+        dissolution_per_material_buffer_.Bind(direct3d::ShaderType::PixelShader, 2);
         instance_buffer_.Bind(1);
         uint32_t renderedInstances = 0;
+
+        direct3d::api().devcon4->PSSetShaderResources(11, 1, &noise_texture_);
         for (const auto &model_instance : model_instances_)
         {
             model_instance.model.vertices.Bind(0);
             model_instance.model.indices.Bind();
 
-            for (uint32_t meshIndex = 0; meshIndex < model_instance.mesh_instances.size(); ++meshIndex)
+            uint32_t rendered_instances_tmp = renderedInstances;
+            for (auto &cubemap : cubemaps)
             {
-                ModelMesh const &mesh = model_instance.model.meshes[meshIndex];
-                auto const &mesh_range = mesh.mesh_range;
-                mesh_to_model_buffer_.Update(mesh.mesh_to_model);
+                rendered_instances_tmp = renderedInstances;
+                dissolution_per_cubemap_buffer_.Update(cubemap);
+                for (uint32_t meshIndex = 0; meshIndex < model_instance.mesh_instances.size(); ++meshIndex)
+                {
+                    ModelMesh const &mesh = model_instance.model.meshes[meshIndex];
+                    auto const &mesh_range = mesh.mesh_range;
+                    mesh_to_model_buffer_.Update(mesh.mesh_to_model);
 
-                uint32_t numInstances = 0;
-                for (auto const &perMaterial : model_instance.mesh_instances[meshIndex].material_instances)
-                {
-                    numInstances += uint32_t(perMaterial.instances.size());
+                    for (auto const &perMaterial : model_instance.mesh_instances[meshIndex].material_instances)
+                    {
+                        const auto &material = perMaterial.material;
+                        material.Bind(dissolution_per_material_buffer_);
+                        if (material.opacity_map != nullptr)
+                        {
+                            direct3d::api().devcon4->PSSetShaderResources(4, 1, &material.opacity_map);
+                        }
+                        uint32_t instances_to_render = uint32_t(perMaterial.instances.size());
+                        direct3d::api().devcon4->DrawIndexedInstanced(mesh_range.index_count, instances_to_render, mesh_range.index_offset, mesh_range.vertex_offset, rendered_instances_tmp);
+                        rendered_instances_tmp += instances_to_render;
+                    }
                 }
-                for (auto &cubemap : cubemaps)
-                {
-                    dissolution_per_cubemap_buffer_.Update(cubemap);
-                    direct3d::api().devcon4->DrawIndexedInstanced(mesh_range.index_count, numInstances, mesh_range.index_offset, mesh_range.vertex_offset, renderedInstances);
-                }
-                renderedInstances += numInstances;
             }
+            renderedInstances = rendered_instances_tmp;
         }
 
         dissolution_cubemap_shader_.Unbind();
@@ -320,44 +258,54 @@ namespace engine::render::_dissolution_detail
 
     void DissolutionRenderSystem::RenderDepthOnly(std::vector<DissolutionPerDepthTexture> const &textures, core::Scene *scene)
     {
-        if (should_update_instances_)
+        if (is_instance_update_scheduled_)
         {
-            OnInstancesUpdated(scene);
+            UpdateInstances(scene);
             scene->renderer->light_render_system().ScheduleShadowMapUpdate();
-            should_update_instances_ = false;
+            is_instance_update_scheduled_ = false;
         }
         if (instance_buffer_.size() == 0)
             return;
         GraphicsShaderProgram::UnbindAll();
         dissolution_texture_shader_.Bind();
         dissolution_per_texture_buffer_.Bind(direct3d::ShaderType::GeometryShader, 0);
-        mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 1);
+        mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 2);
+        dissolution_per_material_buffer_.Bind(direct3d::ShaderType::PixelShader, 2);
         instance_buffer_.Bind(1);
         uint32_t renderedInstances = 0;
 
+        direct3d::api().devcon4->PSSetShaderResources(11, 1, &noise_texture_);
         for (const auto &model_instance : model_instances_)
         {
             model_instance.model.vertices.Bind(0);
             model_instance.model.indices.Bind();
 
-            for (uint32_t meshIndex = 0; meshIndex < model_instance.mesh_instances.size(); ++meshIndex)
+            uint32_t rendered_instances_tmp = renderedInstances;
+            for (auto &texture : textures)
             {
-                ModelMesh const &mesh = model_instance.model.meshes[meshIndex];
-                auto const &mesh_range = mesh.mesh_range;
-                mesh_to_model_buffer_.Update(mesh.mesh_to_model);
+                rendered_instances_tmp = renderedInstances;
+                dissolution_per_texture_buffer_.Update(texture);
+                for (uint32_t meshIndex = 0; meshIndex < model_instance.mesh_instances.size(); ++meshIndex)
+                {
+                    ModelMesh const &mesh = model_instance.model.meshes[meshIndex];
+                    auto const &mesh_range = mesh.mesh_range;
+                    mesh_to_model_buffer_.Update(mesh.mesh_to_model);
 
-                uint32_t numInstances = 0;
-                for (auto const &perMaterial : model_instance.mesh_instances[meshIndex].material_instances)
-                {
-                    numInstances += uint32_t(perMaterial.instances.size());
+                    for (auto const &perMaterial : model_instance.mesh_instances[meshIndex].material_instances)
+                    {
+                        const auto &material = perMaterial.material;
+                        if (material.opacity_map != nullptr)
+                        {
+                            direct3d::api().devcon4->PSSetShaderResources(4, 1, &material.opacity_map);
+                        }
+                        material.Bind(dissolution_per_material_buffer_);
+                        uint32_t instances_to_render = uint32_t(perMaterial.instances.size());
+                        direct3d::api().devcon4->DrawIndexedInstanced(mesh_range.index_count, instances_to_render, mesh_range.index_offset, mesh_range.vertex_offset, rendered_instances_tmp);
+                        rendered_instances_tmp += instances_to_render;
+                    }
                 }
-                for (auto &texture : textures)
-                {
-                    dissolution_per_texture_buffer_.Update(texture);
-                    direct3d::api().devcon4->DrawIndexedInstanced(mesh_range.index_count, numInstances, mesh_range.index_offset, mesh_range.vertex_offset, renderedInstances);
-                }
-                renderedInstances += numInstances;
             }
+            renderedInstances = rendered_instances_tmp;
         }
         dissolution_texture_shader_.Unbind();
     }
@@ -388,9 +336,9 @@ namespace engine::render::_dissolution_detail
                         {
                             registry.erase<components::DissolutionComponent>(entity);
                             ors.AddInstance(dissolution->model_id, registry, entity);
-                            ors.ScheduleOnInstancesUpdate();
+                            ors.ScheduleInstanceUpdate();
                             dissolution = nullptr;
-                            this->ScheduleOnInstancesUpdate();
+                            this->ScheduleInstanceUpdate();
                         }
                         if (dissolution == nullptr)
                         {
@@ -402,7 +350,7 @@ namespace engine::render::_dissolution_detail
                     }
                 }
     }
-    void DissolutionRenderSystem::OnInstancesUpdated(core::Scene *scene)
+    void DissolutionRenderSystem::UpdateInstances(core::Scene *scene)
     {
         auto &registry = scene->registry;
         uint32_t total_instances = 0;

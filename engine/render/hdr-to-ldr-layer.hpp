@@ -13,8 +13,7 @@ namespace engine::render
         {
             float exposure = 1.0f;
             float gamma = 1.0f;
-            uint32_t sample_count = 1;
-            float padding;
+            core::math::vec2 padding;
         };
         HDRtoLDRLayer(direct3d::SwapchainRenderTarget &window_render_target) : PostProcessingLayer(0), window_render_target_{ window_render_target }
         {
@@ -25,13 +24,11 @@ namespace engine::render
         }
         direct3d::RenderTargetBase &OnProcess(direct3d::RenderTargetBase &source) override
         {
-            window_render_target_.SizeResources(source.size());
             direct3d::api().devcon4->OMSetRenderTargets(0, nullptr, nullptr);
             direct3d::api().devcon4->PSSetShaderResources(0, 1, &source.shader_resource_view());
             direct3d::api().devcon4->OMSetRenderTargets(1, &window_render_target_.render_target_view(), nullptr);
             direct3d::api().devcon4->RSSetState(direct3d::states().cull_none.ptr());
             shader_.Bind();
-            buffer_.sample_count = source.render_target_description().SampleDesc.Count;
             constant_buffer_.Update(buffer_);
             constant_buffer_.Bind(direct3d::ShaderType::PixelShader, 1);
             direct3d::api().devcon4->Draw(3, 0);

@@ -66,18 +66,6 @@ void Controller::OnGuiRender()
     auto hdr_to_ldr = hdr_render_pipeline_->hdr_to_ldr_layer();
     ImGui::SliderFloat("Exposure", &hdr_to_ldr->exposure(), -20.0f, 20.0f);
     ImGui::SliderFloat("Gamma", &hdr_to_ldr->gamma(), 0.0f, 20.0f);
-    ImGui::SliderFloat("Default AO", &first_scene->renderer->opaque_render_system().ambient_occlusion(), 0.0f, 1.0f);
-    static int sample_count = 4;
-    if (ImGui::BeginCombo("MSAA sample count", std::to_string(sample_count).c_str()))
-    {
-        if (ImGui::Selectable("1x")) sample_count = 1;
-        if (ImGui::Selectable("2x")) sample_count = 2;
-        if (ImGui::Selectable("4x")) sample_count = 4;
-        if (ImGui::Selectable("8x")) sample_count = 8;
-        if (ImGui::Selectable("16x")) sample_count = 16;
-        if (ImGui::Selectable("32x")) sample_count = 32;
-        ImGui::EndCombo();
-    }
     static float update_limit = Engine::maximum_update_rate();
     ImGui::SliderFloat("Update limit", &update_limit, 1.0f, 1000.0f);
     if (update_limit != Engine::maximum_update_rate())
@@ -96,7 +84,18 @@ void Controller::OnGuiRender()
     {
         Engine::SetMaximumTickrate(tick_limit);
     }
-
+#if 0 // msaa disabled with deferred rendering
+    static int sample_count = 4;
+    if (ImGui::BeginCombo("MSAA sample count", std::to_string(sample_count).c_str()))
+    {
+        if (ImGui::Selectable("1x")) sample_count = 1;
+        if (ImGui::Selectable("2x")) sample_count = 2;
+        if (ImGui::Selectable("4x")) sample_count = 4;
+        if (ImGui::Selectable("8x")) sample_count = 8;
+        if (ImGui::Selectable("16x")) sample_count = 16;
+        if (ImGui::Selectable("32x")) sample_count = 32;
+        ImGui::EndCombo();
+    }
     UINT quality_levels;
     direct3d::api().device->CheckMultisampleQualityLevels(DXGI_FORMAT_R16G16B16A16_FLOAT, sample_count, &quality_levels);
     uint32_t current_sample_count = hdr_render_pipeline_->GetSampleCount();
@@ -106,6 +105,7 @@ void Controller::OnGuiRender()
         sample_count = current_sample_count;
     }
     if ((uint32_t)(sample_count) != current_sample_count) { hdr_render_pipeline_->SetSampleCount(sample_count); }
+#endif
 #if 0
     static core::math::uivec2 poisson_disk_size = { 0.5f, 0.5f };
     ImGui::InputScalar("Poisson disk size x", ImGuiDataType_U32, &poisson_disk_size.x);
@@ -164,10 +164,11 @@ void Controller::OnGuiRender()
 
     object_editor::OnGuiRender();
     object_editor::OnRender(hdr_render_pipeline_->window()->position(), hdr_render_pipeline_->window()->size());
+
     scene_viewer::OnGuiRender();
 }
 
-Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_pipeline)
+Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_render_pipeline)
     : hdr_render_pipeline_{ hdr_render_pipeline }
 {
     first_scene = std::make_shared<Scene>();
@@ -178,15 +179,9 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
     auto &grs = first_scene->renderer->grass_render_system();
     auto &ers = first_scene->renderer->emissive_render_system();
     auto &lrs = first_scene->renderer->light_render_system();
-    ors.SetBrdfTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/IBL/ibl_brdf_lut.dds"));
-    ors.SetIrradianceTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_irradiance.dds"));
-    ors.SetPrefilteredTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_reflection.dds"));
-    drs.SetBrdfTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/IBL/ibl_brdf_lut.dds"));
-    drs.SetIrradianceTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_irradiance.dds"));
-    drs.SetPrefilteredTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_reflection.dds"));
-    grs.SetBrdfTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/IBL/ibl_brdf_lut.dds"));
-    grs.SetIrradianceTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_irradiance.dds"));
-    grs.SetPrefilteredTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_reflection.dds"));
+    hdr_render_pipeline->deferred_resolve()->SetBrdfTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/IBL/ibl_brdf_lut.dds"));
+    hdr_render_pipeline->deferred_resolve()->SetIrradianceTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_irradiance.dds"));
+    hdr_render_pipeline->deferred_resolve()->SetPrefilteredTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_reflection.dds"));
     auto &registry = first_scene->registry;
     main_camera_entity = registry.create();
     registry.emplace<CameraComponent>(main_camera_entity, CameraComponent());
@@ -423,9 +418,10 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
         auto &point_light = registry.emplace<PointLight>(entity);
         point_light.color = vec3{ 0.988, 0.233, 0.255 };
         point_light.power = 2.5e3f;
+        point_light.casts_shadows = true;
         ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
     }
-    if (true) {
+    if (false) {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
         auto &game_object = registry.emplace<GameObject>(entity);
@@ -439,7 +435,31 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
         auto &point_light = registry.emplace<PointLight>(entity);
         point_light.color = vec3{ 0.01, 0.933, 0.255 };
         point_light.power = 3e3f;
+        point_light.casts_shadows = true;
         ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
+    }
+    if (true)
+    {
+        for (int i = 0; i < 24; i++)
+        {
+            auto model_id = render::ModelSystem::GetUnitSphereFlat();
+            auto entity = registry.create();
+            auto &game_object = registry.emplace<GameObject>(entity);
+            game_object.name = "Point light";
+            game_object.parent = lights;
+            lights_game_object.children.push_back(entity);
+            auto &transform = registry.emplace<TransformComponent>(entity);
+            transform.scale = vec3{ 0.1f };
+            transform.position = vec3{ 0, 0.025f, 0 };
+            transform.position += vec3{ std::cosf(float(i) / 24 * 2 * std::numbers::pi), 0, std::sinf(float(i) / 24 * 2 * std::numbers::pi) } *1.0f;
+            transform.UpdateMatrices();
+            auto &point_light = registry.emplace<PointLight>(entity);
+            point_light.color = vec3{ (i + 1) % 2, (i + 1) % 3, (i + 1) % 5 };
+            point_light.color = normalize(point_light.color);
+            point_light.power = 25.0f;
+            point_light.casts_shadows = false;
+            ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
+        }
     }
 
     // add directional light
@@ -457,7 +477,7 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
         transform.UpdateMatrices();
         auto &directional_light = registry.emplace<DirectionalLight>(entity);
         directional_light.color = vec3{ 0.988, 0.933, 0.455 };
-        directional_light.power = 10;
+        directional_light.power = 50;
         directional_light.solid_angle = 0.25f;
         ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(directional_light.color, directional_light.power) });
     }
@@ -611,14 +631,14 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
         grass_component.material_id = material_id;
         grass_component.spawn_range = { 1.8f, 1.8f };
         grass_component.grass_size_range = { 0.075f, 0.1f };
-        grass_component.initial_offset = { 0.0f, 0.09f, 0.0f };
+        grass_component.initial_offset = { 0.0f, 0.11f, 0.0f };
 
-        grass_component.min_distance = 0.75f;
+        grass_component.min_distance = 0.1f;
         grass_component.max_attempts = 64;
         grass_component.Initialize(atlas_data_copy);
     }
     SkyboxManager::LoadSkybox(registry, std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street.dds");
-    first_scene->ScheduleOnInstancesUpdate();
+    first_scene->ScheduleInstanceUpdate();
     camera_movement::RegisterKeyCallbacks();
     object_editor::RegisterKeyCallbacks();
     auto &input = *InputLayer::instance();
@@ -627,6 +647,116 @@ Controller::Controller(std::shared_ptr<direct3d::HDRRenderPipeline> hdr_render_p
     input.AddTickKeyCallback({ Key::KEY_MINUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure -= dt; });
     input.AddTickKeyCallback({ Key::KEY_NUMPAD_MINUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure -= dt; });
     input.AddTickKeyCallback({ Key::KEY_NUMPAD_PLUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure += dt; });
+    input.AddUpdateKeyCallback({ Key::KEY_F },
+                               [&] (InputLayer::KeySeq const &, uint32_t)
+                               {
+                                   static utils::HighResolutionTimer timer;
+                                   const float kDelay = 1.0f / 15.0f;
+                                   if (ImGui::GetIO().WantCaptureMouse)
+                                   {
+                                       return;
+                                   }
+                                   if (timer.elapsed() < kDelay)
+                                   {
+                                       return;
+                                   }
+
+                                   auto &input = *InputLayer::instance();
+                                   auto scene = Engine::scene();
+                                   Ray ray = scene->main_camera->PixelRaycast(vec2{ input.mouse_position() });
+                                   MeshIntersection nearest;
+                                   nearest.reset();
+                                   std::optional<entt::entity> entity = render::ModelSystem::FindIntersection(scene->registry, ray, nearest);
+                                   if (!entity.has_value())
+                                   {
+                                       return;
+                                   }
+                                   auto *opaque_component = registry.try_get<components::OpaqueComponent>(*entity);
+                                   if (opaque_component == nullptr)
+                                   {
+                                       return;
+                                   }
+                                   auto &transform = scene->registry.get<TransformComponent>(*entity);
+                                   DecalComponent::Decal decal;
+                                   uint32_t mesh_id = std::numeric_limits<uint32_t>::max();
+                                   auto *model_instance = Engine::scene()->renderer->opaque_render_system().GetInstancePtr(opaque_component->model_id);
+                                   {
+                                       // TODO:
+                                       // make FindIntersection return mesh and model id
+                                       // this is a bit of an overhead
+                                       if (model_instance == nullptr)
+                                       {
+                                           return;
+                                       }
+                                       for (size_t i = 0; i < model_instance->model.meshes.size(); i++)
+                                       {
+                                           if (&model_instance->model.meshes[i].mesh == nearest.mesh_ptr)
+                                           {
+                                               mesh_id = (uint32_t)i;
+                                           }
+                                       }
+                                       if (mesh_id == std::numeric_limits<uint32_t>::max())
+                                       {
+                                           return;
+                                       }
+                                   }
+                                   static ID3D11ShaderResourceView *texture = core::TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/decal.dds");
+                                   decal.normal_opacity_map = texture;
+                                   decal.mesh_transform = model_instance->model.meshes[mesh_id].mesh_to_model;
+                                   mat4 inv_mat = model_instance->model.meshes[mesh_id].inv_mesh_to_model * transform.inv_model;
+                                   decal.relative_position = (inv_mat * vec4(nearest.point, 1.0f)).xyz;
+
+                                   decal.texture_angle = std::uniform_real_distribution(0.0f, 2.0f * core::math::numbers::pi_v<float>)(core::Engine::random_engine());
+
+                                   decal.relative_scale = vec3{ 0.1f } / transform.scale;
+                                   decal.base_color = random::RandomVector3(core::Engine::random_engine(), 0.25f, 1.0f);
+                                   decal.roughness = 1.0f;
+                                   decal.metalness = 0.01f;
+                                   decal.transmittance = 0.0f;
+                                   decal.ambient_occlusion = 1.0f;
+                                   auto &decal_component = scene->registry.get_or_emplace<DecalComponent>(*entity);
+                                   decal_component.decals.emplace_back(std::move(decal));
+                                   timer.reset();
+                                   scene->renderer->decal_render_system().ScheduleInstanceUpdate();
+                               },
+                               true);
+    input.AddUpdateKeyCallback({ Key::KEY_G },
+                               [&] (InputLayer::KeySeq const &, uint32_t)
+                               {
+                                   static utils::HighResolutionTimer timer;
+                                   const float kDelay = 0.5f;
+                                   if (ImGui::GetIO().WantCaptureMouse)
+                                   {
+                                       return;
+                                   }
+                                   if (timer.elapsed() < kDelay)
+                                   {
+                                       return;
+                                   }
+                                   timer.reset();
+                                   auto scene = Engine::scene();
+                                   Ray ray = scene->main_camera->PixelRaycast(vec2{ input.mouse_position() });
+                                   MeshIntersection nearest;
+                                   nearest.reset();
+                                   std::optional<entt::entity> entity = render::ModelSystem::FindIntersection(scene->registry, ray, nearest);
+                                   if (!entity.has_value())
+                                   {
+                                       return;
+                                   }
+                                   auto model_id = render::ModelSystem::GetUnitSphereFlat();
+                                   auto sphere = registry.create();
+                                   auto &game_object = registry.emplace<GameObject>(sphere);
+                                   game_object.name = "Sphere";
+                                   auto &transform = registry.emplace<TransformComponent>(sphere);
+                                   transform.position = nearest.point;
+                                   transform.scale = vec3{ 0.05f };
+                                   transform.UpdateMatrices();
+                                   render::EmissiveMaterial material;
+                                   material.emissive_color = vec3{ 1 };
+                                   material.power = 5.0f;
+                                   ers.AddInstance(model_id, registry, sphere, { material });
+                                   ers.ScheduleInstanceUpdate();
+                               }, false);
     lrs.ScheduleShadowMapUpdate();
 }
 void Controller::OnTick([[maybe_unused]] float delta_time)

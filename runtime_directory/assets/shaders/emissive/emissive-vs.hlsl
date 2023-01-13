@@ -1,6 +1,6 @@
 #include "../globals/globals-vs.hlsli"
 
-cbuffer PerModel : register(b1)
+cbuffer PerModel : register(b2)
 {
 	row_major matrix g_mesh_to_model;
 	int g_use_emissive_texture;

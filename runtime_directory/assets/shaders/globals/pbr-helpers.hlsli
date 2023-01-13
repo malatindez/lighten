@@ -2,10 +2,11 @@
 #define PBR_HELPERS_HLSLI
 #include "../globals/globals-common.hlsli"
 static const float clampVal = 0.001f;
-static const float depthOffset = 0.015f;
+static const float depthOffset = 0.005f;
 static const float normalOffset = 0.0025f;
 static const float geometryNormalOffset = 0.0025f;
 static const float viewDirOffset = 0.005f;
+static const float kTranslucency = 2.0f;
 
 float3 fetch_position_row_major(row_major matrix model) 
 {
@@ -86,6 +87,8 @@ struct PBR_Material
     float3 f0;
     float roughness;
     float metalness;
+    float transmittance;
+    float ao;
 };
 
 struct PBR_CommonData
@@ -94,8 +97,6 @@ struct PBR_CommonData
     float3 view_dir_normalized;
     float3 normal;
     float3 geometry_normal;
-    float3 tangent;
-    float3 bitangent;
     float3 camera_position;
     float3 fragment_position;
     TextureCubeArray g_point_shadow_maps;
@@ -108,6 +109,12 @@ struct PBR_CommonData
     uint g_point_light_shadow_resolution;
     uint g_spot_light_shadow_resolution;
     uint g_directional_light_shadow_resolution;
+
+    // Env lights
+    TextureCube<float3> irradiance_map;
+    TextureCube<float3> prefiltered_map;
+    Texture2D<float2> brdf_lut;
+    uint prefiltered_map_mip_levels;
 };
 
 float CalculateSolidAngle(float length, float radius, out float sina, out float cosa)
@@ -144,8 +151,8 @@ float3 Illuminate(PBR_Material material,
           float3 specL, float ndotl, float solid_angle) {
 
   float3 diffuse = Lambert(material, ndotl, solid_angle);
-//  float3 spec = float3(0,0,0);
   float3 spec = CookTorrance(material, V_norm, normal, specL, solid_angle);
+//  float3 spec = float3(0,0,0);
 
   return (diffuse * ndotl + spec) * light_energy;   
 }
@@ -156,7 +163,7 @@ uint selectCubeFace(float3 unitDir)
     return index + (asuint(unitDir[index / 2]) >> 31);
 }
 
-bool shadowed(PBR_CommonData common_data, PointLight point_light, uint point_light_index)
+bool shadowed_point(PBR_CommonData common_data, ShadowPointLight point_light, uint point_light_index)
 {
     float3 light_dir = point_light.position - common_data.fragment_position;
     float light_dist = length(light_dir);
@@ -183,7 +190,7 @@ bool shadowed(PBR_CommonData common_data, PointLight point_light, uint point_lig
 
     return visible > 0.5f;
 }
-bool shadowed(PBR_CommonData common_data, SpotLight spot_light, uint spot_light_index)
+bool shadowed_spot(PBR_CommonData common_data, ShadowSpotLight spot_light, uint spot_light_index)
 {
   float3 light_dir = spot_light.position - common_data.fragment_position;
 
@@ -202,7 +209,7 @@ bool shadowed(PBR_CommonData common_data, SpotLight spot_light, uint spot_light_
 
   return visible > 0.5f;
 }
-bool shadowed(PBR_CommonData common_data, DirectionalLight directional_light, uint directional_light_index)
+bool shadowed_directional(PBR_CommonData common_data, ShadowDirectionalLight directional_light, uint directional_light_index)
 {
   float3 light_dir = directional_light.direction;
 
@@ -216,7 +223,7 @@ bool shadowed(PBR_CommonData common_data, DirectionalLight directional_light, ui
   posCS.xy += 0.5f;
 
   posCS.y *= -1;
-
+  
   float shadowmap_depth = common_data.g_directional_shadow_maps.Sample(common_data.g_bilinear_sampler, float3(posCS.xy, directional_light_index)).r;
   return depth < shadowmap_depth;
   // doesn't work for some reason
@@ -224,8 +231,7 @@ bool shadowed(PBR_CommonData common_data, DirectionalLight directional_light, ui
   return visible > 0.5f;
 }
 
-float3 ComputePointLightEnergy(PBR_Material material, PBR_CommonData common_data, PointLight point_light, uint point_light_index,
-  out float fading, out float solid_angle)
+float3 ComputePointLightEnergy(PBR_Material material, PBR_CommonData common_data, PointLight point_light, out float fading, out float solid_angle)
 {
     float3 light_dir = point_light.position - common_data.fragment_position;
     float light_dist = length(light_dir);
@@ -245,18 +251,29 @@ float3 ComputePointLightEnergy(PBR_Material material, PBR_CommonData common_data
     float fadingMicro = saturate ((lightMicroHeight + point_light.radius) / (2 * point_light.radius));
     float fadingMacro = saturate ((lightMacroHeight + point_light.radius) / (2 * point_light.radius));
     fading = fadingMicro * fadingMacro;
-    
-    if(gndotl < -point_light.radius) { return float3(0,0,0); }
+    float3 rv = float3(0.0f, 0.0f, 0.0f);
+    if(dot(common_data.normal, light_dir_normalized) < 0)
+    {
+        ndotl = dot(common_data.normal, light_dir_normalized);
+  //      return point_light.color * fading * solid_angle * material.transmittance * pow(-ndotl, kTranslucency);
+        return material.transmittance * material.albedo * point_light.color * solid_angle * pow(abs(ndotl), kTranslucency);
+    }
+    if(gndotl < -point_light.radius) 
+    { 
+//        return material.transmittance * material.albedo * point_light.color * solid_angle * pow(abs(ndotl), kTranslucency);
+//        return point_light.color * fading * solid_angle * material.transmittance * pow(-gndotl, kTranslucency);
+        return material.transmittance * material.albedo * point_light.color * solid_angle * pow(abs(gndotl), kTranslucency);
+    }
 
     ndotl = max(ndotl, fadingMicro * sina);
     float3 specL = approximateClosestSphereDir(reflect(-common_data.view_dir_normalized, common_data.normal), cosa, light_dir, light_dir_normalized, light_dist, point_light.radius);
     clampDirToHorizon(specL, ndotl, common_data.normal, clampVal );
+    rv += fading * Illuminate(material, point_light.color, common_data.view_dir_normalized, common_data.normal, specL, ndotl, solid_angle);
 
-    return fading * Illuminate(material, point_light.color, common_data.view_dir_normalized, common_data.normal, specL, ndotl, solid_angle);
+    return rv;
 }
  
-float3 ComputeSpotLightEnergy(PBR_Material material, PBR_CommonData common_data, SpotLight spot_light, uint spot_light_index,
-  out float fading, out float solid_angle)
+float3 ComputeSpotLightEnergy(PBR_Material material, PBR_CommonData common_data, SpotLight spot_light, out float fading, out float solid_angle)
 {
     float3 light_dir = spot_light.position - common_data.fragment_position;
     float light_dist = length(light_dir);
@@ -278,6 +295,10 @@ float3 ComputeSpotLightEnergy(PBR_Material material, PBR_CommonData common_data,
     float fadingMacro = saturate ((lightMacroHeight + spot_light.radius) / (2 * spot_light.radius));
     fading = fadingMicro * fadingMacro;
 
+    if(ndotl < 0)
+    {
+        return material.transmittance * spot_light.color * pow(-ndotl, kTranslucency) * fading * solid_angle;
+    }
     if (cos_angle < cos_outer_cutoff) { return float3(0,0,0); }
 
     ndotl = max(ndotl, fadingMicro * (cos_angle - cos_outer_cutoff) / (cos_cutoff - cos_outer_cutoff));
@@ -291,31 +312,144 @@ float3 ComputeSpotLightEnergy(PBR_Material material, PBR_CommonData common_data,
     return fading * attenuation * Illuminate(material, spot_light.color, common_data.view_dir_normalized, common_data.normal, specL, ndotl, solid_angle);
 }
  
-float3 ComputeDirectionalLightEnergy(PBR_Material material, PBR_CommonData common_data, DirectionalLight directional_light, uint directional_light_index)
+float3 ComputeDirectionalLightEnergy(PBR_Material material, PBR_CommonData common_data, DirectionalLight directional_light)
 {
     float3 light_dir = -directional_light.direction;
     float3 light_dir_normalized = light_dir;
     
     float3 H = normalize(light_dir_normalized + common_data.view_dir_normalized);
     float ndotl = max(dot(common_data.normal, light_dir_normalized), clampVal );
+    
+    if(ndotl < 0)
+    {
+        return material.transmittance * directional_light.color * pow(-ndotl, kTranslucency) * directional_light.solid_angle;
+    }
+
     float3 specL = approximateClosestSphereDir(reflect(-common_data.view_dir_normalized, common_data.normal), 0, light_dir, light_dir_normalized, 0, 0);
     clampDirToHorizon(specL, ndotl, common_data.normal, clampVal );
     return Illuminate(material, directional_light.color, common_data.view_dir_normalized, common_data.normal, light_dir, ndotl, directional_light.solid_angle);
 }
 
 
-float3 ComputePointLightEnergy(PBR_Material material, PBR_CommonData common_data, PointLight point_light, uint point_light_index)
+float3 ComputePointLightEnergy(PBR_Material material, PBR_CommonData common_data, PointLight point_light)
 {
   float fading;
   float solid_angle;
-  return ComputePointLightEnergy(material, common_data, point_light, point_light_index, fading, solid_angle);
+  return ComputePointLightEnergy(material, common_data, point_light,fading, solid_angle);
 }
  
-float3 ComputeSpotLightEnergy(PBR_Material material, PBR_CommonData common_data, SpotLight spot_light, uint spot_light_index)
+float3 ComputeSpotLightEnergy(PBR_Material material, PBR_CommonData common_data, SpotLight spot_light)
 {
   float fading;
   float solid_angle;
-  return ComputeSpotLightEnergy(material, common_data, spot_light, spot_light_index, fading, solid_angle);
+  return ComputeSpotLightEnergy(material, common_data, spot_light, fading, solid_angle);
 }
+
+
+float3 ComputePointLightsEnergy(PBR_Material material, PBR_CommonData common_data)
+{
+    float3 rv = 0;
+    for (uint i = 0; i < g_shadow_num_point_lights; i++)
+    {
+        ShadowPointLight light = g_shadow_point_lights[i];
+        if (shadowed_point(common_data, light, i))
+        {
+            continue;
+        }
+        PointLight light_copy;
+        light_copy.color = light.color;
+        light_copy.position = light.position;
+        light_copy.radius = light.radius;
+        rv += ComputePointLightEnergy(material, common_data, light_copy);
+    }
+    for(uint j = 0; j < g_num_point_lights; j++)
+    {
+        PointLight light = g_point_lights[j];
+        rv += ComputePointLightEnergy(material, common_data, light);
+    }
+    return rv;
+}
+
+float3 ComputeSpotLightsEnergy(PBR_Material material, PBR_CommonData common_data)
+{
+    float3 rv = 0;
+    for (uint i = 0; i < g_shadow_num_spot_lights; i++)
+    {
+        ShadowSpotLight light = g_shadow_spot_lights[i];
+        if (shadowed_spot(common_data, light, i))
+        {
+            continue;
+        }
+        SpotLight light_copy;
+        light_copy.color = light.color;
+        light_copy.radius = light.radius;
+        light_copy.cone_direction = light.cone_direction;
+        light_copy.inner_cutoff = light.inner_cutoff;
+        light_copy.position = light.position;
+        light_copy.outer_cutoff = light.outer_cutoff;
+        rv += ComputeSpotLightEnergy(material, common_data,  light_copy);
+    }
+    for(uint j = 0; j < g_num_spot_lights; j++)
+    {
+        SpotLight light = g_spot_lights[j];
+        rv += ComputeSpotLightEnergy(material, common_data, light);
+    }
+    return rv;
+}
+
+float3 ComputeDirectionalLightsEnergy(PBR_Material material, PBR_CommonData common_data)
+{
+    float3 rv = 0;
+    for (uint i = 0; i < g_shadow_num_directional_lights; i++)
+    {
+        ShadowDirectionalLight light = g_shadow_directional_lights[i];
+        if (shadowed_directional(common_data, light, i))
+        {
+            continue;
+        }
+        DirectionalLight light_copy;
+        light_copy.color = light.color;
+        light_copy.direction = light.direction;
+        light_copy.solid_angle = light.solid_angle;
+        rv += ComputeDirectionalLightEnergy(material, common_data, light_copy);
+    }
+    for(uint j = 0; j < g_num_directional_lights; j++)
+    {
+        DirectionalLight light = g_directional_lights[j];
+        rv += ComputeDirectionalLightEnergy(material, common_data, light);
+    }
+    return rv;
+}
+float3 ComputeEnvironmentEnergy(PBR_Material material, PBR_CommonData common_data)
+{
+    float3 R = reflect(-common_data.view_dir_normalized, common_data.normal);
+    float ndotv = max(dot(common_data.normal, common_data.view_dir_normalized), clampVal);
+#if 0
+
+    
+    float3 F = F_SchlickRoughness(ndotv, material.f0, material.roughness);
+    float3 kS = F;
+    float3 kD = 1.0 - kS;
+    kD *= 1.0 - material.metalness;
+
+    float3 irradiance = g_irradiance_map.SampleLevel(g_bilinear_clamp_sampler, common_data.normal, 0).rgb;
+    float3 diffuse = irradiance * material.albedo * kD;
+
+    float3 prefilteredColor = g_prefiltered_map.SampleLevel(g_bilinear_clamp_sampler, R, material.roughness * g_prefiltered_map_mip_levels).rgb;
+
+
+    float2 envBRDF = g_brdf_lut.SampleLevel(g_bilinear_clamp_sampler, float2(material.roughness, 1 - ndotv), 0).rg;
+    float3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
+
+#else	
+    float3 diffuse = material.albedo * (1.0 - material.metalness) * common_data.irradiance_map.SampleLevel(common_data.g_bilinear_sampler, common_data.normal, 0.0);
+
+	float2 reflectanceLUT = common_data.brdf_lut.SampleLevel(common_data.g_bilinear_sampler, float2(material.roughness, 1 - max(ndotv, clampVal)), 0).rg;
+    float3 reflectance = reflectanceLUT.x * material.f0 + reflectanceLUT.y;
+	float3 specular = reflectance * common_data.prefiltered_map.SampleLevel(common_data.g_bilinear_sampler, R, material.roughness * common_data.prefiltered_map_mip_levels);
+#endif
+    return diffuse + specular;
+}
+
 
 #endif // PS_HELPERS_HLSLI

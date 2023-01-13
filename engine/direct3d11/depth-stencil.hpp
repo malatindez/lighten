@@ -42,7 +42,7 @@ namespace engine::direct3d
             depth_buffer_desc.SampleDesc.Count = 1;
             depth_buffer_desc.SampleDesc.Quality = 0;
             depth_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-            depth_buffer_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+            depth_buffer_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
             depth_buffer_desc.CPUAccessFlags = 0;
             depth_buffer_desc.MiscFlags = 0;
             // initialize depth stencil view
