@@ -1,6 +1,10 @@
 #include "d3d-common.hpp"
 namespace engine::direct3d
 {
+    ID3D11RenderTargetView * const null_rtv = nullptr;
+    ID3D11DepthStencilView * const null_dsv = nullptr;
+    ID3D11ShaderResourceView * const null_srv = nullptr;
+
     enum class ShaderType : uint8_t
     {
         VertexShader = 0,
@@ -33,7 +37,9 @@ namespace engine::direct3d
     using Blob = d3d_resource_wrapper<ID3D10Blob>;
     using Buffer = d3d_resource_wrapper<ID3D11Buffer>;
     using ShaderResourceView = d3d_resource_wrapper<ID3D11ShaderResourceView>;
+    using UnorderedAccessView = d3d_resource_wrapper<ID3D11UnorderedAccessView>;
     using Resource = d3d_resource_wrapper<ID3D11Resource>;
+    using BlendState = d3d_resource_wrapper<ID3D11BlendState>;
 
     using Factory = d3d_resource_wrapper<IDXGIFactory>;
     using Factory5 = d3d_resource_wrapper<IDXGIFactory5>;
@@ -45,8 +51,4 @@ namespace engine::direct3d
     using Debug = d3d_resource_wrapper<ID3D11Debug>;
     using DebugInfoQueue = d3d_resource_wrapper<ID3D11InfoQueue>;
 #endif
-}
-namespace engine
-{
-    using TextureId = size_t;
 }

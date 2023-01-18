@@ -40,6 +40,7 @@
 #include <fstream>
 #include <random>
 
+#include "common-typedefs.hpp"
 #include "core/math.hpp"
 
 #ifdef __clang__

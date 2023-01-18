@@ -55,6 +55,15 @@ namespace engine::ini
         return dict_.at(key).to_int();
     }
 
+    [[nodiscard]] bool Section::GetBool(std::string const &key)
+    {
+        if (!dict_.contains(key))
+        {
+            throw KeyErrorException("Invalid key: " + key);
+        }
+        return dict_.at(key).to_bool();
+    }
+
     std::string Section::Serialize() const noexcept
     {
         static constexpr auto format = [] (std::string_view const s)

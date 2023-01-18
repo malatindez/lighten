@@ -13,8 +13,10 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 {
     Engine::Init();
     Engine &app = Engine::Get();
+#ifndef _DEBUG
     try
     {
+#endif
         // Initialize in-engine layers that we need
         auto shader_manager = ShaderManager::instance();
         auto input_layer = InputLayer::instance();
@@ -29,13 +31,12 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
         swapchain_render_target->init(window->handle(), window->size());
 
         auto render_pipeline = std::make_shared<direct3d::HDRRenderPipeline>(std::static_pointer_cast<core::Window>(window), swapchain_render_target);
-        render_pipeline->SetOutputTarget(swapchain_render_target);
         render_pipeline->WindowSizeChanged(window->size());
 
         std::shared_ptr<render::PresentSwapchain> present_swapchain = std::make_shared<render::PresentSwapchain>();
         render_pipeline->post_processing().AddLayer(present_swapchain);
 
-        auto controller = std::make_shared<Controller>(window->size(), window->position(), render_pipeline->hdr_to_ldr_layer()->exposure());
+        auto controller = std::make_shared<Controller>(render_pipeline);
         render_pipeline->PushLayer(controller);
         render_pipeline->SetScene(Engine::scene());
         app.PushLayer(render_pipeline);
@@ -43,14 +44,24 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
         shader_manager = nullptr;
         render_pipeline = nullptr;
         app.Run();
+#ifndef _DEBUG
+    }
+    catch (std::exception e)
+    {
+        spdlog::critical(e.what());
+        spdlog::critical("Exception occurred within the engine. Shutting down.");
+        std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+        app.Exit();
     }
     catch (...)
     {
-        spdlog::critical("Exception occurred within the engine. Shutting down.");
+        spdlog::critical("Unknown exception occurred within the engine. Shutting down.");
+        std::this_thread::sleep_for(std::chrono::milliseconds(5000));
         app.Exit();
     }
+#endif
     std::this_thread::sleep_for(std::chrono::milliseconds(250));
     Engine::Deinit();
     std::this_thread::sleep_for(std::chrono::milliseconds(750));
     return 0;
-}
+    }

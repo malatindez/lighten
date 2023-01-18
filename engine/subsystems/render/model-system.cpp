@@ -30,30 +30,26 @@ namespace engine::render
             }
             return rv;
         }
-    }
+    } // namespace
     std::optional<entt::entity> ModelSystem::FindIntersection(entt::registry &registry,
                                                               Ray const &ray,
                                                               core::MeshIntersection &nearest)
     {
         auto group1 = registry.group<components::OpaqueComponent>(entt::get<components::TransformComponent>);
         auto group2 = registry.group<components::EmissiveComponent>(entt::get<components::TransformComponent>);
+        auto group3 = registry.group<components::DissolutionComponent>(entt::get<components::TransformComponent>);
         std::optional<entt::entity> rv = std::nullopt;
-        group1.each([&rv, &ray, &nearest] (auto const entity, auto const &model_instance, auto const &transform)
+        auto const &func = [&rv, &ray, &nearest] (auto const entity, auto const &model_instance, auto const &transform) -> void
                     {
                         auto const &model = GetModel(model_instance.model_id);
                         if (CheckForIntersection(model, transform, ray, nearest))
                         {
                             rv = entity;
                         }
-                    });
-        group2.each([&rv, &ray, &nearest] (auto const entity, auto const &model_instance, auto const &transform)
-                    {
-                        auto const &model = GetModel(model_instance.model_id);
-                        if (CheckForIntersection(model, transform, ray, nearest))
-                        {
-                            rv = entity;
-                        }
-                    });
+                    };
+        group1.each(func);
+        group2.each(func);
+        group3.each(func);
         return rv;
     }
     std::optional<entt::entity> ModelSystem::FindIntersection(entt::registry &registry,
@@ -140,13 +136,13 @@ namespace engine::render
                         dst.position[sideMasks[side][2]] = position.z * sideSigns[side][2];
                         dst.position = normalize(dst.position);
                     };
-                    auto setTexCoord = [] (Vertex &dst)
+                    auto setTexCoord = [] ([[maybe_unused]] Vertex &dst)
                     {
                         // todo
                         // dst.tex_coord.u = ((-dst.position.z / core::math::abs(dst.position.x)) + 1) / 2;
                         // dst.tex_coord.v = ((-dst.position.y / core::math::abs(dst.position.x)) + 1) / 2;
                     };
-                    auto calculateTangents = [] (Vertex &dst)
+                    auto calculateTangents = [] ([[maybe_unused]] Vertex &dst)
                     {
                         // todo
                         // vec3 tangent = cross(dst.normal, vec3{ 0, 1, 0 });

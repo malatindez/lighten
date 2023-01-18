@@ -3,9 +3,18 @@
 #include "render/shader-program.hpp"
 #include "entt/entt.hpp"
 #include "components/components.hpp"
+#include "render/common.hpp"
+namespace engine::core
+{
+    class Scene;
+}
 namespace engine::render
 {
     class ModelSystem;
+    namespace _light_detail
+    {
+        class LightRenderSystem;
+    }
     namespace _opaque_detail
     {
         struct OpaquePerMaterial;
@@ -94,39 +103,19 @@ namespace engine::render::_opaque_detail
         // Each MeshInstance should correspond the one on the same index in model
         std::vector<MeshInstance> mesh_instances;
     };
-    struct OpaquePointLight
-    {
-        core::math::vec3 color;
-        float padding;
-        core::math::vec3 position;
-        float radius;
-    };
-    struct OpaqueSpotLight
-    {
-        core::math::vec3 color;
-        float padding0;
-        core::math::vec3 direction;
-        float padding1;
-        core::math::vec3 position;
-        float cut_off;
-    };
-    struct OpaqueDirectionalLight
-    {
-        core::math::vec3 color;
-        float padding;
-        core::math::vec3 direction;
-        float solid_angle;
-    };
     struct OpaquePerFrame
     {
-        std::array<OpaquePointLight, kOpaqueShaderMaxPointLights> point_lights;
-        std::array<OpaqueSpotLight, kOpaqueShaderMaxSpotLights> spot_lights;
-        std::array<OpaqueDirectionalLight, kOpaqueShaderMaxDirectionalLights> directional_lights;
+        std::array<GPUPointLight, kOpaqueShaderMaxPointLights> point_lights;
+        std::array<GPUSpotLight, kOpaqueShaderMaxSpotLights> spot_lights;
+        std::array<GPUDirectionalLight, kOpaqueShaderMaxDirectionalLights> directional_lights;
         uint32_t num_point_lights;
         uint32_t num_spot_lights;
         uint32_t num_directional_lights;
         uint32_t prefiltered_map_mip_levels;
         float default_ambient_occulsion_value;
+        uint32_t point_light_shadow_resolution;
+        uint32_t spot_light_shadow_resolution;
+        uint32_t directional_light_shadow_resolution;
     };
     struct OpaquePerMaterial
     {
@@ -136,11 +125,46 @@ namespace engine::render::_opaque_detail
         uint32_t enabled_texture_flags;
         core::math::vec2 uv_multiplier;
     };
+    struct OpaquePerDepthCubemap
+    {
+        std::array<core::math::mat4, 6> g_view_projection;
+        uint32_t g_slice_offset;
+        core::math::vec3 padding0;
+    };
+    struct OpaquePerDepthTexture
+    {
+        core::math::mat4 g_view_projection;
+        uint32_t g_slice_offset;
+        core::math::vec3 padding0;
+    };
 
     auto constexpr opaque_vs_shader_path = "assets/shaders/opaque/opaque-vs.hlsl";
     auto constexpr opaque_ps_shader_path = "assets/shaders/opaque/opaque-ps.hlsl";
-    // This class can only be used as a member of ModelSystem
-    class OpaqueRenderSystem
+    auto constexpr opaque_vs_depth_only_shader_path = "assets/shaders/opaque/opaque-depth-only-vs.hlsl";
+    auto constexpr opaque_gs_depth_only_cubemap_shader_path = "assets/shaders/opaque/opaque-depth-only-cubemap-gs.hlsl";
+    auto constexpr opaque_gs_depth_only_texture_shader_path = "assets/shaders/opaque/opaque-depth-only-texture-gs.hlsl";
+
+    // TODO:
+    // update opaque, emissive and skybox rendering systems so we don't have to call AddInstance
+    // We will use on_construct and on_destruct to change it
+    // TODO:
+    // We should store list of all available materials as an unordered map of opaque materials in opaque render system.
+    // This way we can avoid creating new materials every time we add a new instance
+    // TODO:
+    // We should create OpaqueComponent and store the vector of size_t hashes of materials in it
+    // and store model_id as well
+
+    // We will probably need to have the private cache variable in it so we can delete instances of materials that aren't used
+
+    // on_destruct / on_update / on_construct should update the instance tree using these materials
+    // if hash differs -> update material, update cache, delete previous instance
+    // if hash is the same -> do nothing
+
+    // TODO:
+    // Change the system the way that on_destruct / on_construct will set the dirty flag
+    // and add data that should be updated so we can update instances right before the frame if needed
+
+    class OpaqueRenderSystem : public RenderPass
     {
     public:
         ModelInstance *GetInstancePtr(uint64_t model_id);
@@ -155,15 +179,34 @@ namespace engine::render::_opaque_detail
         [[nodiscard]] float &ambient_occlusion() { return ambient_occlusion_value_; }
 
         OpaqueRenderSystem();
-        void Render(entt::registry &registry);
+        void OnRender(core::Scene *scene) override;
+        void RenderDepthOnly(std::vector<OpaquePerDepthCubemap> const &cubemaps, core::Scene *scene);
+        void RenderDepthOnly(std::vector<OpaquePerDepthTexture> const &textures, core::Scene *scene);
 
         ModelInstance &GetInstance(uint64_t model_id);
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity);
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, std::vector<OpaqueMaterial> const &materials);
 
-        void OnInstancesUpdated(entt::registry &registry);
+        void Update([[maybe_unused]] core::Scene *scene) {}
+        void ScheduleOnInstancesUpdate()
+        {
+            should_update_instances_ = true;
+        }
     private:
+        void OnInstancesUpdated(entt::registry &registry);
+
+        // TODO:
+        void on_attach(entt::registry &, entt::entity) {}
+        void on_destroy(entt::registry &, entt::entity) {}
+
+        bool should_update_instances_ = false;
+
         std::vector<ModelInstance> model_instances_;
+
+        GraphicsShaderProgram opaque_cubemap_shader_;
+        GraphicsShaderProgram opaque_texture_shader_;
+        direct3d::DynamicUniformBuffer<OpaquePerDepthCubemap> opaque_per_cubemap_buffer_;
+        direct3d::DynamicUniformBuffer<OpaquePerDepthTexture> opaque_per_texture_buffer_;
 
         GraphicsShaderProgram opaque_shader_;
         direct3d::DynamicUniformBuffer<OpaquePerFrame> opaque_per_frame_buffer_;

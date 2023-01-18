@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "detail/opaque-render-system.hpp"
+#include "detail/dissolution-render-system.hpp"
 #include "detail/emissive-render-system.hpp"
 #include "components/components.hpp"
 #include "core/math.hpp"

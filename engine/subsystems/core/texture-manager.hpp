@@ -17,7 +17,15 @@ namespace engine::core
         static TextureId LoadTexture(std::filesystem::path const &path, bool generate_mipmaps = true);
         static TextureId LoadCubemap(std::filesystem::path const &path);
         static TextureId LoadCubemap(std::array<std::filesystem::path, 6> const &cubemap_textures, bool generate_mipmaps = true);
-
+        [[nodiscard]] static inline ID3D11ShaderResourceView * const &GetTextureViewRef(TextureId texture)
+        {
+            if (auto it = instance_->textures_.find(texture);
+                it != instance_->textures_.end())
+            {
+                return it->second;
+            }
+            throw std::invalid_argument("Unknown handle");
+        }
         [[nodiscard]] static inline ID3D11ShaderResourceView *GetTextureView(TextureId texture) noexcept
         {
             if (auto it = instance_->textures_.find(texture);

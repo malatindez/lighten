@@ -5,7 +5,7 @@ namespace engine::core
     void ShaderManager::OnEvent(events::Event &e)
     {
         std::unordered_set<std::shared_ptr<render::Shader>> compiled_shaders_;
-        if (e.type() == events::EventType::FilesChanged)
+        if (e.type() == events::EventType::FilesChanged) [[unlikely]]
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
             auto &fce = static_cast<events::FilesChangedEvent &>(e);

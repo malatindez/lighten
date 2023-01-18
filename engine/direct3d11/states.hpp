@@ -18,6 +18,7 @@ namespace engine::direct3d
     using ReadOnlyRasterizerState = _state_detail::state_readonly_wrapper<ID3D11RasterizerState>;
     using ReadOnlySamplerState = _state_detail::state_readonly_wrapper<ID3D11SamplerState>;
     using ReadOnlyDepthStencilState = _state_detail::state_readonly_wrapper<ID3D11DepthStencilState>;
+    using ReadOnlyBlendState = _state_detail::state_readonly_wrapper<ID3D11BlendState>;
     class States
     {
     public:
@@ -40,6 +41,9 @@ namespace engine::direct3d
         ReadOnlySamplerState comparison_linear_clamp_sampler;
         ReadOnlySamplerState comparison_anisotropic_wrap_sampler;
         ReadOnlySamplerState comparison_anisotropic_clamp_sampler;
+
+        ReadOnlyBlendState additive_blend_state;
+        ReadOnlyBlendState alpha_to_coverage_blend_state;
 
         [[nodiscard]] static inline States &instance() { utils::Assert(instance_ != nullptr, "States not initialized"); return *instance_; }
     private:

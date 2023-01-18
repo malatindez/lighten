@@ -46,6 +46,7 @@ namespace engine
         direct3d::api().devcon->PSSetShaderResources(0, 1, &view);
 
         direct3d::api().devcon->Draw(3, 0);
+        skybox_shader_.Unbind();
     }
 
     void SkyboxManager::Init()

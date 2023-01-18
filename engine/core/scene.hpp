@@ -7,17 +7,25 @@ namespace engine::core
     {
     public:
         entt::registry registry;
-        std::unique_ptr<engine::CameraController> main_camera = nullptr;
         std::unique_ptr<render::Renderer> renderer = nullptr;
-        void Render()
+        std::unique_ptr<engine::CameraController> main_camera = nullptr;
+        void Render(render::PerFrame const &per_frame)
         {
             utils::Assert(renderer != nullptr, "Renderer is null");
-            renderer->Render(registry);
+            renderer->Render(this, per_frame);
         }
-        void OnInstancesUpdated()
+        void Tick(float delta_time)
+        {
+            renderer->Tick(this, delta_time);
+        }
+        void Update()
+        {
+            renderer->Update(this);
+        }
+        void ScheduleOnInstancesUpdate()
         {
             utils::Assert(renderer != nullptr, "Renderer is null");
-            renderer->OnInstancesUpdated(registry);
+            renderer->ScheduleOnInstancesUpdate();
         }
         inline void AddOpaqueInstance(uint64_t model_id, entt::entity entity)
         {

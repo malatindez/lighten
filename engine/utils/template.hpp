@@ -29,7 +29,31 @@ namespace engine::utils
     {
         static constexpr size_t size = _template_detail::CalculateSize<Args...>();
         static constexpr size_t amount = _template_detail::CalculateAmount<Args...>();
+        template<size_t index>
+        struct type_at
+        {
+            static_assert(index < size);
+            using type = std::tuple_element_t<index, std::tuple<Args...>>;
+        };
     };
+    // based on https://artificial-mind.net/blog/2020/10/31/constexpr-for
+
+    template <auto begin, auto end, auto inc, class F>
+    constexpr void constexpr_for(F &&f)
+    {
+        if (not f(std::integral_constant<decltype(begin), begin>{}))
+        {
+            return;
+        }
+        if constexpr (begin + inc >= end)
+        {
+            return;
+        }
+        else // else should be constexpr as well
+        {
+            constexpr_for<begin + inc, end, inc>(std::forward<F>(f));
+        }
+    }
 
     template <class iterator, class F>
     constexpr bool for_each_true(iterator begin, iterator const &end, F &&f)

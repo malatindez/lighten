@@ -20,12 +20,11 @@ float4 ps_main(PS_INPUT input) : SV_TARGET
 	{
 		emission = (g_EmissiveTexture.Sample(g_anisotropic_wrap_sampler, input.texcoord.xy)).xyz * input.power;
 	}
-
 	float3 normal = normalize(input.normal);
 	float3 cameraDir = normalize(GetCameraPosition() - input.world_transform[3].xyz);
 
 	float3 normedEmission = emission / max(emission.x, max(emission.y, max(emission.z, 1.0)));
 	
 	float NoV = dot(cameraDir, normal);
-	return float4(lerp(normedEmission * 0.33, emission, pow(max(0.0, NoV), 8)), 1);
+	return float4(lerp(normedEmission, emission, pow(max(0.0, NoV), 5)), 1);
 } 

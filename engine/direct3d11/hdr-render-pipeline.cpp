@@ -1,10 +1,12 @@
 #include "hdr-render-pipeline.hpp"
 #include "components/components.hpp"
-#include "subsystems/render/skybox-manager.hpp"
 #include "subsystems/core/input-layer.hpp"
+#include "subsystems/render/skybox-manager.hpp"
+#include "core/engine.hpp"
+#include "core/../../d3d_test/object-editor.hpp"
 namespace engine::direct3d
 {
-    HDRRenderPipeline::HDRRenderPipeline(std::shared_ptr<core::Window> window, std::shared_ptr<RenderTargetBase> const &output_target)
+    HDRRenderPipeline::HDRRenderPipeline(std::shared_ptr<core::Window> window, std::shared_ptr<SwapchainRenderTarget> const &output_target)
         : core::RenderPipeline(),
         hdr_target_{ DXGI_FORMAT_R16G16B16A16_FLOAT },
         output_target_{ output_target }
@@ -16,9 +18,10 @@ namespace engine::direct3d
         hdr_target_.init();
         InitImGuiLayer(window);
         post_processing_ = std::make_shared<render::PostProcessing>();
-        hdr_to_ldr_layer_ = std::make_shared<render::HDRtoLDRLayer>(output_target_);
+        hdr_to_ldr_layer_ = std::make_shared<render::HDRtoLDRLayer>(*output_target_);
         post_processing_->AddLayer(hdr_to_ldr_layer_);
         this->PushLayer(post_processing_);
+        window_ = window;
     }
     void HDRRenderPipeline::WindowSizeChanged(core::math::ivec2 const &size)
     {
@@ -29,6 +32,8 @@ namespace engine::direct3d
         desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
         desc.Width = static_cast<uint32_t>(size.x);
         desc.Height = static_cast<uint32_t>(size.y);
+        desc.SampleDesc.Count = hdr_target_.render_target_description().SampleDesc.Count;
+        desc.SampleDesc.Quality = hdr_target_.render_target_description().SampleDesc.Quality;
         depth_stencil_.init(&desc, nullptr);
 
         // Set up the viewport.
@@ -39,15 +44,17 @@ namespace engine::direct3d
     void HDRRenderPipeline::OnRender()
     {
         FrameBegin();
-        scene_->Render();
-        for (auto entity : scene_->registry.view<components::SkyboxComponent>())
-        {
-            SkyboxManager::RenderSkybox(scene_->registry.get<components::SkyboxComponent>(entity), per_frame_);
-        }
+
+        direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(1, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(2, 1, &direct3d::states().bilinear_clamp_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(3, 1, &direct3d::states().comparison_linear_clamp_sampler.ptr());
+
+        scene_->Render(per_frame_);
         // Render frame
         LayerStack::OnRender();
-
         PostProcess();
+
         imgui_layer_->Begin();
         OnGuiRender();
         imgui_layer_->End();
@@ -57,6 +64,12 @@ namespace engine::direct3d
     void HDRRenderPipeline::OnUpdate()
     {
         core::RenderPipeline::OnUpdate();
+        scene_->Update();
+    }
+    void HDRRenderPipeline::OnTick(float dt)
+    {
+        core::RenderPipeline::OnTick(dt);
+        scene_->Tick(dt);
     }
     void HDRRenderPipeline::OnEvent(core::events::Event &e)
     {
@@ -70,6 +83,7 @@ namespace engine::direct3d
 
     void HDRRenderPipeline::FrameBegin()
     {
+        api().devcon4->RSSetViewports(1, &viewport_);
         api().devcon4->OMSetRenderTargets(1, &hdr_target_.render_target_view(), depth_stencil_.depth_stencil_view());
 
         api().devcon4->ClearRenderTargetView(hdr_target_.render_target_view(), sky_color_.data.data());
@@ -83,8 +97,11 @@ namespace engine::direct3d
         per_frame_.inv_projection = camera.inv_projection;
         per_frame_.inv_view_projection = camera.inv_view_projection;
         per_frame_.screen_resolution = core::math::vec2{ viewport_.Width, viewport_.Height };
-
         per_frame_.mouse_position = core::math::vec2{ core::InputLayer::instance()->mouse_position() };
+        per_frame_.time_now = core::Engine::TimeFromStart();
+        per_frame_.time_since_last_frame = timer.elapsed();
+        per_frame_.sample_count = hdr_target_.sample_count;
+        timer.reset();
 
         per_frame_buffer_.Update(per_frame_);
         per_frame_buffer_.Bind(ShaderType::VertexShader, 0);

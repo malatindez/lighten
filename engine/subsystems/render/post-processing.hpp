@@ -23,7 +23,7 @@ namespace engine::render
         public:
             virtual void OnFrameEnd(direct3d::RenderTargetBase &) = 0;
         };
-        // Each layer will receive the RenderTarget from that is the result of execution of previous layer
+        // Each layer will receive the RenderTarget that is the result of execution of the previous layer
         class HandleProcess
         {
         public:

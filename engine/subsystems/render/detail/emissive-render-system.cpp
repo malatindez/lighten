@@ -3,10 +3,11 @@
 #include "../model-system.hpp"
 #include "../../core/shader-manager.hpp"
 #include "utils/utils.hpp"
+#include "core/scene.hpp"
 
 namespace engine::render::_emissive_detail
 {
-    EmissiveRenderSystem::EmissiveRenderSystem()
+    EmissiveRenderSystem::EmissiveRenderSystem() : RenderPass(0x10002)
     {
         auto path = std::filesystem::current_path();
 
@@ -27,8 +28,14 @@ namespace engine::render::_emissive_detail
         auto il = std::make_shared<InputLayout>(vs->blob(), d3d_input_desc);
         emissive_shader_.SetVertexShader(vs).SetPixelShader(ps).SetInputLayout(il);
     }
-    void EmissiveRenderSystem::Render()
+    void EmissiveRenderSystem::OnRender(core::Scene *scene)
     {
+        if (should_update_instances_)
+        {
+            OnInstancesUpdated(scene->registry);
+            scene->renderer->light_render_system().ScheduleShadowMapUpdate();
+            should_update_instances_ = false;
+        }
         if (instance_buffer_.size() == 0)
             return;
         emissive_shader_.Bind();
@@ -73,6 +80,7 @@ namespace engine::render::_emissive_detail
                 }
             }
         }
+        emissive_shader_.Unbind();
     }
     void EmissiveRenderSystem::OnInstancesUpdated(entt::registry &registry)
     {

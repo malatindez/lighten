@@ -7,6 +7,7 @@ using namespace components;
 
 namespace camera_movement
 {
+    bool dynamic_shadows = true;
     ivec2 lb_saved_mouse_position{ -1 };
     ivec2 rb_saved_mouse_position{ -1 };
 
@@ -14,6 +15,7 @@ namespace camera_movement
     entt::entity selected_entity = entt::null;
     float selected_distance = 0.0f;
     vec3 selected_object_offset{ 0.0f };
+    bool moving = false;
 
     void RegisterKeyCallbacks()
     {
@@ -67,6 +69,17 @@ namespace camera_movement
                 if (count == std::numeric_limits<uint32_t>::max() || InputLayer::instance()->key_state(engine::core::Key::KEY_CONTROL))
                 {
                     rb_saved_mouse_position = core::math::ivec2{ -1 };
+                    if (moving)
+                    {
+                        moving = false;
+                        if (Engine::scene()->registry.try_get<components::OpaqueComponent>(selected_entity) != nullptr ||
+                            Engine::scene()->registry.try_get<components::PointLight>(selected_entity) != nullptr ||
+                            Engine::scene()->registry.try_get<components::SpotLight>(selected_entity) != nullptr ||
+                            Engine::scene()->registry.try_get<components::DirectionalLight>(selected_entity) != nullptr)
+                        {
+                            Engine::scene()->renderer->light_render_system().ScheduleShadowMapUpdate();
+                        }
+                    }
                     return;
                 }
                 if (rb_saved_mouse_position == core::math::vec2{ -1 })
@@ -95,6 +108,7 @@ namespace camera_movement
                 }
                 else if (selected_scene)
                 {
+                    moving = true;
                     auto &input = *InputLayer::instance();
                     auto scene = Engine::scene();
                     Ray b = scene->main_camera->PixelRaycast(vec2{ input.mouse_position() });
@@ -103,11 +117,66 @@ namespace camera_movement
                     auto &transform = scene->registry.get<TransformComponent>(selected_entity);
                     transform.position = selected_object_offset + obj_offset + scene->main_camera->position();
                     transform.UpdateMatrices();
-                    scene->OnInstancesUpdated();
+                    if (Engine::scene()->registry.try_get<components::OpaqueComponent>(selected_entity))
+                    {
+                        Engine::scene()->renderer->opaque_render_system().ScheduleOnInstancesUpdate();
+                    }
+                    if (Engine::scene()->registry.try_get<components::EmissiveComponent>(selected_entity))
+                    {
+                        Engine::scene()->renderer->emissive_render_system().ScheduleOnInstancesUpdate();
+                    }
+                    if (Engine::scene()->registry.try_get<components::DissolutionComponent>(selected_entity))
+                    {
+                        Engine::scene()->renderer->dissolution_render_system().ScheduleOnInstancesUpdate();
+                    }
+
+                    if (dynamic_shadows && (Engine::scene()->registry.try_get<components::OpaqueComponent>(selected_entity) != nullptr ||
+                                            Engine::scene()->registry.try_get<components::DissolutionComponent>(selected_entity) != nullptr ||
+                                            Engine::scene()->registry.try_get<components::PointLight>(selected_entity) != nullptr ||
+                                            Engine::scene()->registry.try_get<components::SpotLight>(selected_entity) != nullptr ||
+                                            Engine::scene()->registry.try_get<components::DirectionalLight>(selected_entity) != nullptr))
+                    {
+                        Engine::scene()->renderer->light_render_system().ScheduleShadowMapUpdate();
+                    }
                 }
             });
+        input->AddUpdateKeyCallback(InputLayer::KeySeq{ engine::core::Key::KEY_N },
+                                    [&] (InputLayer::KeySeq const &, uint32_t count)
+                                    {
+                                        if (count == std::numeric_limits<uint32_t>::max())
+                                        {
+                                            return;
+                                        }
+                                        static utils::SteadyTimer timer;
+                                        static float kSpawnLimit = 0.25f;
+                                        if (timer.elapsed() < kSpawnLimit)
+                                        {
+                                            return;
+                                        }
+                                        timer.reset();
+                                        auto &registry = Engine::scene()->registry;
+                                        auto &drs = Engine::scene()->renderer->dissolution_render_system();
+                                        auto knight = registry.create();
+
+                                        auto &transform = registry.emplace<TransformComponent>(knight);
+                                        transform.position = Engine::scene()->main_camera->position() + Engine::scene()->main_camera->forward() * 2.0f;
+                                        transform.position -= Engine::scene()->main_camera->up();
+                                        math::mat3 rotation_matrix
+                                        {
+                                               Engine::scene()->main_camera->right(),
+                                               -Engine::scene()->main_camera->up(),
+                                               -Engine::scene()->main_camera->forward()
+                                        };
+                                        rotation_matrix = math::inverse(math::rtranspose(rotation_matrix));
+                                        transform.rotation = math::QuaternionFromRotationMatrix(rotation_matrix);
+                                        transform.UpdateMatrices();
+                                        uint64_t model_id = ModelLoader::Load("assets\\models\\Knight\\Knight.fbx").value();
+                                        drs.AddInstance(model_id, registry, knight, std::uniform_real_distribution<float>(0.5f, 5.0f)(Engine::random_engine()));
+                                        Engine::scene()->renderer->dissolution_render_system().ScheduleOnInstancesUpdate();
+                                        Engine::scene()->renderer->light_render_system().ScheduleShadowMapUpdate();
+                                    });
     }
-    void UpdateCamera(float delta_time)
+    void OnTick(float delta_time)
     {
         auto &input = *InputLayer::instance();
         auto scene = Engine::scene();
@@ -117,5 +186,29 @@ namespace camera_movement
             pixel_delta = input.mouse_position() - lb_saved_mouse_position;
         }
         scene->main_camera->OnTick(delta_time, pixel_delta);
+    }
+
+    void OnUpdate()
+    {
+        // TODO:
+        // find an issue that causes objects to tremble while moving with camera using RMB
+        // Code below outputs the object position each update, but for some reason it shows the correct position values
+        // I have no clue for now what causes this issue.
+        // Probably something's off with the per_frame or transform updates, but it's hard to tell.
+        // I'll leave this code here for now, but it's not used.
+        // I'll try to fix this issue later.
+        return;
+        auto scene = Engine::scene();
+        if (!scene->registry.valid(selected_entity))
+        {
+            return;
+        }
+        auto *transform_ptr = scene->registry.try_get<TransformComponent>(selected_entity);
+        if (transform_ptr == nullptr)
+        {
+            return;
+        }
+        auto &transform = *transform_ptr;
+        spdlog::info(utils::FormatToString(transform.position));
     }
 }
