@@ -26,7 +26,10 @@ namespace engine::core
             math::vec3 center = (V1 + V2 + V3) / 3.f;
 
             bool inserted = addTriangle((uint32_t)(i / 3 - 1), V1, V2, V3, center);
-            utils::Assert(inserted, "Failed to insert triangle");
+            if (!inserted)
+            {
+                utils::Assert(inserted, "Failed to insert triangle");
+            }
         }
     }
 

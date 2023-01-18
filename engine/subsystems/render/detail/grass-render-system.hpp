@@ -34,7 +34,7 @@ namespace engine::render
 
             core::math::vec2 grass_texture_from;
             core::math::vec2 grass_texture_to;
-            
+
             core::math::vec3 wind_vector;
             float wind_amplitude;
             float wind_wavenumber;
@@ -70,12 +70,12 @@ namespace engine::render
         core::math::vec3 translucency_value = 0.0f;
         float metalness_value = 0.0f;
         bool reverse_normal_y = false;
-        
+
         core::math::vec3 wind_vector;
         float wind_amplitude;
         float wind_wavenumber;
         float wind_frequency;
-        
+
         uint32_t texture_flags;
         // from, to texture coordinates
         std::vector<core::math::vec4> atlas_data;
@@ -168,13 +168,9 @@ namespace engine::render::_grass_detail
 {
     using GrassPerDepthCubemap = _opaque_detail::OpaquePerDepthCubemap;
     using GrassPerDepthTexture = _opaque_detail::OpaquePerDepthTexture;
-    constexpr auto kGrassShaderMaxPointLights = _opaque_detail::kOpaqueShaderMaxPointLights;
-    constexpr auto kGrassShaderMaxSpotLights = _opaque_detail::kOpaqueShaderMaxSpotLights;
-    constexpr auto kGrassShaderMaxDirectionalLights = _opaque_detail::kOpaqueShaderMaxDirectionalLights;
 
     constexpr auto grass_vs_shader_path = "assets/shaders/grass/grass-vs.hlsl";
     constexpr auto grass_ps_shader_path = "assets/shaders/grass/grass-ps.hlsl";
-    constexpr auto grass_vs_depth_only_shader_path = "assets/shaders/grass/grass-depth-only-vs.hlsl";
     constexpr auto grass_gs_depth_only_cubemap_shader_path = "assets/shaders/grass/grass-depth-only-cubemap-gs.hlsl";
     constexpr auto grass_gs_depth_only_texture_shader_path = "assets/shaders/grass/grass-depth-only-texture-gs.hlsl";
     constexpr auto grass_ps_depth_only_shader_path = "assets/shaders/grass/grass-depth-only-ps.hlsl";
@@ -185,42 +181,24 @@ namespace engine::render::_grass_detail
         float rotation;
     };
 
-    struct GrassPerFrame
-    {
-        std::array<GPUPointLight, kGrassShaderMaxPointLights> point_lights;
-        std::array<GPUSpotLight, kGrassShaderMaxSpotLights> spot_lights;
-        std::array<GPUDirectionalLight, kGrassShaderMaxDirectionalLights> directional_lights;
-        uint32_t num_point_lights;
-        uint32_t num_spot_lights;
-        uint32_t num_directional_lights;
-        uint32_t prefiltered_map_mip_levels;
-
-        float default_ambient_occlusion_value;
-        uint32_t point_light_shadow_resolution;
-        uint32_t spot_light_shadow_resolution;
-        uint32_t directional_light_shadow_resolution;
-    };
-
     struct MaterialInstance
     {
         std::vector<entt::entity> instances;
         GrassMaterial material;
         size_t material_hash;
     };
-
-    class GrassRenderSystem : public render::RenderPass
+    // TODO:
+    // make grass dynamically movable by adding transform matrix that contains rotation, scale and position of an object
+    // For now, it renders the grass only relatively to the rotation
+    class GrassRenderSystem final : public render::RenderPass
     {
     public:
         GrassRenderSystem();
-        void OnRender(core::Scene *scene) override;
+        void OnRender(core::Scene *scene);
         void RenderDepthOnly(std::vector<GrassPerDepthCubemap> const &cubemaps, core::Scene *scene);
         void RenderDepthOnly(std::vector<GrassPerDepthTexture> const &textures, core::Scene *scene);
         void Update([[maybe_unused]] core::Scene *scene) {}
-        void ScheduleOnInstancesUpdate();
-
-        void SetIrradianceTexture(ID3D11ShaderResourceView *texture) { irradiance_texture_ = texture; }
-        void SetPrefilteredTexture(ID3D11ShaderResourceView *texture) { prefiltered_texture_ = texture; }
-        void SetBrdfTexture(ID3D11ShaderResourceView *texture) { brdf_texture_ = texture; }
+        void ScheduleInstanceUpdate();
 
         GrassMaterial &GetMaterial(size_t material_id) {
             return materials_[material_id].material;
@@ -235,6 +213,12 @@ namespace engine::render::_grass_detail
          */
         size_t AddMaterial(GrassMaterial &&material);
     private:
+        struct GPUTransformInfo
+        {
+            core::math::mat4 rotation_matrix;
+            core::math::vec3 position;
+            float padding;
+        };
         void OnInstancesUpdate(core::Scene *scene);
 
         bool instances_update_scheduled_ = false;
@@ -246,15 +230,10 @@ namespace engine::render::_grass_detail
         direct3d::DynamicUniformBuffer<GrassPerDepthCubemap> grass_per_cubemap_buffer_;
         direct3d::DynamicUniformBuffer<GrassPerDepthTexture> grass_per_texture_buffer_;
 
-        direct3d::DynamicUniformBuffer<GrassPerFrame> grass_per_frame_buffer_;
-        direct3d::DynamicUniformBuffer<core::math::mat4> grass_rotation_buffer_;
+        direct3d::DynamicUniformBuffer<GPUTransformInfo> grass_transform_buffer_;
         direct3d::DynamicVertexBuffer<GPUGrassInstance> instance_buffer_;
 
         direct3d::DynamicUniformBuffer<_grass_detail::GrassPerMaterial> grass_per_material_buffer_;
-
-        ID3D11ShaderResourceView *irradiance_texture_;
-        ID3D11ShaderResourceView *prefiltered_texture_;
-        ID3D11ShaderResourceView *brdf_texture_;
 
         std::vector<MaterialInstance> materials_;
     };

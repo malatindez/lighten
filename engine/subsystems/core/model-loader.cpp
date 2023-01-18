@@ -116,7 +116,18 @@ namespace engine::core
                                                      aiProcess_FlipWindingOrder |
                                                      aiProcess_JoinIdenticalVertices |
                                                      (uint32_t)aiProcess_GenBoundingBoxes |
-                                                     aiProcess_CalcTangentSpace);
+                                                     aiProcess_CalcTangentSpace |
+                                                     aiProcess_OptimizeGraph |
+                                                     aiProcess_OptimizeMeshes |
+                                                     aiProcess_ImproveCacheLocality |
+                                                     aiProcess_RemoveRedundantMaterials |
+                                                     aiProcess_FindDegenerates |
+                                                     aiProcess_FindInvalidData |
+                                                     aiProcess_GenSmoothNormals |
+                                                     aiProcess_SplitLargeMeshes |
+                                                     aiProcess_SortByPType |
+                                                     aiProcess_FindInstances |
+                                                     aiProcess_ValidateDataStructure);
 
         if (scene_ptr == nullptr)
         {

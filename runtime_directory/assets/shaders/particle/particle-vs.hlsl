@@ -26,18 +26,11 @@ struct VS_OUTPUT
     float2 next_uv : NEXT_UV;
 };
 
-cbuffer ParticlePerFrame : register(b1)
+cbuffer ParticlePerFrame : register(b2)
 {
-    PointLight g_point_lights[MAX_POINT_LIGHTS];
-    SpotLight g_spot_lights[MAX_SPOT_LIGHTS];
-    DirectionalLight g_directional_lights[MAX_DIRECTIONAL_LIGHTS];
-    uint num_point_lights;
-    uint num_spot_lights;
-    uint num_directional_lights;
     float g_time_since_last_tick;
     uint2 g_atlas_size;
     uint use_dms_depth_texture;
-    float padding;
 };
 float2 calculate_uv(uint vertex_id, uint index)
 {

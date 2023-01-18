@@ -43,13 +43,13 @@ namespace engine::render::_particle_detail
 // It will modify the engine\components\generated\components-info.hpp file
 
 // To iterate through all the component types you can use the following code:
-// utils::for_constexpr<0, components::kAmount, 1>([](auto i) constexpr -> bool { 
+// utils::for_constexpr<0, components::kAmount, 1>([](auto i) constexpr -> bool {
 //   using component = components::component_by_id<i>;
 //   std::cout << component::name << std::endl;
 //   return true; // if false is returned the loop will break
 // });
 
-// You can use it to substitute the switch statement so you can easily iterate through 
+// You can use it to substitute the switch statement so you can easily iterate through
 // all the components without worrying about giant and complex switch statement
 // Also, this way, you can easily add new components without modifying the switch statement at all
 // And, most importantly, for_constexpr is equivalent or even faster than the
@@ -57,7 +57,6 @@ namespace engine::render::_particle_detail
 // In one test using the intel C++ compiler the switch statement was 6.02% faster
 // than the for_constexpr loop
 // but in the most tests the for_constexpr is faster
-
 
 // Faster by ~8.5% on quick-bench.com:
 // https://quick-bench.com/q/kECfb_lV71FRuVmVp8t3JAE7IYg
@@ -88,7 +87,6 @@ namespace engine::render::_particle_detail
 // ConstexprFor              13.8 ns         13.8 ns     49777778
 // LongSwitchStatement       13.9 ns         14.0 ns     56000000
 
-
 // quick-bench:                        constexpr better by 14.07%
 // https://quick-bench.com/q/sviPz85GilYvdmZiIbMP96ybXzU
 // MSVC i5-12600kf:                     constexpr better by 8.32%
@@ -103,7 +101,6 @@ namespace engine::render::_particle_detail
 // --------------------------------------------------------------
 // ConstexprFor              26.6 ns         26.7 ns     26352941
 // LongSwitchStatement       25.0 ns         24.6 ns     29866667
-
 
 // TODO:
 // Add a python script that will generate the component serialization/deserialization code
@@ -132,7 +129,6 @@ namespace engine::render::_particle_detail
 //         }
 // };
 // It will modify the engine\components\generated\components-serialization.hpp file
-
 
 // TODO:
 // Add a python script that will generate the ImGui component editor code
@@ -181,7 +177,7 @@ namespace engine::render::_particle_detail
 //         {
 //             // draw each of the public members of the component
 //             // using the engine::components::ImGuiEditor::ImGuiEditor<T>{} specialization
-//             // It will draw the component in the ImGui window 
+//             // It will draw the component in the ImGui window
 //             // using the ImGui::InputText, ImGui::InputFloat, etc.
 //             // You can also use the ImGui::DragFloat, ImGui::SliderFloat, etc.
 //             // to make the component editor more user-friendly
@@ -202,15 +198,14 @@ namespace engine::render::_particle_detail
 //         engine::utils::hash_combine (member1);
 //         engine::utils::hash_combine (member2);
 //         ...
-//         engine::utils::hash_combine (memberN);  
-//         // *each public member should have the std::hash<T>{} specialization 
+//         engine::utils::hash_combine (memberN);
+//         // *each public member should have the std::hash<T>{} specialization
 //         return seed;
 //     }
 // };
 // If you want to generate hash class for the component you should add the
 // static constexpr bool kGenerateHash = true; member to the component
 // It will modify the engine\components\generated\components-hash.hpp file
-
 
 namespace engine::components
 {
@@ -318,6 +313,7 @@ namespace engine::components
 
         core::math::vec3 color;
         float power;
+        bool casts_shadows = false;
     };
     struct DirectionalLight final
     {
@@ -331,6 +327,7 @@ namespace engine::components
         float solid_angle;
         core::math::vec3 color;
         float power;
+        bool casts_shadows = false;
     };
     struct SpotLight final
     {
@@ -346,6 +343,7 @@ namespace engine::components
         // direction is determined by transform
         float inner_cutoff;
         float outer_cutoff;
+        bool casts_shadows = false;
     };
 
     // TODO:

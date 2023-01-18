@@ -11,7 +11,11 @@ namespace engine::render
             SkyboxManager::RenderSkybox(scene->registry.get<components::SkyboxComponent>(entity), *per_frame_ptr);
         }
     }
-    void Renderer::Render(core::Scene *scene, render::PerFrame const &per_frame)
+    void Renderer::FrameBegin(core::Scene *scene)
+    {
+        light_render_system_->OnRender(scene);
+    }
+    void Renderer::DeferredRender(core::Scene *scene, GBuffer const &buffer, ID3D11DepthStencilView *dsv)
     {
         /*
         light_render_system_.RenderShadowMaps(scene);
@@ -24,11 +28,18 @@ namespace engine::render
             SkyboxManager::RenderSkybox(scene->registry.get<components::SkyboxComponent>(entity), per_frame);
         }
         particle_render_system_.Render(scene);*/
+        opaque_render_system_->OnRender(scene);
+        dissolution_render_system_->OnRender(scene);
+        emissive_render_system_->OnRender(scene);
+        grass_render_system_->OnRender(scene);
+        decal_render_system_->OnRender(scene, buffer, dsv);
+    }
+
+    void Renderer::ForwardRender(core::Scene *scene, render::PerFrame const &per_frame, GBuffer const &buffer, ID3D11DepthStencilView *dsv)
+    {
         skybox_render_pass_->per_frame_ptr = &per_frame;
-        for (auto &render_pass : render_passes_)
-        {
-            render_pass->OnRender(scene);
-        }
+        skybox_render_pass_->OnRender(scene);
+        particle_render_system_->OnRender(scene, dsv);
     }
     void Renderer::Tick(core::Scene *scene, float delta_time)
     {
@@ -38,16 +49,17 @@ namespace engine::render
     {
         opaque_render_system_->Update(scene);
         dissolution_render_system_->Update(scene);
-        grass_render_system_->Update(scene);
         emissive_render_system_->Update(scene);
+        grass_render_system_->Update(scene);
         light_render_system_->Update(scene);
     }
-    void Renderer::ScheduleOnInstancesUpdate()
+    void Renderer::ScheduleInstanceUpdate()
     {
-        opaque_render_system_->ScheduleOnInstancesUpdate();
-        dissolution_render_system_->ScheduleOnInstancesUpdate();
-        grass_render_system_->ScheduleOnInstancesUpdate();
-        emissive_render_system_->ScheduleOnInstancesUpdate();
-        light_render_system_->ScheduleOnInstancesUpdate();
+        opaque_render_system_->ScheduleInstanceUpdate();
+        dissolution_render_system_->ScheduleInstanceUpdate();
+        grass_render_system_->ScheduleInstanceUpdate();
+        emissive_render_system_->ScheduleInstanceUpdate();
+        light_render_system_->ScheduleInstanceUpdate();
+        decal_render_system_->ScheduleInstanceUpdate();
     }
 }

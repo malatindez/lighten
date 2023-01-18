@@ -75,30 +75,30 @@ namespace engine::render::_emissive_detail
     };
 
     // This class can only be used as a member of ModelSystem
-    class EmissiveRenderSystem : public render::RenderPass
+    class EmissiveRenderSystem final : public render::RenderPass
     {
     public:
         ModelInstance *GetInstancePtr(uint64_t model_id);
 
         EmissiveRenderSystem();
-        void OnRender(core::Scene *scene) override;
+        void OnRender(core::Scene *scene);
         ModelInstance &GetInstance(uint64_t model_id);
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity);
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, std::vector<EmissiveMaterial> const &materials);
 
         void Update([[maybe_unused]] core::Scene *scene) {}
-        void ScheduleOnInstancesUpdate()
+        void ScheduleInstanceUpdate()
         {
-            should_update_instances_ = true;
+            is_instance_update_scheduled_ = true;
         }
 
     private:
-        void OnInstancesUpdated(entt::registry &registry);
+        void UpdateInstances(entt::registry &registry);
 
         static auto constexpr emissive_vs_shader_path = "assets/shaders/emissive/emissive-vs.hlsl";
         static auto constexpr emissive_ps_shader_path = "assets/shaders/emissive/emissive-ps.hlsl";
 
-        bool should_update_instances_ = false;
+        bool is_instance_update_scheduled_ = false;
 
         std::vector<ModelInstance> model_instances_;
 

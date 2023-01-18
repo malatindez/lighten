@@ -1,5 +1,5 @@
 #include "../globals/globals-vs.hlsli"
-cbuffer PerModel : register(b1) { row_major matrix mesh_to_model; }
+cbuffer PerModel : register(b2) { row_major matrix mesh_to_model; }
 
 struct VS_OUTPUT {
   float4 pos : SV_POSITION;
@@ -9,6 +9,7 @@ struct VS_OUTPUT {
   float3 bitangent : BITANGENT;
   float3 fragment_position : FRAGMENT_POSITION;
   float4x4 world_transform : WORLD_TRANSFORM;
+  nointerpolation uint entity_id : ENTITY_ID;
 };
 
 struct VS_INPUT {
@@ -21,6 +22,7 @@ struct VS_INPUT {
   float4 RowY : ROWY;
   float4 RowZ : ROWZ;
   float4 RowW : ROWW;
+  uint entity_id : ENTITY_ID;
 };
 
 VS_OUTPUT vs_main(VS_INPUT input) {
@@ -35,5 +37,6 @@ VS_OUTPUT vs_main(VS_INPUT input) {
   output.tangent = normalize(mul(normalize(input.tangent), (float3x3)world_transform));
   output.bitangent = normalize(mul(normalize(input.bitangent), (float3x3)world_transform));
   output.world_transform = world_transform;
+  output.entity_id = input.entity_id;
   return output;
 }

@@ -58,7 +58,7 @@ namespace engine::render::_particle_detail
         auto il = std::make_shared<InputLayout>(vs->blob(), d3d_input_desc);
         particle_shader_.SetVertexShader(vs).SetPixelShader(ps).SetInputLayout(il);
     }
-    void ParticleRenderSystem::OnRender(core::Scene *scene)
+    void ParticleRenderSystem::OnRender(core::Scene *scene, ID3D11DepthStencilView *dsv)
     {
         auto view = scene->registry.view<components::TransformComponent, components::ParticleEmitter>();
         if (view.size_hint() == 0)
@@ -105,75 +105,11 @@ namespace engine::render::_particle_detail
         ParticlePerFrame per_frame;
         auto &registry = scene->registry;
         using namespace engine::core::math;
-        auto &lrs = scene->renderer->light_render_system();
-        {
-            auto const &point_lights = lrs.point_light_entities();
-            auto const &spot_lights = lrs.spot_light_entities();
-            auto const &directional_lights = lrs.directional_light_entities();
-            auto const &point_light_matrices = lrs.point_light_shadow_matrices();
-            auto const &spot_light_matrices = lrs.spot_light_shadow_matrices();
-            auto const &directional_light_matrices = lrs.directional_light_shadow_matrices();
-
-            per_frame.num_point_lights = per_frame.num_spot_lights = per_frame.num_directional_lights = 0;
-            for (entt::entity entity : point_lights)
-            {
-                auto &opaque_point_light = per_frame.point_lights[per_frame.num_point_lights];
-                auto &registry_point_light = registry.get<components::PointLight>(entity);
-                auto &registry_transform = registry.get<components::TransformComponent>(entity);
-                opaque_point_light.color = registry_point_light.color * registry_point_light.power;
-                opaque_point_light.position = registry_transform.position;
-                opaque_point_light.radius = length(registry_transform.scale) / sqrt(3.1f);
-                opaque_point_light.view_projection = point_light_matrices.at(entity);
-                if (++per_frame.num_point_lights >= kParticleShaderMaxPointLights)
-                {
-                    utils::AlwaysAssert(false, "Amount of point lights on the scene went beyond the maximum amount.");
-                    break;
-                }
-            }
-            for (entt::entity entity : spot_lights)
-            {
-                auto &opaque_spot_light = per_frame.spot_lights[per_frame.num_spot_lights];
-                auto &registry_spot_light = registry.get<components::SpotLight>(entity);
-                auto &registry_transform = registry.get<components::TransformComponent>(entity);
-                opaque_spot_light.color = registry_spot_light.color * registry_spot_light.power;
-                opaque_spot_light.position = registry_transform.position;
-                opaque_spot_light.direction = registry_transform.rotation * core::math::vec3(0, 0, 1);
-                opaque_spot_light.radius = length(registry_transform.scale) / sqrt(3.1f);
-                opaque_spot_light.inner_cutoff = registry_spot_light.inner_cutoff;
-                opaque_spot_light.outer_cutoff = registry_spot_light.outer_cutoff;
-                opaque_spot_light.view_projection = spot_light_matrices.at(entity);
-                if (++per_frame.num_spot_lights >= kParticleShaderMaxSpotLights)
-                {
-                    utils::AlwaysAssert(false, "Amount of spot lights on the scene went beyond the maximum amount.");
-                    break;
-                }
-            }
-            for (entt::entity entity : directional_lights)
-            {
-                auto &opaque_directional_light = per_frame.directional_lights[per_frame.num_directional_lights];
-                auto &registry_directional_light = registry.get<components::DirectionalLight>(entity);
-                auto &registry_transform = registry.get<components::TransformComponent>(entity);
-                opaque_directional_light.color = registry_directional_light.color * registry_directional_light.power;
-                opaque_directional_light.direction = registry_transform.rotation * core::math::vec3{ 0, 1, 0 };
-                opaque_directional_light.solid_angle = registry_directional_light.solid_angle;
-                opaque_directional_light.view_projection = directional_light_matrices.at(entity);
-
-                if (++per_frame.num_directional_lights >= kParticleShaderMaxDirectionalLights)
-                {
-                    utils::AlwaysAssert(false, "Amount of directional lights on the scene went beyond the maximum amount.");
-                    break;
-                }
-            }
-        }
 
         // get depth and render targets
         // It would be better to create srv once and reuse it, but this is quick and dirty solution
 
-        ID3D11RenderTargetView *render_target = nullptr;
-        ID3D11DepthStencilView *depth_target = nullptr;
-
-        direct3d::api().devcon4->OMGetRenderTargets(1, &render_target, &depth_target);
-        direct3d::api().devcon4->OMSetRenderTargets(1, &render_target, nullptr);
+        ID3D11DepthStencilView *depth_target = dsv;
 
         ID3D11Texture2D *depth_texture = nullptr;
         depth_target->GetResource(reinterpret_cast<ID3D11Resource **>(&depth_texture));
@@ -215,11 +151,12 @@ namespace engine::render::_particle_detail
         per_frame.use_dms_depth_texture = depth_texture_desc.SampleDesc.Count > 1;
         particle_per_frame_buffer_.Update(per_frame);
 
-        particle_per_frame_buffer_.Bind(direct3d::ShaderType::VertexShader, 1);
-        particle_per_frame_buffer_.Bind(direct3d::ShaderType::PixelShader, 1);
+        particle_per_frame_buffer_.Bind(direct3d::ShaderType::VertexShader, 2);
+        particle_per_frame_buffer_.Bind(direct3d::ShaderType::PixelShader, 2);
 
         direct3d::api().devcon4->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        direct3d::api().devcon4->OMSetBlendState(direct3d::states().additive_blend_state.ptr(), nullptr, 0xffffffff);
+        direct3d::api().devcon4->OMSetBlendState(direct3d::states().additive_blend_state_alpha.ptr(), nullptr, 0xffffffff);
+        direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().no_depth_write.ptr(), 0);
 
         particle_buffer_.Bind(1);
 
@@ -237,8 +174,6 @@ namespace engine::render::_particle_detail
         direct3d::api().devcon4->DrawInstanced(6, particle_buffer_.size(), 0, 0);
 
         direct3d::api().devcon4->PSSetShaderResources(12 + depth_offset, 1, &direct3d::null_srv);
-
-        direct3d::api().devcon4->OMSetRenderTargets(1, &render_target, depth_target);
 
         depth_texture_buffer->Release();
         depth_srv->Release();

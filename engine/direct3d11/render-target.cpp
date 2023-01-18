@@ -9,7 +9,7 @@ namespace engine::direct3d
     {
     }
 
-    void RenderTarget::init()
+    void RenderTargetMS::init()
     {
         if (initialized)
         {
@@ -29,7 +29,7 @@ namespace engine::direct3d
         }
         initialized = true;
     }
-    void RenderTarget::ForceSizeResources(core::math::ivec2 const &size)
+    void RenderTargetMS::ForceSizeResources(core::math::ivec2 const &size)
     {
         if (size.x < 0 || size.y < 0)
         {
@@ -81,6 +81,97 @@ namespace engine::direct3d
         size_ = size;
     }
 
+    void RenderTargetMS::SizeResources(core::math::ivec2 const &size)
+    {
+        if (size == size_)
+            return;
+        ForceSizeResources(size);
+    }
+
+    void RenderTargetMS::deinit() noexcept
+    {
+        render_target_view_.reset();
+        shader_resource_view_.reset();
+        render_target_.reset();
+        size_ = core::math::ivec2{ 0 };
+        initialized = false;
+    }
+
+
+
+
+    void RenderTarget::init()
+    {
+        if (initialized)
+        {
+            deinit();
+        }
+        UINT formatSupport = 0;
+        if (FAILED(api().device->CheckFormatSupport(format_, &formatSupport)))
+        {
+            throw std::runtime_error("CheckFormatSupport");
+        }
+
+        constexpr UINT32 required = D3D11_FORMAT_SUPPORT_TEXTURE2D | D3D11_FORMAT_SUPPORT_RENDER_TARGET;
+        if ((formatSupport & required) != required)
+        {
+            spdlog::error("RenderTarget: Device does not support the requested format (%u)!", format_);
+            throw std::runtime_error("RenderTarget");
+        }
+        initialized = true;
+    }
+    void RenderTarget::ForceSizeResources(core::math::ivec2 const &size)
+    {
+        if (size.x < 0 || size.y < 0)
+        {
+            throw std::out_of_range("Invalid width/height");
+        }
+
+        size_ = core::math::ivec2{ 0 };
+        render_target_description_.Format = format_;
+        render_target_description_.Width = static_cast<UINT>(size.x);
+        render_target_description_.Height = static_cast<UINT>(size.y);
+        render_target_description_.MipLevels = 1;
+        render_target_description_.ArraySize = 1;
+        render_target_description_.SampleDesc.Count = 1;
+        render_target_description_.SampleDesc.Quality = 0;
+        render_target_description_.Usage = D3D11_USAGE_DEFAULT;
+        render_target_description_.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+        render_target_description_.CPUAccessFlags = 0;
+        render_target_description_.MiscFlags = 0;
+        Assert(api().device->CreateTexture2D(
+            &render_target_description_,
+            nullptr,
+            &render_target_.reset()
+        ));
+
+        D3D11_RENDER_TARGET_VIEW_DESC render_target_view_desc;
+        render_target_view_desc.Format = render_target_description_.Format;
+        render_target_view_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+        render_target_view_desc.Texture2D.MipSlice = 0;
+
+        Assert(api().device->CreateRenderTargetView(
+            render_target_.ptr(),
+            &render_target_view_desc,
+            &render_target_view_.reset()
+        ));
+
+        // Create SRV.
+        D3D11_SHADER_RESOURCE_VIEW_DESC shader_resource_view_desc;
+        shader_resource_view_desc.Format = render_target_description_.Format;
+        shader_resource_view_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+        shader_resource_view_desc.Texture2D.MostDetailedMip = 0;
+        shader_resource_view_desc.Texture2D.MipLevels = 1;
+
+        Assert(api().device->CreateShaderResourceView(
+            render_target_.ptr(),
+            &shader_resource_view_desc,
+            &shader_resource_view_.reset()
+        ));
+
+        size_ = size;
+    }
+
     void RenderTarget::SizeResources(core::math::ivec2 const &size)
     {
         if (size == size_)
@@ -96,6 +187,7 @@ namespace engine::direct3d
         size_ = core::math::ivec2{ 0 };
         initialized = false;
     }
+
 
     void SwapchainRenderTarget::init(HWND hWnd, core::math::ivec2 const &window_size)
     {

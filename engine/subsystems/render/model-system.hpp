@@ -31,6 +31,7 @@ namespace engine::render
         uint64_t AddModel(Model &&model);
 
         static uint64_t GetUnitSphereFlat();
+        static uint64_t GetUnitSphereLowPoly();
         static uint64_t GetUnitCube();
 
     private:
@@ -51,7 +52,6 @@ namespace engine::render
         ModelSystem(ModelSystem const &) = delete;
         ModelSystem &operator=(ModelSystem &&) = delete;
         ModelSystem &operator=(ModelSystem const &) = delete;
-
 
     private:
         static std::shared_ptr<ModelSystem> instance_;

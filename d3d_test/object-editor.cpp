@@ -17,7 +17,7 @@ namespace object_editor
     bool useSnap(false);
     vec4 snap;
 
-    void OnInstancesUpdated()
+    void UpdateInstances()
     {
         auto *emissive = Engine::scene()->registry.try_get<components::EmissiveComponent>(selected_entity);
         auto *directional = Engine::scene()->registry.try_get<components::DirectionalLight>(selected_entity);
@@ -25,21 +25,26 @@ namespace object_editor
         auto *spot = Engine::scene()->registry.try_get<components::SpotLight>(selected_entity);
         auto *opaque = Engine::scene()->registry.try_get<components::OpaqueComponent>(selected_entity);
         auto *dissolution = Engine::scene()->registry.try_get<components::DissolutionComponent>(selected_entity);
+        auto *decal = Engine::scene()->registry.try_get<components::DecalComponent>(selected_entity);
         if (emissive != nullptr)
         {
-            Engine::scene()->renderer->emissive_render_system().ScheduleOnInstancesUpdate();
+            Engine::scene()->renderer->emissive_render_system().ScheduleInstanceUpdate();
         }
         if (directional != nullptr || point != nullptr || spot != nullptr)
         {
-            Engine::scene()->renderer->light_render_system().ScheduleOnInstancesUpdate();
+            Engine::scene()->renderer->light_render_system().ScheduleInstanceUpdate();
         }
         if (opaque != nullptr)
         {
-            Engine::scene()->renderer->opaque_render_system().ScheduleOnInstancesUpdate();
+            Engine::scene()->renderer->opaque_render_system().ScheduleInstanceUpdate();
         }
         if (dissolution != nullptr)
         {
-            Engine::scene()->renderer->dissolution_render_system().ScheduleOnInstancesUpdate();
+            Engine::scene()->renderer->dissolution_render_system().ScheduleInstanceUpdate();
+        }
+        if(decal != nullptr)
+        {
+            Engine::scene()->renderer->decal_render_system().ScheduleInstanceUpdate();
         }
     }
 
@@ -122,7 +127,7 @@ namespace object_editor
                 transform.scale = vec3{ matrixScale[0], matrixScale[1], matrixScale[2] };
                 transform.rotation = QuaternionFromRotationMatrix(scale(matrix, 1.0f / transform.scale).as_rmat<3, 3>());
                 transform.UpdateMatrices();
-                OnInstancesUpdated();
+                UpdateInstances();
             }
         }
     }
@@ -147,7 +152,7 @@ namespace object_editor
             transform.scale = vec3{ matrixScale[0], matrixScale[1], matrixScale[2] };
             transform.rotation = QuaternionFromRotationMatrix(scale(matrix, 1.0f / transform.scale).as_rmat<3, 3>());
             transform.UpdateMatrices();
-            OnInstancesUpdated();
+            UpdateInstances();
         }
     }
     void EditTransform()
@@ -810,7 +815,6 @@ namespace object_editor
                 ImGui::SliderFloat("wind wavenumber ##wind-wavenumber", &material.wind_wavenumber, 0.0f, 50.0f);
                 ImGui::SliderFloat("wind frequency ##wind-frequency", &material.wind_frequency, 0.0f, 50.0f);
 
-                
                 ImGui::NewLine();
                 ImGui::Text("Grass field: ");
                 ImGui::InputScalar("material id ##material-id", ImGuiDataType_U64, &grass_field.material_id);
@@ -821,21 +825,21 @@ namespace object_editor
                 ImGui::InputFloat3("initial offset", grass_field.initial_offset.data.data(), "%.3f", 3);
                 ImGui::InputScalar("min distance between instances", ImGuiDataType_Float, &grass_field.min_distance);
                 ImGui::InputScalar("max attempts", ImGuiDataType_U32, &grass_field.max_attempts);
-                if(ImGui::Button("Initialize"))
+                if (ImGui::Button("Initialize"))
                 {
                     try
                     {
                         grass_field.Initialize(material.atlas_data);
                     }
-                    catch(std::exception const &e)
+                    catch (std::exception const &e)
                     {
                         spdlog::error("Failed to initialize grass field using the given parameters. Exception: {}", e.what());
                     }
-                    catch(...)
+                    catch (...)
                     {
                         spdlog::error("Failed to initialize grass field using the given parameters. Exception: Unknown");
                     }
-                    scene.renderer->grass_render_system().ScheduleOnInstancesUpdate();
+                    scene.renderer->grass_render_system().ScheduleInstanceUpdate();
                 }
             }
         }
@@ -946,7 +950,7 @@ namespace object_editor
                                                                        return false;
                                                                    }
                                                                    registry.emplace<typename kComponentTypes::type_at<i>::type>(selected_entity);
-                                                                   OnInstancesUpdated();
+                                                                   UpdateInstances();
                                                                    return false;
                                                                });
         }
@@ -980,7 +984,7 @@ namespace object_editor
                                                                    if (registry.try_get<typename kComponentTypes::type_at<i>::type>(selected_entity))
                                                                    {
                                                                        registry.erase<typename kComponentTypes::type_at<i>::type>(selected_entity);
-                                                                       Engine::scene()->renderer->ScheduleOnInstancesUpdate();
+                                                                       Engine::scene()->renderer->ScheduleInstanceUpdate();
                                                                        return false;
                                                                    }
                                                                    ImGui::OpenPopup("Entity does not have this component");
@@ -1074,7 +1078,7 @@ namespace object_editor
             },
             false);
         input.AddUpdateKeyCallback(
-            InputLayer::KeySeq{ engine::core::Key::KEY_F },
+            InputLayer::KeySeq{ engine::core::Key::KEY_Y },
             [&] (InputLayer::KeySeq const &, uint32_t count)
             {
                 if (count == std::numeric_limits<uint32_t>::max())

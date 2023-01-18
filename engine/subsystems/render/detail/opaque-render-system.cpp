@@ -14,10 +14,10 @@ namespace engine::render
         texture_flags |= (normal_map != nullptr) ? 1 << 1 : 0;
         texture_flags |= (metalness_map != nullptr) ? 1 << 2 : 0;
         texture_flags |= (roughness_map != nullptr) ? 1 << 3 : 0;
-        texture_flags |= (reverse_normal_y) ? 1 << 4 : 0;
+        texture_flags |= (opacity_map != nullptr) ? 1 << 4 : 0;
+        texture_flags |= (reverse_normal_y) ? 1 << 24 : 0;
     }
-
-    void OpaqueMaterial::Bind(direct3d::DynamicUniformBuffer<_opaque_detail::OpaquePerMaterial> &uniform_buffer) const
+    void OpaqueMaterial::BindTextures() const
     {
         if (albedo_map != nullptr) {
             direct3d::api().devcon4->PSSetShaderResources(0, 1, &albedo_map);
@@ -31,6 +31,12 @@ namespace engine::render
         if (roughness_map != nullptr) {
             direct3d::api().devcon4->PSSetShaderResources(3, 1, &roughness_map);
         }
+        if (opacity_map != nullptr) {
+            direct3d::api().devcon4->PSSetShaderResources(4, 1, &opacity_map);
+        }
+    }
+    void OpaqueMaterial::Bind(direct3d::DynamicUniformBuffer<_opaque_detail::OpaquePerMaterial> &uniform_buffer) const
+    {
         _opaque_detail::OpaquePerMaterial temporary;
         temporary.albedo_color = albedo_color;
         temporary.metalness = metalness_value;
@@ -61,11 +67,16 @@ namespace engine::render
         {
             roughness_map = material.diffuse_roughness_textures.front();
         }
+        if (material.opacity_textures.size() > 0)
+        {
+            opacity_map = material.opacity_textures.front();
+        }
         texture_flags = 0;
         UpdateTextureFlags();
         albedo_color = material.diffuse_color;
         metalness_value = material.metalness;
         roughness_value = material.roughness;
+        twosided = material.twosided;
     }
 }
 namespace engine::render::_opaque_detail
@@ -83,7 +94,8 @@ namespace engine::render::_opaque_detail
              { "ROWX",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA,  1},
              { "ROWY",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1},
              { "ROWZ",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "ROWW",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1}
+             { "ROWW",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+             { "ENTITY_ID", 0, DXGI_FORMAT_R32_UINT, 1, 64, D3D11_INPUT_PER_INSTANCE_DATA, 1},
         };
 
         {
@@ -106,17 +118,18 @@ namespace engine::render::_opaque_detail
                                                                                   path / opaque_gs_depth_only_texture_shader_path,
                                                                                   "cubemapGS"
                                                                               });
+            auto ps = core::ShaderManager::instance()->CompilePixelShader(path / opaque_ps_depth_only_shader_path);
             auto il = std::make_shared<InputLayout>(vs->blob(), d3d_input_desc);
-            opaque_cubemap_shader_.SetVertexShader(vs).SetGeometryShader(gs).SetInputLayout(il);
-            opaque_texture_shader_.SetVertexShader(vs).SetGeometryShader(gs2).SetInputLayout(il);
+            opaque_cubemap_shader_.SetVertexShader(vs).SetGeometryShader(gs).SetPixelShader(ps).SetInputLayout(il);
+            opaque_texture_shader_.SetVertexShader(vs).SetGeometryShader(gs2).SetPixelShader(ps).SetInputLayout(il);
         }
     }
     void OpaqueRenderSystem::OnRender(core::Scene *scene)
     {
-        if (should_update_instances_)
+        if (is_instance_update_scheduled_)
         {
-            OnInstancesUpdated(scene->registry);
-            should_update_instances_ = false;
+            UpdateInstances(scene->registry);
+            is_instance_update_scheduled_ = false;
             scene->renderer->light_render_system().ScheduleShadowMapUpdate();
         }
         if (instance_buffer_.size() == 0)
@@ -124,94 +137,18 @@ namespace engine::render::_opaque_detail
         opaque_shader_.Bind();
 
         direct3d::api().devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        direct3d::api().devcon4->RSSetState(direct3d::states().cull_back);
         direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth, 0);
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 
-        mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 1);
+        mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 2);
 
         instance_buffer_.Bind(1);
 
-        OpaquePerFrame opaque_per_frame;
-        D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-        prefiltered_texture_->GetDesc(&desc);
-        opaque_per_frame.prefiltered_map_mip_levels = desc.TextureCube.MipLevels;
-        opaque_per_frame.default_ambient_occulsion_value = ambient_occlusion_value_;
-        auto &registry = scene->registry;
-        auto &lrs = scene->renderer->light_render_system();
-        {
-            auto const &point_lights = lrs.point_light_entities();
-            auto const &spot_lights = lrs.spot_light_entities();
-            auto const &directional_lights = lrs.directional_light_entities();
-            auto const &point_light_matrices = lrs.point_light_shadow_matrices();
-            auto const &spot_light_matrices = lrs.spot_light_shadow_matrices();
-            auto const &directional_light_matrices = lrs.directional_light_shadow_matrices();
-
-            opaque_per_frame.num_point_lights = opaque_per_frame.num_spot_lights = opaque_per_frame.num_directional_lights = 0;
-            for (entt::entity entity : point_lights)
-            {
-                auto &opaque_point_light = opaque_per_frame.point_lights[opaque_per_frame.num_point_lights];
-                auto &registry_point_light = registry.get<components::PointLight>(entity);
-                auto &registry_transform = registry.get<components::TransformComponent>(entity);
-                opaque_point_light.color = registry_point_light.color * registry_point_light.power;
-                opaque_point_light.position = registry_transform.position;
-                opaque_point_light.radius = length(registry_transform.scale) / sqrt(3.1f);
-                opaque_point_light.view_projection = point_light_matrices.at(entity);
-                if (++opaque_per_frame.num_point_lights >= kOpaqueShaderMaxPointLights)
-                {
-                    utils::AlwaysAssert(false, "Amount of point lights on the scene went beyond the maximum amount.");
-                    break;
-                }
-            }
-            for (entt::entity entity : spot_lights)
-            {
-                auto &opaque_spot_light = opaque_per_frame.spot_lights[opaque_per_frame.num_spot_lights];
-                auto &registry_spot_light = registry.get<components::SpotLight>(entity);
-                auto &registry_transform = registry.get<components::TransformComponent>(entity);
-                opaque_spot_light.color = registry_spot_light.color * registry_spot_light.power;
-                opaque_spot_light.position = registry_transform.position;
-                opaque_spot_light.direction = registry_transform.rotation * core::math::vec3(0, 0, 1);
-                opaque_spot_light.radius = length(registry_transform.scale) / sqrt(3.1f);
-                opaque_spot_light.inner_cutoff = registry_spot_light.inner_cutoff;
-                opaque_spot_light.outer_cutoff = registry_spot_light.outer_cutoff;
-                opaque_spot_light.view_projection = spot_light_matrices.at(entity);
-                if (++opaque_per_frame.num_spot_lights >= kOpaqueShaderMaxSpotLights)
-                {
-                    utils::AlwaysAssert(false, "Amount of spot lights on the scene went beyond the maximum amount.");
-                    break;
-                }
-            }
-            for (entt::entity entity : directional_lights)
-            {
-                auto &opaque_directional_light = opaque_per_frame.directional_lights[opaque_per_frame.num_directional_lights];
-                auto &registry_directional_light = registry.get<components::DirectionalLight>(entity);
-                auto &registry_transform = registry.get<components::TransformComponent>(entity);
-                opaque_directional_light.color = registry_directional_light.color * registry_directional_light.power;
-                opaque_directional_light.direction = registry_transform.rotation * core::math::vec3{ 0, 1, 0 };
-                opaque_directional_light.solid_angle = registry_directional_light.solid_angle;
-                opaque_directional_light.view_projection = directional_light_matrices.at(entity);
-
-                if (++opaque_per_frame.num_directional_lights >= kOpaqueShaderMaxDirectionalLights)
-                {
-                    utils::AlwaysAssert(false, "Amount of directional lights on the scene went beyond the maximum amount.");
-                    break;
-                }
-            }
-        }
-        opaque_per_frame.point_light_shadow_resolution = lrs.point_light_shadow_resolution();
-        opaque_per_frame.spot_light_shadow_resolution = lrs.spot_light_shadow_resolution();
-        opaque_per_frame.directional_light_shadow_resolution = lrs.directional_light_shadow_resolution();
-        opaque_per_frame_buffer_.Bind(direct3d::ShaderType::PixelShader, 1);
-        opaque_per_frame_buffer_.Update(opaque_per_frame);
         opaque_per_material_buffer_.Bind(direct3d::ShaderType::PixelShader, 2);
-        direct3d::api().devcon4->PSSetShaderResources(5, 1, &irradiance_texture_);
-        direct3d::api().devcon4->PSSetShaderResources(6, 1, &prefiltered_texture_);
-        direct3d::api().devcon4->PSSetShaderResources(7, 1, &brdf_texture_);
-        lrs.BindPointShadowMaps(8);
-        lrs.BindSpotShadowMaps(9);
-        lrs.BindDirectionalShadowMaps(10);
 
         uint32_t renderedInstances = 0;
+        direct3d::api().devcon->RSSetState(direct3d::states().cull_none);
+        bool current_state_twosided = false;
         for (const auto &model_instance : model_instances_)
         {
             model_instance.model.vertices.Bind(0);
@@ -221,7 +158,7 @@ namespace engine::render::_opaque_detail
             {
                 ModelMesh const &mesh = model_instance.model.meshes[meshIndex];
                 auto const &mesh_range = mesh.mesh_range;
-                mesh_to_model_buffer_.Update(OpaqueInstance{ .world_transform = mesh.mesh_to_model });
+                mesh_to_model_buffer_.Update(mesh.mesh_to_model);
 
                 for (auto const &perMaterial : model_instance.mesh_instances[meshIndex].material_instances)
                 {
@@ -230,6 +167,12 @@ namespace engine::render::_opaque_detail
 
                     const auto &material = perMaterial.material;
                     material.Bind(opaque_per_material_buffer_);
+                    material.BindTextures();
+                    if (material.twosided != current_state_twosided)
+                    {
+                        direct3d::api().devcon->RSSetState(material.twosided ? direct3d::states().cull_none : direct3d::states().cull_back);
+                        current_state_twosided = material.twosided;
+                    }
 
                     uint32_t numInstances = uint32_t(perMaterial.instances.size());
                     direct3d::api().devcon4->DrawIndexedInstanced(mesh_range.index_count, numInstances, mesh_range.index_offset, mesh_range.vertex_offset, renderedInstances);
@@ -238,25 +181,23 @@ namespace engine::render::_opaque_detail
             }
         }
         opaque_shader_.Unbind();
-        direct3d::api().devcon4->PSSetShaderResources(8, 1, &direct3d::null_srv);
-        direct3d::api().devcon4->PSSetShaderResources(9, 1, &direct3d::null_srv);
-        direct3d::api().devcon4->PSSetShaderResources(10, 1, &direct3d::null_srv);
     }
 
     void OpaqueRenderSystem::RenderDepthOnly(std::vector<OpaquePerDepthCubemap> const &cubemaps, core::Scene *scene)
     {
-        if (should_update_instances_)
+        if (is_instance_update_scheduled_)
         {
-            OnInstancesUpdated(scene->registry);
+            UpdateInstances(scene->registry);
             scene->renderer->light_render_system().ScheduleShadowMapUpdate();
-            should_update_instances_ = false;
+            is_instance_update_scheduled_ = false;
         }
         if (instance_buffer_.size() == 0)
             return;
         GraphicsShaderProgram::UnbindAll();
         opaque_cubemap_shader_.Bind();
         opaque_per_cubemap_buffer_.Bind(direct3d::ShaderType::GeometryShader, 0);
-        mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 1);
+        mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 2);
+        opaque_per_material_buffer_.Bind(direct3d::ShaderType::PixelShader, 2);
         instance_buffer_.Bind(1);
         uint32_t renderedInstances = 0;
         for (const auto &model_instance : model_instances_)
@@ -264,42 +205,51 @@ namespace engine::render::_opaque_detail
             model_instance.model.vertices.Bind(0);
             model_instance.model.indices.Bind();
 
-            for (uint32_t meshIndex = 0; meshIndex < model_instance.mesh_instances.size(); ++meshIndex)
+            uint32_t rendered_instances_tmp = renderedInstances;
+            for (auto &cubemap : cubemaps)
             {
-                ModelMesh const &mesh = model_instance.model.meshes[meshIndex];
-                auto const &mesh_range = mesh.mesh_range;
-                mesh_to_model_buffer_.Update(OpaqueInstance{ .world_transform = mesh.mesh_to_model });
+                rendered_instances_tmp = renderedInstances;
+                opaque_per_cubemap_buffer_.Update(cubemap);
+                for (uint32_t meshIndex = 0; meshIndex < model_instance.mesh_instances.size(); ++meshIndex)
+                {
+                    ModelMesh const &mesh = model_instance.model.meshes[meshIndex];
+                    auto const &mesh_range = mesh.mesh_range;
+                    mesh_to_model_buffer_.Update(mesh.mesh_to_model);
 
-                uint32_t numInstances = 0;
-                for (auto const &perMaterial : model_instance.mesh_instances[meshIndex].material_instances)
-                {
-                    numInstances += uint32_t(perMaterial.instances.size());
+                    for (auto const &perMaterial : model_instance.mesh_instances[meshIndex].material_instances)
+                    {
+                        const auto &material = perMaterial.material;
+                        if (material.opacity_map != nullptr)
+                        {
+                            direct3d::api().devcon4->PSSetShaderResources(4, 1, &material.opacity_map);
+                        }
+                        material.Bind(opaque_per_material_buffer_);
+                        uint32_t instances_to_render = uint32_t(perMaterial.instances.size());
+                        direct3d::api().devcon4->DrawIndexedInstanced(mesh_range.index_count, instances_to_render, mesh_range.index_offset, mesh_range.vertex_offset, rendered_instances_tmp);
+                        rendered_instances_tmp += instances_to_render;
+                    }
                 }
-                for (auto &cubemap : cubemaps)
-                {
-                    opaque_per_cubemap_buffer_.Update(cubemap);
-                    direct3d::api().devcon4->DrawIndexedInstanced(mesh_range.index_count, numInstances, mesh_range.index_offset, mesh_range.vertex_offset, renderedInstances);
-                }
-                renderedInstances += numInstances;
             }
+            renderedInstances = rendered_instances_tmp;
         }
         opaque_cubemap_shader_.Unbind();
     }
 
     void OpaqueRenderSystem::RenderDepthOnly(std::vector<OpaquePerDepthTexture> const &textures, core::Scene *scene)
     {
-        if (should_update_instances_)
+        if (is_instance_update_scheduled_)
         {
-            OnInstancesUpdated(scene->registry);
+            UpdateInstances(scene->registry);
             scene->renderer->light_render_system().ScheduleShadowMapUpdate();
-            should_update_instances_ = false;
+            is_instance_update_scheduled_ = false;
         }
         if (instance_buffer_.size() == 0)
             return;
         GraphicsShaderProgram::UnbindAll();
         opaque_texture_shader_.Bind();
         opaque_per_texture_buffer_.Bind(direct3d::ShaderType::GeometryShader, 0);
-        mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 1);
+        mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 2);
+        opaque_per_material_buffer_.Bind(direct3d::ShaderType::PixelShader, 2);
         instance_buffer_.Bind(1);
         uint32_t renderedInstances = 0;
 
@@ -308,29 +258,37 @@ namespace engine::render::_opaque_detail
             model_instance.model.vertices.Bind(0);
             model_instance.model.indices.Bind();
 
-            for (uint32_t meshIndex = 0; meshIndex < model_instance.mesh_instances.size(); ++meshIndex)
+            uint32_t rendered_instances_tmp = renderedInstances;
+            for (auto &texture : textures)
             {
-                ModelMesh const &mesh = model_instance.model.meshes[meshIndex];
-                auto const &mesh_range = mesh.mesh_range;
-                mesh_to_model_buffer_.Update(OpaqueInstance{ .world_transform = mesh.mesh_to_model });
+                rendered_instances_tmp = renderedInstances;
+                opaque_per_texture_buffer_.Update(texture);
+                for (uint32_t meshIndex = 0; meshIndex < model_instance.mesh_instances.size(); ++meshIndex)
+                {
+                    ModelMesh const &mesh = model_instance.model.meshes[meshIndex];
+                    auto const &mesh_range = mesh.mesh_range;
+                    mesh_to_model_buffer_.Update(mesh.mesh_to_model);
 
-                uint32_t numInstances = 0;
-                for (auto const &perMaterial : model_instance.mesh_instances[meshIndex].material_instances)
-                {
-                    numInstances += uint32_t(perMaterial.instances.size());
+                    for (auto const &perMaterial : model_instance.mesh_instances[meshIndex].material_instances)
+                    {
+                        const auto &material = perMaterial.material;
+                        if (material.opacity_map != nullptr)
+                        {
+                            direct3d::api().devcon4->PSSetShaderResources(4, 1, &material.opacity_map);
+                        }
+                        material.Bind(opaque_per_material_buffer_);
+                        uint32_t instances_to_render = uint32_t(perMaterial.instances.size());
+                        direct3d::api().devcon4->DrawIndexedInstanced(mesh_range.index_count, instances_to_render, mesh_range.index_offset, mesh_range.vertex_offset, rendered_instances_tmp);
+                        rendered_instances_tmp += instances_to_render;
+                    }
                 }
-                for (auto &texture : textures)
-                {
-                    opaque_per_texture_buffer_.Update(texture);
-                    direct3d::api().devcon4->DrawIndexedInstanced(mesh_range.index_count, numInstances, mesh_range.index_offset, mesh_range.vertex_offset, renderedInstances);
-                }
-                renderedInstances += numInstances;
             }
+            renderedInstances = rendered_instances_tmp;
         }
         opaque_texture_shader_.Unbind();
     }
 
-    void OpaqueRenderSystem::OnInstancesUpdated(entt::registry &registry)
+    void OpaqueRenderSystem::UpdateInstances(entt::registry &registry)
     {
         uint32_t total_instances = 0;
         for (auto &model_instance : model_instances_)
@@ -356,7 +314,11 @@ namespace engine::render::_opaque_detail
                     auto &instances = perMaterial.instances;
                     for (auto entity : instances)
                     {
-                        dst[copiedNum++] = OpaqueInstance{ .world_transform = instance_group.get<components::TransformComponent>(entity).model };
+                        dst[copiedNum++] = OpaqueInstance
+                        {
+                            .world_transform = instance_group.get<components::TransformComponent>(entity).model,
+                            .entity_id = static_cast<uint32_t>(entity)
+                        };
                     }
                 }
             }

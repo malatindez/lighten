@@ -1,6 +1,6 @@
 #pragma once
 #include "misc/camera-controller.hpp"
-#include "direct3d11/hdr-render-pipeline.hpp"
+#include "direct3d11/deferred-hdr-render-pipeline.hpp"
 #include "core/engine.hpp"
 class Controller
     : public engine::core::Layer,
@@ -15,7 +15,7 @@ public:
     entt::entity main_camera_entity;
     entt::entity last_created_knight;
 
-    Controller(std::shared_ptr<engine::direct3d::HDRRenderPipeline> hdr_render_pipeline);
+    Controller(std::shared_ptr<engine::direct3d::DeferredHDRRenderPipeline> hdr_render_pipeline);
     std::vector<std::function<void(float)>> &update_callbacks() { return update_callbacks_; }
     void OnTick(float delta_time) override;
     void OnEvent(engine::core::events::Event &e) override;
@@ -26,6 +26,6 @@ public:
 private:
     std::shared_ptr<engine::core::Scene> first_scene;
 private:
-    std::shared_ptr<engine::direct3d::HDRRenderPipeline> hdr_render_pipeline_;
+    std::shared_ptr<engine::direct3d::DeferredHDRRenderPipeline> hdr_render_pipeline_;
     std::vector<UpdateCallback> update_callbacks_;
 };

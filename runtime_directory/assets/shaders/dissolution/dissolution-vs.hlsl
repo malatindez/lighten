@@ -1,5 +1,5 @@
 #include "../globals/globals-vs.hlsli"
-cbuffer PerModel : register(b1) { row_major matrix mesh_to_model; }
+cbuffer PerModel : register(b2) { row_major matrix mesh_to_model; }
 
 struct VS_OUTPUT {
   float4 pos : SV_POSITION;

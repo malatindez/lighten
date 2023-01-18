@@ -34,16 +34,18 @@ namespace engine
         core::math::vec4 right4 = br4 - bl4;
         core::math::vec4 up4 = tl4 - bl4;
         skybox_buffer_->Update(core::math::mat4x3{ bl4, right4, up4 });
-        skybox_buffer_->Bind(direct3d::ShaderType::VertexShader, 1);
+        skybox_buffer_->Bind(direct3d::ShaderType::VertexShader, 2);
         skybox_shader_.Bind();
         auto view = core::TextureManager::GetTextureView(skybox.texture_id);
 
-        direct3d::api().devcon->RSSetState(direct3d::states().cull_none);
+        direct3d::api().devcon4->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        direct3d::api().devcon4->RSSetState(direct3d::states().cull_none);
         direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
         direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth_no_write, 0);
+
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 
-        direct3d::api().devcon->PSSetShaderResources(0, 1, &view);
+        direct3d::api().devcon4->PSSetShaderResources(0, 1, &view);
 
         direct3d::api().devcon->Draw(3, 0);
         skybox_shader_.Unbind();

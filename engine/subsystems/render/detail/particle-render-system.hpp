@@ -24,11 +24,11 @@ namespace engine::render
         static constexpr uint32_t kMaximumEmitterAmountPerFrame = PARTICLE_RENDER_SYSTEM_AMOUNT_OF_EMITTER_PER_CALL;
 
         class ParticleRenderSystem;
- 
+
         constexpr uint32_t kParticleShaderMaxPointLights = 32;
         constexpr uint32_t kParticleShaderMaxSpotLights = 32;
         constexpr uint32_t kParticleShaderMaxDirectionalLights = 4;
-        
+
         struct GPUParticle
         {
             core::math::vec3 position;
@@ -45,18 +45,11 @@ namespace engine::render
 
         struct ParticlePerFrame
         {
-            std::array<GPUPointLight, kParticleShaderMaxPointLights> point_lights;
-            std::array<GPUSpotLight, kParticleShaderMaxSpotLights> spot_lights;
-            std::array<GPUDirectionalLight, kParticleShaderMaxDirectionalLights> directional_lights;
-            uint32_t num_point_lights;
-            uint32_t num_spot_lights;
-            uint32_t num_directional_lights;
             // Used to interpolate particles between frames
             float time_since_last_tick;
             uint32_t atlas_size_x;
             uint32_t atlas_size_y;
             uint32_t use_dms_depth_texture;
-            float padding;
         };
     }
     // TODO:
@@ -67,10 +60,10 @@ namespace engine::render
     {
         auto constexpr particle_vs_shader_path = "assets/shaders/particle/particle-vs.hlsl";
         auto constexpr particle_ps_shader_path = "assets/shaders/particle/particle-ps.hlsl";
-        class ParticleRenderSystem : public RenderPass
+        class ParticleRenderSystem final : public RenderPass
         {
         public:
-            void OnRender(core::Scene *scene) override;
+            void OnRender(core::Scene *scene, ID3D11DepthStencilView *dsv);
             void Tick(core::Scene *scene, float delta_time);
             ParticleRenderSystem();
             ~ParticleRenderSystem() = default;

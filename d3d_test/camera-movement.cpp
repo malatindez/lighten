@@ -119,15 +119,19 @@ namespace camera_movement
                     transform.UpdateMatrices();
                     if (Engine::scene()->registry.try_get<components::OpaqueComponent>(selected_entity))
                     {
-                        Engine::scene()->renderer->opaque_render_system().ScheduleOnInstancesUpdate();
+                        Engine::scene()->renderer->opaque_render_system().ScheduleInstanceUpdate();
                     }
                     if (Engine::scene()->registry.try_get<components::EmissiveComponent>(selected_entity))
                     {
-                        Engine::scene()->renderer->emissive_render_system().ScheduleOnInstancesUpdate();
+                        Engine::scene()->renderer->emissive_render_system().ScheduleInstanceUpdate();
                     }
                     if (Engine::scene()->registry.try_get<components::DissolutionComponent>(selected_entity))
                     {
-                        Engine::scene()->renderer->dissolution_render_system().ScheduleOnInstancesUpdate();
+                        Engine::scene()->renderer->dissolution_render_system().ScheduleInstanceUpdate();
+                    }
+                    if (Engine::scene()->registry.try_get<components::DecalComponent>(selected_entity))
+                    {
+                        Engine::scene()->renderer->decal_render_system().ScheduleInstanceUpdate();
                     }
 
                     if (dynamic_shadows && (Engine::scene()->registry.try_get<components::OpaqueComponent>(selected_entity) != nullptr ||
@@ -172,7 +176,7 @@ namespace camera_movement
                                         transform.UpdateMatrices();
                                         uint64_t model_id = ModelLoader::Load("assets\\models\\Knight\\Knight.fbx").value();
                                         drs.AddInstance(model_id, registry, knight, std::uniform_real_distribution<float>(0.5f, 5.0f)(Engine::random_engine()));
-                                        Engine::scene()->renderer->dissolution_render_system().ScheduleOnInstancesUpdate();
+                                        Engine::scene()->renderer->dissolution_render_system().ScheduleInstanceUpdate();
                                         Engine::scene()->renderer->light_render_system().ScheduleShadowMapUpdate();
                                     });
     }

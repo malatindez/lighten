@@ -25,14 +25,19 @@ namespace engine::render
         ID3D11ShaderResourceView *normal_map = nullptr;
         ID3D11ShaderResourceView *metalness_map = nullptr;
         ID3D11ShaderResourceView *roughness_map = nullptr;
+
+        // Used only to discard pixels with opacity < 0.5
+        ID3D11ShaderResourceView *opacity_map = nullptr;
         core::math::vec3 albedo_color;
         float metalness_value;
         float roughness_value;
         uint32_t texture_flags;
         bool reverse_normal_y = false;
+        bool twosided = false;
         core::math::vec2 uv_multiplier{ 1 };
         void UpdateTextureFlags();
         OpaqueMaterial() = default;
+        void BindTextures() const;
         void Bind(direct3d::DynamicUniformBuffer<_opaque_detail::OpaquePerMaterial> &uniform_buffer) const;
         explicit OpaqueMaterial(Material const &material);
         void reset()
@@ -41,11 +46,13 @@ namespace engine::render
             normal_map = nullptr;
             metalness_map = nullptr;
             roughness_map = nullptr;
+            opacity_map = nullptr;
             albedo_color = core::math::vec3{ 0.0f };
             metalness_value = 0.01f;
             roughness_value = 0.01f;
             texture_flags = 0;
             reverse_normal_y = false;
+            twosided = false;
             uv_multiplier = core::math::vec2{ 1 };
         }
     };
@@ -80,12 +87,10 @@ namespace engine::components
 }
 namespace engine::render::_opaque_detail
 {
-    constexpr uint32_t kOpaqueShaderMaxPointLights = 32;
-    constexpr uint32_t kOpaqueShaderMaxSpotLights = 32;
-    constexpr uint32_t kOpaqueShaderMaxDirectionalLights = 4;
     struct OpaqueInstance
     {
         core::math::mat4 world_transform;
+        uint32_t entity_id;
     };
     struct MaterialInstance
     {
@@ -102,20 +107,6 @@ namespace engine::render::_opaque_detail
         uint64_t model_id;
         // Each MeshInstance should correspond the one on the same index in model
         std::vector<MeshInstance> mesh_instances;
-    };
-    struct OpaquePerFrame
-    {
-        std::array<GPUPointLight, kOpaqueShaderMaxPointLights> point_lights;
-        std::array<GPUSpotLight, kOpaqueShaderMaxSpotLights> spot_lights;
-        std::array<GPUDirectionalLight, kOpaqueShaderMaxDirectionalLights> directional_lights;
-        uint32_t num_point_lights;
-        uint32_t num_spot_lights;
-        uint32_t num_directional_lights;
-        uint32_t prefiltered_map_mip_levels;
-        float default_ambient_occulsion_value;
-        uint32_t point_light_shadow_resolution;
-        uint32_t spot_light_shadow_resolution;
-        uint32_t directional_light_shadow_resolution;
     };
     struct OpaquePerMaterial
     {
@@ -143,6 +134,7 @@ namespace engine::render::_opaque_detail
     auto constexpr opaque_vs_depth_only_shader_path = "assets/shaders/opaque/opaque-depth-only-vs.hlsl";
     auto constexpr opaque_gs_depth_only_cubemap_shader_path = "assets/shaders/opaque/opaque-depth-only-cubemap-gs.hlsl";
     auto constexpr opaque_gs_depth_only_texture_shader_path = "assets/shaders/opaque/opaque-depth-only-texture-gs.hlsl";
+    auto constexpr opaque_ps_depth_only_shader_path = "assets/shaders/opaque/opaque-depth-only-ps.hlsl";
 
     // TODO:
     // update opaque, emissive and skybox rendering systems so we don't have to call AddInstance
@@ -164,22 +156,12 @@ namespace engine::render::_opaque_detail
     // Change the system the way that on_destruct / on_construct will set the dirty flag
     // and add data that should be updated so we can update instances right before the frame if needed
 
-    class OpaqueRenderSystem : public RenderPass
+    class OpaqueRenderSystem final : public RenderPass
     {
     public:
         ModelInstance *GetInstancePtr(uint64_t model_id);
-        void SetIrradianceTexture(ID3D11ShaderResourceView *texture) { irradiance_texture_ = texture; }
-        void SetPrefilteredTexture(ID3D11ShaderResourceView *texture) { prefiltered_texture_ = texture; }
-        void SetBrdfTexture(ID3D11ShaderResourceView *texture) { brdf_texture_ = texture; }
-        void SetAmbientOcclusionValue(float value) { ambient_occlusion_value_ = value; }
-        [[nodiscard]] ID3D11ShaderResourceView *GetIrradianceTexture() const { return irradiance_texture_; }
-        [[nodiscard]] ID3D11ShaderResourceView *GetPrefilteredTexture() const { return prefiltered_texture_; }
-        [[nodiscard]] ID3D11ShaderResourceView *GetBrdfTexture() const { return brdf_texture_; }
-        [[nodiscard]] float const &ambient_occlusion() const { return ambient_occlusion_value_; }
-        [[nodiscard]] float &ambient_occlusion() { return ambient_occlusion_value_; }
-
         OpaqueRenderSystem();
-        void OnRender(core::Scene *scene) override;
+        void OnRender(core::Scene *scene);
         void RenderDepthOnly(std::vector<OpaquePerDepthCubemap> const &cubemaps, core::Scene *scene);
         void RenderDepthOnly(std::vector<OpaquePerDepthTexture> const &textures, core::Scene *scene);
 
@@ -188,18 +170,18 @@ namespace engine::render::_opaque_detail
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, std::vector<OpaqueMaterial> const &materials);
 
         void Update([[maybe_unused]] core::Scene *scene) {}
-        void ScheduleOnInstancesUpdate()
+        void ScheduleInstanceUpdate()
         {
-            should_update_instances_ = true;
+            is_instance_update_scheduled_ = true;
         }
     private:
-        void OnInstancesUpdated(entt::registry &registry);
+        void UpdateInstances(entt::registry &registry);
 
         // TODO:
         void on_attach(entt::registry &, entt::entity) {}
         void on_destroy(entt::registry &, entt::entity) {}
 
-        bool should_update_instances_ = false;
+        bool is_instance_update_scheduled_ = false;
 
         std::vector<ModelInstance> model_instances_;
 
@@ -209,13 +191,8 @@ namespace engine::render::_opaque_detail
         direct3d::DynamicUniformBuffer<OpaquePerDepthTexture> opaque_per_texture_buffer_;
 
         GraphicsShaderProgram opaque_shader_;
-        direct3d::DynamicUniformBuffer<OpaquePerFrame> opaque_per_frame_buffer_;
         direct3d::DynamicUniformBuffer<OpaquePerMaterial> opaque_per_material_buffer_;
-        direct3d::DynamicUniformBuffer<OpaqueInstance> mesh_to_model_buffer_;
+        direct3d::DynamicUniformBuffer<core::math::mat4> mesh_to_model_buffer_;
         direct3d::DynamicVertexBuffer<OpaqueInstance> instance_buffer_;
-        ID3D11ShaderResourceView *irradiance_texture_;
-        ID3D11ShaderResourceView *prefiltered_texture_;
-        ID3D11ShaderResourceView *brdf_texture_;
-        float ambient_occlusion_value_ = 1.0f;
     };
 } // namespace engine::render::_opaque_detail

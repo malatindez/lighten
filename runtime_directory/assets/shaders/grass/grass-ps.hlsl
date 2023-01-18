@@ -2,24 +2,6 @@
 #include "../globals/globals-ps.hlsli"
 #include "../globals/pbr-helpers.hlsli"
 
-cbuffer GrassPerFrame : register(b1)
-{
-    PointLight g_point_lights[MAX_POINT_LIGHTS];
-    SpotLight g_spot_lights[MAX_SPOT_LIGHTS];
-    DirectionalLight g_directional_lights[MAX_DIRECTIONAL_LIGHTS];
-    uint g_num_point_lights;
-    uint g_num_spot_lights;
-    uint g_num_directional_lights;
-    uint g_prefiltered_map_mip_levels;
-
-    float g_default_ambient_occlusion_value;
-    uint g_point_light_shadow_resolution;
-    uint g_spot_light_shadow_resolution;
-    uint g_directional_light_shadow_resolution;
-
-    //    float g_grass_per_frame_padding;
-};
-
 cbuffer GrassPerMaterial : register(b2)
 {
     float3 g_albedo_color;
@@ -91,82 +73,6 @@ struct PS_IN
 
 static const float kTranslucencyPower = 64;
 
-float3 ComputePointLightsEnergy(PBR_Material material, PBR_CommonData common_data, float3 transmittance)
-{
-    float3 rv = 0;
-    for (uint i = 0; i < g_num_point_lights; i++)
-    {
-        PointLight light = g_point_lights[i];
-        if (shadowed(common_data, light, i))
-        {
-            continue;
-        }
-        rv += ComputePointLightEnergy(material, common_data, light, i);
-
-        float3 light_dir = light.position - common_data.fragment_position;
-        float light_dist = length(light_dir);
-        float3 light_dir_normalized = light_dir / light_dist;
-
-        float ndotl = dot(common_data.normal, light_dir_normalized);
-        if (ndotl < 0)
-        {
-
-            float gndotl = dot(common_data.geometry_normal, light_dir_normalized);
-            float3 light_dir = light.position - common_data.fragment_position;
-            float light_dist = length(light_dir);
-            float lightMicroHeight = abs(ndotl * light_dist);
-            float lightMacroHeight = abs(gndotl * light_dist);
-            float fadingMicro = saturate((lightMicroHeight + light.radius) / (2 * light.radius));
-            float fadingMacro = saturate((lightMacroHeight + light.radius) / (2 * light.radius));
-            float fading = fadingMicro * fadingMacro;
-
-            float sina;
-            float cosa;
-            float solid_angle = CalculateSolidAngle(light_dist, light.radius, sina, cosa);
-
-
-            rv += transmittance * light.color * pow(-ndotl, kTranslucencyPower) * fading * solid_angle;
-        }
-    }
-    return rv;
-}
-
-float3 ComputeSpotLightsEnergy(PBR_Material material, PBR_CommonData common_data, float3 transmittance)
-{
-    float3 rv = 0;
-    for (uint i = 0; i < g_num_spot_lights; i++)
-    {
-        SpotLight light = g_spot_lights[i];
-        if (shadowed(common_data, light, i))
-        {
-            continue;
-        }
-        rv += ComputeSpotLightEnergy(material, common_data, light, i);
-    }
-    return rv;
-}
-
-float3 ComputeDirectionalLightsEnergy(PBR_Material material, PBR_CommonData common_data, float3 transmittance)
-{
-    float3 rv = 0;
-    for (uint i = 0; i < g_num_directional_lights; i++)
-    {
-        DirectionalLight light = g_directional_lights[i];
-        if (shadowed(common_data, light, i))
-        {
-            continue;
-        }
-        rv += ComputeDirectionalLightEnergy(material, common_data, light, i);
-    }
-    return rv;
-}
-
-float3 ComputeEnvironmentDiffuseEnergy(PBR_Material material, PBR_CommonData common_data)
-{
-    float3 diffuse = material.albedo * (1.0 - material.metalness) * g_irradiance_map.SampleLevel(g_bilinear_clamp_sampler, common_data.normal, 0.0);
-    return diffuse;
-}
-
 // used to convert section id to color
 // debug purpose
 float4 section_id_to_color(uint section_id, float2 uv)
@@ -180,128 +86,105 @@ float4 section_id_to_color(uint section_id, float2 uv)
     rv.a = 1.0f;
     return rv + float4(uv, 0, 0);
 }
-static const float kClampValue = 0.05f;
-static const float4 kEmissiveColor = float4(0.0f, 10.0f, 15.0f, 1.0f);
-float4 ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
-    : SV_TARGET
-{
-    //   return float4(input.uv, 0, 1);
-    //     return section_id_to_color(input.section_id, input.uv);
 
+struct PS_OUTPUT
+{
+    float4 albedo : SV_TARGET0;
+    float4 normals : SV_TARGET1;
+    float4 roughness_metalness_transmittance_ao : SV_TARGET2;
+    float4 emission : SV_TARGET3;
+};
+
+PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
+{
     input.uv = lerp(g_grass_texture_from, g_grass_texture_to, input.uv);
-    float opacity = g_opacity.Sample(g_bilinear_clamp_sampler, input.uv).r;
-    if (opacity < 0.01f)
+    PS_OUTPUT output;
+    #if 0
+        output.emission.xyz = section_id_to_color(input.section_id, float2(0,0)).xyz * 3; 
+        output.albedo.xyzw = float4(0,0,0,0);
+        output.normals.xyzw = float4(0,0,0,0);
+        output.roughness_metalness_transmittance_ao = float4(0,0,0,0);
+
+        return output;
+    #endif
+    if(g_enabled_texture_flags & TEXTURE_ENABLED_OPACITY)
     {
-        discard;
+        float opacity = g_opacity.Sample(g_bilinear_wrap_sampler, input.uv).r;
+        if (opacity < 0.1)
+        {
+           discard;
+        }
     }
 
-    float3 ambient = float3(0, 0, 0);
-    PBR_Material material;
-
+    
     if (g_enabled_texture_flags & TEXTURE_ENABLED_ALBEDO)
     {
-        material.albedo = g_albedo.Sample(g_bilinear_wrap_sampler, input.uv).rgb;
+        output.albedo = float4(g_albedo.Sample(g_bilinear_wrap_sampler, input.uv).rgb, 1.0f);
     }
     else
     {
-        material.albedo = g_albedo_color;
+        output.albedo = float4(g_albedo_color, 0.0f);
     }
-    material.albedo = pow(material.albedo, 2.2f);
+    output.albedo = pow(output.albedo, 2.2f);
+    output.roughness_metalness_transmittance_ao.a = max(output.roughness_metalness_transmittance_ao.a, 0.01f);
 
     if (g_enabled_texture_flags & TEXTURE_ENABLED_ROUGHNESS)
     {
-        material.roughness = g_roughness.Sample(g_bilinear_wrap_sampler, input.uv).r;
+        output.roughness_metalness_transmittance_ao.r = g_roughness.Sample(g_bilinear_wrap_sampler, input.uv).r;
     }
     else
     {
-        material.roughness = g_roughness_value;
+        output.roughness_metalness_transmittance_ao.r = g_roughness_value;
     }
-    material.roughness = max(material.roughness, 0.01f);
     if (g_enabled_texture_flags & TEXTURE_ENABLED_METALNESS)
     {
-        material.metalness = g_metalness.Sample(g_bilinear_wrap_sampler, input.uv).r;
+        output.roughness_metalness_transmittance_ao.g = g_metalness.Sample(g_bilinear_wrap_sampler, input.uv).r;
     }
     else
     {
-        material.metalness = g_metalness_value;
+        output.roughness_metalness_transmittance_ao.g = g_metalness_value;
+    }
+    
+    if (g_enabled_texture_flags & TEXTURE_ENABLED_TRANSLUCENCY)
+    {
+        output.roughness_metalness_transmittance_ao.b = length(g_translucency.Sample(g_bilinear_wrap_sampler, input.uv).rgb);
+    }
+    else
+    {
+        output.roughness_metalness_transmittance_ao.b = 0.0f;
+    }
+    if (g_enabled_texture_flags & TEXTURE_ENABLED_AO)
+    {
+        output.roughness_metalness_transmittance_ao.a = g_ao.Sample(g_bilinear_wrap_sampler, input.uv).r;
+    }
+    else
+    {
+        output.roughness_metalness_transmittance_ao.a = g_ao_value;
     }
     input.bitangent = normalize(input.bitangent);
     input.tangent = normalize(input.tangent);
     input.normal = normalize(input.normal);
-    if (g_enabled_texture_flags & TEXTURE_ENABLED_SPECULAR)
-    {
-        material.f0 = g_specular.Sample(g_bilinear_wrap_sampler, input.uv).rgb;
-    }
-    else
-    {
-        material.f0 = float3(0.04, 0.04, 0.04);
-        material.f0 = lerp(material.f0, material.albedo, material.metalness);
-    }
-    PBR_CommonData common_data;
-    common_data.g_point_shadow_maps = g_point_shadow_maps;
-    common_data.g_spot_shadow_maps = g_spot_shadow_maps;
-    common_data.g_directional_shadow_maps = g_directional_shadow_maps;
+    
+    float3 normal = input.normal;
+    float3 geometry_normal = input.normal;
 
-    common_data.g_point_shadow_maps_sampler = g_shadowmap_sampler;
-    common_data.g_spot_shadow_maps_sampler = g_shadowmap_sampler;
-    common_data.g_directional_shadow_maps_sampler = g_shadowmap_sampler;
-
-    common_data.g_point_light_shadow_resolution = g_point_light_shadow_resolution;
-    common_data.g_spot_light_shadow_resolution = g_spot_light_shadow_resolution;
-    common_data.g_directional_light_shadow_resolution = g_directional_light_shadow_resolution;
-    common_data.g_bilinear_sampler = g_anisotropic_wrap_sampler;
-
-    common_data.view_dir = fetch_position_row_major(g_inv_view) - input.fragment_position;
-    common_data.view_dir_normalized = normalize(common_data.view_dir);
     if (g_enabled_texture_flags & TEXTURE_ENABLED_NORMAL)
     {
-        common_data.normal = g_normal.Sample(g_bilinear_clamp_sampler, input.uv);
-        common_data.normal = normalize(common_data.normal * 2 - 1);
-        if (g_enabled_texture_flags & TEXTURE_NORMAL_REVERSE_Y)
-        {
-            common_data.normal.y = -common_data.normal.y;
-        }
+        normal = g_normal.Sample(g_bilinear_clamp_sampler, input.uv);
+        normal = normalize(normal * 2 - 1);
+        if(g_enabled_texture_flags & TEXTURE_NORMAL_REVERSE_Y) { normal.y = -normal.y; }
         float3x3 TBN = float3x3(input.tangent, input.bitangent, input.normal);
-        common_data.normal = normalize(mul(common_data.normal, TBN));
+        normal = normalize(mul(normal, TBN));
     }
-    else
-    {
-        common_data.normal = input.normal;
-    }
+    if(!is_front_face)
+        {
+            normal = -normal;
+            geometry_normal = -geometry_normal;
+        }
+    output.normals.xy = packOctahedron(normal);
+    output.normals.zw = packOctahedron(geometry_normal);
+    output.emission = float4(0,0,0,0);
 
-    float ao_value;
-    if (g_enabled_texture_flags & TEXTURE_ENABLED_AO)
-    {
-        ao_value = g_ao.Sample(g_bilinear_clamp_sampler, input.uv).r;
-    }
-    else
-    {
-        ao_value = g_default_ambient_occlusion_value;
-    }
-    common_data.geometry_normal = input.normal;
-    common_data.tangent = input.tangent;
-    common_data.bitangent = input.bitangent;
-    common_data.camera_position = fetch_position_row_major(g_inv_view);
-    common_data.fragment_position = input.fragment_position;
-    if (!is_front_face)
-    {
-        common_data.normal = -common_data.normal;
-        common_data.geometry_normal = -common_data.geometry_normal;
-    }
-    float3 color = float3(0, 0, 0);
 
-    float3 transmittance = g_translucency.Sample(g_bilinear_clamp_sampler, input.uv).rgb;
-
-    color += ComputePointLightsEnergy(material, common_data, transmittance);
-    color += ComputeSpotLightsEnergy(material, common_data, transmittance);
-    color += ComputeDirectionalLightsEnergy(material, common_data, transmittance);
-
-    ambient += ComputeEnvironmentDiffuseEnergy(material, common_data);
-
-    color += ambient * material.albedo;
-
-    color *= ao_value;
-    g_directional_shadow_maps.SampleLevel(g_bilinear_clamp_sampler, float3(0, 0, 0), 0);
-
-    return float4(color, opacity);
+    return output;
 }

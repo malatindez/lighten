@@ -22,9 +22,9 @@ namespace engine::core
         std::string entrypoint = "";
         std::vector<ShaderMacro> macros;
 #if defined(_DEBUG)
-        uint32_t flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_SKIP_OPTIMIZATION | D3DCOMPILE_DEBUG;
+        uint32_t flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG;
 #else
-        uint32_t flags = D3DCOMPILE_ENABLE_STRICTNESS;
+        uint32_t flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3;
 #endif
     };
 
@@ -43,4 +43,26 @@ namespace engine::core
         void CompileShader(ShaderCompileInput const &input, ShaderCompileOutput &output);
         void GetBlobFromCompiledShader(std::filesystem::path const &filename, render::ShaderBlob &blob);
     }
+}
+
+namespace std
+{
+    template <>
+    struct hash<engine::core::ShaderCompileInput>
+    {
+        size_t operator()(engine::core::ShaderCompileInput const &input) const
+        {
+            size_t hash = 0;
+            engine::utils::hash_combine(hash, input.type);
+            engine::utils::hash_combine(hash, input.source_file);
+            engine::utils::hash_combine(hash, input.entrypoint);
+            engine::utils::hash_combine(hash, input.flags);
+            for (auto const &macro : input.macros)
+            {
+                engine::utils::hash_combine(hash, macro.name);
+                engine::utils::hash_combine(hash, macro.definition);
+            }
+            return hash;
+        }
+    };
 }

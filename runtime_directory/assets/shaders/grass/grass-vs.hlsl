@@ -46,11 +46,13 @@ cbuffer PerMaterial : register(b2)
     float g_wavenumber;
     float g_frequency;
 
-    float2 padding0;
+    float2 grass_padding0;
 };
-cbuffer RotationMatrixBuffer : register(b3)
+cbuffer TransformMatrixBuffer : register(b3)
 {
     float4x4 g_rotation_matrix;
+    float3 g_transform_position;
+    float transform_padding0;
 };
 
 float2 CalculateDisplacementAngles(float3 fragment_position, float3 base_tangent, float3 base_bitangent)
@@ -124,7 +126,7 @@ float2 calculate_uv(uint vertex_id, uint section_num)
 VS_OUTPUT vs_main(uint vertex_id: SV_VERTEXID, VS_INPUT input)
 {
     VS_OUTPUT output;
-    output.posWS = input.posWS;
+    output.posWS = g_transform_position.xyz + mul(float4(input.posWS, 1.0f), g_rotation_matrix).xyz;
     // sections divide plane vertically, so wind wopuld look more natural
     // 2 planes, 3 sections:
     //  0  1  2  3  4  5 } section 0 }
@@ -152,7 +154,7 @@ VS_OUTPUT vs_main(uint vertex_id: SV_VERTEXID, VS_INPUT input)
     float4x4 rotation_matrix = float4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     rotation_matrix = rotate_by_x_axis(rotation_matrix, radians(-90.0f));
     rotation_matrix = rotate_by_y_axis(rotation_matrix, angle);
-    rotation_matrix = mul(rotation_matrix, transpose(g_rotation_matrix));
+    rotation_matrix = mul(rotation_matrix, g_rotation_matrix);
     
     // Rotation matrix is 
     
@@ -169,7 +171,6 @@ VS_OUTPUT vs_main(uint vertex_id: SV_VERTEXID, VS_INPUT input)
     normal = mul(float4(normal, 0), rotation_matrix).xyz;
     tangent = mul(float4(tangent, 0), rotation_matrix).xyz;
     bitangent = mul(float4(bitangent, 0), rotation_matrix).xyz;
-
     output.posWS.xyz += vertex_pos;
     output.posVS = mul(float4(output.posWS, 1), g_view);
     output.posVS = mul(output.posVS, g_projection);
@@ -178,5 +179,60 @@ VS_OUTPUT vs_main(uint vertex_id: SV_VERTEXID, VS_INPUT input)
     output.normal = normal;
     output.bitangent = bitangent;
     output.section_id = section_num;
+    return output;
+}
+struct VS_DEPTH_OUTPUT
+{
+    float3 posWS : FRAGMENT_POSITION;
+    float2 uv : TEXCOORD;
+};
+VS_DEPTH_OUTPUT vs_depth_main(uint vertex_id: SV_VERTEXID, VS_INPUT input)
+{
+    VS_DEPTH_OUTPUT output;
+    output.posWS = g_transform_position.xyz + mul(float4(input.posWS, 1.0f), g_rotation_matrix).xyz;
+    // sections divide plane vertically, so wind wopuld look more natural
+    // 2 planes, 3 sections:
+    //  0  1  2  3  4  5 } section 0 }
+    //  6  7  8  9 10 11 } section 1  } plane 0
+    // 12 13 14 15 16 17 } section 2 }
+
+    // 18 19 20 21 22 23 } section 0 }
+    // 24 25 26 27 28 29 } section 1  } plane 1
+    // 30 31 32 33 34 35 } section 2 }
+
+    // =>
+
+    // plane_num = vertex_id / g_section_count / 6;
+    // section_num = (vertex_id / 6) % g_section_count;
+
+    uint plane_num = vertex_id / g_section_count / 6;
+    uint section_num = (vertex_id / 6) % g_section_count;
+    float angle = PI / g_plane_count * plane_num + input.rotation;
+
+    float3 vertex_pos = CalculateVertexPosition(vertex_id % 6, input.size, section_num);
+    float3 tangent = float3(1, 0, 0);
+    float3 normal = float3(0, 1, 0);
+    float3 bitangent = float3(0, 0, 1);
+
+    float4x4 rotation_matrix = float4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+    rotation_matrix = rotate_by_x_axis(rotation_matrix, radians(-90.0f));
+    rotation_matrix = rotate_by_y_axis(rotation_matrix, angle);
+    rotation_matrix = mul(rotation_matrix, g_rotation_matrix);
+    
+    // Rotation matrix is 
+    
+    vertex_pos = mul(float4(vertex_pos, 0), rotation_matrix).xyz;
+    normal = mul(float4(normal, 0), rotation_matrix).xyz;
+    tangent = mul(float4(tangent, 0), rotation_matrix).xyz;
+    bitangent = mul(float4(bitangent, 0), rotation_matrix).xyz;
+
+
+    float2 displacement_angles = CalculateDisplacementAngles(output.posWS.xyz, tangent, bitangent);
+    rotation_matrix = CalculateVertexDisplacementRotationMatrix(vertex_id % 6, angle, section_num, displacement_angles);
+
+    vertex_pos = mul(float4(vertex_pos, 0), rotation_matrix).xyz;
+
+    output.posWS.xyz += vertex_pos;
+    output.uv = calculate_uv(vertex_id % 6, section_num);
     return output;
 }

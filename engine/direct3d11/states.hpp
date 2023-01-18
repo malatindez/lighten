@@ -24,10 +24,13 @@ namespace engine::direct3d
     public:
         ReadOnlyRasterizerState cull_none;
         ReadOnlyRasterizerState cull_back;
+        ReadOnlyRasterizerState cull_front;
 
         ReadOnlyDepthStencilState geq_depth;
         ReadOnlyDepthStencilState geq_depth_no_write;
+        ReadOnlyDepthStencilState no_depth_write;
         ReadOnlyDepthStencilState no_depth_no_write;
+        ReadOnlyDepthStencilState stencil_test;
 
         ReadOnlySamplerState point_wrap_sampler;
         ReadOnlySamplerState point_clamp_sampler;
@@ -42,7 +45,8 @@ namespace engine::direct3d
         ReadOnlySamplerState comparison_anisotropic_wrap_sampler;
         ReadOnlySamplerState comparison_anisotropic_clamp_sampler;
 
-        ReadOnlyBlendState additive_blend_state;
+        ReadOnlyBlendState additive_blend_state_alpha;
+        ReadOnlyBlendState additive_blend_state_no_alpha;
         ReadOnlyBlendState alpha_to_coverage_blend_state;
 
         [[nodiscard]] static inline States &instance() { utils::Assert(instance_ != nullptr, "States not initialized"); return *instance_; }

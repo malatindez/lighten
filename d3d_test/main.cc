@@ -1,5 +1,5 @@
 #include "controller.hpp"
-#include "direct3d11/hdr-render-pipeline.hpp"
+#include "direct3d11/deferred-hdr-render-pipeline.hpp"
 #include "platform/windows/windows-window.hpp"
 #include "render/present-swapchain.hpp"
 #include "core/engine.hpp"
@@ -30,11 +30,8 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
         auto swapchain_render_target = std::make_shared<direct3d::SwapchainRenderTarget>();
         swapchain_render_target->init(window->handle(), window->size());
 
-        auto render_pipeline = std::make_shared<direct3d::HDRRenderPipeline>(std::static_pointer_cast<core::Window>(window), swapchain_render_target);
+        auto render_pipeline = std::make_shared<direct3d::DeferredHDRRenderPipeline>(std::static_pointer_cast<core::Window>(window), swapchain_render_target);
         render_pipeline->WindowSizeChanged(window->size());
-
-        std::shared_ptr<render::PresentSwapchain> present_swapchain = std::make_shared<render::PresentSwapchain>();
-        render_pipeline->post_processing().AddLayer(present_swapchain);
 
         auto controller = std::make_shared<Controller>(render_pipeline);
         render_pipeline->PushLayer(controller);
@@ -64,4 +61,4 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
     Engine::Deinit();
     std::this_thread::sleep_for(std::chrono::milliseconds(750));
     return 0;
-    }
+}
