@@ -1,6 +1,7 @@
 #include "controller.hpp"
-#include "transform-editor.hpp"
 #include "camera-movement.hpp"
+#include "transform-editor.hpp"
+#include "render/renderer.hpp"
 using namespace engine;
 using namespace core;
 using namespace events;
@@ -24,33 +25,44 @@ void Controller::OnGuiRender()
     ImGui::Text("%s", utils::FormatToString(Engine::scene()->main_camera->transform().model).c_str());
     ImGui::Text("Camera inv view matrix");
     ImGui::Text("%s", utils::FormatToString(Engine::scene()->main_camera->camera().inv_view).c_str());
+    ImGui::SliderFloat("Exposure", &exposure_, -20.0f, 20.0f);
+    ImGui::SliderFloat("Default AO", &Engine::scene()->renderer->opaque_render_system().ambient_occlusion(), 0.0f, 1.0f);
     ImGui::End();
-    static bool window = true;
-    ImGui::ShowDemoWindow(&window);
-    ImGui::Begin("Transform edit");
-    transform_editor::OnGuiRender(window_pos, window_size);
-    ImGui::End();
+    object_editor::OnGuiRender(window_pos, window_size);
 }
 
-Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &window_size, math::ivec2 const &window_pos) : renderer_{ renderer }, window_size{ window_size }, window_pos{ window_pos }
+Controller::Controller(math::ivec2 const &window_size, math::ivec2 const &window_pos, float &exposure)
+    : exposure_{ exposure }, window_size{ window_size }, window_pos{ window_pos }
 {
     first_scene = std::make_shared<Scene>();
+    first_scene->renderer = std::make_unique<render::Renderer>();
 
+    auto &ors = first_scene->renderer->opaque_render_system();
+    auto &ers = first_scene->renderer->emissive_render_system();
+    ors.SetBrdfTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/IBL/ibl_brdf_lut.dds"));
+    ors.SetIrradianceTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_irradiance.dds"));
+    ors.SetPrefilteredTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_reflection.dds"));
     auto &registry = first_scene->registry;
     main_camera_entity = registry.create();
     registry.emplace<CameraComponent>(main_camera_entity, CameraComponent());
     registry.emplace<TransformComponent>(main_camera_entity, TransformComponent());
     first_scene->main_camera = std::make_unique<CameraController>(&registry, main_camera_entity, window_size);
     Engine::SetScene(first_scene);
+    Engine::scene()->main_camera->SetWorldOffset(core::math::vec3{ 0.0f, 0.0f, 0.0f });
+    Engine::scene()->main_camera->SetWorldAngles(0.0f, 0.0f, 0.0f);
+    Engine::scene()->main_camera->SetProjectionMatrix(perspective(45.0f, float(window_size.x) / float(window_size.y), 0.1f, 100.0f));
+
     int amount = 10;
     for (int i = 0; i < amount; i++)
     {
         auto knight = registry.create();
         last_created_knight = knight;
         auto &transform = registry.emplace<TransformComponent>(knight);
-
-        auto model_id = ModelLoader::Load("assets\\models\\Knight\\Knight.fbx").value();
-        render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, knight);
+        uint64_t model_id = ModelLoader::Load("assets\\models\\Knight\\Knight.fbx").value();
+        if (i % 4 == 1) model_id = ModelLoader::Load("assets\\models\\Samurai\\Samurai.fbx").value();
+        else if (i % 4 == 2) model_id = ModelLoader::Load("assets\\models\\KnightHorse\\KnightHorse.fbx").value();
+        else if (i % 4 == 3) model_id = ModelLoader::Load("assets\\models\\SunCityWall\\SunCityWall.fbx").value();
+        ors.AddInstance(model_id, registry, knight);
         transform.position = vec3
         {
             std::sin(float(i) / amount * 2 * (float)std::numbers::pi),
@@ -61,56 +73,182 @@ Controller::Controller(std::shared_ptr<Renderer> renderer, math::ivec2 const &wi
         transform.rotation *= QuaternionFromRotationMatrix(look_at(transform.position, vec3{ 0,0,0 }, vec3{ 0,1,0 }).as_rmat<3, 3>());
         transform.UpdateMatrices();
     }
-    /*
-    const auto skybox_path = std::filesystem::current_path() / "assets/textures/skyboxes/yokohama";
-    SkyboxManager::LoadSkybox(registry, std::array<std::filesystem::path, 6> {
-        skybox_path / "posx.jpg",
-            skybox_path / "negx.jpg",
-            skybox_path / "posy.jpg",
-            skybox_path / "negy.jpg",
-            skybox_path / "posz.jpg",
-            skybox_path / "negz.jpg",
-    });*/
-    SkyboxManager::LoadSkybox(registry, std::filesystem::current_path() / "assets/textures/skyboxes/skybox.dds");
+    render::OpaqueMaterial cobblestone_material;
+    render::OpaqueMaterial crystal_material;
+    render::OpaqueMaterial mud_material;
+    render::OpaqueMaterial mudroad_material;
+    render::OpaqueMaterial stone_material;
+    render::OpaqueMaterial blue_metal;
+    render::OpaqueMaterial white_half_metal;
+    render::OpaqueMaterial white_porcelain;
+    render::OpaqueMaterial blue_rubber;
+
+    cobblestone_material.reset();
+    crystal_material.reset();
+    mud_material.reset();
+    mudroad_material.reset();
+    stone_material.reset();
+    blue_metal.reset();
+    white_half_metal.reset();
+    white_porcelain.reset();
+    blue_rubber.reset();
     {
+        {
+            cobblestone_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_albedo.dds");
+            cobblestone_material.normal_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_normal.dds");
+            cobblestone_material.roughness_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_roughness.dds");
+            cobblestone_material.UpdateTextureFlags();
+        }
+        {
+            crystal_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Crystal\\Crystal_albedo.dds");
+            crystal_material.normal_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Crystal\\Crystal_normal.dds");
+            crystal_material.reverse_normal_y = true;
+            crystal_material.UpdateTextureFlags();
+        }
+        {
+            mud_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Mud\\Mud_albedo.dds");
+            mud_material.normal_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Mud\\Mud_normal.dds");
+            mud_material.roughness_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Mud\\Mud_roughness.dds");
+            mud_material.UpdateTextureFlags();
+        }
+        {
+            mudroad_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\MudRoad\\MudRoad_albedo.dds");
+            mudroad_material.normal_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\MudRoad\\MudRoad_normal.dds");
+            mudroad_material.roughness_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\MudRoad\\MudRoad_roughness.dds");
+            mudroad_material.reverse_normal_y = true;
+            mudroad_material.UpdateTextureFlags();
+        }
+        {
+            stone_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Stone\\Stone_albedo.dds");
+            stone_material.normal_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Stone\\Stone_normal.dds");
+            stone_material.roughness_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Stone\\Stone_roughness.dds");
+            stone_material.UpdateTextureFlags();
+        }
+        {
+            blue_metal.albedo_color = vec3{ 0.1f, 0.1f, 1.0f };
+            blue_metal.metalness_value = 1.0f;
+            blue_metal.roughness_value = 0.1f;
+        }
+        {
+            white_half_metal.albedo_color = vec3{ 0.9f, 0.9f, 0.9f };
+            white_half_metal.metalness_value = 0.5f;
+            white_half_metal.roughness_value = 0.25f;
+        }
+        {
+            white_porcelain.albedo_color = vec3{ 0.9f, 0.9f, 0.9f };
+            white_porcelain.metalness_value = 0.0f;
+            white_porcelain.roughness_value = 0.15f;
+        }
+        {
+            blue_rubber.albedo_color = vec3{ 0.1f, 0.1f, 1.0f };
+            blue_rubber.metalness_value = 0.0f;
+            blue_rubber.roughness_value = 0.7f;
+        }
+    }
+    {
+        std::vector<render::OpaqueMaterial> materials = { cobblestone_material, crystal_material, mud_material, mudroad_material, stone_material, blue_metal, white_half_metal, white_porcelain, blue_rubber };
+        for (size_t i = 0; i < materials.size(); i++)
+        {
+            auto model_id = render::ModelSystem::GetUnitCube();
+            auto cube = registry.create();
+            auto &transform = registry.emplace<TransformComponent>(cube);
+            transform.position = vec3{ (int32_t)i - (int32_t)materials.size() / 2, 0, -8 };
+            transform.scale = vec3{ 1 };
+            transform.UpdateMatrices();
+            ors.AddInstance(model_id, registry, cube, { materials[i] });
+        }
+    }
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                auto model_id = render::ModelSystem::GetUnitSphereFlat();
+                auto sphere = registry.create();
+                auto &transform = registry.emplace<TransformComponent>(sphere);
+                transform.position = vec3{ i - 5, j, 5 };
+                transform.scale = vec3{ 0.375f };
+                transform.UpdateMatrices();
+                render::OpaqueMaterial material;
+                material.reset();
+                material.albedo_color = vec3{ 1 };
+                material.metalness_value = mix(0.001f, 1.0f, float(i) / 9.0f);
+                material.roughness_value = mix(0.001f, 1.0f, float(j) / 9.0f);
+                material.UpdateTextureFlags();
+                material.uv_multiplier = vec2{ 1 };
+                ors.AddInstance(model_id, registry, sphere, { material });
+            }
+        }
+    }
+    // ------------------------- CUBES -------------------------
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            auto model_id = render::ModelSystem::GetUnitCube();
+            auto cube = registry.create();
+            auto &transform = registry.emplace<TransformComponent>(cube);
+            transform.position = vec3{ 0, -0.5f, 0 } + vec3{ i < 2 ? -1 : 1, 0, i % 2 == 0 ? -1 : 1 } *2.5f;
+            transform.scale = vec3{ 5,0.1,5 };
+            transform.UpdateMatrices();
+            ors.AddInstance(model_id, registry, cube, { stone_material });
+        }
+    }
+    {
+        auto model_id = render::ModelSystem::GetUnitCube();
         auto cube = registry.create();
-        registry.emplace<TestCubeComponent>(cube);
-        auto &cube_transform = registry.emplace<TransformComponent>(cube);
-        cube_transform.reset();
-        cube_transform.position = vec3{ 0,3,0 };
-        cube_transform.scale = vec3{ 0.01f };
-        cube_transform.rotation = QuaternionFromEuler(0.0f, 0.0f, 0.0f);
-        cube_transform.UpdateMatrices();
-        auto model_id = ModelLoader::Load("assets\\models\\Cube\\Cube.fbx").value();
-        render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, cube);
+        auto &transform = registry.emplace<TransformComponent>(cube);
+        transform.position = vec3{ -5, 4.5f, 0 };
+        transform.scale = vec3{ 10,0.1,10 };
+        transform.rotation = QuaternionFromEuler(0.0f, 0.0f, radians(90.0f));
+        transform.UpdateMatrices();
+        ors.AddInstance(model_id, registry, cube, { stone_material });
     }
-    { // Add two opaque cubes with two different materials
-        auto model_id = ModelLoader::Load("assets\\models\\Cube\\Cube.fbx").value();
-        {
-            auto cube = registry.create();
-            render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, cube);
-            auto &cube_transform = registry.emplace<TransformComponent>(cube);
-            cube_transform.reset();
-            cube_transform.position = vec3{ -10,1,0 };
-            cube_transform.scale = vec3{ 0.01f };
-            cube_transform.rotation = QuaternionFromEuler(0.0f, 0.0f, 0.0f);
-            cube_transform.UpdateMatrices();
-        }
-        {
-            auto cube = registry.create();
-            auto texture_view = TextureManager::GetTextureView(TextureManager::LoadTexture(std::filesystem::current_path() / "assets\\models\\Cube\\textures\\cube2.jpg"));
-            render::ModelSystem::instance().AddOpaqueInstance(model_id, registry, cube, { render::OpaqueMaterial(texture_view) });
-            auto &cube_transform = registry.emplace<TransformComponent>(cube);
-            cube_transform.reset();
-            cube_transform.position = vec3{ -10,3,0 };
-            cube_transform.scale = vec3{ 0.01f };
-            cube_transform.rotation = QuaternionFromEuler(0.0f, 0.0f, 0.0f);
-            cube_transform.UpdateMatrices();
-        }
+    // ------------------------- LIGHTS -------------------------
+    {
+        auto model_id = render::ModelSystem::GetUnitSphereFlat();
+        auto entity = registry.create();
+        auto &transform = registry.emplace<TransformComponent>(entity);
+        transform.scale = vec3{ 0.15f };
+        transform.position = vec3{ 0, 3, -2 };
+        transform.UpdateMatrices();
+        auto &point_light = registry.emplace<PointLight>(entity);
+        point_light.color = vec3{ 0.988, 0.933, 0.655 };
+        point_light.power = 4e1f;
+        ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
     }
-    render::ModelSystem::instance().OnInstancesUpdated(registry);
+    if (true) {
+        auto model_id = render::ModelSystem::GetUnitSphereFlat();
+        auto entity = registry.create();
+        auto &transform = registry.emplace<TransformComponent>(entity);
+        transform.scale = vec3{ 0.15f };
+        transform.position = vec3{ 0, 3, 2 };
+        transform.UpdateMatrices();
+        auto &point_light = registry.emplace<PointLight>(entity);
+        point_light.color = vec3{ 0.988, 0.233, 0.255 };
+        point_light.power = 1.5e2f;
+        ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
+    }
+    if (true) {
+        auto model_id = render::ModelSystem::GetUnitSphereFlat();
+        auto entity = registry.create();
+        auto &transform = registry.emplace<TransformComponent>(entity);
+        transform.scale = vec3{ 0.15f };
+        transform.position = vec3{ 0, 2, -8 };
+        transform.UpdateMatrices();
+        auto &point_light = registry.emplace<PointLight>(entity);
+        point_light.color = vec3{ 0.01, 0.933, 0.255 };
+        point_light.power = 2e2f;
+        ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
+    }
+    SkyboxManager::LoadSkybox(registry, std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street.dds");
+    first_scene->OnInstancesUpdated();
     camera_movement::RegisterKeyCallbacks();
-    transform_editor::RegisterKeyCallbacks();
+    object_editor::RegisterKeyCallbacks();
+    auto &input = *InputLayer::instance();
+    input.AddTickKeyCallback({ Key::KEY_PLUS }, [this] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure_ += dt; });
+    input.AddTickKeyCallback({ Key::KEY_MINUS }, [this] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure_ -= dt; });
+    input.AddTickKeyCallback({ Key::KEY_NUMPAD_MINUS }, [this] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure_ -= dt; });
+    input.AddTickKeyCallback({ Key::KEY_NUMPAD_PLUS }, [this] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure_ += dt; });
 }
 void Controller::OnTick([[maybe_unused]] float delta_time)
 {
@@ -121,8 +259,6 @@ void Controller::OnTick([[maybe_unused]] float delta_time)
     auto &input = *InputLayer::instance();
     auto scene = Engine::scene();
     camera_movement::UpdateCamera(delta_time);
-
-    renderer_->per_frame.view_projection = scene->main_camera->camera().view_projection;
 
     if (input.mouse_scrolled())
     {

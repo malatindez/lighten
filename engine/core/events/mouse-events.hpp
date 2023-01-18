@@ -3,7 +3,6 @@
 #include "event.hpp"
 namespace engine::core::events
 {
-
     class MouseMovedEvent final : public Event
     {
     public:

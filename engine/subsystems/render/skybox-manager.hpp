@@ -27,7 +27,8 @@ namespace engine
         static void Init();
         static void Deinit();
     private:
-        static auto constexpr skybox_shader_path = "assets/shaders/skybox/skybox.hlsl";
+        static auto constexpr skybox_vs_shader_path = "assets/shaders/skybox/skybox-vs.hlsl";
+        static auto constexpr skybox_ps_shader_path = "assets/shaders/skybox/skybox-ps.hlsl";
 
         static render::GraphicsShaderProgram skybox_shader_;
         static std::unique_ptr<direct3d::DynamicUniformBuffer<core::math::mat4x3>> skybox_buffer_;

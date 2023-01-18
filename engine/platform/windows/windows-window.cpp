@@ -43,14 +43,12 @@ namespace engine::platform::windows
 
         // display the window on the screen
         ShowWindow(handle(), 10);
-
-        initialize_d3d();
     }
-    bool Window::OnUpdate()
+    void Window::OnUpdate()
     {
         if (!alive_)
         {
-            return false;
+            return;
         }
         MSG msg;
         while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -68,7 +66,7 @@ namespace engine::platform::windows
             core::events::WindowCloseEvent wce{ handle() };
             event_callback_(wce);
         }
-        return true;
+        return;
     }
     LRESULT CALLBACK Window::WindowProcCallback(HWND handle, UINT message,
                                                 WPARAM w_param, LPARAM l_param)
@@ -128,7 +126,6 @@ namespace engine::platform::windows
         {
             WindowResizeEvent event{ size_.x, size_.y };
             event_callback_(event);
-            OnSizeChangeEnd();
         }
         else if (message == WM_WINDOWPOSCHANGED) // update window position if it has changed
         {
@@ -152,97 +149,5 @@ namespace engine::platform::windows
             return ptr->WindowProcCallback(handle, message, w_param, l_param);
         }
         return DefWindowProcW(handle, message, w_param, l_param);
-    }
-
-    void Window::OnSizeChangeEnd()
-    {
-        ImGuizmo::SetRect((float)position().x, (float)position().y, (float)size().x, (float)size().y);
-
-        if (frame_buffer_.valid())
-        {
-            direct3d::api().devcon4->OMSetRenderTargets(0, nullptr, nullptr);
-            frame_buffer_.reset();
-            frame_buffer_view_.reset();
-            depth_buffer_.reset();
-            depth_buffer_view_.reset();
-            swapchain_->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
-        }
-        initializeFramebuffer();
-        initializeDepthbuffer();
-
-        // Set up the viewport.
-        D3D11_VIEWPORT vp;
-        vp.Width = (float)size().x;
-        vp.Height = (float)size().y;
-        vp.MinDepth = 0.0f;
-        vp.MaxDepth = 1.0f;
-        vp.TopLeftX = 0;
-        vp.TopLeftY = 0;
-        direct3d::api().devcon4->RSSetViewports(1, &vp);
-    }
-    direct3d::SwapChain1 initializeSwapchain(HWND hWnd, core::math::ivec2 const &window_size)
-    {
-        DXGI_SWAP_CHAIN_DESC1 desc;
-        ZeroMemory(&desc, sizeof(DXGI_SWAP_CHAIN_DESC1));
-        desc.Width = window_size.x;
-        desc.Height = window_size.y;
-        desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        desc.Stereo = FALSE;
-        desc.SampleDesc.Count = 1;
-        desc.SampleDesc.Quality = 0;
-        desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-        desc.BufferCount = 2;
-        desc.Scaling = DXGI_SCALING_NONE;
-        desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-        desc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-        desc.Flags = 0;
-
-        IDXGISwapChain1 *swapchain = nullptr;
-        SetLastError(0);
-        direct3d::AlwaysAssert(direct3d::api().factory5->CreateSwapChainForHwnd(direct3d::api().device, hWnd, &desc, nullptr, nullptr, &swapchain),
-                               "Failed to create the swapchain");
-        return direct3d::SwapChain1{ swapchain };
-    }
-
-    void Window::initializeFramebuffer()
-    {
-        ID3D11Texture2D *frame_buffer = nullptr;
-
-        direct3d::AlwaysAssert(swapchain_->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void **>(&frame_buffer)),
-                               "Failed to get frame buffer");
-
-        ID3D11RenderTargetView *frame_buffer_view = nullptr;
-
-        direct3d::AlwaysAssert(direct3d::api().device->CreateRenderTargetView(frame_buffer, nullptr, &frame_buffer_view),
-                               "Failed to initialize framebuffer");
-        frame_buffer_ = frame_buffer;
-        frame_buffer_view_ = frame_buffer_view;
-    }
-
-    void Window::initializeDepthbuffer()
-    {
-        frame_buffer_->GetDesc(&depth_buffer_desc_); // base on frame_buffer properties
-
-        depth_buffer_desc_.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        depth_buffer_desc_.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-
-        ID3D11Texture2D *depth_buffer;
-
-        direct3d::AlwaysAssert(direct3d::api().device->CreateTexture2D(&depth_buffer_desc_, nullptr, &depth_buffer),
-                               "Failed to initialize depthbuffer");
-
-        ID3D11DepthStencilView *depth_buffer_view;
-
-        direct3d::AlwaysAssert(direct3d::api().device->CreateDepthStencilView(depth_buffer, nullptr, &depth_buffer_view),
-                               "Failed to initialize depthbuffer");
-
-        depth_buffer_ = depth_buffer;
-        depth_buffer_view_ = depth_buffer_view;
-    }
-
-    void Window::initialize_d3d()
-    {
-        swapchain_ = initializeSwapchain(handle(), size_);
-        OnSizeChangeEnd();
     }
 } // namespace engine::platform::windows

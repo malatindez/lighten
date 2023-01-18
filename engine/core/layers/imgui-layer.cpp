@@ -111,5 +111,4 @@ namespace engine::core
         ImGui_ImplWin32_Shutdown();
         ImGui::DestroyContext();
     }
-
 }

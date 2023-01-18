@@ -65,7 +65,10 @@ namespace engine::core
             while (running_)
             {
                 OnUpdate();
-
+                if (!running_)
+                {
+                    break;
+                }
                 if (tick_.elapsed() > kTickDuration)
                 {
                     float dt = tick_.elapsed();
@@ -84,9 +87,15 @@ namespace engine::core
                 std::this_thread::yield();
             }
         }
+        catch (std::exception e)
+        {
+            spdlog::critical(e.what());
+            spdlog::critical("Exception occurred within the engine layers. Shutting down.");
+            Exit();
+        }
         catch (...)
         {
-            spdlog::critical("Exception occurred within the engine layers. Shutting down.");
+            spdlog::critical("Unknown exception occurred within the engine layers. Shutting down.");
             Exit();
         }
     }
@@ -130,5 +139,4 @@ namespace engine::core
     Engine::~Engine()
     {
     }
-
 } // namespace engine::core

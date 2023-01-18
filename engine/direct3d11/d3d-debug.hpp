@@ -89,5 +89,4 @@ namespace engine::direct3d
     }
 
 #endif
-
 }

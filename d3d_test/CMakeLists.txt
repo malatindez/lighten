@@ -1,7 +1,11 @@
-set(D3D_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/d3d_test")
-
-file(GLOB_RECURSE D3D_SOURCES ${D3D_SOURCES_DIR} *.*)
-list(FILTER D3D_SOURCES INCLUDE REGEX ${D3D_SOURCES_DIR}/*)
+set(CPP_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/d3d_test")
+set(SHADERS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/runtime_directory/assets/shaders")
+file(GLOB_RECURSE CPP_SOURCES ${CPP_SOURCES_DIR} *.*)
+list(FILTER CPP_SOURCES INCLUDE REGEX ${CPP_SOURCES_DIR}/*)
+file(GLOB_RECURSE SHADER_SOURCES ${SHADERS_DIR} *.*)
+list(FILTER SHADER_SOURCES INCLUDE REGEX ${SHADERS_DIR}/*)
+set(D3D_SOURCES ${CPP_SOURCES})
+#list(APPEND D3D_SOURCES ${SHADER_SOURCES})
 
 foreach(_source IN ITEMS ${D3D_SOURCES})
   if(IS_ABSOLUTE "${_source}")
@@ -20,7 +24,8 @@ target_include_directories(d3d_test PRIVATE ${D3D_SOURCES_DIR})
 target_include_directories(d3d_test PRIVATE ${ENGINE_SOURCES_DIR})
 
 # target_link_libraries(d3d_test engine)
-target_add_libraries(d3d_test "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console" "directxtex" "dds_texture_loader11" "wic_texture_loader11")
+target_add_libraries(d3d_test "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console" "directxtex" "dds_texture_loader11" "wic_texture_loader11" "math")
+#target_precompile_headers(d3d_test PRIVATE "${ENGINE_SOURCES_DIR}/include/library-pch.hpp")
 
 file(GLOB RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/resources/*")
 file(COPY ${RESOURCES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

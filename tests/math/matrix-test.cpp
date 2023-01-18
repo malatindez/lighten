@@ -559,7 +559,5 @@ TEST(TEST_MATRICES, TestMatrixTransformations)
         auto a = look_at(vec3_1, vec3_2, vec3_3);
         auto b = glm::lookAtLH(glm_vec3_1, glm_vec3_2, glm_vec3_3);
         ASSERT_TRUE(look_at(vec3_1, vec3_2, vec3_3) == glm::lookAtLH(glm_vec3_1, glm_vec3_2, glm_vec3_3));
-
-
     }
 }

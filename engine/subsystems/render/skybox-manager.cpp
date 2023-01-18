@@ -1,4 +1,3 @@
-#pragma once
 #include "skybox-manager.hpp"
 #include "../core/shader-manager.hpp"
 namespace engine
@@ -40,7 +39,7 @@ namespace engine
         auto view = core::TextureManager::GetTextureView(skybox.texture_id);
 
         direct3d::api().devcon->RSSetState(direct3d::states().cull_none);
-        direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().point_wrap_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
         direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth_no_write, 0);
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 
@@ -53,8 +52,8 @@ namespace engine
     {
         auto path = std::filesystem::current_path();
 
-        auto vs = core::ShaderManager::instance()->CompileVertexShader(path / skybox_shader_path);
-        auto ps = core::ShaderManager::instance()->CompilePixelShader(path / skybox_shader_path);
+        auto vs = core::ShaderManager::instance()->CompileVertexShader(path / skybox_vs_shader_path);
+        auto ps = core::ShaderManager::instance()->CompilePixelShader(path / skybox_ps_shader_path);
 
         skybox_shader_.SetVertexShader(vs).SetPixelShader(ps);
         skybox_buffer_ = std::make_unique<direct3d::DynamicUniformBuffer<core::math::mat4x3>>();

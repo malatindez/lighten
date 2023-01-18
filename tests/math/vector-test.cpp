@@ -1,4 +1,4 @@
-#include "core/math.hpp"
+#include "include/library-pch.hpp"
 #include "pch.h"
 #include "utils.hpp"
 #include <glm/glm.hpp>
@@ -8,10 +8,8 @@
 #include <glm/gtx/compatibility.hpp>
 #include <glm/gtx/norm.hpp>
 
-
 using namespace engine::core::math;
 
-#ifdef TEMPLATE_TESTS
 template <size_t size, typename T>
 void vec_test_basic_arithmetic_same_types()
 {
@@ -259,11 +257,11 @@ TEST(TEST_VECTORS_ARITHMETIC, RandomTestDifferentTypes)
 {
     for (size_t i = 0; i < utils::RandomConstexpr(-1, 10, 25); i++)
     {
-        vec_test_basic_arithmetic_different_types_all<utils::RandomConstexpr(15, 2, 256)>();
-        vec_test_basic_arithmetic_different_types_all<utils::RandomConstexpr(34, 2, 256)>();
+        vec_test_basic_arithmetic_different_types_all<utils::RandomConstexpr(15, 4, 10)>();
+        vec_test_basic_arithmetic_different_types_all<utils::RandomConstexpr(34, 4, 10)>();
     }
 }
-#endif
+
 template<AnyVec V, int x, typename T, glm::qualifier Q>
 bool operator==(V const &lhs, glm::vec<x, T, Q> const &rhs)
 {

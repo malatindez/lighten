@@ -20,10 +20,19 @@ namespace engine::core
                 UINT *bytes) noexcept
             {
                 std::filesystem::path final_path;
+                std::filesystem::path shader_dir;
+                if (parent_data == nullptr) [[likely]]
+                {
+                    shader_dir = shader_dir_;
+                }
+                else
+                {
+                    shader_dir = shader_files_[parent_data].parent_path();
+                }
                 switch (include_type)
                 {
                 case D3D_INCLUDE_LOCAL:
-                    final_path = std::filesystem::path(shader_dir_) / std::filesystem::path(file_name);
+                    final_path = shader_dir / std::filesystem::path(file_name);
                     break;
                 case D3D_INCLUDE_SYSTEM:
                     final_path = file_name;
@@ -43,6 +52,7 @@ namespace engine::core
                     contents.copy(buf, contents.size());
                     *data_ptr = buf;
                     *bytes = (UINT)contents.size();
+                    shader_files_[buf] = final_path;
                 }
                 else
                 {
@@ -64,6 +74,7 @@ namespace engine::core
         private:
             std::string shader_dir_;
             std::vector<std::filesystem::path> includes_;
+            std::map<LPCVOID, std::filesystem::path> shader_files_;
         };
     }
 
@@ -206,6 +217,5 @@ namespace engine::core
             CompileShader(compile_input, out);
             return std::make_shared<ComputeShader>(out.blob);
         }
-
     }
 }

@@ -2,7 +2,6 @@
 #include "layer-stack-threadsafe.hpp"
 namespace engine::core
 {
-
     template <typename T>
     void LayerStackThreadsafe::PushLayer(std::shared_ptr<T> layer)
     {
@@ -33,5 +32,4 @@ namespace engine::core
         std::shared_lock guard{ mutex };
         LayerStack::HasLayer(layer);
     }
-
 }

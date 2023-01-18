@@ -13,6 +13,7 @@ namespace engine::core
     private:
         using TextureHash = size_t;
     public:
+        static TextureId LoadTexture(uint8_t *data, size_t width, size_t height, size_t channels, bool generate_mips = true);
         static TextureId LoadTexture(std::filesystem::path const &path, bool generate_mipmaps = true);
         static TextureId LoadCubemap(std::filesystem::path const &path);
         static TextureId LoadCubemap(std::array<std::filesystem::path, 6> const &cubemap_textures, bool generate_mipmaps = true);
@@ -26,7 +27,24 @@ namespace engine::core
             }
             return nullptr;
         }
-
+        [[nodiscard]] static inline ID3D11ShaderResourceView *GetTextureView(std::filesystem::path const &path, bool generate_mipmaps = true) noexcept
+        {
+            return GetTextureView(LoadTexture(path, generate_mipmaps));
+        }
+        [[nodiscard]] static inline TextureId GetTextureIdByPointer(ID3D11ShaderResourceView *ptr)
+        {
+            for (auto const &[id, texture] : instance_->textures_)
+            {
+                if (texture == ptr)
+                {
+                    return id;
+                }
+            }
+            return kInvalidTextureId;
+        }
+        [[nodiscard]] static inline auto const &GetTextures() noexcept { return instance_->textures_; }
+        [[nodiscard]] static inline auto const &GetTexturePaths() noexcept { return instance_->texture_paths_; }
+        [[nodiscard]] static inline auto const &GetTextureHashes() noexcept { return instance_->texture_hashes_; }
     private:
         friend class ::engine::core::Engine;
 
@@ -38,7 +56,7 @@ namespace engine::core
         static void Deinit() { instance_ = nullptr; }
 
     private:
-        TextureManager() {}
+        TextureManager() = default;
 
         // delete move & copy semantics
         TextureManager(TextureManager &&) = delete;
@@ -52,6 +70,7 @@ namespace engine::core
     private:
         TextureId current_id_ = 0;
         std::unordered_map<TextureId, direct3d::ShaderResourceView> textures_;
-        std::unordered_map<TextureHash, TextureId> hash_ids_;
+        std::unordered_map<TextureId, std::filesystem::path> texture_paths_;
+        std::unordered_map<TextureHash, TextureId> texture_hashes_;
     };
 }

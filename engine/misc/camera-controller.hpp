@@ -1,9 +1,7 @@
 #pragma once
 #include "components/components.hpp"
-#include "core/math/ray.hpp"
 namespace engine
 {
-
     class CameraController
     {
     public:
@@ -56,7 +54,6 @@ namespace engine
             ndc.v = -ndc.v;
             return Raycast(ndc);
         }
-
 
         [[nodiscard]] inline components::CameraComponent const &camera() const noexcept { return registry_->get<components::CameraComponent>(camera_); }
         [[nodiscard]] inline components::TransformComponent const &transform() const noexcept { return registry_->get<components::TransformComponent>(camera_); }

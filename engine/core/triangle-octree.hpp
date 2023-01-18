@@ -1,9 +1,9 @@
 #pragma once
-
-#include "core/math.hpp"
+#include "include/library-pch.hpp"
 namespace engine::render
 {
     struct Mesh;
+    struct ModelMesh;
 }
 
 namespace engine::core
@@ -14,11 +14,13 @@ namespace engine::core
 
         float near;
         uint32_t triangle;
+        render::Mesh const *mesh_ptr;
 
-        constexpr void reset(float near_v, float far = std::numeric_limits<float>::infinity())
+        constexpr void reset(float near_v = std::numeric_limits<float>::infinity(), float far = std::numeric_limits<float>::infinity())
         {
             near = near_v;
             t = far;
+            mesh_ptr = nullptr;
         }
         bool valid() const { return std::isfinite(t); }
     };
@@ -39,7 +41,7 @@ namespace engine::core
         void clear() { m_mesh = nullptr; }
         bool inited() const { return m_mesh != nullptr; }
 
-        void initialize(render::Mesh const &mesh);
+        void initialize(render::ModelMesh const &mesh);
 
         bool intersect(const math::Ray &ray, MeshIntersection &nearest) const;
 
@@ -51,7 +53,7 @@ namespace engine::core
         math::Box m_initialBox = math::Box::empty();
         std::unique_ptr<std::array<TriangleOctree, 8>> m_children;
 
-        void initialize(const render::Mesh &mesh, const math::Box &parentBox, const math::vec3 &parentCenter, int octetIndex);
+        void initialize(render::Mesh const &mesh, const math::Box &parentBox, const math::vec3 &parentCenter, int octetIndex);
 
         bool addTriangle(uint32_t triangleIndex, const math::vec3 &V1, const math::vec3 &V2, const math::vec3 &V3, const math::vec3 &center);
 

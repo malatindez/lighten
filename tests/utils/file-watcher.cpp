@@ -48,7 +48,7 @@ TEST(FILE_WATCHER_TEST, RandomTest)
     for (int i = 0; i < kTestSize; i++)
     {
         size_t amount_to_change = utils::Random<size_t>(0, paths.size());
-        for (int i = 0; i < amount_to_change; i++)
+        for (int j = 0; j < amount_to_change; j++)
         {
             auto &file = paths.at(utils::Random<size_t>(0, paths.size() - 1));
             files_changed.emplace(file);

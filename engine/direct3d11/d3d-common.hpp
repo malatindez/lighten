@@ -33,7 +33,6 @@ namespace engine::direct3d
             return ptr_;
         }
 
-
         constexpr d3d_resource_wrapper<T> &operator=(T *ptr)
         {
             this->reset(ptr);

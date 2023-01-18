@@ -8,3 +8,4 @@
 #include "string.hpp"
 #include "template.hpp"
 #include "timer.hpp"
+#include "stl-helpers.hpp"

@@ -13,7 +13,6 @@ namespace engine::direct3d
             using readonly_d3d_resource_wrapper<T>::operator=;
             using readonly_d3d_resource_wrapper<T>::readonly_d3d_resource_wrapper;
         };
-
     } // namespace _state_detail
 
     using ReadOnlyRasterizerState = _state_detail::state_readonly_wrapper<ID3D11RasterizerState>;
@@ -25,17 +24,22 @@ namespace engine::direct3d
         ReadOnlyRasterizerState cull_none;
         ReadOnlyRasterizerState cull_back;
 
-
         ReadOnlyDepthStencilState geq_depth;
         ReadOnlyDepthStencilState geq_depth_no_write;
-
+        ReadOnlyDepthStencilState no_depth_no_write;
 
         ReadOnlySamplerState point_wrap_sampler;
         ReadOnlySamplerState point_clamp_sampler;
-        ReadOnlySamplerState linear_wrap_sampler;
-        ReadOnlySamplerState linear_clamp_sampler;
+        ReadOnlySamplerState bilinear_wrap_sampler;
+        ReadOnlySamplerState bilinear_clamp_sampler;
         ReadOnlySamplerState anisotropic_wrap_sampler;
         ReadOnlySamplerState anisotropic_clamp_sampler;
+        ReadOnlySamplerState comparison_point_wrap_sampler;
+        ReadOnlySamplerState comparison_point_clamp_sampler;
+        ReadOnlySamplerState comparison_linear_wrap_sampler;
+        ReadOnlySamplerState comparison_linear_clamp_sampler;
+        ReadOnlySamplerState comparison_anisotropic_wrap_sampler;
+        ReadOnlySamplerState comparison_anisotropic_clamp_sampler;
 
         [[nodiscard]] static inline States &instance() { utils::Assert(instance_ != nullptr, "States not initialized"); return *instance_; }
     private:

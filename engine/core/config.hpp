@@ -24,7 +24,6 @@ title = Engine
 [Debug]
 show_direct3d_debug_output = false
 )";
-
     } // namespace _config_detail
     class Config final : public ini::Ini
     {

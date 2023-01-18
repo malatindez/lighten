@@ -1,6 +1,7 @@
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party")
 
 set(GLM_DIR "${LIB_DIR}/glm")
+set(MATH_DIR "${LIB_DIR}/math")
 set(ASSIMP_DIR "${LIB_DIR}/assimp")
 set(IMGUI_DIR "${LIB_DIR}/imgui")
 set(IMGUIZMO_DIR "${LIB_DIR}/imguizmo")
@@ -29,6 +30,11 @@ endfunction(target_add_direct3d)
 function(target_add_glm TARGET)
   target_include_directories("${TARGET}" PRIVATE "${GLM_DIR}")
 endfunction(target_add_glm)
+
+# math
+function(target_add_math TARGET)
+  target_include_directories("${TARGET}" PRIVATE "${MATH_DIR}")
+endfunction(target_add_math)
 
 # assimp
 set(ZLIB_LIBRARIES zlibstatic)
@@ -233,6 +239,10 @@ function(target_add_libraries TARGET)
   
   if("${ARGN}" MATCHES "[gG][lL][mM]")
     target_add_glm(${TARGET})
+  endif()
+
+  if("${ARGN}" MATCHES "[mM][aA][tT][hH]")
+    target_add_math(${TARGET})
   endif()
 
 endfunction(target_add_libraries)

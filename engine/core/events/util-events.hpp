@@ -1,5 +1,5 @@
 #pragma once
-#include "core/math.hpp"
+#include "include/library-pch.hpp"
 #include "event.hpp"
 namespace engine::core::events
 {
