@@ -49,7 +49,7 @@ namespace engine::render
         ID3D11ShaderResourceView *metalness_map = nullptr;
         ID3D11ShaderResourceView *roughness_map = nullptr;
         ID3D11ShaderResourceView *opacity_map = nullptr;
-        core::math::vec3 albedo_color = core::math::vec3{0.0f};
+        core::math::vec3 albedo_color = core::math::vec3{ 0.0f };
         float metalness_value = 0.01f;
         float roughness_value = 0.01f;
         uint32_t flags = 0;
@@ -58,7 +58,7 @@ namespace engine::render
         bool appearing = true;
         bool emissive = true;
         core::math::vec2 uv_multiplier{ 1 };
-        
+
         OpaqueMaterial ToOpaqueMaterial() const
         {
             OpaqueMaterial material;

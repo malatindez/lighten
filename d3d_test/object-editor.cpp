@@ -42,7 +42,7 @@ namespace object_editor
         {
             Engine::scene()->renderer->dissolution_render_system().ScheduleInstanceUpdate();
         }
-        if(decal != nullptr)
+        if (decal != nullptr)
         {
             Engine::scene()->renderer->decal_render_system().ScheduleInstanceUpdate();
         }

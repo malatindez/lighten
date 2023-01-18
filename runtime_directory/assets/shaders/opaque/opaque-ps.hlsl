@@ -2,7 +2,6 @@
 #include "../globals/globals-ps.hlsli"
 #include "../globals/pbr-helpers.hlsli"
 
-
 cbuffer OpaquePerMaterial : register(b2)
 {
     float3 g_albedo_color;

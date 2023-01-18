@@ -150,7 +150,7 @@ namespace engine::render::_grass_detail
                 path / grass_vs_shader_path,
                 "vs_depth_main" });
             auto gs = core::ShaderManager::instance()->CompileGeometryShader(core::ShaderCompileInput{
-                direct3d::ShaderType::GeometryShader, 
+                direct3d::ShaderType::GeometryShader,
                 path / grass_gs_depth_only_cubemap_shader_path,
                 "cubemapGS" });
             auto gs2 = core::ShaderManager::instance()->CompileGeometryShader(core::ShaderCompileInput{

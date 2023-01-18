@@ -17,12 +17,12 @@ float4 ps_main(PS_INPUT input)
     float2 uv = input.uv;
     float2 center = float2(0.5f, 0.5f);
     float2 delta = uv - center;
-    
+
     if (dot(delta, delta) > 0.25f)
         discard;
 
     float depth = g_depth.Load(int3(input.posVS.xy, 0));
-    
+
     if (input.posVS.z < depth)
         discard;
 

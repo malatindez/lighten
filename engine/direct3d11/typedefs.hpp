@@ -1,9 +1,9 @@
 #include "d3d-common.hpp"
 namespace engine::direct3d
 {
-    ID3D11RenderTargetView * const null_rtv = nullptr;
-    ID3D11DepthStencilView * const null_dsv = nullptr;
-    ID3D11ShaderResourceView * const null_srv = nullptr;
+    ID3D11RenderTargetView *const null_rtv = nullptr;
+    ID3D11DepthStencilView *const null_dsv = nullptr;
+    ID3D11ShaderResourceView *const null_srv = nullptr;
 
     enum class ShaderType : uint8_t
     {

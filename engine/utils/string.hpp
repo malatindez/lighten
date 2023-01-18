@@ -96,5 +96,4 @@ namespace engine::utils
         }
         return ss.str();
     }
-    
 }
