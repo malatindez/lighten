@@ -37,10 +37,10 @@ cbuffer PerMaterial : register(b2)
     uint g_plane_count;
     uint g_section_count;
     uint g_enabled_texture_flags;
-    
+
     float2 g_grass_texture_from;
     float2 g_grass_texture_to;
-    
+
     float3 g_wind_vector;
     float g_amplitude;
     float g_wavenumber;
@@ -63,19 +63,18 @@ float2 CalculateDisplacementAngles(float3 fragment_position, float3 base_tangent
                 sin(
                     g_wavenumber * dot(normalize(g_wind_vector), fragment_position) +
                     g_frequency * g_time_now);
-    
+
     return float2(
-        dot(normalize(g_wind_vector), base_tangent), 
-        dot(normalize(g_wind_vector), base_bitangent)) 
-        * tmp;
-    
+               dot(normalize(g_wind_vector), base_tangent),
+               dot(normalize(g_wind_vector), base_bitangent)) *
+           tmp;
 }
 
 static const float kVertexDisplacementModifier = 2.0f;
 
 float4x4 CalculateVertexDisplacementRotationMatrix(in uint vertex_id, in float angle, in uint section_num, in float2 displacement_angles)
 {
-    float4x4 rotation_matrix = float4x4(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);
+    float4x4 rotation_matrix = float4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     uint offset = (vertex_id == 0 || vertex_id == 1 || vertex_id == 4) ? 1 : 0;
 
     displacement_angles *= pow(1.0f - float(section_num + offset) / g_section_count, kVertexDisplacementModifier);
@@ -91,7 +90,7 @@ float3 CalculateVertexPosition(in uint vertex_id, in float2 size, in uint sectio
     Y /= g_section_count;
     float3 temp = ((vertex_id == 0 || vertex_id == 2 || vertex_id == 3) ? -X : X) +
                   ((vertex_id == 2 || vertex_id == 3 || vertex_id == 5) ? -Y : Y);
-    temp += Y * (section_num) * 4.0f - Y * (g_section_count - 1) * 2.0f;
+    temp += Y * (section_num)*4.0f - Y * (g_section_count - 1) * 2.0f;
     switch (vertex_id)
     {
     case 0:
@@ -112,13 +111,12 @@ float3 CalculateVertexPosition(in uint vertex_id, in float2 size, in uint sectio
     return temp;
 }
 
-
 float2 calculate_uv(uint vertex_id, uint section_num)
 {
     float2 rv;
     rv = float2((vertex_id == 0 || vertex_id == 2 || vertex_id == 3) ? 0.0f : 1.0f,
                 (vertex_id == 2 || vertex_id == 3 || vertex_id == 5) ? 0.0f : 1.0f);
-    // apply section num 
+    // apply section num
     rv.y /= g_section_count;
     rv.y += float(1.0f / g_section_count) * section_num;
     return rv;
@@ -155,14 +153,13 @@ VS_OUTPUT vs_main(uint vertex_id: SV_VERTEXID, VS_INPUT input)
     rotation_matrix = rotate_by_x_axis(rotation_matrix, radians(-90.0f));
     rotation_matrix = rotate_by_y_axis(rotation_matrix, angle);
     rotation_matrix = mul(rotation_matrix, g_rotation_matrix);
-    
-    // Rotation matrix is 
-    
+
+    // Rotation matrix is
+
     vertex_pos = mul(float4(vertex_pos, 0), rotation_matrix).xyz;
     normal = mul(float4(normal, 0), rotation_matrix).xyz;
     tangent = mul(float4(tangent, 0), rotation_matrix).xyz;
     bitangent = mul(float4(bitangent, 0), rotation_matrix).xyz;
-
 
     float2 displacement_angles = CalculateDisplacementAngles(output.posWS.xyz, tangent, bitangent);
     rotation_matrix = CalculateVertexDisplacementRotationMatrix(vertex_id % 6, angle, section_num, displacement_angles);
@@ -218,14 +215,13 @@ VS_DEPTH_OUTPUT vs_depth_main(uint vertex_id: SV_VERTEXID, VS_INPUT input)
     rotation_matrix = rotate_by_x_axis(rotation_matrix, radians(-90.0f));
     rotation_matrix = rotate_by_y_axis(rotation_matrix, angle);
     rotation_matrix = mul(rotation_matrix, g_rotation_matrix);
-    
-    // Rotation matrix is 
-    
+
+    // Rotation matrix is
+
     vertex_pos = mul(float4(vertex_pos, 0), rotation_matrix).xyz;
     normal = mul(float4(normal, 0), rotation_matrix).xyz;
     tangent = mul(float4(tangent, 0), rotation_matrix).xyz;
     bitangent = mul(float4(bitangent, 0), rotation_matrix).xyz;
-
 
     float2 displacement_angles = CalculateDisplacementAngles(output.posWS.xyz, tangent, bitangent);
     rotation_matrix = CalculateVertexDisplacementRotationMatrix(vertex_id % 6, angle, section_num, displacement_angles);

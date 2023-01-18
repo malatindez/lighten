@@ -69,7 +69,7 @@ namespace camera_movement
                 if (count == std::numeric_limits<uint32_t>::max() || InputLayer::instance()->key_state(engine::core::Key::KEY_CONTROL))
                 {
                     rb_saved_mouse_position = core::math::ivec2{ -1 };
-                    if (moving)
+                    if (moving && Engine::scene()->registry.valid(selected_entity))
                     {
                         moving = false;
                         if (Engine::scene()->registry.try_get<components::OpaqueComponent>(selected_entity) != nullptr ||
@@ -106,7 +106,7 @@ namespace camera_movement
                         selected_distance = 0;
                     }
                 }
-                else if (selected_scene)
+                else if (selected_scene && Engine::scene()->registry.valid(selected_entity))
                 {
                     moving = true;
                     auto &input = *InputLayer::instance();
@@ -144,41 +144,6 @@ namespace camera_movement
                     }
                 }
             });
-        input->AddUpdateKeyCallback(InputLayer::KeySeq{ engine::core::Key::KEY_N },
-                                    [&] (InputLayer::KeySeq const &, uint32_t count)
-                                    {
-                                        if (count == std::numeric_limits<uint32_t>::max())
-                                        {
-                                            return;
-                                        }
-                                        static utils::SteadyTimer timer;
-                                        static float kSpawnLimit = 0.25f;
-                                        if (timer.elapsed() < kSpawnLimit)
-                                        {
-                                            return;
-                                        }
-                                        timer.reset();
-                                        auto &registry = Engine::scene()->registry;
-                                        auto &drs = Engine::scene()->renderer->dissolution_render_system();
-                                        auto knight = registry.create();
-
-                                        auto &transform = registry.emplace<TransformComponent>(knight);
-                                        transform.position = Engine::scene()->main_camera->position() + Engine::scene()->main_camera->forward() * 2.0f;
-                                        transform.position -= Engine::scene()->main_camera->up();
-                                        math::mat3 rotation_matrix
-                                        {
-                                               Engine::scene()->main_camera->right(),
-                                               -Engine::scene()->main_camera->up(),
-                                               -Engine::scene()->main_camera->forward()
-                                        };
-                                        rotation_matrix = math::inverse(math::rtranspose(rotation_matrix));
-                                        transform.rotation = math::QuaternionFromRotationMatrix(rotation_matrix);
-                                        transform.UpdateMatrices();
-                                        uint64_t model_id = ModelLoader::Load("assets\\models\\Knight\\Knight.fbx").value();
-                                        drs.AddInstance(model_id, registry, knight, std::uniform_real_distribution<float>(0.5f, 5.0f)(Engine::random_engine()));
-                                        Engine::scene()->renderer->dissolution_render_system().ScheduleInstanceUpdate();
-                                        Engine::scene()->renderer->light_render_system().ScheduleShadowMapUpdate();
-                                    });
     }
     void OnTick(float delta_time)
     {
@@ -202,6 +167,7 @@ namespace camera_movement
         // I'll leave this code here for now, but it's not used.
         // I'll try to fix this issue later.
         return;
+#if 0
         auto scene = Engine::scene();
         if (!scene->registry.valid(selected_entity))
         {
@@ -214,5 +180,6 @@ namespace camera_movement
         }
         auto &transform = *transform_ptr;
         spdlog::info(utils::FormatToString(transform.position));
+#endif
     }
 }

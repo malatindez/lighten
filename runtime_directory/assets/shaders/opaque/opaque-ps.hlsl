@@ -1,5 +1,5 @@
-#include "../globals/globals-ps.hlsli"
 #include "../common/helpers.hlsli"
+#include "../globals/globals-ps.hlsli"
 #include "../globals/pbr-helpers.hlsli"
 
 cbuffer OpaquePerMaterial : register(b2)
@@ -47,10 +47,10 @@ struct PS_OUTPUT
 PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
 {
     input.texcoord = input.texcoord * g_uv_multiplier;
-    if(g_enabled_texture_flags & TEXTURE_ENABLED_OPACITY)
+    if (g_enabled_texture_flags & TEXTURE_ENABLED_OPACITY)
     {
         float opacity = g_opacity.Sample(g_bilinear_wrap_sampler, input.texcoord).r;
-        if (opacity < 0.1)
+        if (opacity < 0.5f)
         {
             discard;
         }
@@ -89,7 +89,7 @@ PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
     input.bitangent = normalize(input.bitangent);
     input.tangent = normalize(input.tangent);
     input.normal = normalize(input.normal);
-    
+
     float3 normal = input.normal;
     float3 geometry_normal = input.normal;
 
@@ -97,11 +97,14 @@ PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
     {
         normal = g_normal.Sample(g_bilinear_clamp_sampler, input.texcoord);
         normal = normalize(normal * 2 - 1);
-        if(g_enabled_texture_flags & TEXTURE_NORMAL_REVERSE_Y) { normal.y = -normal.y; }
+        if (g_enabled_texture_flags & TEXTURE_NORMAL_REVERSE_Y)
+        {
+            normal.y = -normal.y;
+        }
         float3x3 TBN = float3x3(input.tangent, input.bitangent, input.normal);
         normal = normalize(mul(normal, TBN));
     }
-    if(!is_front_face)
+    if (!is_front_face)
     {
         normal = -normal;
         geometry_normal = -geometry_normal;

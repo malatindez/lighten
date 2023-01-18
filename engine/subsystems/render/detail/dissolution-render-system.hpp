@@ -49,14 +49,50 @@ namespace engine::render
         ID3D11ShaderResourceView *metalness_map = nullptr;
         ID3D11ShaderResourceView *roughness_map = nullptr;
         ID3D11ShaderResourceView *opacity_map = nullptr;
-        core::math::vec3 albedo_color;
-        float metalness_value;
-        float roughness_value;
-        uint32_t texture_flags;
+        core::math::vec3 albedo_color = core::math::vec3{ 0.0f };
+        float metalness_value = 0.01f;
+        float roughness_value = 0.01f;
+        uint32_t flags = 0;
         bool reverse_normal_y = false;
         bool twosided = false;
+        bool appearing = true;
+        bool emissive = true;
         core::math::vec2 uv_multiplier{ 1 };
 
+        OpaqueMaterial ToOpaqueMaterial() const
+        {
+            OpaqueMaterial material;
+            material.albedo_map = albedo_map;
+            material.normal_map = normal_map;
+            material.metalness_map = metalness_map;
+            material.roughness_map = roughness_map;
+            material.opacity_map = opacity_map;
+            material.albedo_color = albedo_color;
+            material.metalness_value = metalness_value;
+            material.roughness_value = roughness_value;
+            material.reverse_normal_y = reverse_normal_y;
+            material.twosided = twosided;
+            material.uv_multiplier = uv_multiplier;
+            material.UpdateTextureFlags();
+            return material;
+        }
+        static DissolutionMaterial FromOpaqueMaterial(OpaqueMaterial const &material) noexcept
+        {
+            DissolutionMaterial result;
+            result.albedo_map = material.albedo_map;
+            result.normal_map = material.normal_map;
+            result.metalness_map = material.metalness_map;
+            result.roughness_map = material.roughness_map;
+            result.opacity_map = material.opacity_map;
+            result.albedo_color = material.albedo_color;
+            result.metalness_value = material.metalness_value;
+            result.roughness_value = material.roughness_value;
+            result.reverse_normal_y = material.reverse_normal_y;
+            result.twosided = material.twosided;
+            result.uv_multiplier = material.uv_multiplier;
+            result.UpdateTextureFlags();
+            return result;
+        }
         void UpdateTextureFlags();
         DissolutionMaterial() = default;
         void BindTextures() const;
@@ -64,17 +100,7 @@ namespace engine::render
         explicit DissolutionMaterial(Material const &material);
         void reset()
         {
-            albedo_map = nullptr;
-            normal_map = nullptr;
-            metalness_map = nullptr;
-            roughness_map = nullptr;
-            opacity_map = nullptr;
-            albedo_color = core::math::vec3{ 0.0f };
-            metalness_value = 0.01f;
-            roughness_value = 0.01f;
-            texture_flags = 0;
-            reverse_normal_y = false;
-            uv_multiplier = core::math::vec2{ 1 };
+            *this = DissolutionMaterial{};
         }
     };
 }
@@ -92,8 +118,11 @@ namespace std {
             engine::utils::hash_combine(seed, material.albedo_color);
             engine::utils::hash_combine(seed, material.metalness_value);
             engine::utils::hash_combine(seed, material.roughness_value);
-            engine::utils::hash_combine(seed, material.texture_flags);
+            engine::utils::hash_combine(seed, material.flags);
             engine::utils::hash_combine(seed, material.reverse_normal_y);
+            engine::utils::hash_combine(seed, material.twosided);
+            engine::utils::hash_combine(seed, material.appearing);
+            engine::utils::hash_combine(seed, material.emissive);
             engine::utils::hash_combine(seed, material.uv_multiplier);
             return seed;
         }
@@ -139,7 +168,7 @@ namespace engine::render::_dissolution_detail
         core::math::vec3 albedo_color;
         float metalness;
         float roughness;
-        uint32_t enabled_texture_flags;
+        uint32_t flags;
         core::math::vec2 uv_multiplier;
         float time_begin;
         float lifetime;
@@ -164,8 +193,8 @@ namespace engine::render::_dissolution_detail
         void RenderDepthOnly(std::vector<DissolutionPerDepthTexture> const &textures, core::Scene *scene);
 
         ModelInstance &GetInstance(uint64_t model_id);
-        void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, float lifetime);
-        void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, std::vector<DissolutionMaterial> const &materials, float lifetime);
+        void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, float lifetime, bool appearing = true, bool emissive = true);
+        void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, float lifetime, std::vector<DissolutionMaterial> const &materials);
 
         void Update([[maybe_unused]] core::Scene *scene);
         void ScheduleInstanceUpdate()
@@ -179,6 +208,12 @@ namespace engine::render::_dissolution_detail
 
         utils::SteadyTimer update_timer_;
         float update_time_ = 0.1f;
+
+        utils::SteadyTimer particle_spawn_timer_;
+        // TODO:
+        // This is a hack, we need to make it configurable in the shader
+        // This is taken from spawn-particle-vs.hlsl
+        static constexpr float kAmountOfCallsPerSecond = 30.0f;
 
         // TODO:
         void on_attach(entt::registry &, entt::entity) {}
@@ -198,6 +233,7 @@ namespace engine::render::_dissolution_detail
         direct3d::DynamicUniformBuffer<DissolutionPerMaterial> dissolution_per_material_buffer_;
         direct3d::DynamicUniformBuffer<core::math::mat4> mesh_to_model_buffer_;
         direct3d::DynamicVertexBuffer<DissolutionInstance> instance_buffer_;
+        uint32_t instance_buffer_size_;
         ID3D11ShaderResourceView *noise_texture_;
     };
 } // namespace engine::render::_dissolution_detail

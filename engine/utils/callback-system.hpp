@@ -3,7 +3,7 @@ namespace engine::utils
     template<typename T, typename... U>
     size_t GetFunctionAddress(std::function<T(U...)> f) {
         typedef T(FnType)(U...);
-        FnType ** fnPointer = f.template target<FnType*>();
+        FnType **fnPointer = f.template target<FnType *>();
         return reinterpret_cast<size_t>(*fnPointer);
     }
     // TODO (malatindez): improve this later

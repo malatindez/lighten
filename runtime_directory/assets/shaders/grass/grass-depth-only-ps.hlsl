@@ -36,11 +36,11 @@ struct PS_IN
 
 float ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
     : SV_Depth
-{  
+{
     input.uv = lerp(g_grass_texture_from, g_grass_texture_to, input.uv);
-	if(g_opacity.Sample(g_bilinear_clamp_sampler, input.uv).r <= 0.0f)
-	{
-		discard;
+    if (g_opacity.Sample(g_bilinear_clamp_sampler, input.uv).r <= 0.0f)
+    {
+        discard;
     }
     return input.posVS.z;
 }

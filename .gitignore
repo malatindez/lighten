@@ -41,3 +41,4 @@ _build
 .vscode
 
 runtime_directory/logs
+runtime_directory/particles_dump_data

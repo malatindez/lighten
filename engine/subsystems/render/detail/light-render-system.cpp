@@ -354,7 +354,10 @@ namespace engine::render::_light_detail
         per_frame.directional_light_shadow_resolution = directional_light_shadow_resolution();
         lights_per_frame_.Update(per_frame);
         lights_per_frame_.Bind(direct3d::ShaderType::VertexShader, 1);
+        lights_per_frame_.Bind(direct3d::ShaderType::HullShader, 1);
+        lights_per_frame_.Bind(direct3d::ShaderType::DomainShader, 1);
         lights_per_frame_.Bind(direct3d::ShaderType::GeometryShader, 1);
         lights_per_frame_.Bind(direct3d::ShaderType::PixelShader, 1);
+        lights_per_frame_.Bind(direct3d::ShaderType::ComputeShader, 1);
     }
 }

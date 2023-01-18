@@ -1,12 +1,13 @@
-#include "../globals/globals-ps.hlsli"
 #include "../common/helpers.hlsli"
+#include "../globals/globals-ps.hlsli"
 #include "../globals/pbr-helpers.hlsli"
+
 cbuffer DissolutionPerMaterial : register(b2)
 {
     float3 g_albedo_color;
     float g_metalness_value;
     float g_roughness_value;
-    uint g_enabled_texture_flags;
+    uint g_material_flags;
     float2 g_uv_multiplier;
     float time_begin;
     float lifetime;
@@ -26,7 +27,8 @@ static const uint TEXTURE_ENABLED_METALNESS = 1 << 2;
 static const uint TEXTURE_ENABLED_ROUGHNESS = 1 << 3;
 static const uint TEXTURE_ENABLED_OPACITY = 1 << 4;
 static const uint TEXTURE_NORMAL_REVERSE_Y = 1 << 24;
-
+static const uint EMISSIVE = 1 << 25;
+static const uint APPEARING = 1 << 26;
 
 struct PS_IN
 {
@@ -41,8 +43,7 @@ struct PS_IN
     float lifetime : LIFETIME;
 };
 
-static const float kClampValue = 0.05f;
-static const float4 kEmissiveColor = float4(0.0f, 10.0f, 15.0f, 1.0f);
+static const float4 kEmissiveColor = float4(0.0f, 60.0f, 75.0f, 1.0f);
 struct PS_OUTPUT
 {
     float4 albedo : SV_TARGET0;
@@ -51,36 +52,42 @@ struct PS_OUTPUT
     float4 emission : SV_TARGET3;
 };
 
-
 PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
 {
     input.texcoord = input.texcoord * g_uv_multiplier;
-    if(g_enabled_texture_flags & TEXTURE_ENABLED_OPACITY != 0 && g_opacity.Sample(g_bilinear_wrap_sampler, input.texcoord).r < 0.5f)
+    if (g_material_flags & TEXTURE_ENABLED_OPACITY)
     {
-        discard;
-    }
-    PS_OUTPUT output;
-    
-
-    float alpha = g_noise_texture.Sample(g_bilinear_wrap_sampler, input.texcoord);
-    float alpha_threshold = 1.0f - (g_time_now - input.time_begin) / input.lifetime;
-    float lerpValue = 1.0f;
-
-    float4 emission =  float4(0.0f, 0.0f, 0.0f, 0.0f);
-    if (alpha < alpha_threshold)
-    {
-        discard;
-    }
-    else if (alpha < alpha_threshold + kClampValue)
-    {
-        lerpValue = saturate((alpha - alpha_threshold + kClampValue) / (2 * kClampValue));
-        if (lerpValue < 1)
+        if (g_opacity.Sample(g_bilinear_wrap_sampler, input.texcoord).r < 0.5f)
         {
-            emission = kEmissiveColor * lerpValue;
+            discard;
         }
     }
-    
-    if (g_enabled_texture_flags & TEXTURE_ENABLED_ALBEDO)
+    PS_OUTPUT output;
+
+    float alpha = g_noise_texture.Sample(g_bilinear_wrap_sampler, input.texcoord);
+    float time_normalized = (g_time_now - input.time_begin) / input.lifetime;
+
+    if (!(g_material_flags & APPEARING))
+    {
+        time_normalized = 1.0f - time_normalized;
+    }
+    const float kClampValue = 0.2f / input.lifetime;
+    float4 emission = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    if (alpha > time_normalized)
+    {
+        discard;
+    }
+    else if (alpha + kClampValue > time_normalized && g_material_flags & EMISSIVE)
+    {
+        float value = lerp(1.0f, 0.0f, (time_normalized - alpha) / kClampValue);
+        if (!(g_material_flags & APPEARING))
+        {
+            value = 1.0f - value;
+        }
+        emission = kEmissiveColor * value;
+    }
+
+    if (g_material_flags & TEXTURE_ENABLED_ALBEDO)
     {
         output.albedo = float4(g_albedo.Sample(g_bilinear_wrap_sampler, input.texcoord).rgb, 1.0f);
     }
@@ -91,7 +98,7 @@ PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
     output.albedo = pow(output.albedo, 2.2f);
     output.roughness_metalness_transmittance_ao.a = max(output.roughness_metalness_transmittance_ao.a, 0.01f);
 
-    if (g_enabled_texture_flags & TEXTURE_ENABLED_ROUGHNESS)
+    if (g_material_flags & TEXTURE_ENABLED_ROUGHNESS)
     {
         output.roughness_metalness_transmittance_ao.r = g_roughness.Sample(g_bilinear_wrap_sampler, input.texcoord).r;
     }
@@ -99,7 +106,7 @@ PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
     {
         output.roughness_metalness_transmittance_ao.r = g_roughness_value;
     }
-    if (g_enabled_texture_flags & TEXTURE_ENABLED_METALNESS)
+    if (g_material_flags & TEXTURE_ENABLED_METALNESS)
     {
         output.roughness_metalness_transmittance_ao.g = g_metalness.Sample(g_bilinear_wrap_sampler, input.texcoord).r;
     }
@@ -112,15 +119,18 @@ PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
     input.bitangent = normalize(input.bitangent);
     input.tangent = normalize(input.tangent);
     input.normal = normalize(input.normal);
-    
+
     float3 normal = input.normal;
     float3 geometry_normal = input.normal;
 
-    if (g_enabled_texture_flags & TEXTURE_ENABLED_NORMAL)
+    if (g_material_flags & TEXTURE_ENABLED_NORMAL)
     {
         normal = g_normal.Sample(g_bilinear_clamp_sampler, input.texcoord);
         normal = normalize(normal * 2 - 1);
-        if(g_enabled_texture_flags & TEXTURE_NORMAL_REVERSE_Y) { normal.y = -normal.y; }
+        if (g_material_flags & TEXTURE_NORMAL_REVERSE_Y)
+        {
+            normal.y = -normal.y;
+        }
         float3x3 TBN = float3x3(input.tangent, input.bitangent, input.normal);
         normal = normalize(mul(normal, TBN));
     }
@@ -128,5 +138,4 @@ PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
     output.normals.zw = packOctahedron(geometry_normal);
     output.emission = emission;
     return output;
-
 }

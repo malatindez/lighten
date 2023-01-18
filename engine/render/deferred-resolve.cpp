@@ -138,7 +138,6 @@ namespace engine::render
         D3D11_SHADER_RESOURCE_VIEW_DESC desc;
         prefiltered_texture_->GetDesc(&desc);
         per_frame.prefiltered_map_mip_levels = desc.TextureCube.MipLevels;
-        auto &registry = scene->registry;
         auto &lrs = scene->renderer->light_render_system();
 
         per_frame_buffer_.Bind(direct3d::ShaderType::PixelShader, 2);

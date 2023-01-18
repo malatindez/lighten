@@ -99,24 +99,23 @@ PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
 {
     input.uv = lerp(g_grass_texture_from, g_grass_texture_to, input.uv);
     PS_OUTPUT output;
-    #if 0
+#if 0
         output.emission.xyz = section_id_to_color(input.section_id, float2(0,0)).xyz * 3; 
         output.albedo.xyzw = float4(0,0,0,0);
         output.normals.xyzw = float4(0,0,0,0);
         output.roughness_metalness_transmittance_ao = float4(0,0,0,0);
 
         return output;
-    #endif
-    if(g_enabled_texture_flags & TEXTURE_ENABLED_OPACITY)
+#endif
+    if (g_enabled_texture_flags & TEXTURE_ENABLED_OPACITY)
     {
         float opacity = g_opacity.Sample(g_bilinear_wrap_sampler, input.uv).r;
         if (opacity < 0.1)
         {
-           discard;
+            discard;
         }
     }
 
-    
     if (g_enabled_texture_flags & TEXTURE_ENABLED_ALBEDO)
     {
         output.albedo = float4(g_albedo.Sample(g_bilinear_wrap_sampler, input.uv).rgb, 1.0f);
@@ -144,7 +143,7 @@ PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
     {
         output.roughness_metalness_transmittance_ao.g = g_metalness_value;
     }
-    
+
     if (g_enabled_texture_flags & TEXTURE_ENABLED_TRANSLUCENCY)
     {
         output.roughness_metalness_transmittance_ao.b = length(g_translucency.Sample(g_bilinear_wrap_sampler, input.uv).rgb);
@@ -164,7 +163,7 @@ PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
     input.bitangent = normalize(input.bitangent);
     input.tangent = normalize(input.tangent);
     input.normal = normalize(input.normal);
-    
+
     float3 normal = input.normal;
     float3 geometry_normal = input.normal;
 
@@ -172,19 +171,21 @@ PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
     {
         normal = g_normal.Sample(g_bilinear_clamp_sampler, input.uv);
         normal = normalize(normal * 2 - 1);
-        if(g_enabled_texture_flags & TEXTURE_NORMAL_REVERSE_Y) { normal.y = -normal.y; }
+        if (g_enabled_texture_flags & TEXTURE_NORMAL_REVERSE_Y)
+        {
+            normal.y = -normal.y;
+        }
         float3x3 TBN = float3x3(input.tangent, input.bitangent, input.normal);
         normal = normalize(mul(normal, TBN));
     }
-    if(!is_front_face)
-        {
-            normal = -normal;
-            geometry_normal = -geometry_normal;
-        }
+    if (!is_front_face)
+    {
+        normal = -normal;
+        geometry_normal = -geometry_normal;
+    }
     output.normals.xy = packOctahedron(normal);
     output.normals.zw = packOctahedron(geometry_normal);
-    output.emission = float4(0,0,0,0);
-
+    output.emission = float4(0, 0, 0, 0);
 
     return output;
 }

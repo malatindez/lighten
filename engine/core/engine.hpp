@@ -160,7 +160,7 @@ namespace engine::core
         [[nodiscard]] static inline float maximum_update_rate() { return application_->update_rate_; }
 
 #ifdef _DEBUG
-        utils::Measurer<std::chrono::high_resolution_clock> update_measurer{ "Engine::Update()", false};
+        utils::Measurer<std::chrono::high_resolution_clock> update_measurer{ "Engine::Update()", false };
         utils::Measurer<std::chrono::high_resolution_clock> render_measurer{ "Engine::Render()", false };
         utils::Measurer<std::chrono::high_resolution_clock> tick_measurer{ "Engine::Tick()", false };
 #endif
