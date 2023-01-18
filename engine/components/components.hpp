@@ -13,10 +13,9 @@ namespace engine::render::_particle_detail
 
 /**
  * @brief The components namespace contains all the components that can be used in the engine
- * @todo make general empty class Component
  * @todo Every component should inherit from it and have a static \code{.cpp} constexpr std::string_view name;\endcode 
  * member that is used to identify the component by name
- * @todo If it doesn't have a name, \code{.cpp}static_assert(false, "Component {class name} must have a name declared");\endcode will be generated automatically
+ * If the component doesn't have a name, \code{.cpp}static_assert(false, "Component {class name} must have a name declared");\endcode will be generated automatically
  * in generated file to make sure that the component has a name
  *
  * About forward declaring or including the component headers.
@@ -352,7 +351,7 @@ namespace engine::components
         ~PointLight() = default;
 
         /// @brief Position of the light in the local space relative to the world matrix in the transform component
-        /// @todo:
+        /// @todo
         /// Use position in the LightRenderSystem to calculate the world position of the light
         core::math::vec3 position;
         /// @brief Color of the light
@@ -361,7 +360,7 @@ namespace engine::components
         float power;
 
         /// @brief Radius of the light
-        /// @todo:
+        /// @todo
         /// Use radius in LightRenderSystem and multiply it by the scale of the transform component
         float radius;
         /// @brief If the light casts shadows
