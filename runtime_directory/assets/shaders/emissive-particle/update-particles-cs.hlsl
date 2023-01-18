@@ -4,8 +4,8 @@
 Texture2D<float> g_depth : register(t0);
 Texture2D<float4> g_normal : register(t1);
 
-static const float3 kGravity = float3(0, -9.81, 0) / 8;
-static const float kCollisionEnergyLoss = 0.01f;
+static const float3 kGravity = float3(0, -9.81, 0)/ 4;
+static const float kCollisionEnergyLoss = 0.15f;
 
 [numthreads(64, 1, 1)]
 void cs_main(uint3 thread_id: SV_DispatchThreadID)
@@ -24,9 +24,7 @@ void cs_main(uint3 thread_id: SV_DispatchThreadID)
         return;
     }
     const float dt = g_time_since_last_frame;
-    // TODO:
-    // better collision detection checking if we intersected the surface in-between the last and the current position
-    float3 tmp_position = g_particles[particle_index].position + g_particles[particle_index].velocity * dt;
+    float3 new_position = g_particles[particle_index].position + g_particles[particle_index].velocity * dt;
     g_particles[particle_index].velocity += kGravity * dt;
 
     float2 posCS;
@@ -49,9 +47,10 @@ void cs_main(uint3 thread_id: SV_DispatchThreadID)
     float3 normal = unpackOctahedron(g_normal.Load(int3(posSS, 0)).xy);
 
     float distance = length(scene_pos - g_particles[particle_index].position);
+    
     if (distance > g_particles[particle_index].size + 0.1f)
     {
-        g_particles[particle_index].position = tmp_position;
+        g_particles[particle_index].position = new_position;
         return;
     }
     g_particles[particle_index].position = scene_pos + normal * (g_particles[particle_index].size);

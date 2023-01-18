@@ -242,9 +242,9 @@ namespace engine::render::_emissive_particle_detail
             .world_transform = transform.model,
             .time_begin = dissolution_component.time_begin,
             .object_lifetime = dissolution_component.lifetime,
-            .velocity_range = {0.25f, 0.75f}, // TODO: make this the system parameter that we can change from UI
-            .size_range = {0.005f, 0.01f},     // TODO: make this the system parameter that we can change from UI
-            .particle_lifetime = 7.5f,      // TODO: make this the system parameter that we can change from UI
+            .velocity_range = {0.25f, 1.5f}, // TODO: make this the system parameter that we can change from UI
+            .size_range = {0.001f, 0.005f},     // TODO: make this the system parameter that we can change from UI
+            .particle_lifetime = 22.5f,      // TODO: make this the system parameter that we can change from UI
             .flags = 0 };
         per_frame_buffer_.Update(PerFrame{ .maximum_amount_of_particles = kMaximumAmountOfParticles });
 

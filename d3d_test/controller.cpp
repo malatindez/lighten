@@ -203,7 +203,6 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         auto &transform = registry.emplace<TransformComponent>(knight);
         uint64_t model_id = ModelLoader::Load("assets\\models\\Knight\\Knight.fbx").value();
         game_object.name = "Knight";
-#if 0
         if (i % 4 == 1)
         {
             model_id = ModelLoader::Load("assets\\models\\Samurai\\Samurai.fbx").value();
@@ -214,6 +213,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             model_id = ModelLoader::Load("assets\\models\\KnightHorse\\KnightHorse.fbx").value();
             game_object.name = "KnightHorse";
         }
+#if 0
         else if (i % 4 == 3)
         {
             model_id = ModelLoader::Load("assets\\models\\SunCityWall\\SunCityWall.fbx").value();
