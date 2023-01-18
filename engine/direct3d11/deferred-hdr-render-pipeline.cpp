@@ -63,6 +63,16 @@ namespace engine::direct3d
         direct3d::api().devcon4->PSSetSamplers(2, 1, &direct3d::states().bilinear_clamp_sampler.ptr());
         direct3d::api().devcon4->PSSetSamplers(3, 1, &direct3d::states().comparison_linear_clamp_sampler.ptr());
 
+        direct3d::api().devcon4->VSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
+        direct3d::api().devcon4->VSSetSamplers(1, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
+        direct3d::api().devcon4->VSSetSamplers(2, 1, &direct3d::states().bilinear_clamp_sampler.ptr());
+        direct3d::api().devcon4->VSSetSamplers(3, 1, &direct3d::states().comparison_linear_clamp_sampler.ptr());
+
+        direct3d::api().devcon4->CSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
+        direct3d::api().devcon4->CSSetSamplers(1, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
+        direct3d::api().devcon4->CSSetSamplers(2, 1, &direct3d::states().bilinear_clamp_sampler.ptr());
+        direct3d::api().devcon4->CSSetSamplers(3, 1, &direct3d::states().comparison_linear_clamp_sampler.ptr());
+
         scene_->FrameBegin();
 
         api().devcon4->RSSetViewports(1, &viewport_);
@@ -138,9 +148,13 @@ namespace engine::direct3d
         per_frame_.time_since_last_frame = timer.elapsed();
         timer.reset();
 
-        per_frame_buffer_.Update(per_frame_);
         per_frame_buffer_.Bind(ShaderType::VertexShader, 0);
+        per_frame_buffer_.Bind(ShaderType::HullShader, 0);
+        per_frame_buffer_.Bind(ShaderType::DomainShader, 0);
+        per_frame_buffer_.Bind(ShaderType::GeometryShader, 0);
         per_frame_buffer_.Bind(ShaderType::PixelShader, 0);
+        per_frame_buffer_.Bind(ShaderType::ComputeShader, 0);
+        per_frame_buffer_.Update(per_frame_);
     }
     void DeferredHDRRenderPipeline::PostProcess()
     {

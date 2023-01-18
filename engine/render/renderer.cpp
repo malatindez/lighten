@@ -39,6 +39,7 @@ namespace engine::render
     {
         skybox_render_pass_->per_frame_ptr = &per_frame;
         skybox_render_pass_->OnRender(scene);
+        emissive_particle_render_system_->OnRender(scene, buffer, dsv);
         particle_render_system_->OnRender(scene, dsv);
     }
     void Renderer::Tick(core::Scene *scene, float delta_time)
@@ -52,6 +53,7 @@ namespace engine::render
         emissive_render_system_->Update(scene);
         grass_render_system_->Update(scene);
         light_render_system_->Update(scene);
+        emissive_particle_render_system_->Update(scene);
     }
     void Renderer::ScheduleInstanceUpdate()
     {

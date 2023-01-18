@@ -36,8 +36,8 @@ namespace engine::direct3d
 
         // Init D3D Device & Context
 
-        const D3D_FEATURE_LEVEL kFeatureLevelRequested = D3D_FEATURE_LEVEL_11_0;
-        D3D_FEATURE_LEVEL featureLevelInitialized = D3D_FEATURE_LEVEL_11_0;
+        const D3D_FEATURE_LEVEL kFeatureLevelRequested = D3D_FEATURE_LEVEL_11_1;
+        D3D_FEATURE_LEVEL featureLevelInitialized = D3D_FEATURE_LEVEL_11_1;
 #if !defined(_DEBUG)
         UINT flag = D3D11_CREATE_DEVICE_SINGLETHREADED;
 #else

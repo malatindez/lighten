@@ -19,15 +19,13 @@ struct PS_IN
     nointerpolation uint slice : SV_RenderTargetArrayIndex;
 };
 
-
-
 float ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
     : SV_Depth
-{  
-	if(g_enabled_texture_flags & TEXTURE_ENABLED_OPACITY)
+{
+    if (g_enabled_texture_flags & TEXTURE_ENABLED_OPACITY)
     {
         float opacity = g_opacity.Sample(g_bilinear_wrap_sampler, input.uv * g_uv_multiplier).r;
-        if (opacity < 0.1)
+        if (opacity < 0.5f)
         {
             discard;
         }

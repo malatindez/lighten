@@ -11,13 +11,15 @@ namespace engine::render
 {
     void DissolutionMaterial::UpdateTextureFlags()
     {
-        texture_flags = 0;
-        texture_flags |= (albedo_map != nullptr) ? 1 << 0 : 0;
-        texture_flags |= (normal_map != nullptr) ? 1 << 1 : 0;
-        texture_flags |= (metalness_map != nullptr) ? 1 << 2 : 0;
-        texture_flags |= (roughness_map != nullptr) ? 1 << 3 : 0;
-        texture_flags |= (opacity_map != nullptr) ? 1 << 4 : 0;
-        texture_flags |= (reverse_normal_y) ? 1 << 24 : 0;
+        flags = 0;
+        flags |= (albedo_map != nullptr) ? 1 << 0 : 0;
+        flags |= (normal_map != nullptr) ? 1 << 1 : 0;
+        flags |= (metalness_map != nullptr) ? 1 << 2 : 0;
+        flags |= (roughness_map != nullptr) ? 1 << 3 : 0;
+        flags |= (opacity_map != nullptr) ? 1 << 4 : 0;
+        flags |= (reverse_normal_y) ? 1 << 24 : 0;
+        flags |= (emissive) ? 1 << 25 : 0;
+        flags |= (appearing) ? 1 << 26 : 0;
     }
     void DissolutionMaterial::BindTextures() const
     {
@@ -48,7 +50,7 @@ namespace engine::render
         temporary.albedo_color = albedo_color;
         temporary.metalness = metalness_value;
         temporary.roughness = roughness_value;
-        temporary.enabled_texture_flags = texture_flags;
+        temporary.flags = flags;
         temporary.uv_multiplier = uv_multiplier;
         uniform_buffer.Update(temporary);
     }
@@ -74,7 +76,11 @@ namespace engine::render
         {
             roughness_map = material.diffuse_roughness_textures.front();
         }
-        texture_flags = 0;
+        if (material.opacity_textures.size() > 0)
+        {
+            opacity_map = material.opacity_textures.front();
+        }
+        flags = 0;
         UpdateTextureFlags();
         albedo_color = material.diffuse_color;
         metalness_value = material.metalness;
@@ -133,7 +139,7 @@ namespace engine::render::_dissolution_detail
             is_instance_update_scheduled_ = false;
         }
 
-        if (instance_buffer_.size() == 0)
+        if (instance_buffer_size_ == 0)
             return;
         dissolution_shader_.Bind();
 
@@ -158,7 +164,7 @@ namespace engine::render::_dissolution_detail
 
         auto group = registry.group<components::DissolutionComponent>(entt::get<components::TransformComponent>);
 
-        direct3d::api().devcon4->OMSetBlendState(direct3d::states().alpha_to_coverage_blend_state.ptr(), nullptr, 0xffffffff);
+        direct3d::api().devcon4->OMSetBlendState(direct3d::states().alpha_to_coverage_blend_state, nullptr, 0xffffffff);
 
         direct3d::api().devcon->RSSetState(direct3d::states().cull_none);
         bool current_state_twosided = false;
@@ -195,10 +201,6 @@ namespace engine::render::_dissolution_detail
             }
         }
         dissolution_shader_.Unbind();
-        ID3D11ShaderResourceView *nullSRV[1] = { nullptr };
-        direct3d::api().devcon4->PSSetShaderResources(8, 1, nullSRV);
-        direct3d::api().devcon4->PSSetShaderResources(9, 1, nullSRV);
-        direct3d::api().devcon4->PSSetShaderResources(10, 1, nullSRV);
     }
 
     void DissolutionRenderSystem::RenderDepthOnly(std::vector<DissolutionPerDepthCubemap> const &cubemaps, core::Scene *scene)
@@ -209,7 +211,7 @@ namespace engine::render::_dissolution_detail
             scene->renderer->light_render_system().ScheduleShadowMapUpdate();
             is_instance_update_scheduled_ = false;
         }
-        if (instance_buffer_.size() == 0)
+        if (instance_buffer_size_ == 0)
             return;
         GraphicsShaderProgram::UnbindAll();
         dissolution_cubemap_shader_.Bind();
@@ -264,7 +266,7 @@ namespace engine::render::_dissolution_detail
             scene->renderer->light_render_system().ScheduleShadowMapUpdate();
             is_instance_update_scheduled_ = false;
         }
-        if (instance_buffer_.size() == 0)
+        if (instance_buffer_size_ == 0)
             return;
         GraphicsShaderProgram::UnbindAll();
         dissolution_texture_shader_.Bind();
@@ -318,6 +320,30 @@ namespace engine::render::_dissolution_detail
             update_timer_.reset();
             TransitInstances(scene);
         }
+        if (particle_spawn_timer_.elapsed() > 1.0f / kAmountOfCallsPerSecond)
+        {
+            particle_spawn_timer_.reset();
+            auto &registry = scene->registry;
+            // TODO: stop updating it here, add instance and check if the entity is valid in the emissive particle render system
+            std::map<entt::entity, std::vector<render::DissolutionMaterial *>> materials;
+
+            for (auto &model_instance : model_instances_)
+                for (auto &mesh_instance : model_instance.mesh_instances)
+                    for (auto &material_instance : mesh_instance.material_instances)
+                    {
+                        if (material_instance.material.appearing == false)
+                        {
+                            for (auto it = material_instance.instances.begin(); it != material_instance.instances.end(); ++it)
+                                materials[*it].push_back(&material_instance.material);
+                        }
+                    }
+
+            auto &eprs = scene->renderer->emissive_particle_render_system();
+            for (auto &material : materials)
+            {
+                eprs.EmitParticles(registry, material.first, material.second);
+            }
+        }
     }
     void DissolutionRenderSystem::TransitInstances(core::Scene *scene)
     {
@@ -331,22 +357,33 @@ namespace engine::render::_dissolution_detail
                     {
                         auto &entity = *it;
 
-                        auto *dissolution = registry.try_get<components::DissolutionComponent>(entity);
-                        if (dissolution != nullptr && dissolution->time_begin + dissolution->lifetime < core::Engine::TimeFromStart())
+                        components::DissolutionComponent *dissolution = nullptr;
+                        if (registry.valid(entity)) [[likely]]
                         {
-                            registry.erase<components::DissolutionComponent>(entity);
-                            ors.AddInstance(dissolution->model_id, registry, entity);
-                            ors.ScheduleInstanceUpdate();
-                            dissolution = nullptr;
-                            this->ScheduleInstanceUpdate();
+                            dissolution = registry.try_get<components::DissolutionComponent>(entity);
                         }
-                        if (dissolution == nullptr)
-                        {
-                            it = material_instance.instances.erase(it);
-                            continue;
-                        }
+                            if (dissolution != nullptr && dissolution->time_begin + dissolution->lifetime < core::Engine::TimeFromStart()) [[unlikely]]
+                            {
+                                if (material_instance.material.appearing)
+                                {
+                                    ors.AddInstance(dissolution->model_id, registry, entity);
+                                    ors.ScheduleInstanceUpdate();
+                                    registry.erase<components::DissolutionComponent>(entity);
+                                }
+                                else
+                                {
+                                    registry.destroy(entity);
+                                }
+                                dissolution = nullptr;
+                                this->ScheduleInstanceUpdate();
+                            }
+                                if (dissolution == nullptr) [[unlikely]]
+                                {
+                                    it = material_instance.instances.erase(it);
+                                    continue;
+                                }
 
-                        ++it;
+                            ++it;
                     }
                 }
     }
@@ -363,7 +400,7 @@ namespace engine::render::_dissolution_detail
             return;
 
         instance_buffer_.Init(total_instances); // resizes if needed
-
+        instance_buffer_size_ = total_instances;
         auto mapping = instance_buffer_.Map();
         DissolutionInstance *dst = static_cast<DissolutionInstance *>(mapping.pData);
         auto instance_group = registry.group<components::DissolutionComponent>(entt::get<components::TransformComponent>);
@@ -406,7 +443,7 @@ namespace engine::render::_dissolution_detail
             return *it;
         }
         model_instances_.emplace_back(ModelInstance{ .model = ModelSystem::GetModel(model_id), .model_id = model_id });
-        auto &instance = model_instances_.at(model_id);
+        auto &instance = model_instances_.back();
         for (auto const &mesh : instance.model.meshes)
         {
             MeshInstance value;
@@ -417,14 +454,18 @@ namespace engine::render::_dissolution_detail
         return instance;
     }
 
-    void DissolutionRenderSystem::AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, float lifetime)
+    void DissolutionRenderSystem::AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, float lifetime, bool appearing, bool emissive)
     {
         auto &instance = GetInstance(model_id);
         for (size_t mesh_index = 0; mesh_index < instance.model.meshes.size(); mesh_index++)
         {
             auto const &mesh = instance.model.meshes[mesh_index];
             auto &material_instances = instance.mesh_instances[mesh_index].material_instances;
-            MaterialInstance material_instance{ .material = DissolutionMaterial(instance.model.materials[mesh.loaded_material_id]) };
+            DissolutionMaterial __tmp_material(instance.model.materials[mesh.loaded_material_id]);
+            __tmp_material.appearing = appearing;
+            __tmp_material.emissive = emissive;
+            __tmp_material.UpdateTextureFlags();
+            MaterialInstance material_instance{ .material = std::move(__tmp_material) };
             bool add_new_material = true;
             for (auto &mat_instance : material_instances)
             {
@@ -444,7 +485,7 @@ namespace engine::render::_dissolution_detail
         registry.emplace<components::DissolutionComponent>(entity, components::DissolutionComponent{ .model_id = model_id, .time_begin = core::Engine::TimeFromStart(), .lifetime = lifetime });
     }
 
-    void DissolutionRenderSystem::AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, std::vector<DissolutionMaterial> const &materials, float lifetime)
+    void DissolutionRenderSystem::AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, float lifetime, std::vector<DissolutionMaterial> const &materials)
     {
         auto &instance = GetInstance(model_id);
         utils::Assert(materials.size() == instance.mesh_instances.size());

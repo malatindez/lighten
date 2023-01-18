@@ -96,7 +96,7 @@ namespace engine::render::_decal_detail
             {
                 size_t texture_ptr = reinterpret_cast<size_t>(material_instance.normal_opacity_map);
                 auto tmp = std::lower_bound(insert_helper.begin(), insert_helper.end(), texture_ptr);
-                material_instance.instances_amount = std::distance(lower, tmp);
+                material_instance.instances_amount = static_cast<uint32_t>(std::distance(lower, tmp));
                 lower = tmp;
             }
         }

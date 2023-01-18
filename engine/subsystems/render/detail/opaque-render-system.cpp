@@ -345,7 +345,7 @@ namespace engine::render::_opaque_detail
             return *it;
         }
         model_instances_.emplace_back(ModelInstance{ .model = ModelSystem::GetModel(model_id), .model_id = model_id });
-        auto &instance = model_instances_.at(model_id);
+        auto &instance = model_instances_.back();
         for (auto const &mesh : instance.model.meshes)
         {
             MeshInstance value;

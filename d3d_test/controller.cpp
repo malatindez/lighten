@@ -1,8 +1,8 @@
 #include "controller.hpp"
 #include "camera-movement.hpp"
 #include "object-editor.hpp"
-#include "scene-viewer.hpp"
 #include "render/renderer.hpp"
+#include "scene-viewer.hpp"
 using namespace engine;
 using namespace core;
 using namespace events;
@@ -221,14 +221,13 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         }
 #endif
         ors.AddInstance(model_id, registry, knight);
-        transform.position = vec3
-        {
-            std::sin(float(i) / amount * 2 * (float)std::numbers::pi),
-            0,
-            std::cos(float(i) / amount * 2 * (float)std::numbers::pi)
-        } *(float(amount) / std::sqrtf((float)amount));
+        transform.position = vec3{
+                                 std::sin(float(i) / amount * 2 * (float)std::numbers::pi),
+                                 0,
+                                 std::cos(float(i) / amount * 2 * (float)std::numbers::pi) } *
+                                 (float(amount) / std::sqrtf((float)amount));
         transform.rotation = QuaternionFromEuler(0.0f, 0.0f, radians(180.0f));
-        transform.rotation *= QuaternionFromRotationMatrix(look_at(transform.position, vec3{ 0,0,0 }, vec3{ 0,1,0 }).as_rmat<3, 3>());
+        transform.rotation *= QuaternionFromRotationMatrix(look_at(transform.position, vec3{ 0, 0, 0 }, vec3{ 0, 1, 0 }).as_rmat<3, 3>());
         transform.UpdateMatrices();
     }
     render::OpaqueMaterial cobblestone_material;
@@ -251,11 +250,10 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     white_porcelain.reset();
     blue_rubber.reset();
     {
-        {
-            cobblestone_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_albedo.dds");
-            cobblestone_material.normal_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_normal.dds");
-            cobblestone_material.roughness_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_roughness.dds");
-            cobblestone_material.UpdateTextureFlags();
+        {cobblestone_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_albedo.dds");
+        cobblestone_material.normal_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_normal.dds");
+        cobblestone_material.roughness_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_roughness.dds");
+        cobblestone_material.UpdateTextureFlags();
         }
         {
             crystal_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Crystal\\Crystal_albedo.dds");
@@ -324,7 +322,8 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             ors.AddInstance(model_id, registry, cube, { materials[i] });
         }
     }
-    if (false) {
+    if (false)
+    {
         entt::entity spheres = registry.create();
         auto &spheres_game_object = registry.emplace<GameObject>(spheres);
         spheres_game_object.name = "Spheres";
@@ -368,7 +367,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             floor_game_object.children.push_back(cube);
             auto &transform = registry.emplace<TransformComponent>(cube);
             transform.position = vec3{ 0, -0.5f, 0 } + vec3{ i < 2 ? -1 : 1, 0, i % 2 == 0 ? -1 : 1 } *2.5f;
-            transform.scale = vec3{ 5,0.1,5 };
+            transform.scale = vec3{ 5, 0.1, 5 };
             transform.UpdateMatrices();
             ors.AddInstance(model_id, registry, cube, { stone_material });
         }
@@ -380,7 +379,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         wall_game_object.name = "Wall";
         auto &transform = registry.emplace<TransformComponent>(wall);
         transform.position = vec3{ -5, 4.5f, 0 };
-        transform.scale = vec3{ 10,0.1,10 };
+        transform.scale = vec3{ 10, 0.1, 10 };
         transform.rotation = QuaternionFromEuler(0.0f, 0.0f, radians(90.0f));
         transform.UpdateMatrices();
         ors.AddInstance(model_id, registry, wall, { stone_material });
@@ -388,7 +387,8 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     // ------------------------- LIGHTS -------------------------
     entt::entity lights = registry.create();
     auto &lights_game_object = registry.emplace<GameObject>(lights);
-    if (false) {
+    if (false)
+    {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
         auto &game_object = registry.emplace<GameObject>(entity);
@@ -404,7 +404,8 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         point_light.power = 1e3f;
         ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
     }
-    if (true) {
+    if (true)
+    {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
         auto &game_object = registry.emplace<GameObject>(entity);
@@ -421,7 +422,8 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         point_light.casts_shadows = true;
         ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
     }
-    if (false) {
+    if (false)
+    {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
         auto &game_object = registry.emplace<GameObject>(entity);
@@ -451,7 +453,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             auto &transform = registry.emplace<TransformComponent>(entity);
             transform.scale = vec3{ 0.1f };
             transform.position = vec3{ 0, 0.025f, 0 };
-            transform.position += vec3{ std::cosf(float(i) / 24 * 2 * std::numbers::pi), 0, std::sinf(float(i) / 24 * 2 * std::numbers::pi) } *1.0f;
+            transform.position += vec3{ std::cosf(float(i) / 24 * 2 * std::numbers::pi_v<float>), 0, std::sinf(float(i) / 24 * 2 * std::numbers::pi_v<float>) } *1.0f;
             transform.UpdateMatrices();
             auto &point_light = registry.emplace<PointLight>(entity);
             point_light.color = vec3{ (i + 1) % 2, (i + 1) % 3, (i + 1) % 5 };
@@ -463,7 +465,8 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     }
 
     // add directional light
-    if (true) {
+    if (true)
+    {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
         auto &transform = registry.emplace<TransformComponent>(entity);
@@ -513,7 +516,8 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     first_scene->renderer->particle_render_system().atlas_size = { 8, 8 };
 
     // add particle emitters
-    if (true) {
+    if (true)
+    {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
         auto &game_object = registry.emplace<GameObject>(entity);
@@ -543,7 +547,8 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         particle_emitter.maximum_amount_of_particles = 200;
         ors.AddInstance(model_id, registry, entity, { white_porcelain });
     }
-    if (true) {
+    if (true)
+    {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
         auto &game_object = registry.emplace<GameObject>(entity);
@@ -643,120 +648,192 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     object_editor::RegisterKeyCallbacks();
     auto &input = *InputLayer::instance();
     auto &exposure = hdr_render_pipeline_->hdr_to_ldr_layer()->exposure();
-    input.AddTickKeyCallback({ Key::KEY_PLUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure += dt; });
-    input.AddTickKeyCallback({ Key::KEY_MINUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure -= dt; });
-    input.AddTickKeyCallback({ Key::KEY_NUMPAD_MINUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure -= dt; });
-    input.AddTickKeyCallback({ Key::KEY_NUMPAD_PLUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t) { exposure += dt; });
-    input.AddUpdateKeyCallback({ Key::KEY_F },
-                               [&] (InputLayer::KeySeq const &, uint32_t)
+    input.AddTickKeyCallback({ Key::KEY_PLUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t)
+                             { exposure += dt; });
+    input.AddTickKeyCallback({ Key::KEY_MINUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t)
+                             { exposure -= dt; });
+    input.AddTickKeyCallback({ Key::KEY_NUMPAD_MINUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t)
+                             { exposure -= dt; });
+    input.AddTickKeyCallback({ Key::KEY_NUMPAD_PLUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t)
+                             { exposure += dt; });
+    input.AddUpdateKeyCallback(
+        { Key::KEY_F },
+        [&] (InputLayer::KeySeq const &, uint32_t)
+        {
+            static utils::HighResolutionTimer timer;
+            const float kDelay = 1.0f / 15.0f;
+            if (ImGui::GetIO().WantCaptureMouse)
+            {
+                return;
+            }
+            if (timer.elapsed() < kDelay)
+            {
+                return;
+            }
+
+            auto &input = *InputLayer::instance();
+            auto scene = Engine::scene();
+            Ray ray = scene->main_camera->PixelRaycast(vec2{ input.mouse_position() });
+            MeshIntersection nearest;
+            nearest.reset();
+            std::optional<entt::entity> entity = render::ModelSystem::FindIntersection(scene->registry, ray, nearest);
+            if (!entity.has_value())
+            {
+                return;
+            }
+            auto *opaque_component = registry.try_get<components::OpaqueComponent>(*entity);
+            if (opaque_component == nullptr)
+            {
+                return;
+            }
+            auto &transform = scene->registry.get<TransformComponent>(*entity);
+            DecalComponent::Decal decal;
+            uint32_t mesh_id = std::numeric_limits<uint32_t>::max();
+            auto *model_instance = Engine::scene()->renderer->opaque_render_system().GetInstancePtr(opaque_component->model_id);
+            {
+                // TODO:
+                // make FindIntersection return mesh and model id
+                // this is a bit of an overhead
+                if (model_instance == nullptr)
+                {
+                    return;
+                }
+                for (size_t i = 0; i < model_instance->model.meshes.size(); i++)
+                {
+                    if (&model_instance->model.meshes[i].mesh == nearest.mesh_ptr)
+                    {
+                        mesh_id = (uint32_t)i;
+                    }
+                }
+                if (mesh_id == std::numeric_limits<uint32_t>::max())
+                {
+                    return;
+                }
+            }
+            static ID3D11ShaderResourceView *texture = core::TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/decal.dds");
+            decal.normal_opacity_map = texture;
+            decal.mesh_transform = model_instance->model.meshes[mesh_id].mesh_to_model;
+            mat4 inv_mat = model_instance->model.meshes[mesh_id].inv_mesh_to_model * transform.inv_model;
+            decal.relative_position = (inv_mat * vec4(nearest.point, 1.0f)).xyz;
+
+            decal.texture_angle = std::uniform_real_distribution(0.0f, 2.0f * core::math::numbers::pi_v<float>)(core::Engine::random_engine());
+
+            decal.relative_scale = vec3{ 0.1f } / transform.scale;
+            decal.base_color = random::RandomVector3(core::Engine::random_engine(), 0.25f, 1.0f);
+            decal.roughness = 1.0f;
+            decal.metalness = 0.01f;
+            decal.transmittance = 0.0f;
+            decal.ambient_occlusion = 1.0f;
+            auto &decal_component = scene->registry.get_or_emplace<DecalComponent>(*entity);
+            decal_component.decals.emplace_back(std::move(decal));
+            timer.reset();
+            scene->renderer->decal_render_system().ScheduleInstanceUpdate();
+        },
+        true);
+    input.AddUpdateKeyCallback(InputLayer::KeySeq{ engine::core::Key::KEY_N },
+                               [&] (InputLayer::KeySeq const &, uint32_t count)
                                {
-                                   static utils::HighResolutionTimer timer;
-                                   const float kDelay = 1.0f / 15.0f;
-                                   if (ImGui::GetIO().WantCaptureMouse)
+                                   if (count == std::numeric_limits<uint32_t>::max())
                                    {
                                        return;
                                    }
-                                   if (timer.elapsed() < kDelay)
-                                   {
-                                       return;
-                                   }
-
-                                   auto &input = *InputLayer::instance();
-                                   auto scene = Engine::scene();
-                                   Ray ray = scene->main_camera->PixelRaycast(vec2{ input.mouse_position() });
-                                   MeshIntersection nearest;
-                                   nearest.reset();
-                                   std::optional<entt::entity> entity = render::ModelSystem::FindIntersection(scene->registry, ray, nearest);
-                                   if (!entity.has_value())
-                                   {
-                                       return;
-                                   }
-                                   auto *opaque_component = registry.try_get<components::OpaqueComponent>(*entity);
-                                   if (opaque_component == nullptr)
-                                   {
-                                       return;
-                                   }
-                                   auto &transform = scene->registry.get<TransformComponent>(*entity);
-                                   DecalComponent::Decal decal;
-                                   uint32_t mesh_id = std::numeric_limits<uint32_t>::max();
-                                   auto *model_instance = Engine::scene()->renderer->opaque_render_system().GetInstancePtr(opaque_component->model_id);
-                                   {
-                                       // TODO:
-                                       // make FindIntersection return mesh and model id
-                                       // this is a bit of an overhead
-                                       if (model_instance == nullptr)
-                                       {
-                                           return;
-                                       }
-                                       for (size_t i = 0; i < model_instance->model.meshes.size(); i++)
-                                       {
-                                           if (&model_instance->model.meshes[i].mesh == nearest.mesh_ptr)
-                                           {
-                                               mesh_id = (uint32_t)i;
-                                           }
-                                       }
-                                       if (mesh_id == std::numeric_limits<uint32_t>::max())
-                                       {
-                                           return;
-                                       }
-                                   }
-                                   static ID3D11ShaderResourceView *texture = core::TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/decal.dds");
-                                   decal.normal_opacity_map = texture;
-                                   decal.mesh_transform = model_instance->model.meshes[mesh_id].mesh_to_model;
-                                   mat4 inv_mat = model_instance->model.meshes[mesh_id].inv_mesh_to_model * transform.inv_model;
-                                   decal.relative_position = (inv_mat * vec4(nearest.point, 1.0f)).xyz;
-
-                                   decal.texture_angle = std::uniform_real_distribution(0.0f, 2.0f * core::math::numbers::pi_v<float>)(core::Engine::random_engine());
-
-                                   decal.relative_scale = vec3{ 0.1f } / transform.scale;
-                                   decal.base_color = random::RandomVector3(core::Engine::random_engine(), 0.25f, 1.0f);
-                                   decal.roughness = 1.0f;
-                                   decal.metalness = 0.01f;
-                                   decal.transmittance = 0.0f;
-                                   decal.ambient_occlusion = 1.0f;
-                                   auto &decal_component = scene->registry.get_or_emplace<DecalComponent>(*entity);
-                                   decal_component.decals.emplace_back(std::move(decal));
-                                   timer.reset();
-                                   scene->renderer->decal_render_system().ScheduleInstanceUpdate();
-                               },
-                               true);
-    input.AddUpdateKeyCallback({ Key::KEY_G },
-                               [&] (InputLayer::KeySeq const &, uint32_t)
-                               {
-                                   static utils::HighResolutionTimer timer;
-                                   const float kDelay = 0.5f;
-                                   if (ImGui::GetIO().WantCaptureMouse)
-                                   {
-                                       return;
-                                   }
-                                   if (timer.elapsed() < kDelay)
+                                   static utils::SteadyTimer timer;
+                                   static float kDeleteLimit = 0.5f;
+                                   if (timer.elapsed() < kDeleteLimit)
                                    {
                                        return;
                                    }
                                    timer.reset();
-                                   auto scene = Engine::scene();
-                                   Ray ray = scene->main_camera->PixelRaycast(vec2{ input.mouse_position() });
-                                   MeshIntersection nearest;
-                                   nearest.reset();
-                                   std::optional<entt::entity> entity = render::ModelSystem::FindIntersection(scene->registry, ray, nearest);
-                                   if (!entity.has_value())
-                                   {
-                                       return;
-                                   }
-                                   auto model_id = render::ModelSystem::GetUnitSphereFlat();
-                                   auto sphere = registry.create();
-                                   auto &game_object = registry.emplace<GameObject>(sphere);
-                                   game_object.name = "Sphere";
-                                   auto &transform = registry.emplace<TransformComponent>(sphere);
-                                   transform.position = nearest.point;
-                                   transform.scale = vec3{ 0.05f };
+                                   auto &registry = Engine::scene()->registry;
+                                   auto &drs = Engine::scene()->renderer->dissolution_render_system();
+                                   auto knight = registry.create();
+
+                                   auto &transform = registry.emplace<TransformComponent>(knight);
+                                   transform.position = Engine::scene()->main_camera->position() + Engine::scene()->main_camera->forward() * 2.0f;
+                                   transform.position -= Engine::scene()->main_camera->up();
+                                   math::mat3 rotation_matrix{
+                                       Engine::scene()->main_camera->right(),
+                                       -Engine::scene()->main_camera->up(),
+                                       -Engine::scene()->main_camera->forward() };
+                                   rotation_matrix = math::inverse(math::rtranspose(rotation_matrix));
+                                   transform.rotation = math::QuaternionFromRotationMatrix(rotation_matrix);
                                    transform.UpdateMatrices();
-                                   render::EmissiveMaterial material;
-                                   material.emissive_color = vec3{ 1 };
-                                   material.power = 5.0f;
-                                   ers.AddInstance(model_id, registry, sphere, { material });
-                                   ers.ScheduleInstanceUpdate();
-                               }, false);
+                                   uint64_t model_id = ModelLoader::Load("assets\\models\\Knight\\Knight.fbx").value();
+                                   drs.AddInstance(model_id, registry, knight, std::uniform_real_distribution<float>(3.0f, 15.0f)(Engine::random_engine()));
+                                   Engine::scene()->renderer->dissolution_render_system().ScheduleInstanceUpdate();
+                                   Engine::scene()->renderer->light_render_system().ScheduleShadowMapUpdate();
+                               });
+
+    input.AddUpdateKeyCallback(
+        { Key::KEY_DELETE },
+        [&] (InputLayer::KeySeq const &, uint32_t)
+        {
+            static utils::HighResolutionTimer timer;
+            const float kDelay = 0.5f;
+            if (ImGui::GetIO().WantCaptureMouse)
+            {
+                return;
+            }
+            if (timer.elapsed() < kDelay)
+            {
+                return;
+            }
+            timer.reset();
+            auto scene = Engine::scene();
+            Ray ray = scene->main_camera->PixelRaycast(vec2{ input.mouse_position() });
+            MeshIntersection nearest;
+            nearest.reset();
+            std::optional<entt::entity> entity = render::ModelSystem::FindIntersection(scene->registry, ray, nearest);
+            if (!entity.has_value())
+            {
+                return;
+            }
+
+            auto *opaque = registry.try_get<components::OpaqueComponent>(entity.value());
+            // TODO:
+            // Make better system to get/fetch models and their materials
+            // This is a hack, we should have a more flexible way to do this
+            if (opaque != nullptr)
+            {
+                float lifetime = std::uniform_real_distribution(1.0f, 5.0f)(core::Engine::random_engine());
+                auto &model_instance = ors.GetInstance(opaque->model_id);
+                std::vector<render::OpaqueMaterial *> materials;
+                for (auto &mesh_instance : model_instance.mesh_instances)
+                {
+                    for (auto &material_instance : mesh_instance.material_instances)
+                    {
+                        auto it = std::find(material_instance.instances.begin(), material_instance.instances.end(), entity.value());
+                        if (it != material_instance.instances.end())
+                        {
+                            material_instance.instances.erase(it);
+                            materials.push_back(&material_instance.material);
+                            break;
+                        }
+                    }
+                }
+                std::vector<render::DissolutionMaterial> dissolution_materials;
+
+                std::transform(
+                    materials.begin(),
+                    materials.end(),
+                    std::back_inserter(dissolution_materials),
+                    [](render::OpaqueMaterial *material) __lambda_force_inline->render::DissolutionMaterial
+                    {
+                       auto rv = render::DissolutionMaterial::FromOpaqueMaterial(*material);
+                       rv.emissive = true;
+                       rv.appearing = false;
+                       rv.UpdateTextureFlags();
+                       return rv;
+                    });
+                drs.AddInstance(opaque->model_id, registry, entity.value(), lifetime, std::move(dissolution_materials));
+                drs.ScheduleInstanceUpdate();
+
+                registry.erase<components::OpaqueComponent>(entity.value());
+                ors.ScheduleInstanceUpdate();
+                opaque = nullptr;
+            }
+        },
+        false);
     lrs.ScheduleShadowMapUpdate();
 }
 void Controller::OnTick([[maybe_unused]] float delta_time)

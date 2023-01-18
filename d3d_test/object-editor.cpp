@@ -995,6 +995,10 @@ namespace object_editor
 
     void OnGuiRender()
     {
+        if (selected_entity != entt::null && !Engine::scene()->registry.valid(selected_entity))
+        {
+            selected_entity = entt::null;
+        }
         ImGui::Begin("Component editor");
         EditGameObject();
         ImGui::Spacing();

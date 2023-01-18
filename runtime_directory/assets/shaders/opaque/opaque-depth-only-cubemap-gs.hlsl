@@ -6,8 +6,8 @@ struct GS_OUTPUT
 };
 struct GS_INPUT
 {
-  float4 pos : SV_POSITION;
-  float2 uv : TEXCOORD;
+    float4 pos : SV_POSITION;
+    float2 uv : TEXCOORD;
 };
 cbuffer PerCubemap : register(b0)
 {

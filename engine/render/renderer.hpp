@@ -8,6 +8,7 @@
 #include "subsystems/render/detail/decal-render-system.hpp"
 #include "subsystems/render/detail/light-render-system.hpp"
 #include "subsystems/render/detail/opaque-render-system.hpp"
+#include "subsystems/render/detail/emissive-particle-render-system.hpp"
 #include "subsystems/render/detail/particle-render-system.hpp"
 #include "subsystems/render/model-system.hpp"
 namespace engine::core
@@ -86,6 +87,8 @@ namespace engine::render
             AddRenderPass(particle_render_system_);
             decal_render_system_ = std::make_shared<_decal_detail::DecalRenderSystem>();
             AddRenderPass(decal_render_system_);
+            emissive_particle_render_system_ = std::make_shared<_emissive_particle_detail::EmissiveParticleRenderSystem>();
+            AddRenderPass(emissive_particle_render_system_);
         }
         Renderer(Renderer const &) = delete;
         Renderer &operator=(Renderer const &) = delete;
@@ -99,6 +102,7 @@ namespace engine::render
         [[nodiscard]] auto &emissive_render_system() const noexcept { return *emissive_render_system_; }
         [[nodiscard]] auto &decal_render_system() const noexcept { return *decal_render_system_; }
         [[nodiscard]] auto &light_render_system() const noexcept { return *light_render_system_; }
+        [[nodiscard]] auto &emissive_particle_render_system() const noexcept { return *emissive_particle_render_system_; }
         [[nodiscard]] auto &particle_render_system() const noexcept { return *particle_render_system_; }
 
         [[nodiscard]] auto &opaque_render_system() noexcept { return *opaque_render_system_; }
@@ -107,6 +111,7 @@ namespace engine::render
         [[nodiscard]] auto &emissive_render_system() noexcept { return *emissive_render_system_; }
         [[nodiscard]] auto &decal_render_system() noexcept { return *decal_render_system_; }
         [[nodiscard]] auto &light_render_system() noexcept { return *light_render_system_; }
+        [[nodiscard]] auto &emissive_particle_render_system() noexcept { return *emissive_particle_render_system_; }
         [[nodiscard]] auto &particle_render_system() noexcept { return *particle_render_system_; }
 
         inline void AddOpaqueInstance(uint64_t model_id, entt::registry &registry, entt::entity entity)
@@ -160,6 +165,7 @@ namespace engine::render
         std::shared_ptr<_emissive_detail::EmissiveRenderSystem> emissive_render_system_;
         std::shared_ptr<_decal_detail::DecalRenderSystem> decal_render_system_;
         std::shared_ptr<_light_detail::LightRenderSystem> light_render_system_;
+        std::shared_ptr<_emissive_particle_detail::EmissiveParticleRenderSystem> emissive_particle_render_system_;
         std::shared_ptr<_particle_detail::ParticleRenderSystem> particle_render_system_;
     };
 }

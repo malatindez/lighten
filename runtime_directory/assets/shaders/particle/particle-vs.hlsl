@@ -43,8 +43,7 @@ float2 calculate_uv(uint vertex_id, uint index)
     return rv;
 }
 
-
-VS_OUTPUT vs_main(uint vertex_id : SV_VERTEXID, VS_INPUT input)
+VS_OUTPUT vs_main(uint vertex_id: SV_VERTEXID, VS_INPUT input)
 {
     VS_OUTPUT output;
     input.posWS += input.velocity * g_time_since_last_tick +
@@ -61,7 +60,7 @@ VS_OUTPUT vs_main(uint vertex_id : SV_VERTEXID, VS_INPUT input)
     output.posWS = float4(input.posWS, 1.0f);
     float3 temp = ((vertex_id == 0 || vertex_id == 2 || vertex_id == 3) ? -X : X) +
                   ((vertex_id == 2 || vertex_id == 3 || vertex_id == 5) ? -Y : Y);
-    switch(vertex_id)
+    switch (vertex_id)
     {
     case 0:
         temp += -X + Y;
@@ -72,7 +71,7 @@ VS_OUTPUT vs_main(uint vertex_id : SV_VERTEXID, VS_INPUT input)
         break;
     case 2:
     case 3:
-        temp += -X - Y;        
+        temp += -X - Y;
         break;
     case 5:
         temp += +X - Y;
@@ -84,9 +83,7 @@ VS_OUTPUT vs_main(uint vertex_id : SV_VERTEXID, VS_INPUT input)
     float3 camera_up = g_inv_view[1].xyz;
 
     output.posWS.xyz += temp.x * camera_right + temp.y * camera_up;
-    output.posVS = mul(output.posWS, g_view);
-
-    output.posVS = mul(output.posVS, g_projection);
+    output.posVS = mul(output.posWS, g_view_projection);
     output.size = lerp(input.begin_size, input.end_size, input.lifespan);
     output.color = input.color;
     uint index = uint(input.lifespan * float(g_atlas_size.x * g_atlas_size.y));

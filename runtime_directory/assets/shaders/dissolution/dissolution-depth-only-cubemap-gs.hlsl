@@ -8,10 +8,10 @@ struct GS_OUTPUT
 };
 struct GS_INPUT
 {
-  float4 pos : SV_POSITION;
-  float2 uv : TEXCOORD;
-  nointerpolation float time_begin : TIME_BEGIN;
-  nointerpolation float lifetime : LIFETIME;
+    float4 pos : SV_POSITION;
+    float2 uv : TEXCOORD;
+    nointerpolation float time_begin : TIME_BEGIN;
+    nointerpolation float lifetime : LIFETIME;
 };
 cbuffer PerCubemap : register(b0)
 {
