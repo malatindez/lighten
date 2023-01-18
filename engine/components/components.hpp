@@ -327,15 +327,16 @@ namespace engine::components
         float z_far_ = 0.002f;
     };
 
-    // TODO:
-    // add casts_shadow boolean so that we can have lights that don't cast shadows
-    // add shadow_bias
-    // add shadow_normal_bias
-    // add shadow_blur
-    // add shadow_blur_radius
-    // add shadow_blur_sigma
+
 
     /// @brief Point light component
+    /// TODO: Add these features:
+    /// * add casts_shadow boolean so that we can have lights that don't cast shadows
+    /// * add shadow_bias
+    /// * add shadow_normal_bias
+    /// * add shadow_blur
+    /// * add shadow_blur_radius
+    /// * add shadow_blur_sigma
     struct PointLight final : Component
     {
         static constexpr bool kGenerateSerialization = true;
@@ -349,19 +350,19 @@ namespace engine::components
         PointLight &operator=(const PointLight &) = default;
         PointLight &operator=(PointLight &&) = default;
         ~PointLight() = default;
-        // TODO:
-        // add position
 
         /// @brief Position of the light in the local space relative to the world matrix in the transform component
+        /// @todo:
+        /// Use position in the LightRenderSystem to calculate the world position of the light
         core::math::vec3 position;
         /// @brief Color of the light
         core::math::vec3 color;
         /// @brief Intensity of light
         float power;
 
-        // TODO:
-        // Use radius in light render system and multiply it by the scale of the transform component
         /// @brief Radius of the light
+        /// @todo:
+        /// Use radius in LightRenderSystem and multiply it by the scale of the transform component
         float radius;
         /// @brief If the light casts shadows
         bool casts_shadows = false;
@@ -392,19 +393,24 @@ namespace engine::components
         SpotLight &operator=(const SpotLight &) = default;
         SpotLight &operator=(SpotLight &&) = default;
         ~SpotLight() = default;
-
+        /// @brief Position of the light in the local space relative to the world matrix in the transform component
+        /// @todo Use position in the LightRenderSystem to calculate the world position of the light
+        core::math::vec3 position;
+        /// @brief Radius of the light
+        /// @todo Use radius in LightRenderSystem and multiply it by the scale of the transform component
+        float radius;
+        /// @brief Color of the light
         core::math::vec3 color;
+        /// @brief Intensity of light
         float power;
-        // direction is determined by transform
+        /// @brief inner cutoff angle in radians
         float inner_cutoff;
+        /// @brief outer cutoff angle in radians
         float outer_cutoff;
+        /// @brief If the light casts shadows
         bool casts_shadows = false;
     };
 
-    // TODO:
-    // Add support for multiple particle materials
-    // PBR (probably?)
-    // Add GPU support
     /**
      * @brief Particle emitter component
      *
@@ -415,6 +421,10 @@ namespace engine::components
      * All the angles declared here are relative to the transform.forward of the particle emitter
      * It means that if you want to emit particles in a cone, you need to rotate the transform
      *
+     * @todo Add these features to particle-rendering-system:
+     * * support for multiple particle materials
+     * * PBR
+     * * GPU support
      */
     struct ParticleEmitter final : Component
     {
