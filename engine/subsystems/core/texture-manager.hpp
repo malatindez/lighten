@@ -22,7 +22,7 @@ namespace engine::core
             if (auto it = instance_->textures_.find(texture);
                 it != instance_->textures_.end())
             {
-                return it->second;
+                return instance_->textures_[texture].ptr();
             }
             throw std::invalid_argument("Unknown handle");
         }

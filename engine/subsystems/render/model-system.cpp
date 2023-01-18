@@ -79,10 +79,10 @@ namespace engine::render
         {
             return model_id;
         }
-        const uint32_t SIDES = 6;
-        const uint32_t GRID_SIZE = 12;
-        const uint32_t TRIS_PER_SIDE = GRID_SIZE * GRID_SIZE * 2;
-        const uint32_t VERT_PER_SIZE = 3 * TRIS_PER_SIDE;
+        const uint64_t SIDES = 6;
+        const uint64_t GRID_SIZE = 12;
+        const uint64_t TRIS_PER_SIDE = GRID_SIZE * GRID_SIZE * 2;
+        const uint64_t VERT_PER_SIZE = 3 * TRIS_PER_SIDE;
 
         std::string name = "UNIT_SPHERE_FLAT";
         Box box = Box::empty();
@@ -197,7 +197,7 @@ namespace engine::render
                 }
             }
         }
-        for (uint32_t i = 0; i < (int)mesh.vertices.size(); i += 3)
+        for (uint32_t i = 0; i < (uint32_t)mesh.vertices.size(); i += 3)
         {
             mesh.indices.push_back(i + 2);
             mesh.indices.push_back(i + 1);
@@ -233,10 +233,10 @@ namespace engine::render
         {
             return model_id;
         }
-        const uint32_t SIDES = 6;
-        const uint32_t GRID_SIZE = 2;
-        const uint32_t TRIS_PER_SIDE = GRID_SIZE * GRID_SIZE * 2;
-        const uint32_t VERT_PER_SIZE = 3 * TRIS_PER_SIDE;
+        const uint64_t SIDES = 6;
+        const uint64_t GRID_SIZE = 2;
+        const uint64_t TRIS_PER_SIDE = GRID_SIZE * GRID_SIZE * 2;
+        const uint64_t VERT_PER_SIZE = 3 * TRIS_PER_SIDE;
 
         std::string name = "UNIT_SPHERE_FLAT";
         Box box = Box::empty();
@@ -351,7 +351,7 @@ namespace engine::render
                 }
             }
         }
-        for (uint32_t i = 0; i < (int)mesh.vertices.size(); i += 3)
+        for (uint32_t i = 0; i < (uint32_t)mesh.vertices.size(); i += 3)
         {
             mesh.indices.push_back(i + 2);
             mesh.indices.push_back(i + 1);

@@ -23,7 +23,7 @@ namespace engine::utils
         }
 #else
         Measurer(std::string_view s = "Measurer", bool log_automatically = true, float time_to_flush = 30) :
-            log_automatically(log_automatically), time_to_flush(time_to_flush)
+            time_to_flush(time_to_flush), log_automatically(log_automatically)
         {
             output = s;
         }

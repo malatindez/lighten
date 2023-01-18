@@ -417,8 +417,8 @@ namespace engine::core
             {
                 float x = (float)i / (float)precision;
                 float y = (float)j / (float)precision;
-                float theta = x * 2.0f * (float)core::math::numbers::pi;
-                float phi = y * (float)core::math::numbers::pi;
+                float theta = x * 2.0f * core::math::numbers::pi_v<float>;
+                float phi = y * core::math::numbers::pi_v<float>;
                 float sin_theta = sin(theta);
                 float cos_theta = cos(theta);
                 float sin_phi = sin(phi);

@@ -116,7 +116,6 @@ namespace engine::render::_light_detail
         bool should_update = false;
         bool refresh_data = false;
         utils::SteadyTimer shadow_map_update_timer_;
-        float last_update_;
         float shadow_map_update_interval_ = 0.0f;
 
         void ProcessPointLights(core::Scene *scene);

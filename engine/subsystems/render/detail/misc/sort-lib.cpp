@@ -56,7 +56,7 @@ namespace engine::render::misc
         buffer_desc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
         buffer_desc.ByteWidth = 4 * sizeof(UINT);
         buffer_desc.MiscFlags = D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS;
-        indirect_sort_args_buffer_.Init(std::move(D3D11_BUFFER_DESC(buffer_desc)));
+        indirect_sort_args_buffer_.Init(D3D11_BUFFER_DESC(buffer_desc));
 
         D3D11_UNORDERED_ACCESS_VIEW_DESC uav_desc;
         ZeroMemory(&uav_desc, sizeof(uav_desc));
@@ -213,11 +213,10 @@ namespace engine::render::misc
         direct3d::api().device->CreateBuffer(&bDesc, NULL, &readBackBuffer);
 
         // Download the data
-        D3D11_MAPPED_SUBRESOURCE MappedResource = { 0 };
+        D3D11_MAPPED_SUBRESOURCE MappedResource = { nullptr, 0, 0 };
         direct3d::api().devcon->CopyResource(readBackBuffer, srcResource);
         direct3d::api().devcon->Map(readBackBuffer, 0, D3D11_MAP_READ, 0, &MappedResource);
 
-        bool correct = true;
         typedef struct
         {
             float sortval;
@@ -225,9 +224,10 @@ namespace engine::render::misc
         } BufferData;
 
         BufferData *b = &((BufferData *)(MappedResource.pData))[0];
+        //        bool correct = true;
         for (unsigned int i = 1; i < size; ++i)
         {
-            correct &= b[i - 1].sortval <= b[i].sortval;
+            //          correct &= b[i - 1].sortval <= b[i].sortval;
             if (b[i - 1].sortval > b[i].sortval)
             {
                 int _abc = 0;

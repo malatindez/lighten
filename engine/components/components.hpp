@@ -207,10 +207,13 @@ namespace engine::render::_particle_detail
 // static constexpr bool kGenerateHash = true; member to the component
 // It will modify the engine\components\generated\components-hash.hpp file
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 26495) // Variable 'component' is uninitialized. Always initialize a member variable
+#endif
+
 namespace engine::components
 {
-#pragma warning(push)
-#pragma warning(disable : 26495)
     struct GameObject final
     {
         GameObject() = default;
@@ -255,7 +258,6 @@ namespace engine::components
         core::math::mat4 model;
         core::math::mat4 inv_model;
     };
-#pragma warning(pop)
 
     struct CameraComponent final
     {
@@ -494,4 +496,7 @@ namespace engine::components
         // radius of the sphere collider
         float radius;
     };
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 } // namespace engine::components

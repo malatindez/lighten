@@ -103,7 +103,6 @@ namespace engine::render::_particle_detail
 
         particle_buffer_.Init(std::span<GPUParticle>(particles));
         ParticlePerFrame per_frame;
-        auto &registry = scene->registry;
         using namespace engine::core::math;
 
         // get depth and render targets

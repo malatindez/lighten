@@ -24,22 +24,22 @@ void Controller::OnGuiRender()
     auto &render_measurer = Engine::Get().render_measurer;
     auto &tick_measurer = Engine::Get().tick_measurer;
 
-    ImGui::Text("Average Engine::Update() time: %.3f ms", 1000 * update_measurer.avg());
-    ImGui::Text("Average Engine::Update() time over the last %d calls: %.3f ms", calls_amount, 1000 * update_measurer.avg(calls_amount));
-    ImGui::Text("Average Engine::Update() time over the last %.2f seconds: %.3f ms", seconds_amount, 1000 * update_measurer.avg_over_the_last(seconds_amount));
-    ImGui::Text("Average Engine::Update() time percentage over the last %.2f seconds: %.3f%%", seconds_amount, update_measurer.avg_over_the_last_limited(seconds_amount) * 100);
+    ImGui::Text("Average Engine::Update() time: %.3f ms", 1000ull * update_measurer.avg());
+    ImGui::Text("Average Engine::Update() time over the last %d calls: %.3f ms", calls_amount, 1000ull * update_measurer.avg(calls_amount));
+    ImGui::Text("Average Engine::Update() time over the last %.2f seconds: %.3f ms", seconds_amount, 1000ull * update_measurer.avg_over_the_last(seconds_amount));
+    ImGui::Text("Average Engine::Update() time percentage over the last %.2f seconds: %.3f%%", seconds_amount, update_measurer.avg_over_the_last_limited(seconds_amount) * 100ull);
     ImGui::Text("Average Engine::Update() amount of calls over the last %.2f seconds: %llu", std::min(seconds_amount, update_measurer.elapsed()), update_measurer.amount_of_calls(seconds_amount));
 
-    ImGui::Text("Average Engine::Tick() time: %.3f ms", 1000 * tick_measurer.avg());
-    ImGui::Text("Average Engine::Tick() time over the last %d calls: %.3f ms", calls_amount, 1000 * tick_measurer.avg(calls_amount));
-    ImGui::Text("Average Engine::Tick() time over the last %.2f seconds: %.3f ms", seconds_amount, 1000 * tick_measurer.avg_over_the_last(seconds_amount));
-    ImGui::Text("Average Engine::Tick() time percentage over the last %.2f seconds: %.3f%%", seconds_amount, tick_measurer.avg_over_the_last_limited(seconds_amount) * 100);
+    ImGui::Text("Average Engine::Tick() time: %.3f ms", 1000ull * tick_measurer.avg());
+    ImGui::Text("Average Engine::Tick() time over the last %d calls: %.3f ms", calls_amount, 1000ull * tick_measurer.avg(calls_amount));
+    ImGui::Text("Average Engine::Tick() time over the last %.2f seconds: %.3f ms", seconds_amount, 1000ull * tick_measurer.avg_over_the_last(seconds_amount));
+    ImGui::Text("Average Engine::Tick() time percentage over the last %.2f seconds: %.3f%%", seconds_amount, tick_measurer.avg_over_the_last_limited(seconds_amount) * 100ull);
     ImGui::Text("Average Engine::Tick() amount of calls over the last %.2f seconds: %llu", std::min(seconds_amount, tick_measurer.elapsed()), tick_measurer.amount_of_calls(seconds_amount));
 
-    ImGui::Text("Average Engine::Render() time: %.3f ms", 1000 * render_measurer.avg());
-    ImGui::Text("Average Engine::Render() time over the last %d calls: %.3f ms", calls_amount, 1000 * render_measurer.avg(calls_amount));
-    ImGui::Text("Average Engine::Render() time over the last %.2f seconds: %.3f ms", seconds_amount, 1000 * render_measurer.avg_over_the_last(seconds_amount));
-    ImGui::Text("Average Engine::Render() time percentage over the last %.2f seconds: %.3f%%", seconds_amount, render_measurer.avg_over_the_last_limited(seconds_amount) * 100);
+    ImGui::Text("Average Engine::Render() time: %.3f ms", 1000ull * render_measurer.avg());
+    ImGui::Text("Average Engine::Render() time over the last %d calls: %.3f ms", calls_amount, 1000ull * render_measurer.avg(calls_amount));
+    ImGui::Text("Average Engine::Render() time over the last %.2f seconds: %.3f ms", seconds_amount, 1000ull * render_measurer.avg_over_the_last(seconds_amount));
+    ImGui::Text("Average Engine::Render() time percentage over the last %.2f seconds: %.3f%%", seconds_amount, render_measurer.avg_over_the_last_limited(seconds_amount) * 100ull);
     ImGui::Text("Average Engine::Render() amount of calls over the last %.2f seconds: %llu", std::min(seconds_amount, render_measurer.elapsed()), render_measurer.amount_of_calls(seconds_amount));
     ImGui::End();
 #endif
@@ -619,7 +619,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         grass_material.wind_frequency = 1.0f;
 
         core::math::vec4 texture_size = { 4096, 4096, 4096, 4096 };
-        grass_material.atlas_data = {
+        std::vector<core::math::vec4> atlas_data = {
             core::math::vec4{82, 69, 2277, 1736} / texture_size,
             core::math::vec4{2474, 90, 4017, 1361} / texture_size,
             core::math::vec4{377, 1810, 1761, 2697} / texture_size,
@@ -627,9 +627,10 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             core::math::vec4{76, 2746, 2217, 4065} / texture_size,
             core::math::vec4{2651, 3005, 3774, 4033} / texture_size,
         };
+
+        grass_material.atlas_data = atlas_data;
         grass_material.planes_count = 2;
         grass_material.section_count = 4;
-        auto atlas_data_copy = grass_material.atlas_data;
         auto material_id = grs.AddMaterial(std::move(grass_material));
 
         auto &grass_component = registry.emplace<GrassComponent>(grass);
@@ -640,7 +641,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
 
         grass_component.min_distance = 0.1f;
         grass_component.max_attempts = 64;
-        grass_component.Initialize(atlas_data_copy);
+        grass_component.Initialize(atlas_data);
     }
     SkyboxManager::LoadSkybox(registry, std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street.dds");
     first_scene->ScheduleInstanceUpdate();
@@ -648,13 +649,13 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     object_editor::RegisterKeyCallbacks();
     auto &input = *InputLayer::instance();
     auto &exposure = hdr_render_pipeline_->hdr_to_ldr_layer()->exposure();
-    input.AddTickKeyCallback({ Key::KEY_PLUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t)
+    input.AddTickKeyCallback({ Key::KEY_PLUS }, [&exposure] (float dt, InputLayer::KeySeq const &, uint32_t)
                              { exposure += dt; });
-    input.AddTickKeyCallback({ Key::KEY_MINUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t)
+    input.AddTickKeyCallback({ Key::KEY_MINUS }, [&exposure] (float dt, InputLayer::KeySeq const &, uint32_t)
                              { exposure -= dt; });
-    input.AddTickKeyCallback({ Key::KEY_NUMPAD_MINUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t)
+    input.AddTickKeyCallback({ Key::KEY_NUMPAD_MINUS }, [&exposure] (float dt, InputLayer::KeySeq const &, uint32_t)
                              { exposure -= dt; });
-    input.AddTickKeyCallback({ Key::KEY_NUMPAD_PLUS }, [this, &exposure] (float dt, InputLayer::KeySeq const &, uint32_t)
+    input.AddTickKeyCallback({ Key::KEY_NUMPAD_PLUS }, [&exposure] (float dt, InputLayer::KeySeq const &, uint32_t)
                              { exposure += dt; });
     input.AddUpdateKeyCallback(
         { Key::KEY_F },
@@ -674,7 +675,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             auto &input = *InputLayer::instance();
             auto scene = Engine::scene();
             Ray ray = scene->main_camera->PixelRaycast(vec2{ input.mouse_position() });
-            MeshIntersection nearest;
+            MeshIntersection nearest{};
             nearest.reset();
             std::optional<entt::entity> entity = render::ModelSystem::FindIntersection(scene->registry, ray, nearest);
             if (!entity.has_value())
@@ -687,7 +688,6 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                 return;
             }
             auto &transform = scene->registry.get<TransformComponent>(*entity);
-            DecalComponent::Decal decal;
             uint32_t mesh_id = std::numeric_limits<uint32_t>::max();
             auto *model_instance = Engine::scene()->renderer->opaque_render_system().GetInstancePtr(opaque_component->model_id);
             {
@@ -711,6 +711,8 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                 }
             }
             static ID3D11ShaderResourceView *texture = core::TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/decal.dds");
+
+            DecalComponent::Decal decal{};
             decal.normal_opacity_map = texture;
             decal.mesh_transform = model_instance->model.meshes[mesh_id].mesh_to_model;
             mat4 inv_mat = model_instance->model.meshes[mesh_id].inv_mesh_to_model * transform.inv_model;
@@ -781,7 +783,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             timer.reset();
             auto scene = Engine::scene();
             Ray ray = scene->main_camera->PixelRaycast(vec2{ input.mouse_position() });
-            MeshIntersection nearest;
+            MeshIntersection nearest{};
             nearest.reset();
             std::optional<entt::entity> entity = render::ModelSystem::FindIntersection(scene->registry, ray, nearest);
             if (!entity.has_value())

@@ -23,11 +23,11 @@ namespace engine::render::_light_detail
         {
             directional_light_entities.push_back(entity);
         }
-        std::ranges::sort(point_light_entities, [&registry] (entt::entity const &lhs, entt::entity const &rhs)
+        std::ranges::sort(point_light_entities, [] (entt::entity const &lhs, entt::entity const &rhs)
                           { return static_cast<uint32_t>(lhs) < static_cast<uint32_t>(rhs); });
-        std::ranges::sort(spot_light_entities, [&registry] (entt::entity const &lhs, entt::entity const &rhs)
+        std::ranges::sort(spot_light_entities, [] (entt::entity const &lhs, entt::entity const &rhs)
                           { return static_cast<uint32_t>(lhs) < static_cast<uint32_t>(rhs); });
-        std::ranges::sort(directional_light_entities, [&registry] (entt::entity const &lhs, entt::entity const &rhs)
+        std::ranges::sort(directional_light_entities, [] (entt::entity const &lhs, entt::entity const &rhs)
                           { return static_cast<uint32_t>(lhs) < static_cast<uint32_t>(rhs); });
 
         point_light_entities_temp_ = std::move(point_light_entities);

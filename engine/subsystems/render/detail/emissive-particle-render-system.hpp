@@ -103,7 +103,6 @@ namespace engine::render
 
             direct3d::DynamicUniformBuffer<PerFrame> per_frame_buffer_;
             direct3d::DynamicUniformBuffer<PerMesh> per_mesh_buffer_;
-            float last_tick_time_ = 0.0f;
             std::mt19937 random_engine_;
             ID3D11ShaderResourceView *noise_texture_;
         };

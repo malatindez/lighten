@@ -714,18 +714,24 @@ namespace object_editor
             }
             if (ImGui::CollapsingHeader("Camera data: "))
             {
+                std::string view = utils::FormatToString(camera.view);
+                std::string projection = utils::FormatToString(camera.view);
+                std::string view_projection = utils::FormatToString(camera.view);
+                std::string inv_view = utils::FormatToString(camera.view);
+                std::string inv_projection = utils::FormatToString(camera.view);
+                std::string inv_view_projection = utils::FormatToString(camera.view);
                 ImGui::Text("View matrix: ");
-                ImGui::Text(utils::FormatToString(camera.view).c_str());
+                ImGui::Text("%s", view.c_str());
                 ImGui::Text("Projection matrix: ");
-                ImGui::Text(utils::FormatToString(camera.projection).c_str());
+                ImGui::Text("%s", projection.c_str());
                 ImGui::Text("View projection matrix: ");
-                ImGui::Text(utils::FormatToString(camera.view_projection).c_str());
+                ImGui::Text("%s", view_projection.c_str());
                 ImGui::Text("Inv view matrix: ");
-                ImGui::Text(utils::FormatToString(camera.inv_view).c_str());
+                ImGui::Text("%s", inv_view.c_str());
                 ImGui::Text("Inv projection matrix: ");
-                ImGui::Text(utils::FormatToString(camera.inv_projection).c_str());
+                ImGui::Text("%s", inv_projection.c_str());
                 ImGui::Text("Inv view projection matrix: ");
-                ImGui::Text(utils::FormatToString(camera.inv_view_projection).c_str());
+                ImGui::Text("%s", inv_view_projection.c_str());
             }
         }
     }
@@ -752,9 +758,9 @@ namespace object_editor
                 ImGui::Text("Tag: ");
                 ImGui::SameLine();
                 ImGui::InputText("##tag", game_object.tag.data(), game_object.tag.capacity());
-                auto constexpr convert_entity_id = [] (entt::entity id) -> uint64_t
+                auto constexpr convert_entity_id = [] (entt::entity id) -> uint32_t
                 {
-                    return static_cast<uint64_t>(*reinterpret_cast<entt::id_type *>(&id));
+                    return static_cast<uint32_t>(*reinterpret_cast<entt::id_type *>(&id));
                 };
                 ImGui::Text("Entity id: ");
                 ImGui::SameLine();
@@ -764,7 +770,7 @@ namespace object_editor
                 ImGui::Text("%u", convert_entity_id(game_object.parent));
                 ImGui::Text("Amount of children: ");
                 ImGui::SameLine();
-                ImGui::Text("%u", game_object.children.size());
+                ImGui::Text("%u", static_cast<uint32_t>(game_object.children.size()));
                 for (auto child : game_object.children)
                 {
                     auto *ptr = registry.try_get<GameObject>(child);
@@ -775,7 +781,7 @@ namespace object_editor
                     }
                     ImGui::Text("Name: ");
                     ImGui::SameLine();
-                    ImGui::Text(name);
+                    ImGui::Text("%s", name);
                     ImGui::SameLine();
                     ImGui::Text(". Id: ");
                     ImGui::SameLine();

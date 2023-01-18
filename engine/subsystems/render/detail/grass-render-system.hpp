@@ -71,17 +71,17 @@ namespace engine::render
         float metalness_value = 0.0f;
         bool reverse_normal_y = false;
 
-        core::math::vec3 wind_vector;
-        float wind_amplitude;
-        float wind_wavenumber;
-        float wind_frequency;
+        core::math::vec3 wind_vector = core::math::vec3{ 0,0,0 };
+        float wind_amplitude = 0.0f;
+        float wind_wavenumber = 0.0f;
+        float wind_frequency = 0.0f;
 
-        uint32_t texture_flags;
+        uint32_t texture_flags = 0;
         // from, to texture coordinates
-        std::vector<core::math::vec4> atlas_data;
+        std::vector<core::math::vec4> atlas_data{};
 
-        uint32_t planes_count;
-        uint32_t section_count;
+        uint32_t planes_count = 2;
+        uint32_t section_count = 3;
 
         void UpdateTextureFlags();
         GrassMaterial() = default;

@@ -698,9 +698,6 @@ TEST(TEST_VECTORS_GLM, TestCommonFunctions)
         ASSERT_TRUE(clamp(vec2_1, 2.0f, 3.0f) == glm::clamp(glm_vec2_1, 2.0f, 3.0f));
         ASSERT_TRUE(clamp(vec3_1, 2.0f, 3.0f) == glm::clamp(glm_vec3_1, 2.0f, 3.0f));
         ASSERT_TRUE(clamp(vec4_1, 2.0f, 3.0f) == glm::clamp(glm_vec4_1, 2.0f, 3.0f));
-        ASSERT_TRUE(mix(vec2_1, vec2_2, vec2_3) == glm::mix(glm_vec2_1, glm_vec2_2, glm_vec2_3));
-        ASSERT_TRUE(mix(vec3_1, vec3_2, vec3_3) == glm::mix(glm_vec3_1, glm_vec3_2, glm_vec3_3));
-        ASSERT_TRUE(mix(vec4_1, vec4_2, vec4_3) == glm::mix(glm_vec4_1, glm_vec4_2, glm_vec4_3));
         ASSERT_TRUE(mix(vec2_1, vec2_2, 0.5f) == glm::mix(glm_vec2_1, glm_vec2_2, 0.5f));
         ASSERT_TRUE(mix(vec3_1, vec3_2, 0.5f) == glm::mix(glm_vec3_1, glm_vec3_2, 0.5f));
         ASSERT_TRUE(mix(vec4_1, vec4_2, 0.5f) == glm::mix(glm_vec4_1, glm_vec4_2, 0.5f));

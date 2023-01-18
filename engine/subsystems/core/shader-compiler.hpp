@@ -20,7 +20,7 @@ namespace engine::core
         direct3d::ShaderType type = direct3d::ShaderType::None;
         std::filesystem::path source_file;
         std::string entrypoint = "";
-        std::vector<ShaderMacro> macros;
+        std::vector<ShaderMacro> macros = {};
 #if defined(_DEBUG)
         uint32_t flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG;
 #else

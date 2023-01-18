@@ -29,8 +29,7 @@ namespace engine::platform::windows
         [[nodiscard]] void *native() override { return handle(); };
         // TODO(malatindez) make this method private and handle events using GetMessage
         // save main-thread dependant events in event pool and pass them if Window->OnUpdate is called
-        void OnUpdate();
-
+        void OnUpdate() override;
 
     private:
         // remove copy and move semantics because the callback system is bound to the

@@ -155,14 +155,10 @@ namespace engine::render::_dissolution_detail
 
         instance_buffer_.Bind(1);
 
-        auto &registry = scene->registry;
-
         dissolution_per_material_buffer_.Bind(direct3d::ShaderType::PixelShader, 2);
         direct3d::api().devcon4->PSSetShaderResources(11, 1, &noise_texture_);
 
         uint32_t renderedInstances = 0;
-
-        auto group = registry.group<components::DissolutionComponent>(entt::get<components::TransformComponent>);
 
         direct3d::api().devcon4->OMSetBlendState(direct3d::states().alpha_to_coverage_blend_state, nullptr, 0xffffffff);
 

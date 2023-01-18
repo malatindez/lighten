@@ -89,10 +89,10 @@ namespace engine::render
     {
         const uint32_t kPriority = 0;
         explicit RenderPass(uint32_t priority) : kPriority(priority) {}
-        RenderPass(const RenderPass &other) = default;
-        RenderPass(RenderPass &&other) = default;
-        RenderPass &operator=(const RenderPass &other) = default;
-        RenderPass &operator=(RenderPass &&other) = default;
+        RenderPass(const RenderPass &other) = delete;
+        RenderPass &operator=(const RenderPass &other) = delete;
+        RenderPass(RenderPass &&other) = delete;
+        RenderPass &operator=(RenderPass &&other) = delete;
         virtual ~RenderPass() = default;
     };
 

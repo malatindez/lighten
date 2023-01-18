@@ -8,7 +8,9 @@ namespace engine::render::misc
     class SortLib
     {
     public:
-        SortLib() = default;
+        // TODO:
+
+        SortLib() = delete;
         SortLib(SortLib const &) = delete;
         SortLib(SortLib &&) = delete;
         SortLib &operator=(SortLib const &) = delete;

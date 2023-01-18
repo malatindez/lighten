@@ -9,6 +9,7 @@ namespace engine::direct3d
     {
     public:
         explicit RenderTargetBase(DXGI_FORMAT format) noexcept;
+        virtual ~RenderTargetBase() = default;
 
         RenderTargetBase(RenderTargetBase &&) = default;
         RenderTargetBase &operator= (RenderTargetBase &&) = default;
@@ -43,6 +44,7 @@ namespace engine::direct3d
     {
     public:
         RenderTarget(DXGI_FORMAT format) : RenderTargetBase(format) {}
+        virtual ~RenderTarget() = default;
         void init();
         void deinit() noexcept;
         static RenderTarget empty() noexcept { return RenderTarget(DXGI_FORMAT_UNKNOWN); }
@@ -54,6 +56,7 @@ namespace engine::direct3d
     {
     public:
         RenderTargetMS(DXGI_FORMAT format, uint32_t sample_count = 1) : RenderTargetBase(format), sample_count(sample_count) {}
+        virtual ~RenderTargetMS() = default;
         void init();
         void deinit() noexcept;
         static RenderTargetMS empty() noexcept { return RenderTargetMS(DXGI_FORMAT_UNKNOWN); }
@@ -66,6 +69,7 @@ namespace engine::direct3d
     {
     public:
         using RenderTargetBase::RenderTargetBase;
+        virtual ~SwapchainRenderTarget() = default;
         SwapchainRenderTarget() : RenderTargetBase(DXGI_FORMAT_UNKNOWN) {}
         void init(HWND hWnd, core::math::ivec2 const &window_size);
         void deinit() noexcept;
