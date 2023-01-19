@@ -13,6 +13,15 @@
 #ifndef MAX_DIRECTIONAL_LIGHTS
 #define MAX_DIRECTIONAL_LIGHTS 4u
 #endif
+#ifndef MAX_SHADOW_POINT_LIGHTS
+#define MAX_SHADOW_POINT_LIGHTS 8u
+#endif
+#ifndef MAX_SHADOW_SPOT_LIGHTS
+#define MAX_SHADOW_SPOT_LIGHTS 4u
+#endif
+#ifndef MAX_SHADOW_DIRECTIONAL_LIGHTS
+#define MAX_SHADOW_DIRECTIONAL_LIGHTS 2u
+#endif
 
 struct ShadowPointLight {
   float3 color;
@@ -77,9 +86,9 @@ cbuffer PerFrame : register(b0) {
 }
 
 cbuffer LightsPerFrame : register(b1) {
-  ShadowPointLight g_shadow_point_lights[MAX_POINT_LIGHTS];
-  ShadowSpotLight g_shadow_spot_lights[MAX_SPOT_LIGHTS];
-  ShadowDirectionalLight g_shadow_directional_lights[MAX_DIRECTIONAL_LIGHTS];
+  ShadowPointLight g_shadow_point_lights[MAX_SHADOW_POINT_LIGHTS];
+  ShadowSpotLight g_shadow_spot_lights[MAX_SHADOW_SPOT_LIGHTS];
+  ShadowDirectionalLight g_shadow_directional_lights[MAX_SHADOW_DIRECTIONAL_LIGHTS];
 
   PointLight g_point_lights[MAX_POINT_LIGHTS];
   SpotLight g_spot_lights[MAX_SPOT_LIGHTS];

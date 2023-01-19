@@ -387,7 +387,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     // ------------------------- LIGHTS -------------------------
     entt::entity lights = registry.create();
     auto &lights_game_object = registry.emplace<GameObject>(lights);
-    if (false)
+    if (true)
     {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
@@ -401,7 +401,8 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         transform.UpdateMatrices();
         auto &point_light = registry.emplace<PointLight>(entity);
         point_light.color = vec3{ 0.988, 0.933, 0.655 };
-        point_light.power = 1e3f;
+        point_light.power = 2e3f;
+        point_light.casts_shadows = true;
         ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
     }
     if (true)
@@ -440,7 +441,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         point_light.casts_shadows = true;
         ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
     }
-    if (true)
+    if (false)
     {
         for (int i = 0; i < 24; i++)
         {
@@ -480,7 +481,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         transform.UpdateMatrices();
         auto &directional_light = registry.emplace<DirectionalLight>(entity);
         directional_light.color = vec3{ 0.988, 0.933, 0.455 };
-        directional_light.power = 50;
+        directional_light.power = 10;
         directional_light.solid_angle = 0.25f;
         ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(directional_light.color, directional_light.power) });
     }
@@ -627,7 +628,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             core::math::vec4{76, 2746, 2217, 4065} / texture_size,
             core::math::vec4{2651, 3005, 3774, 4033} / texture_size,
         };
-
+        grass_material.atlas_size = texture_size.xy;
         grass_material.atlas_data = atlas_data;
         grass_material.planes_count = 2;
         grass_material.section_count = 4;

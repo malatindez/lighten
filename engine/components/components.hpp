@@ -13,8 +13,9 @@ namespace engine::render::_particle_detail
 
 /**
  * @brief The components namespace contains all the components that can be used in the engine
- * @todo Every component should inherit from it and have a static \code{.cpp} constexpr std::string_view name;\endcode
- * member that is used to identify the component by name
+ * @todo Every component should inherit from Component class
+ * @todo Every component should have static \code{.cpp} constexpr std::string_view name;\endcode member that is used to identify the component by name
+ * 
  * If the component doesn't have a name, \code{.cpp}static_assert(false, "Component {class name} must have a name declared");\endcode will be generated automatically
  * in generated file to make sure that the component has a name
  *
@@ -39,13 +40,9 @@ namespace engine::render::_particle_detail
  * Otherwise because they will be included in the engine\components\generated\components-info.hpp file
  * this will lead to problems with header including mentioned above
  *
- @todo
- * Add the python pre-build step that will gather all the components identifying them
- * by Component parent class, and then generate the header files that will contain all the components.
- * It will contain
- * `utils::parameter_pack_info<Component, Component, ...>` as the list of types and
- * corresponding `std::array<std::string, N>` as the list of component names
- * It will modify the engine\components\generated\components-info.hpp file
+ @todo Add the python pre-build step that will gather all the components identifying them by Component parent class, and then generate the header files that will contain all the components.
+ * This header file will contain `utils::parameter_pack_info<Component, Component, ...>` as the list of types and corresponding `std::array<std::string, N>` as the list of component names
+ * It will modify the `engine\components\generated\components-info.hpp` file
  *
  * To iterate through all the component types you can use the following code:
  \code{.cpp}
@@ -55,28 +52,29 @@ namespace engine::render::_particle_detail
      return true; // if false is returned the loop will break
    });
  \endcode
+
   * You can use it to substitute the switch statement so you can easily iterate through
   * all the components without worrying about giant and complex switch statement
   * Also, this way, you can easily add new components without modifying the switch statement at all
-  * And, most importantly, for_constexpr is equivalent or even faster than the
-  * switch statement by 1.5-20% (according to my tests using google benchmark):
-  * In one test using the intel C++ compiler the switch statement was 6.02% faster
-  * than the for_constexpr loop
-  * but in the most test cases the for_constexpr is better
+  * And, most importantly, for_constexpr is equivalent or even faster than the switch statement by 1.5-20% in most cases
+  @note But in the most test cases the for_constexpr is better
 
   @todo Add a python script that will generate the component serialization/deserialization code
-  * If you want to generate serialization/deserialization for the component you should add the
-  * static constexpr bool kGenerateSerialization = true; member to the component
-  * private members and members serialization of which is not defined will be ignored
-  * To create custom serializer you can create a specialization of the engine::components::Serialize::Serializer
+  * If you want to generate serialization/deserialization for the component you should add `static constexpr bool kGenerateSerialization = true;` member to the component
+  *
+  * Private members and members that do not have serialization specification will be ignored.
+  * 
+  * If you want to create custom serializer you should create a specialization of the `engine::components::Serialize::Serializer`
   * The script will try to find it, but if it won't you can include it in the component header
   * This is the example of a serializer:
-\code{.cpp}
+  \code{.cpp}
 namespace engine::components::Serialize
 {
   template<class Ty>
   struct Serializer;
 }
+  \endcode
+  \code{.cpp}
 namespace engine::components::Serialize
 {
     template<>
@@ -93,18 +91,20 @@ namespace engine::components::Serialize
             // using the engine::components::Serialize::Serializer<T>{} specialization
         }
 };
-\endcode
-* It will modify the engine\components\generated\components-serialization.hpp file
+  \endcode
+  * It will modify the engine\components\generated\components-serialization.hpp file
 
-@todo Add a python script that will generate the ImGui component editor code
-
-* It will create the special configuration file engine\components\generated\components-editor.json
-* that will contain the list of rules how to render each component
-* If the member variable cannot be rendered/cast to the ImGuiEditor<T>{} specialization it will be written as an "unknown type" in the json file
-* The user will be able to edit the json file and add the rules for the ImGuiEditor<T>{} specializations
-* The user will be able to add the ImGuiEditor<T>{} specializations for the types that are not supported by default
-* Example of json file
-\code{.json}
+  @todo Add a python script that will generate the ImGui component editor code
+  * This script should create the special configuration file located at `engine\components\generated\components-editor.json`.
+  *
+  * This file will contain the list of rules how to render each component.
+  * 
+  * @warning If the member variable cannot be rendered/cast to the `ImGuiEditor<T>{}` specialization it will be written as an "unknown type" in the `.json` file
+  * @note The user will be able to edit the `.json` file and add the rules for the `ImGuiEditor<T>{}` specializations
+  * @note The user will be able to add the `ImGuiEditor<T>{}` specializations for the types that are not supported by default
+  * 
+  * Example of `.json` configuration file:
+  \code{.json}
 {
     "ComponentName": {
         "member1": {
@@ -124,17 +124,19 @@ namespace engine::components::Serialize
     },
     "ComponentName2": { ... }
 }
-\endcode
-* It will work similarly to the serialization/deserialization code
-* If you want to generate editor for the component you should add the
-* `static constexpr bool kGenerateEditor = true;` member to the component
-* This is the example of a component editor:
-\code{.cpp}
+  \endcode
+  * It will work similarly to the serialization/deserialization code
+  * If you want to generate editor for the component you should add the
+  * `static constexpr bool kGenerateEditor = true;` member to the component
+  * This is the example of a component editor:
+  \code{.cpp}
 namespace engine::components::ImGuiEditor
 {
   template<class Ty>
   struct ImGuiEditor;
 }
+  \endcode
+  \code{.cpp}
 namespace engine::components::ImGuiEditor
 {
     template<>
@@ -151,12 +153,12 @@ namespace engine::components::ImGuiEditor
         }
     };
 }
-\endcode
-* It will modify the engine\components\generated\components-editor.hpp file
-@todo
-* Add a python script that will generate the `std::hash` extension for each component
-* It will work mostly like this:
-\code{.cpp}
+  \endcode
+  * It will modify the engine\components\generated\components-editor.hpp file
+  @todo Add a python script that will generate the `std::hash` extension for each component
+
+  * The generated code will look like this:
+  \code{.cpp}
 template<>
 struct std::hash<engine::components::ComponentName>
 {
@@ -171,18 +173,17 @@ struct std::hash<engine::components::ComponentName>
         return seed;
     }
 };
-\endcode
-@note Each public member should have the `std::hash<T>{}` specialization to be able to use the hash_combine function
-
-* If you want to generate hash class for the component you should add the
-* \code{.cpp} static constexpr bool kGenerateHash = true;\endcode member to the component
-* It will modify the engine\components\generated\components-hash.hpp file
+  \endcode
+  @note Each public member should have the `std::hash<T>{}` specialization to be able to use the hash_combine function
+  *
+  * If you want to generate hash class for the component you should add the `static constexpr bool kGenerateHash = true;` member to the component.
+  *
+  * It will modify the engine\components\generated\components-hash.hpp file
 */
 namespace engine::components
 {
-    struct Component
-    {
-    };
+    /// @brief Base class for all components
+    struct Component{};
     /**
      * @brief Component that contains the name of the object and its tag
      * @note This component is used to identify the object in the scene and to find it's descendants
@@ -264,7 +265,7 @@ namespace engine::components
         /// @brief Inverse of the world matrix
         core::math::mat4 inv_world;
     };
-
+    /// @brief Component that contains the camera of the object
     struct CameraComponent final : Component
     {
         static constexpr bool kGenerateSerialization = true;
@@ -382,6 +383,7 @@ namespace engine::components
         /// @brief If the light casts shadows
         bool casts_shadows = false;
     };
+    /// @brief Spot light component
     struct SpotLight final : Component
     {
         SpotLight() = default;

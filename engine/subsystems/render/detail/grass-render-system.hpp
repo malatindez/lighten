@@ -32,15 +32,12 @@ namespace engine::render
             uint32_t section_count;
             uint32_t enabled_texture_flags;
 
-            core::math::vec2 grass_texture_from;
-            core::math::vec2 grass_texture_to;
-
             core::math::vec3 wind_vector;
             float wind_amplitude;
             float wind_wavenumber;
             float wind_frequency;
 
-            core::math::vec2 padding0;
+            core::math::uivec2 atlas_texture_size;
         };
     } // namespace _grass_detail
 
@@ -79,13 +76,14 @@ namespace engine::render
         uint32_t texture_flags = 0;
         // from, to texture coordinates
         std::vector<core::math::vec4> atlas_data{};
+        core::math::uivec2 atlas_size;
 
         uint32_t planes_count = 2;
         uint32_t section_count = 3;
 
         void UpdateTextureFlags();
         GrassMaterial() = default;
-        void Bind(direct3d::DynamicUniformBuffer<_grass_detail::GrassPerMaterial> &uniform_buffer, uint32_t atlas_id) const;
+        void Bind(direct3d::DynamicUniformBuffer<_grass_detail::GrassPerMaterial> &uniform_buffer) const;
         void BindTextures() const;
         void reset()
         {
@@ -179,6 +177,10 @@ namespace engine::render::_grass_detail
         core::math::vec3 position;
         core::math::vec2 size;
         float rotation;
+        uint16_t from_uv_x;
+        uint16_t from_uv_y;
+        uint16_t to_uv_x;
+        uint16_t to_uv_y;
     };
 
     struct MaterialInstance

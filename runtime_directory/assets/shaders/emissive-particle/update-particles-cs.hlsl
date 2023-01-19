@@ -48,12 +48,12 @@ void cs_main(uint3 thread_id: SV_DispatchThreadID)
 
     float distance = length(scene_pos - g_particles[particle_index].position);
     
-    if (distance > g_particles[particle_index].size + 0.1f)
+    if (distance > g_particles[particle_index].size)
     {
         g_particles[particle_index].position = new_position;
         return;
     }
-    g_particles[particle_index].position = scene_pos + normal * (g_particles[particle_index].size);
+    g_particles[particle_index].position = scene_pos + normal * (g_particles[particle_index].size) * 4;
     g_particles[particle_index].velocity = reflect(g_particles[particle_index].velocity, normal) * (1.0f - kCollisionEnergyLoss);
 }
 

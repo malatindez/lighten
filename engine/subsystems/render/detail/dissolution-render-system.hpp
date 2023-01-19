@@ -172,6 +172,7 @@ namespace engine::render::_dissolution_detail
         core::math::vec2 uv_multiplier;
         float time_begin;
         float lifetime;
+        core::math::vec2 padding0;
     };
 
     auto constexpr dissolution_vs_shader_path = "assets/shaders/dissolution/dissolution-vs.hlsl";

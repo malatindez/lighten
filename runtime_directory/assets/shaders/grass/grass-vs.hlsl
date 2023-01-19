@@ -15,6 +15,8 @@ struct VS_INPUT
     float3 posWS : POSITION;
     float2 size : SIZE;
     float rotation : ROTATION;
+    uint fromUV : FROM_UV;
+    uint toUV : TO_UV;
 };
 
 cbuffer PerMaterial : register(b2)
@@ -38,15 +40,11 @@ cbuffer PerMaterial : register(b2)
     uint g_section_count;
     uint g_enabled_texture_flags;
 
-    float2 g_grass_texture_from;
-    float2 g_grass_texture_to;
-
     float3 g_wind_vector;
     float g_amplitude;
     float g_wavenumber;
     float g_frequency;
-
-    float2 grass_padding0;
+    uint2 g_atlas_texture_size;
 };
 cbuffer TransformMatrixBuffer : register(b3)
 {
@@ -171,7 +169,12 @@ VS_OUTPUT vs_main(uint vertex_id: SV_VERTEXID, VS_INPUT input)
     output.posWS.xyz += vertex_pos;
     output.posVS = mul(float4(output.posWS, 1), g_view);
     output.posVS = mul(output.posVS, g_projection);
-    output.uv = calculate_uv(vertex_id % 6, section_num);
+    
+    float2 fromUV = float2(input.fromUV & 0xffff, input.fromUV >> 16) / g_atlas_texture_size;
+    float2 toUV = float2(input.toUV & 0xffff, input.toUV >> 16) / g_atlas_texture_size;
+    output.uv = lerp(fromUV, toUV, calculate_uv(vertex_id % 6, section_num));
+
+
     output.tangent = tangent;
     output.normal = normal;
     output.bitangent = bitangent;
@@ -229,6 +232,9 @@ VS_DEPTH_OUTPUT vs_depth_main(uint vertex_id: SV_VERTEXID, VS_INPUT input)
     vertex_pos = mul(float4(vertex_pos, 0), rotation_matrix).xyz;
 
     output.posWS.xyz += vertex_pos;
-    output.uv = calculate_uv(vertex_id % 6, section_num);
+    
+    float2 fromUV = float2(input.fromUV >> 16, input.fromUV & 0xffff) / g_atlas_texture_size;
+    float2 toUV = float2(input.toUV >> 16, input.toUV & 0xffff) / g_atlas_texture_size;
+    output.uv = lerp(fromUV, toUV, calculate_uv(vertex_id % 6, section_num));
     return output;
 }

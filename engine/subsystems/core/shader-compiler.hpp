@@ -54,7 +54,7 @@ namespace std
         {
             size_t hash = 0;
             engine::utils::hash_combine(hash, input.type);
-            engine::utils::hash_combine(hash, input.source_file);
+            engine::utils::hash_combine(hash, input.source_file.string());
             engine::utils::hash_combine(hash, input.entrypoint);
             engine::utils::hash_combine(hash, input.flags);
             for (auto const &macro : input.macros)

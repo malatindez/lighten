@@ -26,11 +26,9 @@ namespace engine::components
                 .position = core::math::vec3(position.x, size_normalized.y / 2, position.y) + initial_offset,
                 .size = size_normalized,
                 .rotation = rotation_distribution(random_engine),
-                .atlas_id = atlas_id
-            };
-            utils::SortedInsert<GrassInstance>(grass_instances_, std::move(grass_instance), [] (auto const &lhs, auto const &rhs) constexpr -> bool {
-                return lhs.atlas_id < rhs.atlas_id;
-                                               });
+                .atlas_id = atlas_id};
+            utils::SortedInsert<GrassInstance>(grass_instances_, std::move(grass_instance), [](auto const &lhs, auto const &rhs) constexpr -> bool
+                                               { return lhs.atlas_id < rhs.atlas_id; });
         }
     }
 }
@@ -54,7 +52,7 @@ namespace engine::render
         texture_flags |= (metalness_texture != nullptr) ? 1 << 11 : 0;
         texture_flags |= reverse_normal_y ? 1 << 24 : 0;
     }
-    void GrassMaterial::Bind(direct3d::DynamicUniformBuffer<_grass_detail::GrassPerMaterial> &uniform_buffer, uint32_t atlas_id) const
+    void GrassMaterial::Bind(direct3d::DynamicUniformBuffer<_grass_detail::GrassPerMaterial> &uniform_buffer) const
     {
         uniform_buffer.Update(_grass_detail::GrassPerMaterial{
             .albedo_color = albedo_color,
@@ -70,13 +68,11 @@ namespace engine::render
             .plane_count = planes_count,
             .section_count = section_count,
             .enabled_texture_flags = texture_flags,
-            .grass_texture_from = atlas_data[atlas_id].xy,
-            .grass_texture_to = atlas_data[atlas_id].zw,
             .wind_vector = wind_vector,
             .wind_amplitude = wind_amplitude,
             .wind_wavenumber = wind_wavenumber,
-            .wind_frequency = wind_frequency
-                              });
+            .wind_frequency = wind_frequency,
+            .atlas_texture_size = atlas_size});
     }
     void GrassMaterial::BindTextures() const
     {
@@ -137,9 +133,11 @@ namespace engine::render::_grass_detail
         auto path = std::filesystem::current_path();
 
         std::vector<D3D11_INPUT_ELEMENT_DESC> d3d_input_desc{
-            {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0,                            D3D11_INPUT_PER_INSTANCE_DATA, 1},
-            {"SIZE",     0, DXGI_FORMAT_R32G32_FLOAT,    1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-            {"ROTATION", 0, DXGI_FORMAT_R32_FLOAT,       1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"SIZE", 0, DXGI_FORMAT_R32G32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ROTATION", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"FROM_UV", 0, DXGI_FORMAT_R32_UINT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"TO_UV", 0, DXGI_FORMAT_R32_UINT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
         };
         {
             auto vs = core::ShaderManager::instance()->CompileVertexShader(path / grass_vs_shader_path);
@@ -151,15 +149,15 @@ namespace engine::render::_grass_detail
             auto vs = core::ShaderManager::instance()->CompileVertexShader(core::ShaderCompileInput{
                 direct3d::ShaderType::VertexShader,
                 path / grass_vs_shader_path,
-                "vs_depth_main" });
+                "vs_depth_main"});
             auto gs = core::ShaderManager::instance()->CompileGeometryShader(core::ShaderCompileInput{
                 direct3d::ShaderType::GeometryShader,
                 path / grass_gs_depth_only_cubemap_shader_path,
-                "cubemapGS" });
+                "cubemapGS"});
             auto gs2 = core::ShaderManager::instance()->CompileGeometryShader(core::ShaderCompileInput{
                 direct3d::ShaderType::GeometryShader,
                 path / grass_gs_depth_only_texture_shader_path,
-                "cubemapGS" });
+                "cubemapGS"});
             auto il = std::make_shared<InputLayout>(vs->blob(), d3d_input_desc);
             auto ps = core::ShaderManager::instance()->CompilePixelShader(path / grass_ps_depth_only_shader_path);
             grass_cubemap_shader_.SetVertexShader(vs).SetGeometryShader(gs).SetPixelShader(ps).SetInputLayout(il);
@@ -201,29 +199,13 @@ namespace engine::render::_grass_detail
                 auto &grass_component = view.get<components::GrassComponent>(entity);
                 auto &transform = scene->registry.get<components::TransformComponent>(entity);
 
-                grass_transform_buffer_.Update(GPUTransformInfo{ .rotation_matrix = transpose(transform.rotation.as_mat4()), .position = transform.position });
-
-                for (uint32_t current_atlas_id = 0; current_atlas_id < material.material.atlas_data.size(); current_atlas_id++)
-                {
-                    material.material.Bind(grass_per_material_buffer_, current_atlas_id);
-                    material.material.BindTextures();
-
-                    auto begin = std::lower_bound(grass_component.grass_instances_.begin(), grass_component.grass_instances_.end(), current_atlas_id,
-                                                  [] (auto const &lhs, auto const &rhs) constexpr -> bool
-                                                  {
-                                                      return lhs.atlas_id < rhs;
-                                                  });
-                    auto end = std::upper_bound(begin, grass_component.grass_instances_.end(), current_atlas_id,
-                                                [] (auto const &lhs, auto const &rhs) constexpr -> bool
-                                                {
-                                                    return lhs < rhs.atlas_id;
-                                                });
-                    uint32_t instances_to_render = static_cast<uint32_t>(end - begin);
-
-                    direct3d::api().devcon4->DrawInstanced(6 * material.material.section_count * material.material.planes_count, instances_to_render, 0, rendered_instances);
-                    update_shadow_maps = true;
-                    rendered_instances += instances_to_render;
-                }
+                grass_transform_buffer_.Update(GPUTransformInfo{.rotation_matrix = transpose(transform.rotation.as_mat4()), .position = transform.position});
+                material.material.Bind(grass_per_material_buffer_);
+                material.material.BindTextures();
+                uint32_t instances_to_render = static_cast<uint32_t>(grass_component.grass_instances_.size());
+                direct3d::api().devcon4->DrawInstanced(6 * material.material.section_count * material.material.planes_count, instances_to_render, 0, rendered_instances);
+                update_shadow_maps = true;
+                rendered_instances += instances_to_render;
             }
         }
         grass_shader_.Unbind();
@@ -234,6 +216,10 @@ namespace engine::render::_grass_detail
     }
     void GrassRenderSystem::RenderDepthOnly(std::vector<GrassPerDepthCubemap> const &cubemaps, core::Scene *scene)
     {
+#if 1
+#pragma message ("Warning: grass shadows are disabled")
+        return;
+#endif
         if (instances_update_scheduled_)
         {
             OnInstancesUpdate(scene);
@@ -266,40 +252,31 @@ namespace engine::render::_grass_detail
                 auto &grass_component = view.get<components::GrassComponent>(entity);
                 auto &transform = scene->registry.get<components::TransformComponent>(entity);
 
-                grass_transform_buffer_.Update(GPUTransformInfo{ .rotation_matrix = transpose(transform.rotation.as_mat4()), .position = transform.position });
+                grass_transform_buffer_.Update(GPUTransformInfo{.rotation_matrix = transpose(transform.rotation.as_mat4()), .position = transform.position});
 
-                for (uint32_t current_atlas_id = 0; current_atlas_id < material.material.atlas_data.size(); current_atlas_id++)
+                material.material.Bind(grass_per_material_buffer_);
+                if (material.material.opacity_texture != nullptr)
                 {
-                    material.material.Bind(grass_per_material_buffer_, current_atlas_id);
-                    if (material.material.opacity_texture != nullptr)
-                    {
-                        direct3d::api().devcon4->PSSetShaderResources(0, 1, &material.material.opacity_texture);
-                    }
-                    auto begin = std::lower_bound(grass_component.grass_instances_.begin(), grass_component.grass_instances_.end(), current_atlas_id,
-                                                  [] (auto const &lhs, auto const &rhs) constexpr -> bool
-                                                  {
-                                                      return lhs.atlas_id < rhs;
-                                                  });
-                    auto end = std::upper_bound(begin, grass_component.grass_instances_.end(), current_atlas_id,
-                                                [] (auto const &lhs, auto const &rhs) constexpr -> bool
-                                                {
-                                                    return lhs < rhs.atlas_id;
-                                                });
-                    uint32_t instances_to_render = static_cast<uint32_t>(end - begin);
-
-                    for (auto &cubemap : cubemaps)
-                    {
-                        grass_per_cubemap_buffer_.Update(cubemap);
-                        direct3d::api().devcon4->DrawInstanced(6 * material.material.section_count * material.material.planes_count, instances_to_render, 0, rendered_instances);
-                    }
-                    rendered_instances += instances_to_render;
+                    direct3d::api().devcon4->PSSetShaderResources(0, 1, &material.material.opacity_texture);
                 }
+                uint32_t instances_to_render = static_cast<uint32_t>(grass_component.grass_instances_.size());
+                for (auto &cubemap : cubemaps)
+                {
+                    grass_per_cubemap_buffer_.Update(cubemap);
+                    direct3d::api().devcon4->DrawInstanced(6 * material.material.section_count * material.material.planes_count, instances_to_render, 0, rendered_instances);
+                }
+                rendered_instances += instances_to_render;
             }
         }
         grass_cubemap_shader_.Unbind();
     }
     void GrassRenderSystem::RenderDepthOnly(std::vector<GrassPerDepthTexture> const &textures, core::Scene *scene)
     {
+
+#if 1
+#pragma message ("Warning: grass shadows are disabled")
+        return;
+#endif
         if (instances_update_scheduled_)
         {
             OnInstancesUpdate(scene);
@@ -332,34 +309,19 @@ namespace engine::render::_grass_detail
                 auto &grass_component = view.get<components::GrassComponent>(entity);
                 auto &transform = scene->registry.get<components::TransformComponent>(entity);
 
-                grass_transform_buffer_.Update(GPUTransformInfo{ .rotation_matrix = transpose(transform.rotation.as_mat4()), .position = transform.position });
-
-                for (uint32_t current_atlas_id = 0; current_atlas_id < material.material.atlas_data.size(); current_atlas_id++)
+                grass_transform_buffer_.Update(GPUTransformInfo{.rotation_matrix = transpose(transform.rotation.as_mat4()), .position = transform.position});
+                material.material.Bind(grass_per_material_buffer_);
+                if (material.material.opacity_texture != nullptr)
                 {
-                    material.material.Bind(grass_per_material_buffer_, current_atlas_id);
-                    if (material.material.opacity_texture != nullptr)
-                    {
-                        direct3d::api().devcon4->PSSetShaderResources(0, 1, &material.material.opacity_texture);
-                    }
-                    auto begin = std::lower_bound(grass_component.grass_instances_.begin(), grass_component.grass_instances_.end(), current_atlas_id,
-                                                  [] (auto const &lhs, auto const &rhs) constexpr -> bool
-                                                  {
-                                                      return lhs.atlas_id < rhs;
-                                                  });
-                    auto end = std::upper_bound(begin, grass_component.grass_instances_.end(), current_atlas_id,
-                                                [] (auto const &lhs, auto const &rhs) constexpr -> bool
-                                                {
-                                                    return lhs < rhs.atlas_id;
-                                                });
-                    uint32_t instances_to_render = static_cast<uint32_t>(end - begin);
-
-                    for (auto &texture : textures)
-                    {
-                        grass_per_texture_buffer_.Update(texture);
-                        direct3d::api().devcon4->DrawInstanced(6 * material.material.section_count * material.material.planes_count, instances_to_render, 0, rendered_instances);
-                    }
-                    rendered_instances += instances_to_render;
+                    direct3d::api().devcon4->PSSetShaderResources(0, 1, &material.material.opacity_texture);
                 }
+                uint32_t instances_to_render = static_cast<uint32_t>(grass_component.grass_instances_.size());
+                for (auto &texture : textures)
+                {
+                    grass_per_texture_buffer_.Update(texture);
+                    direct3d::api().devcon4->DrawInstanced(6 * material.material.section_count * material.material.planes_count, instances_to_render, 0, rendered_instances);
+                }
+                rendered_instances += instances_to_render;
             }
         }
         grass_texture_shader_.Unbind();
@@ -372,14 +334,14 @@ namespace engine::render::_grass_detail
     {
         size_t material_hash = std::hash<GrassMaterial>{}(material);
         auto it = std::find_if(materials_.begin(), materials_.end(),
-                               [&material_hash] (auto const &instance) constexpr -> bool
+                               [&material_hash](auto const &instance) constexpr -> bool
                                {
                                    return instance.material_hash == material_hash;
                                });
 
         if (it == materials_.end())
         {
-            materials_.push_back({ {}, std::forward<GrassMaterial>(material), material_hash });
+            materials_.push_back({{}, std::forward<GrassMaterial>(material), material_hash});
             return materials_.size() - 1;
         }
         return it - materials_.begin();
@@ -396,14 +358,14 @@ namespace engine::render::_grass_detail
             }
             auto &material_instance = *(materials_.begin() + grass_component.material_id);
             if (std::find_if(material_instance.instances.begin(), material_instance.instances.end(),
-                             [entity] (auto const &instance) constexpr -> bool
+                             [entity](auto const &instance) constexpr -> bool
                              {
                                  return instance == entity;
                              }) != material_instance.instances.end())
             {
                 continue;
             }
-                             material_instance.instances.push_back(entity);
+            material_instance.instances.push_back(entity);
         }
 
         std::vector<GPUGrassInstance> grass_instances;
@@ -413,26 +375,34 @@ namespace engine::render::_grass_detail
             {
                 auto &grass_component = view.get<components::GrassComponent>(entity);
                 grass_instances.reserve(grass_instances.size() + grass_component.grass_instances_.size());
-                for (uint32_t current_atlas_id = 0; current_atlas_id < material.material.atlas_data.size(); current_atlas_id++)
+                auto &atlas_data = material.material.atlas_data;
+                auto &atlas_size = material.material.atlas_size;
+                for (uint32_t current_atlas_id = 0; current_atlas_id < atlas_data.size(); current_atlas_id++)
                 {
-                    material.material.Bind(grass_per_material_buffer_, current_atlas_id);
                     auto begin = std::lower_bound(grass_component.grass_instances_.begin(), grass_component.grass_instances_.end(), current_atlas_id,
-                                                  [] (auto const &lhs, auto const &rhs) constexpr -> bool
+                                                  [](auto const &lhs, auto const &rhs) constexpr -> bool
                                                   {
                                                       return lhs.atlas_id < rhs;
                                                   });
                     auto end = std::upper_bound(begin, grass_component.grass_instances_.end(), current_atlas_id,
-                                                [] (auto const &lhs, auto const &rhs) constexpr -> bool
+                                                [](auto const &lhs, auto const &rhs) constexpr -> bool
                                                 {
                                                     return lhs < rhs.atlas_id;
                                                 });
+
+                    core::math::uivec2 from = atlas_size * atlas_data[current_atlas_id].xy;
+                    core::math::uivec2 to = atlas_size * atlas_data[current_atlas_id].zw;
                     for (auto &it = begin; it != end; ++it)
                     {
                         auto &instance = *it;
                         grass_instances.emplace_back(GPUGrassInstance{
                             .position = instance.position,
                             .size = instance.size,
-                            .rotation = instance.rotation });
+                            .rotation = instance.rotation,
+                            .from_uv_x = static_cast<uint16_t>(from.x),
+                            .from_uv_y = static_cast<uint16_t>(from.y),
+                            .to_uv_x = static_cast<uint16_t>(to.x),
+                            .to_uv_y = static_cast<uint16_t>(to.y)});
                     }
                 }
             }

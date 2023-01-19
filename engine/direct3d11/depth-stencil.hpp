@@ -5,6 +5,7 @@
 
 namespace engine::direct3d
 {
+    /// @todo finish documentation for DepthStencil class
     class DepthStencil
     {
     public:

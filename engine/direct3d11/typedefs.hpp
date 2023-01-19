@@ -1,21 +1,31 @@
 #include "d3d-common.hpp"
 namespace engine::direct3d
 {
+    /// @brief null render target view pointer
     ID3D11RenderTargetView *const null_rtv = nullptr;
+    /// @brief null depth stencil view pointer
     ID3D11DepthStencilView *const null_dsv = nullptr;
+    /// @brief null depth stencil state pointer
     ID3D11ShaderResourceView *const null_srv = nullptr;
-
+    /// @brief Shader type enum 
     enum class ShaderType : uint8_t
     {
+        /// @brief Vertex shader
         VertexShader = 0,
+        /// @brief Pixel shader
         PixelShader = 1,
+        /// @brief Hull shader
         HullShader = 2,
+        /// @brief Domain shader
         DomainShader = 3,
+        /// @brief Geometry shader
         GeometryShader = 4,
+        /// @brief Compute shader
         ComputeShader = 5,
+        /// @brief No shader
         None = 6
     };
-
+    
     using SwapChain1 = d3d_resource_wrapper<IDXGISwapChain1>;
     using RenderTargetView1 = d3d_resource_wrapper<ID3D11RenderTargetView1>;
     using RenderTargetView = d3d_resource_wrapper<ID3D11RenderTargetView>;
