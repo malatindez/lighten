@@ -73,21 +73,21 @@ namespace engine::render::_decal_detail
                     instance.ambient_occlusion = decal.ambient_occlusion;
                     instance.entity_id = static_cast<uint32_t>(entity);
                     size_t texture_ptr = reinterpret_cast<size_t>(decal.normal_opacity_map);
-                    auto lower = std::lower_bound(insert_helper.begin(), insert_helper.end(), texture_ptr);
-                    if (lower == insert_helper.end() || *lower != texture_ptr)
+                    auto upper = std::upper_bound(insert_helper.begin(), insert_helper.end(), texture_ptr);
+                    if (upper == insert_helper.end() || *upper != texture_ptr)
                     {
                         material_instances_.emplace_back(MaterialInstance{
                             .normal_opacity_map = decal.normal_opacity_map,
                             .instances_amount = 0 });
                         decal_instances.emplace_back(std::move(instance));
-                        insert_helper.insert(lower, texture_ptr);
+                        insert_helper.insert(upper, texture_ptr);
                     }
                     else
                     {
-                        auto instance_index = std::distance(insert_helper.begin(), lower);
+                        auto instance_index = std::distance(insert_helper.begin(), upper);
                         auto insert_iterator = decal_instances.begin() + instance_index;
                         decal_instances.emplace(insert_iterator, std::move(instance));
-                        insert_helper.insert(lower, texture_ptr);
+                        insert_helper.insert(upper, texture_ptr);
                     }
                 }
             }

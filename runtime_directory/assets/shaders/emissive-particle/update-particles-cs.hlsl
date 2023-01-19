@@ -48,7 +48,7 @@ void cs_main(uint3 thread_id: SV_DispatchThreadID)
 
     float distance = length(scene_pos - g_particles[particle_index].position);
     
-    if (distance > g_particles[particle_index].size + 0.1f)
+    if (distance > g_particles[particle_index].size + 0.25f)
     {
         g_particles[particle_index].position = new_position;
         return;

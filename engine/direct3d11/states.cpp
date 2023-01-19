@@ -30,7 +30,7 @@ namespace
         desc.CullMode = cullMode;
         desc.FillMode = fillMode;
         desc.DepthClipEnable = TRUE;
-        desc.MultisampleEnable = TRUE;
+        desc.MultisampleEnable = FALSE;
 
         return desc;
     }

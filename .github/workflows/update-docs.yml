@@ -21,7 +21,6 @@ jobs:
       uses: mattnotmitt/doxygen-action@v1.9.5
       with:
         doxyfile-path: "./Doxyfile"
-        enable-latex: true
         additional-packages: graphviz
                              biblatex
     

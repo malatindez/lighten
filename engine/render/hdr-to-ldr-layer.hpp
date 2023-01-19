@@ -11,7 +11,7 @@ namespace engine::render
     public:
         struct Buffer
         {
-            float exposure = 1.0f;
+            float exposure = -1.0f;
             float gamma = 1.0f;
             core::math::vec2 padding;
         };
