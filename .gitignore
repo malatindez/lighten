@@ -43,3 +43,5 @@ _build
 runtime_directory/logs
 runtime_directory/particles_dump_data
 runtime_directory/imgui.ini
+docs/reference
+docs/latex
