@@ -627,7 +627,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             core::math::vec4{76, 2746, 2217, 4065} / texture_size,
             core::math::vec4{2651, 3005, 3774, 4033} / texture_size,
         };
-
+        grass_material.atlas_size = texture_size.xy;
         grass_material.atlas_data = atlas_data;
         grass_material.planes_count = 2;
         grass_material.section_count = 4;

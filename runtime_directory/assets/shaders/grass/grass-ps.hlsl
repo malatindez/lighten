@@ -22,9 +22,12 @@ cbuffer GrassPerMaterial : register(b2)
     uint g_plane_count;
     uint g_section_count;
     uint g_enabled_texture_flags;
-
-    float2 g_grass_texture_from;
-    float2 g_grass_texture_to;
+    
+    float3 g_wind_vector;
+    float g_amplitude;
+    float g_wavenumber;
+    float g_frequency;
+    uint2 g_atlas_texture_size;
 };
 
 Texture2D<float3> g_albedo : register(t0);
@@ -97,10 +100,17 @@ struct PS_OUTPUT
 
 PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
 {
-    input.uv = lerp(g_grass_texture_from, g_grass_texture_to, input.uv);
     PS_OUTPUT output;
 #if 0
         output.emission.xyz = section_id_to_color(input.section_id, float2(0,0)).xyz * 3; 
+        output.albedo.xyzw = float4(0,0,0,0);
+        output.normals.xyzw = float4(0,0,0,0);
+        output.roughness_metalness_transmittance_ao = float4(0,0,0,0);
+
+        return output;
+#endif
+#if 0
+        output.emission.xy = float2(input.uv) * 3; 
         output.albedo.xyzw = float4(0,0,0,0);
         output.normals.xyzw = float4(0,0,0,0);
         output.roughness_metalness_transmittance_ao = float4(0,0,0,0);

@@ -2,6 +2,7 @@
 #include "../globals/globals-ps.hlsli"
 cbuffer GrassPerMaterial : register(b2)
 {
+
     float3 g_albedo_color;
     float g_ao_value;
 
@@ -21,8 +22,11 @@ cbuffer GrassPerMaterial : register(b2)
     uint g_section_count;
     uint g_enabled_texture_flags;
 
-    float2 g_grass_texture_from;
-    float2 g_grass_texture_to;
+    float3 g_wind_vector;
+    float g_amplitude;
+    float g_wavenumber;
+    float g_frequency;
+    uint2 g_atlas_texture_size;
 };
 
 Texture2D<float> g_opacity : register(t0);
@@ -37,7 +41,6 @@ struct PS_IN
 float ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
     : SV_Depth
 {
-    input.uv = lerp(g_grass_texture_from, g_grass_texture_to, input.uv);
     if (g_opacity.Sample(g_bilinear_clamp_sampler, input.uv).r <= 0.0f)
     {
         discard;
