@@ -13,7 +13,7 @@ namespace engine::render::_particle_detail
 
 /**
  * @brief The components namespace contains all the components that can be used in the engine
- * @todo Every component should inherit from it and have a static \code{.cpp} constexpr std::string_view name;\endcode 
+ * @todo Every component should inherit from it and have a static \code{.cpp} constexpr std::string_view name;\endcode
  * member that is used to identify the component by name
  * If the component doesn't have a name, \code{.cpp}static_assert(false, "Component {class name} must have a name declared");\endcode will be generated automatically
  * in generated file to make sure that the component has a name
@@ -32,9 +32,9 @@ namespace engine::render::_particle_detail
  * * not being able to recognize the size of the component before including the header
  * * not being able to use the component in the engine\components\generated\components-info.hpp
  * * still it will be necessary to include the headers in serialization/gui files to use them
- * 
+ *
  * I think we should include the headers, because it will be easier to work with the components
- * 
+ *
  * If you don't want to mess up your project you should create separate file for component and/or components
  * Otherwise because they will be included in the engine\components\generated\components-info.hpp file
  * this will lead to problems with header including mentioned above
@@ -63,7 +63,7 @@ namespace engine::render::_particle_detail
   * In one test using the intel C++ compiler the switch statement was 6.02% faster
   * than the for_constexpr loop
   * but in the most test cases the for_constexpr is better
-  
+
   @todo Add a python script that will generate the component serialization/deserialization code
   * If you want to generate serialization/deserialization for the component you should add the
   * static constexpr bool kGenerateSerialization = true; member to the component
@@ -187,19 +187,19 @@ namespace engine::components
      * @brief Component that contains the name of the object and its tag
      * @note This component is used to identify the object in the scene and to find it's descendants
      */
-    struct ObjectComponent final : Component
+    struct GameObject final : Component
     {
         static constexpr bool kGenerateSerialization = false;
         static constexpr bool kGenerateEditor = false;
         static constexpr bool kGenerateHash = false;
         static constexpr std::string_view kName = "Game Object";
 
-        ObjectComponent() = default;
-        ObjectComponent(const ObjectComponent &) = default;
-        ObjectComponent(ObjectComponent &&) = default;
-        ObjectComponent &operator=(const ObjectComponent &) = default;
-        ObjectComponent &operator=(ObjectComponent &&) = default;
-        ~ObjectComponent() = default;
+        GameObject() = default;
+        GameObject(const GameObject &) = default;
+        GameObject(GameObject &&) = default;
+        GameObject &operator=(const GameObject &) = default;
+        GameObject &operator=(GameObject &&) = default;
+        ~GameObject() = default;
         /// @brief Object's name
         std::string name = "None";
         /// @brief Object's tag
@@ -225,23 +225,23 @@ namespace engine::components
         ~TransformComponent() = default;
         void reset()
         {
-            position = core::math::vec3{0};
-            scale = core::math::vec3{1};
-            rotation = core::math::quat{1, 0, 0, 0};
+            position = core::math::vec3{ 0 };
+            scale = core::math::vec3{ 1 };
+            rotation = core::math::quat{ 1, 0, 0, 0 };
             UpdateMatrices();
         }
         void UpdateMatrices() noexcept
         {
-            model = core::math::mat4{1};
+            model = core::math::mat4{ 1 };
             model = core::math::translate(model, position);
             model = model * rotation.as_mat4();
             model = core::math::scale(model, scale);
             inv_model = core::math::inverse(model);
         }
         /// @brief Object position in the local space
-        core::math::vec3 position{0};
+        core::math::vec3 position{ 0 };
         /// @brief Object scale in the local space
-        core::math::vec3 scale{1};
+        core::math::vec3 scale{ 1 };
         /// @brief Object rotation in the local space
         core::math::quat rotation;
         /**
@@ -286,38 +286,38 @@ namespace engine::components
          */
         [[nodiscard]] constexpr core::math::vec3 right() const noexcept
         {
-            return core::math::vec3{inv_view[0][0], inv_view[0][1], inv_view[0][2]};
+            return core::math::vec3{ inv_view[0][0], inv_view[0][1], inv_view[0][2] };
         }
         /// @brief Returns the up vector of the camera
         /// @return up vector of the camera
         [[nodiscard]] constexpr core::math::vec3 up() const noexcept
         {
-            return core::math::vec3{inv_view[1][0], inv_view[1][1], inv_view[1][2]};
+            return core::math::vec3{ inv_view[1][0], inv_view[1][1], inv_view[1][2] };
         }
         /// @brief Returns the forward vector of the camera
         /// @return forward vector of the camera
         [[nodiscard]] constexpr core::math::vec3 forward() const noexcept
         {
-            return core::math::vec3{inv_view[2][0], inv_view[2][1], inv_view[2][2]};
+            return core::math::vec3{ inv_view[2][0], inv_view[2][1], inv_view[2][2] };
         }
         /// @brief Returns the position of the camera
         /// @return position of the camera
         [[nodiscard]] constexpr core::math::vec3 position() const noexcept
         {
-            return core::math::vec3{inv_view[3][0], inv_view[3][1], inv_view[3][2]};
+            return core::math::vec3{ inv_view[3][0], inv_view[3][1], inv_view[3][2] };
         }
         /// @brief View matrix
-        core::math::mat4 view{1};
+        core::math::mat4 view{ 1 };
         /// @brief Projection matrix
-        core::math::mat4 projection{1};
+        core::math::mat4 projection{ 1 };
         /// @brief View projection matrix
-        core::math::mat4 view_projection{1};
+        core::math::mat4 view_projection{ 1 };
         /// @brief Inverse of the view matrix
-        core::math::mat4 inv_view{1};
+        core::math::mat4 inv_view{ 1 };
         /// @brief Inverse of the projection matrix
-        core::math::mat4 inv_projection{1};
+        core::math::mat4 inv_projection{ 1 };
         /// @brief Inverse of the view projection matrix
-        core::math::mat4 inv_view_projection{1};
+        core::math::mat4 inv_view_projection{ 1 };
         /// @brief Field of view in radians
         float fovy_ = core::math::radians(45.0f);
         /// @brief near plane Z coordinate
@@ -325,8 +325,6 @@ namespace engine::components
         /// @brief far plane Z coordinate
         float z_far_ = 0.002f;
     };
-
-
 
     /// @brief Point light component
     /// TODO: Add these features:
@@ -625,22 +623,22 @@ namespace engine::components
              * @brief Directional force field is a plane that applies a force to all the particles in front of it
              * Works like this: \f$\mathrm{applied_force} \pluseq \mathrm{direction} \cdot \mathrm{force} \cdot {{(1 - (\frac{\mathrm{dot}(\mathrm{normal}, \mathrm{particle_position})}{\mathrm{radius}})}^\mathrm{falloff}}\f$
              */
-            Directional = 1,
-            // OmniDirectional force field is a sphere field that applies force inwards of this sphere from all directions
-            // Can be used to simulate the air/water/whatever resistance
-            // You can calculate approximate force for the field like this:
-            // 0.5 * fluid_density * average_particle_velocity ^ 2 * average_particle_area * fluid_drag_coefficient
-            // It is pretty costy to simulate the whole fluid dynamics, so this is a good approximation
-            // Basically works like this: applied_force += -normalized(velocity.direction) * force
-            /**
-             * @brief OmniDirectional force field is a sphere field that applies force inwards of this sphere from all directions
-             * Can be used to simulate the air/water/whatever resistance
-             * You can calculate approximate force for the field like this:
-             * \f$0.5 \cdot \mathrm{fluid_density} \cdot \mathrm{average_particle_velocity}^2 \cdot \mathrm{average_particle_area} \cdot \mathrm{fluid_drag_coefficient}\f$
-             * It is pretty costy to simulate the whole fluid dynamics, so this is a good approximation
-             * Works like this: \f$\mathrm{applied_force} \pluseq -\mathrm{normalized}(\mathrm{velocity.direction}) \cdot \mathrm{force}\f$
-             */
-            OmniDirectional = 2
+             Directional = 1,
+             // OmniDirectional force field is a sphere field that applies force inwards of this sphere from all directions
+             // Can be used to simulate the air/water/whatever resistance
+             // You can calculate approximate force for the field like this:
+             // 0.5 * fluid_density * average_particle_velocity ^ 2 * average_particle_area * fluid_drag_coefficient
+             // It is pretty costy to simulate the whole fluid dynamics, so this is a good approximation
+             // Basically works like this: applied_force += -normalized(velocity.direction) * force
+             /**
+              * @brief OmniDirectional force field is a sphere field that applies force inwards of this sphere from all directions
+              * Can be used to simulate the air/water/whatever resistance
+              * You can calculate approximate force for the field like this:
+              * \f$0.5 \cdot \mathrm{fluid_density} \cdot \mathrm{average_particle_velocity}^2 \cdot \mathrm{average_particle_area} \cdot \mathrm{fluid_drag_coefficient}\f$
+              * It is pretty costy to simulate the whole fluid dynamics, so this is a good approximation
+              * Works like this: \f$\mathrm{applied_force} \pluseq -\mathrm{normalized}(\mathrm{velocity.direction}) \cdot \mathrm{force}\f$
+              */
+              OmniDirectional = 2
         };
 
         ForceField() = default;
