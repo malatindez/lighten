@@ -23,13 +23,16 @@ namespace engine
 
         struct LightsPerFrame
         {
+            static constexpr uint32_t kMaxShadowPointLights = 8;
+            static constexpr uint32_t kMaxShadowSpotLights = 4;
+            static constexpr uint32_t kMaxShadowDirectionalLights = 2;
             static constexpr uint32_t kMaxPointLights = 32;
             static constexpr uint32_t kMaxSpotLights = 32;
             static constexpr uint32_t kMaxDirectionalLights = 4;
 
-            std::array<GPUShadowPointLight, kMaxPointLights> shadow_point_lights;
-            std::array<GPUShadowSpotLight, kMaxSpotLights> shadow_spot_lights;
-            std::array<GPUShadowDirectionalLight, kMaxDirectionalLights> shadow_directional_lights;
+            std::array<GPUShadowPointLight, kMaxShadowPointLights> shadow_point_lights;
+            std::array<GPUShadowSpotLight, kMaxShadowSpotLights> shadow_spot_lights;
+            std::array<GPUShadowDirectionalLight, kMaxShadowDirectionalLights> shadow_directional_lights;
             std::array<GPUPointLight, kMaxPointLights> point_lights;
             std::array<GPUSpotLight, kMaxSpotLights> spot_lights;
             std::array<GPUDirectionalLight, kMaxDirectionalLights> directional_lights;
