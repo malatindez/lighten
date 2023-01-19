@@ -402,9 +402,10 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         auto &point_light = registry.emplace<PointLight>(entity);
         point_light.color = vec3{ 0.988, 0.933, 0.655 };
         point_light.power = 2e3f;
+        point_light.casts_shadows = true;
         ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
     }
-    if (false)
+    if (true)
     {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
@@ -480,7 +481,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         transform.UpdateMatrices();
         auto &directional_light = registry.emplace<DirectionalLight>(entity);
         directional_light.color = vec3{ 0.988, 0.933, 0.455 };
-        directional_light.power = 50;
+        directional_light.power = 10;
         directional_light.solid_angle = 0.25f;
         ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(directional_light.color, directional_light.power) });
     }

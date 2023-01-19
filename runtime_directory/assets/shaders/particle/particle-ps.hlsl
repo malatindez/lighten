@@ -240,7 +240,6 @@ float4 ps_main(PS_INPUT input)
     result.xyz += ComputePointLightsEnergy(input.posWS.xyz, rlt_value, botBF_value);
     result.xyz += ComputeSpotLightsEnergy(input.posWS.xyz, rlt_value, botBF_value);
     result.xyz += ComputeDirectionalLightsEnergy(input.posWS.xyz, rlt_value, botBF_value);
-
     // get depth
     //    float depth = g_depth.Load(float3(input.posVS.xy, 0.0f));
     //    float depth_range = g_camera_far - g_camera_near;
