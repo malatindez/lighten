@@ -62,9 +62,9 @@ namespace camera_movement
                     lb_saved_mouse_position = mouse_position();
                 }
             });
-        input->AddUpdateKeyCallback(
+        input->AddTickKeyCallback(
             InputLayer::KeySeq{ engine::core::Key::KEY_RBUTTON },
-            [&] (InputLayer::KeySeq const &, uint32_t count)
+            [&] (float, InputLayer::KeySeq const &, uint32_t count)
             {
                 if (count == std::numeric_limits<uint32_t>::max() || InputLayer::instance()->key_state(engine::core::Key::KEY_CONTROL))
                 {

@@ -20,7 +20,6 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
         // Initialize in-engine layers that we need
         auto shader_manager = ShaderManager::instance();
         auto input_layer = InputLayer::instance();
-        app.PushLayer(input_layer);
         app.PushLayer(shader_manager);
 
         std::shared_ptr<windows::Window> window = std::make_shared<windows::Window>(core::Window::Props{ "D3D Test", { 1280, 720 }, {100, 100} });
@@ -40,6 +39,7 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 
         shader_manager = nullptr;
         render_pipeline = nullptr;
+        app.PushLayer(input_layer);
         app.Run();
 #ifndef _DEBUG
     }
