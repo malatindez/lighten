@@ -57,8 +57,9 @@ namespace engine::render::_decal_detail
             {
                 auto &decal_component = group.get<components::DecalComponent>(entity);
                 auto &transform_component = group.get<components::TransformComponent>(entity);
-                for (auto &decal : decal_component.decals)
+                for (auto it = decal_component.decals.rbegin(); it != decal_component.decals.rend(); ++it )
                 {
+                    auto& decal = *it;
                     DecalInstance instance;
                     instance.world_transform = transform_component.model * decal.mesh_transform;
                     instance.world_transform = core::math::translate(instance.world_transform, decal.relative_position);
@@ -72,22 +73,23 @@ namespace engine::render::_decal_detail
                     instance.transmittance = decal.transmittance;
                     instance.ambient_occlusion = decal.ambient_occlusion;
                     instance.entity_id = static_cast<uint32_t>(entity);
+
                     size_t texture_ptr = reinterpret_cast<size_t>(decal.normal_opacity_map);
-                    auto upper = std::upper_bound(insert_helper.begin(), insert_helper.end(), texture_ptr);
-                    if (upper == insert_helper.end() || *upper != texture_ptr)
+                    auto lower = std::lower_bound(insert_helper.begin(), insert_helper.end(), texture_ptr);
+                    if (lower == insert_helper.end() || *lower != texture_ptr)
                     {
                         material_instances_.emplace_back(MaterialInstance{
                             .normal_opacity_map = decal.normal_opacity_map,
                             .instances_amount = 0 });
                         decal_instances.emplace_back(std::move(instance));
-                        insert_helper.insert(upper, texture_ptr);
+                        insert_helper.insert(lower, texture_ptr);
                     }
                     else
                     {
-                        auto instance_index = std::distance(insert_helper.begin(), upper);
+                        auto instance_index = std::distance(insert_helper.begin(), lower);
                         auto insert_iterator = decal_instances.begin() + instance_index;
-                        decal_instances.emplace(insert_iterator, std::move(instance));
-                        insert_helper.insert(upper, texture_ptr);
+                        decal_instances.insert(insert_iterator, std::move(instance));
+                        insert_helper.insert(lower, texture_ptr);
                     }
                 }
             }
@@ -95,7 +97,7 @@ namespace engine::render::_decal_detail
             for (auto &material_instance : material_instances_)
             {
                 size_t texture_ptr = reinterpret_cast<size_t>(material_instance.normal_opacity_map);
-                auto tmp = std::lower_bound(insert_helper.begin(), insert_helper.end(), texture_ptr);
+                auto tmp = std::upper_bound(insert_helper.begin(), insert_helper.end(), texture_ptr);
                 material_instance.instances_amount = static_cast<uint32_t>(std::distance(lower, tmp));
                 lower = tmp;
             }
@@ -197,6 +199,10 @@ namespace engine::render::_decal_detail
         uint32_t rendered_instances = 0;
         for (auto const &material : material_instances_)
         {
+            if (material.instances_amount == 0)
+            {
+                continue;
+            }
             direct3d::api().devcon4->PSSetShaderResources(0, 1, &material.normal_opacity_map);
             for (auto const &mesh : cube.meshes)
             {
