@@ -41,6 +41,8 @@ struct PS_IN
     float4x4 world_transform : WORLD_TRANSFORM;
     float time_begin : TIME_BEGIN;
     float lifetime : LIFETIME;
+    nointerpolation float3 click_point : CLICK_POINT;
+    nointerpolation float3 box_half_size : BOX_HALF_SIZE;
 };
 
 static const float4 kEmissiveColor = float4(0.0f, 60.0f, 75.0f, 1.0f);
@@ -64,12 +66,19 @@ PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
     }
     PS_OUTPUT output;
 
-    float alpha = g_noise_texture.Sample(g_bilinear_wrap_sampler, input.texcoord);
+    float alpha;
     float time_normalized = (g_time_now - input.time_begin) / input.lifetime;
 
     if (!(g_material_flags & APPEARING))
     {
+        // TODO: this is not correct
+        // figure out why
+        alpha = length(input.click_point - input.fragment_position) / length(input.box_half_size);
         time_normalized = 1.0f - time_normalized;
+    }
+    else
+    {
+        alpha = g_noise_texture.Sample(g_bilinear_wrap_sampler, input.texcoord);
     }
     const float kClampValue = 0.2f / input.lifetime;
     float4 emission = float4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -119,6 +128,7 @@ PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
     input.bitangent = normalize(input.bitangent);
     input.tangent = normalize(input.tangent);
     input.normal = normalize(input.normal);
+    
 
     float3 normal = input.normal;
     float3 geometry_normal = input.normal;

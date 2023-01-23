@@ -761,7 +761,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                                    transform.rotation = math::QuaternionFromRotationMatrix(rotation_matrix);
                                    transform.UpdateMatrices();
                                    uint64_t model_id = ModelLoader::Load("assets\\models\\Knight\\Knight.fbx").value();
-                                   drs.AddInstance(model_id, registry, knight, std::uniform_real_distribution<float>(3.0f, 15.0f)(Engine::random_engine()));
+                                   drs.AddInstance(model_id, registry, knight, core::math::vec3{ 0.0f }, std::uniform_real_distribution<float>(3.0f, 15.0f)(Engine::random_engine()));
                                    Engine::scene()->renderer->dissolution_render_system().ScheduleInstanceUpdate();
                                    Engine::scene()->renderer->light_render_system().ScheduleShadowMapUpdate();
                                });
@@ -814,7 +814,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                        rv.UpdateTextureFlags();
                        return rv;
                     });
-                drs.AddInstance(opaque->model_id, registry, entity.value(), lifetime, std::move(dissolution_materials));
+                drs.AddInstance(opaque->model_id, registry, entity.value(), nearest.point, lifetime, std::move(dissolution_materials));
                 drs.ScheduleInstanceUpdate();
 
                 registry.erase<components::OpaqueComponent>(entity.value());

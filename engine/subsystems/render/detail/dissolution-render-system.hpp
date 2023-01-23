@@ -135,6 +135,7 @@ namespace engine::components
         uint64_t model_id;
         float time_begin;
         float lifetime;
+        core::math::vec3 click_point;
     };
 }
 namespace engine::render::_dissolution_detail
@@ -144,6 +145,9 @@ namespace engine::render::_dissolution_detail
         core::math::mat4 world_transform;
         float time_begin;
         float lifetime;
+        core::math::vec3 bounding_box_min;
+        core::math::vec3 bounding_box_max;
+        core::math::vec3 click_point;
     };
     using DissolutionPerDepthCubemap = _opaque_detail::OpaquePerDepthCubemap;
     using DissolutionPerDepthTexture = _opaque_detail::OpaquePerDepthTexture;
@@ -194,8 +198,8 @@ namespace engine::render::_dissolution_detail
         void RenderDepthOnly(std::vector<DissolutionPerDepthTexture> const &textures, core::Scene *scene);
 
         ModelInstance &GetInstance(uint64_t model_id);
-        void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, float lifetime, bool appearing = true, bool emissive = true);
-        void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, float lifetime, std::vector<DissolutionMaterial> const &materials);
+        void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, core::math::vec3 const &click_point, float lifetime, bool appearing = true, bool emissive = true);
+        void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, core::math::vec3 const &click_point, float lifetime, std::vector<DissolutionMaterial> const &materials);
 
         void Update([[maybe_unused]] core::Scene *scene);
         void ScheduleInstanceUpdate()

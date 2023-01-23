@@ -15,6 +15,8 @@ struct VS_OUTPUT
     float4x4 world_transform : WORLD_TRANSFORM;
     float time_begin : TIME_BEGIN;
     float lifetime : LIFETIME;
+    nointerpolation float3 click_point : CLICK_POINT;
+    nointerpolation float3 box_half_size : BOX_HALF_SIZE;
 };
 
 struct VS_INPUT
@@ -30,6 +32,8 @@ struct VS_INPUT
     float4 RowW : ROWW;
     float time_begin : TIME_BEGIN;
     float lifetime : LIFETIME;
+    nointerpolation float3 click_point : CLICK_POINT;
+    nointerpolation float3 box_half_size : BOX_HALF_SIZE;
 };
 
 VS_OUTPUT vs_main(VS_INPUT input)
@@ -47,5 +51,7 @@ VS_OUTPUT vs_main(VS_INPUT input)
     output.world_transform = world_transform;
     output.time_begin = input.time_begin;
     output.lifetime = input.lifetime;
+    output.click_point = input.click_point;
+    output.box_half_size = input.box_half_size;
     return output;
 }

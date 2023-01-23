@@ -105,6 +105,8 @@ namespace engine::render::_dissolution_detail
             {"ROWW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
             {"TIME_BEGIN", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
             {"LIFETIME", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"CLICK_POINT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"BOX_HALF_SIZE", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
         };
         noise_texture_ = core::TextureManager::GetTextureView(path / "assets/dissolution_perlin_noise.dds");
         {
@@ -412,7 +414,13 @@ namespace engine::render::_dissolution_detail
                     {
                         auto &transform = instance_group.get<components::TransformComponent>(entity);
                         auto &dissolution = instance_group.get<components::DissolutionComponent>(entity);
-                        dst[copiedNum++] = DissolutionInstance{ .world_transform = transform.model, .time_begin = dissolution.time_begin, .lifetime = dissolution.lifetime };
+                        dst[copiedNum++] = DissolutionInstance{ .world_transform = transform.model,
+                                                                .time_begin = dissolution.time_begin,
+                                                                .lifetime = dissolution.lifetime,
+                                                                .bounding_box_min = model_instance.model.bounding_box.min,
+                                                                .bounding_box_max = model_instance.model.bounding_box.max,
+                                                                .click_point = dissolution.click_point
+                        };
                     }
                 }
             }
@@ -450,7 +458,7 @@ namespace engine::render::_dissolution_detail
         return instance;
     }
 
-    void DissolutionRenderSystem::AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, float lifetime, bool appearing, bool emissive)
+    void DissolutionRenderSystem::AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, core::math::vec3 const &click_point, float lifetime, bool appearing, bool emissive)
     {
         auto &instance = GetInstance(model_id);
         for (size_t mesh_index = 0; mesh_index < instance.model.meshes.size(); mesh_index++)
@@ -478,10 +486,14 @@ namespace engine::render::_dissolution_detail
                 mat.instances.push_back(entity);
             }
         }
-        registry.emplace<components::DissolutionComponent>(entity, components::DissolutionComponent{ .model_id = model_id, .time_begin = core::Engine::TimeFromStart(), .lifetime = lifetime });
+        registry.emplace_or_replace<components::DissolutionComponent>(entity, components::DissolutionComponent{
+                .model_id = model_id,
+                .time_begin = core::Engine::TimeFromStart(),
+                .lifetime = lifetime,
+                .click_point = click_point });
     }
 
-    void DissolutionRenderSystem::AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, float lifetime, std::vector<DissolutionMaterial> const &materials)
+    void DissolutionRenderSystem::AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, core::math::vec3 const &click_point, float lifetime, std::vector<DissolutionMaterial> const &materials)
     {
         auto &instance = GetInstance(model_id);
         utils::Assert(materials.size() == instance.mesh_instances.size());
@@ -505,6 +517,11 @@ namespace engine::render::_dissolution_detail
                 mat.instances.push_back(entity);
             }
         }
-        registry.emplace<components::DissolutionComponent>(entity, components::DissolutionComponent{ .model_id = model_id, .time_begin = core::Engine::TimeFromStart(), .lifetime = lifetime });
+
+        registry.emplace_or_replace<components::DissolutionComponent>(entity, components::DissolutionComponent{
+                .model_id = model_id,
+                .time_begin = core::Engine::TimeFromStart(),
+                .lifetime = lifetime,
+                .click_point = click_point });
     }
 }

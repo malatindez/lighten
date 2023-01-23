@@ -100,7 +100,7 @@ float3 ComputePointLightsEnergy(float3 posWS,
         PointLight point_light = g_point_lights[i];
         light_energy += ComputePointLightEnergy(point_light, posWS, rlt, botBF);
     }
-    for (uint j = 0; j < g_shadow_num_directional_lights; j++)
+    for (uint j = 0; j < g_shadow_num_point_lights; j++)
     {
         ShadowPointLight point_light = g_shadow_point_lights[j];
         light_energy += ComputePointLightEnergy(point_light, posWS, rlt, botBF);
