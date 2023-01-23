@@ -29,7 +29,6 @@ namespace engine::components
             float metalness;
             float transmittance;
             float ambient_occlusion;
-            ID3D11ShaderResourceView *normal_opacity_map;
         };
         // The entity can have multiple decals so we need to store them in a vector
         // as we can't have multiple components of the same type on the same entity
@@ -71,6 +70,7 @@ namespace engine::render::_decal_detail
             is_instance_update_scheduled_ = true;
         }
 
+        ID3D11ShaderResourceView *normal_opacity_map;
     private:
         bool is_instance_update_scheduled_ = false;
         void UpdateInstances(entt::registry &registry);

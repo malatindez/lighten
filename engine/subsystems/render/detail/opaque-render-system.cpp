@@ -336,13 +336,13 @@ namespace engine::render::_opaque_detail
         }
         return nullptr;
     }
-    ModelInstance &OpaqueRenderSystem::GetInstance(uint64_t model_id)
+    size_t OpaqueRenderSystem::GetInstanceId(uint64_t model_id)
     {
         auto it = std::find_if(model_instances_.begin(), model_instances_.end(), [&model_id] (auto const &instance)
                                { return instance.model_id == model_id; });
         if (it != model_instances_.end())
         {
-            return *it;
+            return std::distance(model_instances_.begin(), it);
         }
         model_instances_.emplace_back(ModelInstance{ .model = ModelSystem::GetModel(model_id), .model_id = model_id });
         auto &instance = model_instances_.back();
@@ -353,24 +353,28 @@ namespace engine::render::_opaque_detail
             value.material_instances.emplace_back(std::move(material_instance));
             instance.mesh_instances.emplace_back(std::move(value));
         }
-        return instance;
+        return model_instances_.size() - 1;
     }
 
     void OpaqueRenderSystem::AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity)
     {
-        auto &instance = GetInstance(model_id);
-        for (size_t mesh_index = 0; mesh_index < instance.model.meshes.size(); mesh_index++)
+        auto instance_id = GetInstanceId(model_id);
+        auto &model_instance = model_instances_.at(instance_id);
+        std::vector<size_t> material_instance_id;
+        for (size_t mesh_index = 0; mesh_index < model_instance.model.meshes.size(); mesh_index++)
         {
-            auto const &mesh = instance.model.meshes[mesh_index];
-            auto &material_instances = instance.mesh_instances[mesh_index].material_instances;
-            MaterialInstance material_instance{ .material = OpaqueMaterial(instance.model.materials[mesh.loaded_material_id]) };
+            auto const &mesh = model_instance.model.meshes[mesh_index];
+            auto &material_instances = model_instance.mesh_instances[mesh_index].material_instances;
+            MaterialInstance material_instance{ .material = OpaqueMaterial(model_instance.model.materials[mesh.loaded_material_id]) };
             bool add_new_material = true;
-            for (auto &mat_instance : material_instances)
+            for (auto it = material_instances.begin(); it != material_instances.end(); ++it)
             {
+                auto &mat_instance = *it;
                 if (std::hash<OpaqueMaterial>()(mat_instance.material) == std::hash<OpaqueMaterial>()(material_instance.material)) [[likely]]
                 {
                     add_new_material = false;
                     mat_instance.instances.push_back(entity);
+                    material_instance_id.push_back(std::distance(material_instances.begin(), it));
                     break;
                 }
             }
@@ -378,26 +382,33 @@ namespace engine::render::_opaque_detail
             {
                 auto &mat = material_instances.emplace_back(std::move(material_instance));
                 mat.instances.push_back(entity);
+                material_instance_id.push_back(material_instances.size() - 1);
             }
         }
-        registry.emplace_or_replace<components::OpaqueComponent>(entity, components::OpaqueComponent{ .model_id = model_id });
+        auto &opaque_instance = registry.emplace_or_replace<components::OpaqueComponent>(entity, components::OpaqueComponent(model_id));
+        opaque_instance.model_instance_id = instance_id;
+        opaque_instance.material_instance_id = std::move(material_instance_id);
     }
 
     void OpaqueRenderSystem::AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, std::vector<OpaqueMaterial> const &materials)
     {
-        auto &instance = GetInstance(model_id);
-        utils::Assert(materials.size() == instance.mesh_instances.size());
-        for (size_t mesh_index = 0; mesh_index < instance.model.meshes.size(); mesh_index++)
+        auto instance_id = GetInstanceId(model_id);
+        auto &model_instance = model_instances_.at(instance_id);
+        std::vector<size_t> material_instance_id;
+        utils::Assert(materials.size() == model_instance.mesh_instances.size());
+        for (size_t mesh_index = 0; mesh_index < model_instance.model.meshes.size(); mesh_index++)
         {
-            auto &material_instances = instance.mesh_instances[mesh_index].material_instances;
+            auto &material_instances = model_instance.mesh_instances[mesh_index].material_instances;
             MaterialInstance material_instance{ .material = OpaqueMaterial(materials[mesh_index]) };
             bool add_new_material = true;
-            for (auto &mat_instance : material_instances)
+            for (auto it = material_instances.begin(); it != material_instances.end(); ++it)
             {
+                auto &mat_instance = *it;
                 if (std::hash<OpaqueMaterial>()(mat_instance.material) == std::hash<OpaqueMaterial>()(material_instance.material)) [[likely]]
                 {
                     add_new_material = false;
                     mat_instance.instances.push_back(entity);
+                    material_instance_id.push_back(std::distance(material_instances.begin(), it));
                     break;
                 }
             }
@@ -405,8 +416,11 @@ namespace engine::render::_opaque_detail
             {
                 auto &mat = material_instances.emplace_back(std::move(material_instance));
                 mat.instances.push_back(entity);
+                material_instance_id.push_back(material_instances.size() - 1);
             }
         }
-        registry.emplace<components::OpaqueComponent>(entity, components::OpaqueComponent{ .model_id = model_id });
+        auto &opaque_instance = registry.emplace_or_replace<components::OpaqueComponent>(entity, components::OpaqueComponent(model_id));
+        opaque_instance.model_instance_id = instance_id;
+        opaque_instance.material_instance_id = std::move(material_instance_id);
     }
 }

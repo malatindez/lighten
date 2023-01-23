@@ -711,10 +711,9 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                     return;
                 }
             }
-            static ID3D11ShaderResourceView *texture = core::TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/decal.dds");
+            scene->renderer->decal_render_system().normal_opacity_map = core::TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/decal.dds");
 
             DecalComponent::Decal decal{};
-            decal.normal_opacity_map = texture;
             decal.mesh_transform = model_instance->model.meshes[mesh_id].mesh_to_model;
             mat4 inv_mat = model_instance->model.meshes[mesh_id].inv_mesh_to_model * transform.inv_model;
             decal.relative_position = (inv_mat * vec4(nearest.point, 1.0f)).xyz;
@@ -799,28 +798,15 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             if (opaque != nullptr)
             {
                 float lifetime = std::uniform_real_distribution(1.0f, 5.0f)(core::Engine::random_engine());
-                auto &model_instance = ors.GetInstance(opaque->model_id);
-                std::vector<render::OpaqueMaterial *> materials;
-                for (auto &mesh_instance : model_instance.mesh_instances)
-                {
-                    for (auto &material_instance : mesh_instance.material_instances)
-                    {
-                        auto it = std::find(material_instance.instances.begin(), material_instance.instances.end(), entity.value());
-                        if (it != material_instance.instances.end())
-                        {
-                            material_instance.instances.erase(it);
-                            materials.push_back(&material_instance.material);
-                            break;
-                        }
-                    }
-                }
+                auto instance_info = ors.GetInstanceInfo(registry, entity.value());
+                ors.RemoveInstance(registry, entity.value());
                 std::vector<render::DissolutionMaterial> dissolution_materials;
 
                 std::transform(
-                    materials.begin(),
-                    materials.end(),
+                    instance_info.materials.begin(),
+                    instance_info.materials.end(),
                     std::back_inserter(dissolution_materials),
-                    [](render::OpaqueMaterial *material) __lambda_force_inline->render::DissolutionMaterial
+                    [](render::OpaqueMaterial const *material) __lambda_force_inline->render::DissolutionMaterial
                     {
                        auto rv = render::DissolutionMaterial::FromOpaqueMaterial(*material);
                        rv.emissive = true;

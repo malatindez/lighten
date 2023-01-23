@@ -18,6 +18,7 @@ namespace engine::render
     namespace _opaque_detail
     {
         struct OpaquePerMaterial;
+        class OpaqueRenderSystem;
     }
     struct OpaqueMaterial
     {
@@ -82,7 +83,13 @@ namespace engine::components
 {
     struct OpaqueComponent
     {
-        uint64_t model_id;
+    public:
+        OpaqueComponent(size_t model_id) : model_id(model_id) {}
+        size_t model_id;
+    private:
+        friend class ::engine::render::_opaque_detail::OpaqueRenderSystem;
+        size_t model_instance_id;
+        std::vector<size_t> material_instance_id;
     };
 }
 namespace engine::render::_opaque_detail
@@ -128,7 +135,11 @@ namespace engine::render::_opaque_detail
         uint32_t g_slice_offset;
         core::math::vec3 padding0;
     };
-
+    struct OpaqueInstanceInfo
+    {
+        uint64_t model_id;
+        std::vector<OpaqueMaterial const *> materials;
+    };
     auto constexpr opaque_vs_shader_path = "assets/shaders/opaque/opaque-vs.hlsl";
     auto constexpr opaque_ps_shader_path = "assets/shaders/opaque/opaque-ps.hlsl";
     auto constexpr opaque_vs_depth_only_shader_path = "assets/shaders/opaque/opaque-depth-only-vs.hlsl";
@@ -165,9 +176,36 @@ namespace engine::render::_opaque_detail
         void RenderDepthOnly(std::vector<OpaquePerDepthCubemap> const &cubemaps, core::Scene *scene);
         void RenderDepthOnly(std::vector<OpaquePerDepthTexture> const &textures, core::Scene *scene);
 
-        ModelInstance &GetInstance(uint64_t model_id);
+        size_t GetInstanceId(uint64_t model_id);
+        /** @brief Returns instance information
+        * @warning pointers to materials aren't guaranteed to point to the correct location after UpdateInstances was called
+        */
+        OpaqueInstanceInfo GetInstanceInfo(entt::registry &registry, entt::entity entity)
+        {
+            OpaqueInstanceInfo rv;
+            components::OpaqueComponent &oc = registry.get<components::OpaqueComponent>(entity);
+            rv.model_id = oc.model_id;
+            ModelInstance &model_instance = model_instances_.at(oc.model_instance_id);
+            auto &materials = rv.materials;
+            uint32_t i = 0;
+            for (auto material_instance_id : oc.material_instance_id)
+            {
+                materials.emplace_back(&model_instance.mesh_instances[i++].material_instances[material_instance_id].material);
+            }
+            return rv;
+        }
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity);
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, std::vector<OpaqueMaterial> const &materials);
+        void RemoveInstance(entt::registry &registry, entt::entity entity)
+        {
+            components::OpaqueComponent &oc = registry.get<components::OpaqueComponent>(entity);
+            ModelInstance &model_instance = model_instances_.at(oc.model_instance_id);
+            uint32_t i = 0;
+            for (auto material_instance_id : oc.material_instance_id)
+            {
+                std::erase(model_instance.mesh_instances[i++].material_instances[material_instance_id].instances, entity);
+            }
+        }
 
         void Update([[maybe_unused]] core::Scene *scene) {}
         void ScheduleInstanceUpdate()

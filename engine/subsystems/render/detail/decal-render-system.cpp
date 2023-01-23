@@ -14,30 +14,30 @@ namespace engine::render::_decal_detail
         auto path = std::filesystem::current_path();
 
         std::vector<D3D11_INPUT_ELEMENT_DESC> d3d_input_desc{
-             {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D11_INPUT_PER_VERTEX_DATA, 0},
+            {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+            {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+            {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0},
+            {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0},
+            {"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D11_INPUT_PER_VERTEX_DATA, 0},
 
-             { "ROWX",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA,  1},
-             { "ROWY",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "ROWZ",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "ROWW",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ROWX", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ROWY", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ROWZ", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ROWW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
 
-             { "INV_ROWX",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA,  1},
-             { "INV_ROWY",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "INV_ROWZ",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "INV_ROWW",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"INV_ROWX", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"INV_ROWY", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"INV_ROWZ", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"INV_ROWW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
 
-             { "HALF_SIZE", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "BASE_COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "TEXTURE_ANGLE", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "ROUGHNESS", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "METALNESS", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "TRANSMITTANCE", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "AMBIENT_OCCLUSION", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "ENTITY_ID", 0, DXGI_FORMAT_R32_UINT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"HALF_SIZE", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"BASE_COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"TEXTURE_ANGLE", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ROUGHNESS", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"METALNESS", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"TRANSMITTANCE", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"AMBIENT_OCCLUSION", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ENTITY_ID", 0, DXGI_FORMAT_R32_UINT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
         };
         {
             auto vs = core::ShaderManager::instance()->CompileVertexShader(path / decal_vs_shader_path);
@@ -50,17 +50,28 @@ namespace engine::render::_decal_detail
     {
         auto group = registry.group<components::DecalComponent, components::TransformComponent>();
         material_instances_.clear();
-        std::vector<DecalInstance> decal_instances;
+        size_t instances_count = 0;
+        for (auto entity : group)
+        {
+            auto &decal_component = group.get<components::DecalComponent>(entity);
+            instances_count += decal_component.decals.size();
+        }
+
+        if (instances_count == 0)
+            return;
+        instance_buffer_.Init(instances_count);
+        auto mapping = instance_buffer_.Map();
+        DecalInstance *decal_instances = reinterpret_cast<DecalInstance *>(mapping.pData);
         {
             std::vector<size_t> insert_helper;
             for (auto entity : group)
             {
                 auto &decal_component = group.get<components::DecalComponent>(entity);
                 auto &transform_component = group.get<components::TransformComponent>(entity);
-                for (auto it = decal_component.decals.rbegin(); it != decal_component.decals.rend(); ++it )
+                for (auto it = decal_component.decals.rbegin(); it != decal_component.decals.rend(); ++it)
                 {
-                    auto& decal = *it;
-                    DecalInstance instance;
+                    auto &decal = *it;
+                    DecalInstance &instance = *(decal_instances++);
                     instance.world_transform = transform_component.model * decal.mesh_transform;
                     instance.world_transform = core::math::translate(instance.world_transform, decal.relative_position);
                     instance.world_transform = core::math::scale(instance.world_transform, decal.relative_scale);
@@ -73,40 +84,9 @@ namespace engine::render::_decal_detail
                     instance.transmittance = decal.transmittance;
                     instance.ambient_occlusion = decal.ambient_occlusion;
                     instance.entity_id = static_cast<uint32_t>(entity);
-
-                    size_t texture_ptr = reinterpret_cast<size_t>(decal.normal_opacity_map);
-                    auto lower = std::lower_bound(insert_helper.begin(), insert_helper.end(), texture_ptr);
-                    if (lower == insert_helper.end() || *lower != texture_ptr)
-                    {
-                        material_instances_.emplace_back(MaterialInstance{
-                            .normal_opacity_map = decal.normal_opacity_map,
-                            .instances_amount = 0 });
-                        decal_instances.emplace_back(std::move(instance));
-                        insert_helper.insert(lower, texture_ptr);
-                    }
-                    else
-                    {
-                        auto instance_index = std::distance(insert_helper.begin(), lower);
-                        auto insert_iterator = decal_instances.begin() + instance_index;
-                        decal_instances.insert(insert_iterator, std::move(instance));
-                        insert_helper.insert(lower, texture_ptr);
-                    }
                 }
             }
-            auto lower = insert_helper.begin();
-            for (auto &material_instance : material_instances_)
-            {
-                size_t texture_ptr = reinterpret_cast<size_t>(material_instance.normal_opacity_map);
-                auto tmp = std::upper_bound(insert_helper.begin(), insert_helper.end(), texture_ptr);
-                material_instance.instances_amount = static_cast<uint32_t>(std::distance(lower, tmp));
-                lower = tmp;
-            }
         }
-        instance_buffer_size_ = decal_instances.size();
-        if (decal_instances.size() == 0)
-            return;
-
-        instance_buffer_.Init(std::span<DecalInstance>(decal_instances));
     }
     void DecalRenderSystem::OnRender(core::Scene *scene, GBuffer const &buffer, ID3D11DepthStencilView *dsv)
     {
@@ -177,11 +157,10 @@ namespace engine::render::_decal_detail
         }
         std::vector<ID3D11RenderTargetView *> rtvs = {
             buffer.albedo->render_target_view(),
-                buffer.normals->render_target_view(),
-                buffer.roughness_metalness_transmittance_ao->render_target_view(),
-                buffer.emission->render_target_view(),
-                nullptr
-        };
+            buffer.normals->render_target_view(),
+            buffer.roughness_metalness_transmittance_ao->render_target_view(),
+            buffer.emission->render_target_view(),
+            nullptr };
         direct3d::api().devcon4->OMSetRenderTargets(5, rtvs.data(), dsv);
 
         direct3d::api().devcon4->PSSetShaderResources(1, 1, &normals_srv.ptr());
@@ -197,22 +176,14 @@ namespace engine::render::_decal_detail
         cube.vertices.Bind(0);
         cube.indices.Bind();
         uint32_t rendered_instances = 0;
-        for (auto const &material : material_instances_)
+        direct3d::api().devcon4->PSSetShaderResources(0, 1, &normal_opacity_map);
+        for (auto const &mesh : cube.meshes)
         {
-            if (material.instances_amount == 0)
-            {
-                continue;
-            }
-            direct3d::api().devcon4->PSSetShaderResources(0, 1, &material.normal_opacity_map);
-            for (auto const &mesh : cube.meshes)
-            {
-                direct3d::api().devcon4->DrawIndexedInstanced(mesh.mesh_range.index_count,
-                                                              instance_buffer_.size(),
-                                                              mesh.mesh_range.index_offset,
-                                                              mesh.mesh_range.vertex_offset,
-                                                              rendered_instances);
-            }
-            rendered_instances += material.instances_amount;
+            direct3d::api().devcon4->DrawIndexedInstanced(mesh.mesh_range.index_count,
+                                                          instance_buffer_.size(),
+                                                          mesh.mesh_range.index_offset,
+                                                          mesh.mesh_range.vertex_offset,
+                                                          rendered_instances);
         }
         decal_shader_.Unbind();
 
