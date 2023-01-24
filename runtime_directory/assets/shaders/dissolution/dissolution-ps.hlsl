@@ -68,33 +68,46 @@ PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
 
     float alpha;
     float time_normalized = (g_time_now - input.time_begin) / input.lifetime;
-
-    if (!(g_material_flags & APPEARING))
+    const float kClampValue = 0.2f / input.lifetime;
+    float4 emission = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    if (g_material_flags & APPEARING)
     {
-        // TODO: this is not correct
-        // figure out why
-        alpha = length(input.click_point - input.fragment_position) / length(input.box_half_size);
-        time_normalized = 1.0f - time_normalized;
+        alpha = g_noise_texture.Sample(g_bilinear_wrap_sampler, input.texcoord);
+        if (alpha > time_normalized)
+        {
+            discard;
+        }
+        else if (alpha + kClampValue > time_normalized && g_material_flags & EMISSIVE)
+        {
+            float value = lerp(1.0f, 0.0f, (time_normalized - alpha) / kClampValue);
+            if (!(g_material_flags & APPEARING))
+            {
+                value = 1.0f - value;
+            }
+            emission = kEmissiveColor * value;
+        }
+
+
     }
     else
     {
-        alpha = g_noise_texture.Sample(g_bilinear_wrap_sampler, input.texcoord);
-    }
-    const float kClampValue = 0.2f / input.lifetime;
-    float4 emission = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    if (alpha > time_normalized)
-    {
-        discard;
-    }
-    else if (alpha + kClampValue > time_normalized && g_material_flags & EMISSIVE)
-    {
-        float value = lerp(1.0f, 0.0f, (time_normalized - alpha) / kClampValue);
-        if (!(g_material_flags & APPEARING))
+        alpha = length((input.click_point - input.fragment_position) / input.box_half_size) / 2;
+        alpha = saturate(alpha);
+        if (alpha < time_normalized)
         {
-            value = 1.0f - value;
+            discard;
         }
-        emission = kEmissiveColor * value;
+        else if (alpha - kClampValue < time_normalized && g_material_flags & EMISSIVE)
+        {
+            float value = lerp(1.0f, 0.0f, (alpha - time_normalized) / kClampValue);
+            if (!(g_material_flags & APPEARING))
+            {
+                value = 1.0f - value;
+            }
+            emission = kEmissiveColor * value;
+        }
     }
+    output.emission = emission;
 
     if (g_material_flags & TEXTURE_ENABLED_ALBEDO)
     {

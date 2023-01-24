@@ -44,10 +44,13 @@ namespace engine::render
             float time_begin;
             float object_lifetime;
             core::math::vec2 velocity_range;
-
             core::math::vec2 size_range;
             float particle_lifetime;
             uint32_t flags;
+            core::math::vec3 click_point;
+            float padding0;
+            core::math::vec3 box_half_size;
+            float padding1;
         };
     } // namespace _emissive_particle_detail
 

@@ -238,6 +238,8 @@ namespace engine::render::_emissive_particle_detail
         // but it's a quick fix for now
         auto &dissolution_component = registry.get<components::DissolutionComponent>(entity);
         auto &transform = registry.get<components::TransformComponent>(entity);
+        auto& model = ModelSystem::GetModel(dissolution_component.model_id);
+
         PerMesh per_mesh{
             .world_transform = transform.model,
             .time_begin = dissolution_component.time_begin,
@@ -245,7 +247,13 @@ namespace engine::render::_emissive_particle_detail
             .velocity_range = {0.25f, 1.5f}, // TODO: make this the system parameter that we can change from UI
             .size_range = {0.001f, 0.005f},     // TODO: make this the system parameter that we can change from UI
             .particle_lifetime = 22.5f,      // TODO: make this the system parameter that we can change from UI
-            .flags = 0 };
+            .flags = 0,
+            .click_point = dissolution_component.click_point,
+            .padding0 = 0.0f,
+            .box_half_size = core::math::abs(model.bounding_box.min - model.bounding_box.max) / 2 * transform.scale,
+            .padding1 = 0.0f
+             };
+
         per_frame_buffer_.Update(PerFrame{ .maximum_amount_of_particles = kMaximumAmountOfParticles });
 
         per_frame_buffer_.Bind(direct3d::ShaderType::VertexShader, 2);
@@ -269,8 +277,7 @@ namespace engine::render::_emissive_particle_detail
                                                                            nullptr);
         particle_emit_shader_.UnbindAll();
         particle_emit_shader_.Bind();
-        auto &model = ModelSystem::GetModel(dissolution_component.model_id);
-
+        
         direct3d::api().devcon4->VSSetShaderResources(1, 1, &noise_texture_);
         model.indices.Bind();
         model.vertices.Bind();

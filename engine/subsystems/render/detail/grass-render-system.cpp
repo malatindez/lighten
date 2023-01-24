@@ -219,7 +219,7 @@ namespace engine::render::_grass_detail
 #if 1
 #pragma message ("Warning: grass shadows are disabled")
         return;
-#endif
+#else
         if (instances_update_scheduled_)
         {
             OnInstancesUpdate(scene);
@@ -269,6 +269,7 @@ namespace engine::render::_grass_detail
             }
         }
         grass_cubemap_shader_.Unbind();
+#endif
     }
     void GrassRenderSystem::RenderDepthOnly(std::vector<GrassPerDepthTexture> const &textures, core::Scene *scene)
     {
@@ -276,7 +277,7 @@ namespace engine::render::_grass_detail
 #if 1
 #pragma message ("Warning: grass shadows are disabled")
         return;
-#endif
+#else
         if (instances_update_scheduled_)
         {
             OnInstancesUpdate(scene);
@@ -325,6 +326,7 @@ namespace engine::render::_grass_detail
             }
         }
         grass_texture_shader_.Unbind();
+#endif
     }
     void GrassRenderSystem::ScheduleInstanceUpdate()
     {

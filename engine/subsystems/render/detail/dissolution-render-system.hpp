@@ -145,9 +145,8 @@ namespace engine::render::_dissolution_detail
         core::math::mat4 world_transform;
         float time_begin;
         float lifetime;
-        core::math::vec3 bounding_box_min;
-        core::math::vec3 bounding_box_max;
         core::math::vec3 click_point;
+        core::math::vec3 box_half_size;
     };
     using DissolutionPerDepthCubemap = _opaque_detail::OpaquePerDepthCubemap;
     using DissolutionPerDepthTexture = _opaque_detail::OpaquePerDepthTexture;

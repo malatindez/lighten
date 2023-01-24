@@ -417,9 +417,8 @@ namespace engine::render::_dissolution_detail
                         dst[copiedNum++] = DissolutionInstance{ .world_transform = transform.model,
                                                                 .time_begin = dissolution.time_begin,
                                                                 .lifetime = dissolution.lifetime,
-                                                                .bounding_box_min = model_instance.model.bounding_box.min,
-                                                                .bounding_box_max = model_instance.model.bounding_box.max,
-                                                                .click_point = dissolution.click_point
+                                                                .click_point = dissolution.click_point,
+                                                                .box_half_size = abs(model_instance.model.bounding_box.max - model_instance.model.bounding_box.min) / 2.0f * transform.scale
                         };
                     }
                 }
