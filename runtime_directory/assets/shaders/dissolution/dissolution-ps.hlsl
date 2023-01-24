@@ -68,7 +68,7 @@ PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
 
     float alpha;
     float time_normalized = (g_time_now - input.time_begin) / input.lifetime;
-    const float kClampValue = 0.2f / input.lifetime;
+    const float kClampValue = 0.05f / input.lifetime;
     float4 emission = float4(0.0f, 0.0f, 0.0f, 0.0f);
     if (g_material_flags & APPEARING)
     {
@@ -91,7 +91,7 @@ PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
     }
     else
     {
-        alpha = length((input.click_point - input.fragment_position) / input.box_half_size) / 2;
+        alpha = length((input.click_point - input.fragment_position)) / 2 / length(input.box_half_size);
         alpha = saturate(alpha);
         if (alpha < time_normalized)
         {

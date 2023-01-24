@@ -69,10 +69,9 @@ float4 vs_main(VS_INPUT input) : SV_Position {
   }
   output.position = mul(float4(input.pos, 1.0f), g_world_transform).xyz;
 
-  const float kClampValue = 4.0f / kAmountOfCallsPerSecond / g_object_lifetime;
+  const float kClampValue = 8.0f / kAmountOfCallsPerSecond / g_object_lifetime;
   float time_normalized = (g_time_now - g_time_begin) / g_object_lifetime;
-  float alpha = length((g_click_point - output.position) /
-                       g_box_half_size) / 2;
+  float alpha = length((g_click_point - output.position)) / 2 / length(g_box_half_size);
   if (alpha > time_normalized) {
     return float4(0,0,0,0);
   } else if (alpha + kClampValue < time_normalized) {
