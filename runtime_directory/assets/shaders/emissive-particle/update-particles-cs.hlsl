@@ -5,7 +5,7 @@ Texture2D<float> g_depth : register(t0);
 Texture2D<float4> g_normal : register(t1);
 
 static const float3 kGravity = float3(0, -9.81, 0)/ 8;
-static const float kCollisionEnergyLoss = 0.3f;
+static const float kCollisionEnergyLoss = 0.05f;
 
 [numthreads(64, 1, 1)]
 void cs_main(uint3 thread_id: SV_DispatchThreadID)
@@ -53,7 +53,7 @@ void cs_main(uint3 thread_id: SV_DispatchThreadID)
         g_particles[particle_index].position = new_position;
         return;
     }
-    g_particles[particle_index].position = scene_pos + normal * (g_particles[particle_index].size) * 16;
+    g_particles[particle_index].position = g_particles[particle_index].position + normal * (g_particles[particle_index].size) * 16;
     g_particles[particle_index].velocity = reflect(g_particles[particle_index].velocity, normal) * (1.0f - kCollisionEnergyLoss);
 }
 
