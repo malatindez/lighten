@@ -230,7 +230,7 @@ namespace engine::render::_emissive_particle_detail
                                                                            nullptr);
     }
 
-    void EmissiveParticleRenderSystem::EmitParticles(entt::registry &registry, entt::entity entity, std::vector<render::DissolutionMaterial *> const &materials)
+    void EmissiveParticleRenderSystem::EmitParticles(entt::registry &registry, entt::entity entity, std::vector<render::DissolutionMaterial *> const &materials, float time_since_last_emission)
     {
         // TODO:
         // refactor
@@ -249,7 +249,7 @@ namespace engine::render::_emissive_particle_detail
             .particle_lifetime = 22.5f,      // TODO: make this the system parameter that we can change from UI
             .flags = 0,
             .click_point = dissolution_component.click_point,
-            .padding0 = 0.0f,
+            .time_since_last_emission = time_since_last_emission,
             .box_half_size = core::math::abs(model.bounding_box.min - model.bounding_box.max) / 2 * transform.scale,
             .padding1 = 0.0f
              };

@@ -48,7 +48,7 @@ namespace engine::render
             float particle_lifetime;
             uint32_t flags;
             core::math::vec3 click_point;
-            float padding0;
+            float time_since_last_emission;
             core::math::vec3 box_half_size;
             float padding1;
         };
@@ -71,7 +71,7 @@ namespace engine::render
             // TODO:
             // fix this
             // System should hold the entity and emit particles until it's not alive, but this is a quick hack
-            void EmitParticles(entt::registry &registry, entt::entity entity, std::vector<render::DissolutionMaterial *> const &materials);
+            void EmitParticles(entt::registry &registry, entt::entity entity, std::vector<render::DissolutionMaterial *> const &materials, float time_since_last_emission);
 
             EmissiveParticleRenderSystem();
             ~EmissiveParticleRenderSystem() = default;

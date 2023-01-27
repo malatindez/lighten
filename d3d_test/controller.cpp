@@ -792,9 +792,6 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             }
 
             auto *opaque = registry.try_get<components::OpaqueComponent>(entity.value());
-            // TODO:
-            // Make better system to get/fetch models and their materials
-            // This is a hack, we should have a more flexible way to do this
             if (opaque != nullptr)
             {
                 float lifetime = std::uniform_real_distribution(1.0f, 5.0f)(core::Engine::random_engine());

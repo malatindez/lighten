@@ -12,7 +12,7 @@ cbuffer PerMesh : register(b3) {
   uint g_flags;
 
   float3 g_click_point;
-  float g_per_mesh_padding0;
+  float g_time_since_last_emission;
   float3 g_box_half_size;
   float g_per_mesh_padding1;
 
@@ -52,7 +52,6 @@ float LerpRandom(VS_INPUT input, float2 range, float3 seed, float2 noise_size) {
                   int3(RandomUV(input, seed, noise_size) * noise_size, 0)));
 }
 
-static const float kAmountOfCallsPerSecond = 30.0f;
 static const float4 kEmissiveColor = float4(0.0f, 10.0f, 15.0f, 1.0f);
 float4 vs_main(VS_INPUT input) : SV_Position {
   uint2 noise_size;
@@ -69,13 +68,14 @@ float4 vs_main(VS_INPUT input) : SV_Position {
   }
   output.position = mul(float4(input.pos, 1.0f), g_world_transform).xyz;
 
-  const float kClampValue = 8.0f / kAmountOfCallsPerSecond / g_object_lifetime;
   float time_normalized = (g_time_now - g_time_begin) / g_object_lifetime;
-  float alpha = length((g_click_point - output.position)) / 2 / length(g_box_half_size);
-  if (alpha > time_normalized) {
-    return float4(0,0,0,0);
-  } else if (alpha + kClampValue < time_normalized) {
-    return float4(0,0,0,0);
+  float last_time_normalized = (g_time_now - g_time_begin - g_time_since_last_emission) / g_object_lifetime;
+  float distance_from_center_normalized = length((g_click_point - output.position)) / 2 / length(g_box_half_size);
+
+  if (distance_from_center_normalized > time_normalized) {
+    return float4(0, 0, 0, 0);
+  } else if (distance_from_center_normalized < last_time_normalized) {
+    return float4(0, 0, 0, 0);
   }
   
   output.spawn_time = g_time_now;

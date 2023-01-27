@@ -8,6 +8,8 @@ struct VS_OUTPUT
     float2 uv : TEXCOORD;
     nointerpolation float time_begin : TIME_BEGIN;
     nointerpolation float lifetime : LIFETIME;
+    nointerpolation float3 click_point : CLICK_POINT;
+    nointerpolation float3 box_half_size : BOX_HALF_SIZE;
 };
 
 struct VS_INPUT
@@ -23,6 +25,8 @@ struct VS_INPUT
     float4 RowW : ROWW;
     float time_begin : TIME_BEGIN;
     float lifetime : LIFETIME;
+    float3 click_point : CLICK_POINT;
+    float3 box_half_size : BOX_HALF_SIZE;
 };
 
 VS_OUTPUT vs_main(VS_INPUT input)
@@ -34,5 +38,7 @@ VS_OUTPUT vs_main(VS_INPUT input)
     output.uv = input.uv;
     output.time_begin = input.time_begin;
     output.lifetime = input.lifetime;
+    output.click_point = input.click_point;
+    output.box_half_size = input.box_half_size;
     return output;
 }

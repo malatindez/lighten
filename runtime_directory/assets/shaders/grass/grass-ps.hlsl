@@ -109,7 +109,7 @@ PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
 
         return output;
 #endif
-#if 0
+#if 1
         output.emission.xy = float2(input.uv) * 3; 
         output.albedo.xyzw = float4(0,0,0,0);
         output.normals.xyzw = float4(0,0,0,0);

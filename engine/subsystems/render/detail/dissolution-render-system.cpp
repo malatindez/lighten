@@ -318,7 +318,8 @@ namespace engine::render::_dissolution_detail
             update_timer_.reset();
             TransitInstances(scene);
         }
-        if (particle_spawn_timer_.elapsed() > 1.0f / kAmountOfCallsPerSecond)
+        float time_since_last_emission = particle_spawn_timer_.elapsed();
+        if (time_since_last_emission > 1.0f / kAmountOfCallsPerSecond)
         {
             particle_spawn_timer_.reset();
             auto &registry = scene->registry;
@@ -339,7 +340,7 @@ namespace engine::render::_dissolution_detail
             auto &eprs = scene->renderer->emissive_particle_render_system();
             for (auto &material : materials)
             {
-                eprs.EmitParticles(registry, material.first, material.second);
+                eprs.EmitParticles(registry, material.first, material.second, time_since_last_emission);
             }
         }
     }

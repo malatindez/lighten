@@ -56,6 +56,7 @@ namespace engine::render::_decal_detail
             auto &decal_component = group.get<components::DecalComponent>(entity);
             instances_count += decal_component.decals.size();
         }
+        instance_buffer_size_ = instances_count;
 
         if (instances_count == 0)
             return;
@@ -68,7 +69,7 @@ namespace engine::render::_decal_detail
             {
                 auto &decal_component = group.get<components::DecalComponent>(entity);
                 auto &transform_component = group.get<components::TransformComponent>(entity);
-                for (auto it = decal_component.decals.rbegin(); it != decal_component.decals.rend(); ++it)
+                for (auto it = decal_component.decals.begin(); it != decal_component.decals.end(); ++it)
                 {
                     auto &decal = *it;
                     DecalInstance &instance = *(decal_instances++);
@@ -87,6 +88,7 @@ namespace engine::render::_decal_detail
                 }
             }
         }
+        instance_buffer_.Unmap();
     }
     void DecalRenderSystem::OnRender(core::Scene *scene, GBuffer const &buffer, ID3D11DepthStencilView *dsv)
     {

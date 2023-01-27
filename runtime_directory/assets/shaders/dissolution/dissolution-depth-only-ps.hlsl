@@ -18,9 +18,12 @@ Texture2D<float> g_noise_texture : register(t11);
 struct PS_IN
 {
     float4 posVS : SV_POSITION;
+    float3 fragment_position : FRAGMENT_POSITION;
     float2 uv : TEXCOORD;
     nointerpolation float time_begin : TIME_BEGIN;
     nointerpolation float lifetime : LIFETIME;
+    nointerpolation float3 click_point : CLICK_POINT;
+    nointerpolation float3 box_half_size : BOX_HALF_SIZE;
 };
 static const float kClampValue = 0.05f;
 float ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
@@ -31,18 +34,26 @@ float ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
     {
         discard;
     }
-    float alpha = g_noise_texture.Sample(g_bilinear_wrap_sampler, input.uv);
+    float alpha;
     float time_normalized = (g_time_now - input.time_begin) / input.lifetime;
-
-    if (!(g_material_flags & APPEARING))
-    {
-        time_normalized = 1.0f - time_normalized;
-    }
-    const float kClampValue = 0.2f / input.lifetime;
+    const float kClampValue = 0.05f / input.lifetime;
     float4 emission = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    if (alpha > time_normalized)
+    if (g_material_flags & APPEARING)
     {
-        discard;
+        alpha = g_noise_texture.Sample(g_bilinear_wrap_sampler, input.uv);
+        if (alpha > time_normalized)
+        {
+            discard;
+        }
+    }
+    else
+    {
+        alpha = length((input.click_point - input.fragment_position)) / 2 / length(input.box_half_size);
+        alpha = saturate(alpha);
+        if (alpha < time_normalized)
+        {
+            discard;
+        }
     }
     return input.posVS.z;
 }
