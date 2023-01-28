@@ -12,6 +12,11 @@ namespace engine::core
 }
 namespace engine::render
 {
+    /**
+     * @brief ModelSystem class, responsible for loading and rendering models.
+     * @details This class is responsible for loading and rendering models. It also provides a way to find intersections with models.
+     * @todo Remove opaque, emissive, and dissolve render systems and move their functionality into ModelSystem. This will allow more flexibility in rendering. To do this, we need to remove Opaque, Emissive and Dissolve components and create general purpose component for model rendering. It should contain data so that we can easily find the instance and material data for a given entity: instance data, material data, material instance data, and shading type.
+     */
     class ModelSystem final
     {
     public:

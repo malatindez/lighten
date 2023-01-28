@@ -170,7 +170,7 @@ VS_OUTPUT vs_main(uint vertex_id: SV_VERTEXID, VS_INPUT input)
     output.posVS = mul(float4(output.posWS, 1), g_view);
     output.posVS = mul(output.posVS, g_projection);
     
-    output.uv = lerp(input.fromUV, input.toUV, calculate_uv(vertex_id % 6, section_num));
+    output.uv = lerp(float2(input.fromUV) * 65535 / g_atlas_texture_size, float2(input.toUV) * 65535 / g_atlas_texture_size, calculate_uv(vertex_id % 6, section_num));
 
 
     output.tangent = tangent;

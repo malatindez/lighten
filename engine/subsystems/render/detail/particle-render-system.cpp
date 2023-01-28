@@ -154,7 +154,8 @@ namespace engine::render::_particle_detail
         particle_per_frame_buffer_.Bind(direct3d::ShaderType::PixelShader, 2);
 
         direct3d::api().devcon4->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        direct3d::api().devcon4->OMSetBlendState(direct3d::states().additive_blend_state_alpha.ptr(), nullptr, 0xffffffff);
+        core::math::vec4 blend_factor{0.0f};
+        direct3d::api().devcon4->OMSetBlendState(direct3d::states().additive_blend_state_alpha.ptr(), blend_factor.data.data(), 0xffffffff);
         direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().no_depth_write.ptr(), 0);
 
         particle_buffer_.Bind(1);

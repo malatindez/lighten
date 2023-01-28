@@ -260,7 +260,21 @@ float4 ps_main(PS_INPUT input)
     {
         depth = g_depth.Load(int3(int2(input.posVS.xy), 0));
     }
+    if(depth > input.posVS.z)
+    {
+        discard;
+    }
+    float3 scene_posWS;
+    {
+        float2 posCS = (input.posVS.xy / g_screen_resolution) * 2;
+        posCS.y *= -1.0f;
+        posCS += float2(-1, 1);
+
+        float4 ndc = float4(posCS, depth, 1.0f);
+        float4 view_pos = mul(ndc, g_inv_view_projection);
+        scene_posWS = view_pos.xyz / view_pos.w;
+    }
     float4 rv = result * input.color;
-    rv.a *= saturate((input.posVS.z - depth) / input.thickness * length(GetCameraPosition() - input.posWS.xyz));
-    return rv;
+    rv.a *= saturate(length(scene_posWS - input.posWS.xyz) / input.size);
+    return rv * input.thickness;
 }

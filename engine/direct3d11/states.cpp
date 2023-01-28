@@ -136,8 +136,8 @@ namespace engine::direct3d
         blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
         blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
         blend_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-        blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-        blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+        blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
+        blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
         blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
         blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
@@ -157,6 +157,12 @@ namespace engine::direct3d
 
         ZeroMemory(&blend_desc, sizeof(blend_desc));
         blend_desc.AlphaToCoverageEnable = true;
+        blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+        blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+        blend_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+        blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+        blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+        blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
         blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
         AlwaysAssert(api().device->CreateBlendState(&blend_desc, &alpha_to_coverage_blend_state.reset()), "Failed to create alpha to coverage blend state");
