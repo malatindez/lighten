@@ -84,9 +84,10 @@ namespace engine::direct3d
                                      gbuffer_.entity_id->render_target_view()
         };
         api().devcon4->OMSetRenderTargets(5, gbuffer_target_views.data(), depth_stencil_.depth_stencil_view());
-
+        direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth_write_stencil_replace, 0);
         scene_->DeferredRender(gbuffer_, depth_stencil_.depth_stencil_view());
 
+        direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth_write_stencil_read, 0);
         deferred_resolve_->Process(gbuffer_, scene_.get(), depth_stencil_.depth_stencil_view());
 
         api().devcon4->RSSetViewports(1, &viewport_);

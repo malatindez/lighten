@@ -137,7 +137,6 @@ namespace engine::render::_opaque_detail
         opaque_shader_.Bind();
 
         direct3d::api().devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth, 0);
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 
         mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 2);

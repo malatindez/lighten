@@ -150,7 +150,6 @@ namespace engine::render::_dissolution_detail
         direct3d::api().devcon4->PSSetSamplers(1, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
         direct3d::api().devcon4->PSSetSamplers(2, 1, &direct3d::states().bilinear_clamp_sampler.ptr());
         direct3d::api().devcon4->PSSetSamplers(3, 1, &direct3d::states().comparison_linear_clamp_sampler.ptr());
-        direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth, 0);
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 
         mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 2);

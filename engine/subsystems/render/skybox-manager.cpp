@@ -41,7 +41,6 @@ namespace engine
         direct3d::api().devcon4->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         direct3d::api().devcon4->RSSetState(direct3d::states().cull_none);
         direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
-        direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth_no_write, 0);
 
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 

@@ -85,6 +85,41 @@ namespace engine::direct3d
         /// * BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP
         /// * BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS
         ReadOnlyDepthStencilState geq_depth;
+        /// @brief Greater or equal depth test, depth write enabled, stencil test enabled, stencil write enabled
+        /// @details This state is equivalent to the following D3D11_DEPTH_STENCIL_DESC:
+        /// * DepthEnable = true
+        /// * DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL
+        /// * DepthFunc = D3D11_COMPARISON_GREATER_EQUAL
+        /// * StencilEnable = true
+        /// * StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK
+        /// * StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK
+        /// * FrontFace.StencilFailOp = D3D11_STENCIL_OP_REPLACE
+        /// * FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_REPLACE
+        /// * FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE
+        /// * FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS
+        /// * BackFace.StencilFailOp = D3D11_STENCIL_OP_REPLACE
+        /// * BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_REPLACE
+        /// * BackFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE
+        /// * BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS
+        ReadOnlyDepthStencilState geq_depth_write_stencil_replace;
+        
+        /// @brief Greater or equal depth test, depth write enabled, stencil test enabled, stencil write enabled
+        /// @details This state is equivalent to the following D3D11_DEPTH_STENCIL_DESC:
+        /// * DepthEnable = true
+        /// * DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL
+        /// * DepthFunc = D3D11_COMPARISON_GREATER_EQUAL
+        /// * StencilEnable = true
+        /// * StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK
+        /// * StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK
+        /// * FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP
+        /// * FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP
+        /// * FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP
+        /// * FrontFace.StencilFunc = D3D11_COMPARISON_EQUAL
+        /// * BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP
+        /// * BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP
+        /// * BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP
+        /// * BackFace.StencilFunc = D3D11_COMPARISON_EQUAL
+        ReadOnlyDepthStencilState geq_depth_write_stencil_read;
         /// @brief Greater or equal depth test, depth write disabled
         /// @details This state is equivalent to the following D3D11_DEPTH_STENCIL_DESC:
         /// * DepthEnable = true
@@ -137,24 +172,7 @@ namespace engine::direct3d
         /// * BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP
         /// * BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS
         ReadOnlyDepthStencilState no_depth_no_write;
-        /// @brief no depth test, depth write disabled, stencil test enabled
-        /// @details This state is equivalent to the following D3D11_DEPTH_STENCIL_DESC:
-        /// * DepthEnable = false
-        /// * DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO
-        /// * DepthFunc = D3D11_COMPARISON_ALWAYS
-        /// * StencilEnable = true
-        /// * StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK
-        /// * StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK
-        /// * FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP
-        /// * FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP
-        /// * FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP
-        /// * FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS
-        /// * BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP
-        /// * BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP
-        /// * BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP
-        /// * BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS
-        ReadOnlyDepthStencilState stencil_test;
-
+        
         /// @brief Point wrap sampler state
         /// @details This state is equivalent to the following D3D11_SAMPLER_DESC:
         /// * Filter = D3D11_FILTER_MIN_MAG_MIP_POINT

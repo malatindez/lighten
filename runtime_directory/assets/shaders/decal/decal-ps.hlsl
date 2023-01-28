@@ -111,14 +111,13 @@ PS_OUTPUT ps_main(PS_INPUT input, bool is_front_face: SV_IsFrontFace)
     right = mul(float4(right, 0), input.world_transform).xyz;
 
     float3 normal = scene_geometry_normal;
-    float3 tangent = normalize(right - scene_normal * dot(scene_normal, right));
+    float3 tangent = normalize(right - scene_normal * dot(normal, right));
     float3 bitangent = cross(scene_normal, tangent);
     float3x3 TBN = float3x3(tangent, bitangent, normal);
 
     float3 result_normal;
 
     result_normal = normalize(scene_normal + normalize(mul(decal_normal, TBN).xyz));
-
     output.albedo = float4(input.color, 1.0);
     output.normals.xy = packOctahedron(result_normal);
     output.normals.zw = packOctahedron(scene_geometry_normal);

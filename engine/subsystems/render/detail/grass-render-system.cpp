@@ -182,7 +182,6 @@ namespace engine::render::_grass_detail
         direct3d::api().devcon4->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         direct3d::api().devcon4->RSSetState(direct3d::states().cull_none.ptr());
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
-        direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth.ptr(), 0);
 
         grass_per_material_buffer_.Bind(direct3d::ShaderType::VertexShader, 2);
         grass_transform_buffer_.Bind(direct3d::ShaderType::VertexShader, 3);
