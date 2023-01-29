@@ -530,14 +530,14 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         transform.UpdateMatrices();
 
         auto &particle_emitter = registry.emplace<ParticleEmitter>(entity);
-        particle_emitter.position_yaw_pitch_range = vec4{ -numbers::pi / 4, -numbers::pi / 4, numbers::pi / 4, numbers::pi / 4 };
+        particle_emitter.position_yaw_pitch_range = vec4{ vec2{-numbers::pi}, vec2{numbers::pi} } / 16;
         particle_emitter.position_radius = vec2{ 0.25, 0.5f };
-        particle_emitter.velocity_yaw_pitch_range = vec4{ -numbers::pi / 16, -numbers::pi / 16, numbers::pi / 16, numbers::pi / 16 };
+        particle_emitter.velocity_yaw_pitch_range = vec4{ vec2{-numbers::pi}, vec2{numbers::pi} } / 32;
         particle_emitter.velocity_radius = vec2{ 0.15f, 0.4f };
         particle_emitter.base_diffuse_color = vec4{ 1.288, 1.133, 1.055, 1.0f };
         particle_emitter.diffuse_variation = vec4{ 0.2f, 0.2f, 0.2f, 0.0f };
         particle_emitter.particle_lifespan_range = vec2{ 0.5f, 15.0f };
-        particle_emitter.thickness_range = vec2{ 0.0f, 0.05f };
+        particle_emitter.thickness_range = vec2{ 0.25f, 1.0f };
         particle_emitter.begin_size_range = vec2{ 0.01f, 0.15f };
         particle_emitter.end_size_range = vec2{ 0.0f, 0.3f };
         particle_emitter.mass_range = vec2{ 0.1f, 0.5f };
@@ -568,7 +568,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         particle_emitter.base_diffuse_color = vec4{ 1.988, 1.933, 1.455, 1.0f };
         particle_emitter.diffuse_variation = vec4{ 0.8f, 0.5f, 0.5f, 0.0f };
         particle_emitter.particle_lifespan_range = vec2{ 25.0f, 100.0f };
-        particle_emitter.thickness_range = vec2{ 0.0f, 0.05f };
+        particle_emitter.thickness_range = vec2{ 0.25f, 1.0f };
         particle_emitter.begin_size_range = vec2{ 0.01f, 0.25f };
         particle_emitter.end_size_range = vec2{ 4.0f, 10.0f };
         particle_emitter.mass_range = vec2{ 0.1f, 0.5f };

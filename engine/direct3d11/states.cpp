@@ -95,6 +95,18 @@ namespace engine::direct3d
         ds_desc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_REPLACE;
         ds_desc.BackFace = ds_desc.FrontFace;
         AlwaysAssert(api().device->CreateDepthStencilState(&ds_desc, &geq_depth_write_stencil_replace.reset()), "Failed to create depth state");
+        ZeroMemory(&ds_desc, sizeof(ds_desc));
+        ds_desc = CreateDepthState(false, true);
+        ds_desc.DepthFunc = D3D11_COMPARISON_GREATER_EQUAL;
+        ds_desc.StencilEnable = true;
+        ds_desc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
+        ds_desc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
+        ds_desc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+        ds_desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
+        ds_desc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_REPLACE;
+        ds_desc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_REPLACE;
+        ds_desc.BackFace = ds_desc.FrontFace;
+        AlwaysAssert(api().device->CreateDepthStencilState(&ds_desc, &no_depth_stencil_replace.reset()), "Failed to create depth state");
         ds_desc = CreateDepthState(true, true);
         ds_desc.DepthFunc = D3D11_COMPARISON_GREATER_EQUAL;
         ds_desc.StencilEnable = true;
@@ -107,6 +119,18 @@ namespace engine::direct3d
         ds_desc.BackFace = ds_desc.FrontFace;
         AlwaysAssert(api().device->CreateDepthStencilState(&ds_desc, &geq_depth_write_stencil_read.reset()), "Failed to create depth state");
 
+        ZeroMemory(&ds_desc, sizeof(ds_desc));
+        ds_desc = CreateDepthState(false, true);
+        ds_desc.DepthFunc = D3D11_COMPARISON_GREATER_EQUAL;
+        ds_desc.StencilEnable = true;
+        ds_desc.StencilWriteMask = 0;
+        ds_desc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
+        ds_desc.FrontFace.StencilFunc = D3D11_COMPARISON_EQUAL;
+        ds_desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+        ds_desc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+        ds_desc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+        ds_desc.BackFace = ds_desc.FrontFace;
+        AlwaysAssert(api().device->CreateDepthStencilState(&ds_desc, &no_depth_stencil_read.reset()), "Failed to create depth state");
 
         D3D11_SAMPLER_DESC sampler_desc = CreateSamplerState(D3D11_FILTER_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_WRAP);
         AlwaysAssert(api().device5->CreateSamplerState(&sampler_desc, &point_wrap_sampler.reset()), "Failed to create sampler state");

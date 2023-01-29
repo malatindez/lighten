@@ -32,5 +32,6 @@ namespace engine
 
         static render::GraphicsShaderProgram skybox_shader_;
         static std::unique_ptr<direct3d::DynamicUniformBuffer<core::math::mat4x3>> skybox_buffer_;
+        static direct3d::DepthStencilState skybox_depth_state;
     };
 }

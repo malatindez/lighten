@@ -84,10 +84,10 @@ namespace engine::direct3d
                                      gbuffer_.entity_id->render_target_view()
         };
         api().devcon4->OMSetRenderTargets(5, gbuffer_target_views.data(), depth_stencil_.depth_stencil_view());
-        direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth_write_stencil_replace, 0);
+        direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth_write_stencil_replace, 1);
         scene_->DeferredRender(gbuffer_, depth_stencil_.depth_stencil_view());
 
-        direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth_write_stencil_read, 0);
+        direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().no_depth_stencil_read, 1);
         deferred_resolve_->Process(gbuffer_, scene_.get(), depth_stencil_.depth_stencil_view());
 
         api().devcon4->RSSetViewports(1, &viewport_);
@@ -134,7 +134,7 @@ namespace engine::direct3d
         api().devcon4->ClearRenderTargetView(gbuffer_.roughness_metalness_transmittance_ao->render_target_view(), empty_vec.data.data());
         api().devcon4->ClearRenderTargetView(gbuffer_.emission->render_target_view(), empty_vec.data.data());
         api().devcon4->ClearRenderTargetView(gbuffer_.entity_id->render_target_view(), empty_vec.data.data());
-        api().devcon4->ClearDepthStencilView(depth_stencil_.depth_stencil_view(), D3D11_CLEAR_DEPTH, 0.0f, 0);
+        api().devcon4->ClearDepthStencilView(depth_stencil_.depth_stencil_view(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0);
 
         auto const &camera = scene_->main_camera->camera();
         per_frame_.view = camera.view;

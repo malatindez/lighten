@@ -43,6 +43,7 @@ namespace engine
         direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
 
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
+        direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().no_depth_stencil_read, 0);
 
         direct3d::api().devcon4->PSSetShaderResources(0, 1, &view);
 

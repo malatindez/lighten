@@ -155,9 +155,8 @@ namespace engine::render
         lrs.BindSpotShadowMaps(9);
         lrs.BindDirectionalShadowMaps(10);
 
-        direct3d::api().devcon4->OMSetRenderTargets(1, &hdr_render_target_.render_target_view(), nullptr);
+        direct3d::api().devcon4->OMSetRenderTargets(1, &hdr_render_target_.render_target_view(), depth_target);
 
-        direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff);
         direct3d::api().devcon4->OMSetBlendState(direct3d::states().additive_blend_state_no_alpha.ptr(), nullptr, 0xffffffff);
 
         environment_shader_.Bind();
