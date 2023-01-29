@@ -128,11 +128,6 @@ namespace engine::render
         {
             emissive_render_system_->AddInstance(model_id, registry, entity);
         }
-
-        inline void AddEmissiveInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, std::vector<EmissiveMaterial> const &materials)
-        {
-            emissive_render_system_->AddInstance(model_id, registry, entity, materials);
-        }
         template<typename T>
         inline void AddRenderPass(std::shared_ptr<T> const &ptr)
         {

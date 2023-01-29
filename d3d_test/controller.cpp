@@ -403,7 +403,10 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         point_light.color = vec3{ 0.988, 0.933, 0.655 };
         point_light.power = 2e3f;
         point_light.casts_shadows = true;
-        ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
+        ers.AddInstance(model_id, registry, entity);
+        auto &emissive = registry.get<EmissiveComponent>(entity);
+        emissive.emissive_color = point_light.color;
+        emissive.power = point_light.power;
     }
     if (true)
     {
@@ -421,7 +424,10 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         point_light.color = vec3{ 0.988, 0.233, 0.255 };
         point_light.power = 2.5e3f;
         point_light.casts_shadows = true;
-        ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
+        ers.AddInstance(model_id, registry, entity);
+        auto &emissive = registry.get<EmissiveComponent>(entity);
+        emissive.emissive_color = point_light.color;
+        emissive.power = point_light.power;
     }
     if (false)
     {
@@ -439,7 +445,10 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         point_light.color = vec3{ 0.01, 0.933, 0.255 };
         point_light.power = 3e3f;
         point_light.casts_shadows = true;
-        ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
+        ers.AddInstance(model_id, registry, entity);
+        auto &emissive = registry.get<EmissiveComponent>(entity);
+        emissive.emissive_color = point_light.color;
+        emissive.power = point_light.power;
     }
     if (false)
     {
@@ -461,7 +470,10 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             point_light.color = normalize(point_light.color);
             point_light.power = 25.0f;
             point_light.casts_shadows = false;
-            ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(point_light.color, point_light.power) });
+            ers.AddInstance(model_id, registry, entity);
+            auto &emissive = registry.get<EmissiveComponent>(entity);
+            emissive.emissive_color = point_light.color;
+            emissive.power = point_light.power;
         }
     }
 
@@ -483,7 +495,10 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         directional_light.color = vec3{ 0.988, 0.933, 0.455 };
         directional_light.power = 10;
         directional_light.solid_angle = 0.25f;
-        ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(directional_light.color, directional_light.power) });
+        ers.AddInstance(model_id, registry, entity);
+        auto &emissive = registry.get<EmissiveComponent>(entity);
+        emissive.emissive_color = directional_light.color;
+        emissive.power = directional_light.power;
     }
     // add spot light
     if (false)
@@ -506,7 +521,10 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         spot_light.power = 10;
         spot_light.inner_cutoff = radians(10.0f);
         spot_light.outer_cutoff = radians(20.0f);
-        ers.AddInstance(model_id, registry, entity, { render::EmissiveMaterial(spot_light.color, spot_light.power) });
+        ers.AddInstance(model_id, registry, entity);
+        auto &emissive = registry.get<EmissiveComponent>(entity);
+        emissive.emissive_color = spot_light.color;
+        emissive.power = spot_light.power;
     }
     auto prs_texture_path = std::filesystem::current_path() / "assets/textures/smoke";
     first_scene->renderer->particle_render_system().botbf = TextureManager::GetTextureView(prs_texture_path / "BotBF.tga");
@@ -628,7 +646,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             core::math::vec4{76, 2746, 2217, 4065} / texture_size,
             core::math::vec4{2651, 3005, 3774, 4033} / texture_size,
         };
-        grass_material.atlas_size = texture_size.xy;
+        grass_material.atlas_size = uivec2(texture_size.xy);
         grass_material.atlas_data = atlas_data;
         grass_material.planes_count = 2;
         grass_material.section_count = 4;

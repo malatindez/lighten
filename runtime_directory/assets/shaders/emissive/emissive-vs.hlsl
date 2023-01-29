@@ -3,17 +3,12 @@
 cbuffer PerModel : register(b2)
 {
     row_major matrix g_mesh_to_model;
-    int g_use_emissive_texture;
-    float g_power;
-    float2 g_padding;
 }
 struct VS_OUTPUT
 {
     float4 pos : SV_POSITION;
     float2 texcoord : TEXCOORD;
     float3 emission : EMISSION;
-    nointerpolation bool use_emissive_texture : USE_EMISSIVE_TEXTURE;
-    nointerpolation float power : POWER;
     float3 normal : NORMAL;
     float3 world_position : WORLD_POSITION;
     float4x4 world_transform : WORLD_TRANSFORM;
@@ -43,8 +38,6 @@ VS_OUTPUT vs_main(VS_INPUT input)
     output.pos = mul(output.pos, g_view_projection);
     output.texcoord = input.texcoord;
     output.emission = input.emission_color;
-    output.use_emissive_texture = g_use_emissive_texture != 0;
-    output.power = g_power;
     output.normal = mul(input.normal, (float3x3)world_transform);
     output.normal = normalize(output.normal);
     output.world_transform = world_transform;

@@ -176,7 +176,6 @@ namespace engine::render::_opaque_detail
         void RenderDepthOnly(std::vector<OpaquePerDepthCubemap> const &cubemaps, core::Scene *scene);
         void RenderDepthOnly(std::vector<OpaquePerDepthTexture> const &textures, core::Scene *scene);
 
-        size_t GetInstanceId(uint64_t model_id);
         /** @brief Returns instance information
         * @warning pointers to materials aren't guaranteed to point to the correct location after UpdateInstances was called
         */
@@ -213,6 +212,8 @@ namespace engine::render::_opaque_detail
             is_instance_update_scheduled_ = true;
         }
     private:
+        size_t GetInstanceId(uint64_t model_id);
+        
         void UpdateInstances(entt::registry &registry);
 
         // TODO:

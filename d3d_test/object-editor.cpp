@@ -302,38 +302,6 @@ namespace object_editor
         }
     }
 
-    void EditMaterialEmissive(render::EmissiveMaterial *material)
-    {
-        if (ImGui::CollapsingHeader("Emissive material", ImGuiTreeNodeFlags_SpanAvailWidth))
-        {
-            static entt::entity entity;
-            static uint64_t texture_id = 0;
-            static uint64_t saved_texture_id = 0;
-            static bool texture_enabled = false;
-            if (entity != selected_entity)
-            {
-                entity = selected_entity;
-                texture_id = TextureManager::GetTextureIdByPointer(material->emissive_texture);
-                saved_texture_id = TextureManager::GetTextureIdByPointer(material->emissive_texture);
-                texture_enabled = texture_id == kInvalidTextureId;
-            }
-
-            ImGui::Checkbox("##ambient_enabled", &texture_enabled);
-            ImGui::SameLine();
-            ImGui::BeginDisabled(!texture_enabled);
-            ImGui::InputScalar("Texture ID", ImGuiDataType_U64, &texture_id, nullptr, nullptr, "%llu");
-            ImGui::EndDisabled();
-            ImGui::ColorEdit3("Emissive color", material->emissive_color.data.data());
-            ImGui::SliderFloat("Power", &material->power, 0, 1e6f, "%.3f", ImGuiSliderFlags_Logarithmic);
-            if (!texture_enabled)
-                texture_id = kInvalidTextureId;
-            if (saved_texture_id != texture_id)
-            {
-                material->emissive_texture = TextureManager::GetTextureView(texture_id);
-                saved_texture_id = texture_id;
-            }
-        }
-    }
     void EditMaterial()
     {
         auto &scene = *Engine::scene();
@@ -372,33 +340,6 @@ namespace object_editor
             }
         }
 
-        if (auto *emissive_component = registry.try_get<components::EmissiveComponent>(selected_entity); emissive_component)
-        {
-            auto *model_instance = Engine::scene()->renderer->emissive_render_system().GetInstancePtr(emissive_component->model_id);
-            if (model_instance)
-            {
-                uint32_t mesh_id = std::numeric_limits<uint32_t>::max();
-                for (size_t i = 0; i < model_instance->model.meshes.size(); i++)
-                {
-                    if (&model_instance->model.meshes[i].mesh == selected_mesh)
-                    {
-                        mesh_id = (uint32_t)i;
-                    }
-                }
-                if (mesh_id != std::numeric_limits<uint32_t>::max())
-                {
-                    for (auto &material_instance : model_instance->mesh_instances[mesh_id].material_instances)
-                    {
-                        if (auto it = std::ranges::find(material_instance.instances, selected_entity); it != material_instance.instances.end())
-                        {
-                            EditMaterialEmissive(&material_instance.material);
-                            flag = true;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
         if (!flag)
         {
             EditMaterialEmpty();

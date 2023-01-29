@@ -52,10 +52,5 @@ namespace engine::core
             utils::Assert(renderer != nullptr, "Renderer is null");
             renderer->AddEmissiveInstance(model_id, registry, entity);
         }
-        inline void AddEmissiveInstance(uint64_t model_id, entt::entity entity, std::vector<render::EmissiveMaterial> const &materials)
-        {
-            utils::Assert(renderer != nullptr, "Renderer is null");
-            renderer->AddEmissiveInstance(model_id, registry, entity, materials);
-        }
     };
 }
