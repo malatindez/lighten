@@ -6,7 +6,7 @@ struct PS_INPUT
 {
     float4 pos : SV_POSITION;
     float2 texcoord : TEXCOORD;
-    float3 emission : EMISSION;
+    nointerpolation float3 emission : EMISSION;
     float3 normal : NORMAL;
     float3 world_position : WORLD_POSITION;
     float4x4 world_transform : WORLD_TRANSFORM;
