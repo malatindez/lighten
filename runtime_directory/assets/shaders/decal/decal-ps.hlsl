@@ -99,27 +99,23 @@ PS_OUTPUT ps_main(PS_INPUT input, bool is_front_face: SV_IsFrontFace)
 #endif
     float3 decal_normal = normal_opacity_value.xyz;
     float decal_opacity = normal_opacity_value.w;
-    if (decal_opacity < 0.99f)
+    if (decal_opacity < 0.5f)
     {
         discard;
     }
     // TODO(IMPORTANT !!!):
     // fix normal rotation
 
-    decal_normal = normalize(mul(float4(decal_normal, 0), input.world_transform).xyz);
     float3 right = normalize(g_inv_view[0].xyz);
-    right = mul(float4(right, 0), input.world_transform).xyz;
 
-    float3 normal = scene_geometry_normal;
-    float3 tangent = normalize(right - scene_normal * dot(normal, right));
+    float3 normal = scene_normal;
+    float3 tangent = normalize(right - scene_normal * dot(scene_normal, right));
     float3 bitangent = cross(scene_normal, tangent);
     float3x3 TBN = float3x3(tangent, bitangent, normal);
 
-    float3 result_normal;
-
-    result_normal = normalize(scene_normal + normalize(mul(decal_normal, TBN).xyz));
+    float3 result_normal = mul(decal_normal, TBN).xyz;
     output.albedo = float4(input.color, 1.0);
-    output.normals.xy = packOctahedron(result_normal);
+    output.normals.xy = packOctahedron(normalize(scene_normal + result_normal));
     output.normals.zw = packOctahedron(scene_geometry_normal);
     input.roughness = max(input.roughness, 0.01f);
     input.metalness = max(input.metalness, 0.01f);
