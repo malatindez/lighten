@@ -172,8 +172,8 @@ namespace engine::render::_decal_detail
         instance_buffer_.Bind(1);
 
         direct3d::api().devcon4->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        direct3d::api().devcon4->RSSetState(direct3d::states().cull_back.ptr());
-        direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth_no_write, 1);
+        direct3d::api().devcon4->RSSetState(direct3d::states().cull_front.ptr());
+        direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().no_depth_no_write, 1);
         auto &cube = ModelSystem::GetModel(ModelSystem::GetUnitCube());
         cube.vertices.Bind(0);
         cube.indices.Bind();
