@@ -736,7 +736,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             mat4 inv_mat = model_instance->model.meshes[mesh_id].inv_mesh_to_model * transform.inv_model;
             vec3 relative_position = (inv_mat * vec4(nearest.point, 1.0f)).xyz;
 
-            decal.texture_angle = std::uniform_real_distribution(0.0f, 2.0f * numbers::pi_v<float>)(core::Engine::random_engine());
+            float texture_angle = std::uniform_real_distribution(0.0f, 2.0f * numbers::pi_v<float>)(core::Engine::random_engine());
 
             decal.base_color = random::RandomVector3(core::Engine::random_engine(), 0.25f, 1.0f);
             decal.roughness = 1.0f;
@@ -748,16 +748,20 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                                       Engine::scene()->main_camera->right(),
                                       -Engine::scene()->main_camera->up(),
                                       -Engine::scene()->main_camera->forward() };
+            rotation_matrix = rotation_matrix * mat3{
+                std::cos(texture_angle), -std::sin(texture_angle), 0.0f,
+                std::sin(texture_angle), std::cos(texture_angle), 0.0f,
+                0.0f, 0.0f, 1.0f };
+
             rotation_matrix = inv_mat.as_rmat<3, 3>() * inverse(rtranspose(rotation_matrix));
             mat4 rotation_matrix_4x4 = mat4::identity();
             rotation_matrix_4x4.as_rmat<3, 3>() = rotation_matrix;
 
-            
             // this rotation should be relative to the model space, so we had to multiply it by the inverse of the model matrix
             decal.model_to_decal = mat4::identity();
-            decal.model_to_decal = translate(decal.model_to_decal , relative_position);
+            decal.model_to_decal = translate(decal.model_to_decal, relative_position);
             decal.model_to_decal = decal.model_to_decal * rotation_matrix_4x4;
-            decal.model_to_decal = scale(decal.model_to_decal, vec3{ 0.05, 0.05, 0.1f });
+            decal.model_to_decal = scale(decal.model_to_decal, vec3{ 0.1f });
 
             auto &decal_component = scene->registry.get_or_emplace<DecalComponent>(*entity);
             decal_component.decals.emplace_back(std::move(decal));

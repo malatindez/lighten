@@ -30,9 +30,7 @@ namespace engine::render::_decal_detail
             {"INV_ROWZ", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
             {"INV_ROWW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
 
-            {"HALF_SIZE", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
             {"BASE_COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-            {"TEXTURE_ANGLE", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
             {"ROUGHNESS", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
             {"METALNESS", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
             {"TRANSMITTANCE", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
@@ -74,9 +72,7 @@ namespace engine::render::_decal_detail
                     auto &decal = *it;
                     DecalInstance &instance = *(decal_instances++);
                     instance.world_transform = transform_component.model * decal.mesh_transform * decal.model_to_decal;
-
                     instance.inv_world_transform = core::math::inverse(instance.world_transform);
-                    instance.texture_angle = decal.texture_angle;
                     instance.base_color = decal.base_color;
                     instance.roughness = decal.roughness;
                     instance.metalness = decal.metalness;

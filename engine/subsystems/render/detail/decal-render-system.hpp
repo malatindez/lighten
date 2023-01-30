@@ -40,9 +40,7 @@ namespace engine::render::_decal_detail
     {
         core::math::mat4 world_transform;
         core::math::mat4 inv_world_transform;
-        core::math::vec3 half_size;
         core::math::vec3 base_color;
-        float texture_angle;
         float roughness;
         float metalness;
         float transmittance;

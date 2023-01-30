@@ -15,7 +15,6 @@ struct PS_INPUT
     float2 texcoord : TEXCOORD;
     float3 normal : NORMAL;
     nointerpolation float3 color : COLOR;
-    nointerpolation float texture_angle : TEXTURE_ANGLE;
     nointerpolation float roughness : ROUGHNESS;
     nointerpolation float metalness : METALNESS;
     nointerpolation float transmittance : TRANSMITTANCE;
@@ -41,7 +40,7 @@ PS_OUTPUT ps_main(PS_INPUT input, bool is_front_face: SV_IsFrontFace)
     if (input.entity_id != entity_ids.Load(int3(input.posVS.xy, 0)))
     {
         output.emission += float4(1, 0, 0, 1);
-//        discard;
+        discard;
     }
 
     float depth_value = depth.Load(int3(input.posVS.xy, 0));
@@ -60,7 +59,7 @@ PS_OUTPUT ps_main(PS_INPUT input, bool is_front_face: SV_IsFrontFace)
         abs(cuboid_point.z) > 1)
     {
         output.emission += float4(1, 0, 0, 1);
-//        discard;
+        discard;
     }
 
     float4 scene_normals = normals.Load(int3(input.posVS.xy, 0));
@@ -68,18 +67,6 @@ PS_OUTPUT ps_main(PS_INPUT input, bool is_front_face: SV_IsFrontFace)
     float3 scene_normal = unpackOctahedron(scene_normals.xy);
     float3 scene_geometry_normal = unpackOctahedron(scene_normals.zw);
 
-    // faces 4 and 5 are correct
-    float3x3 rot_matrix;
-
-    { // rotate uv
-        float sinA, cosA;
-        sincos(input.texture_angle, sinA, cosA);
-        rot_matrix = float3x3(
-            cosA, -sinA, 0.0f,
-            sinA, cosA, 0.0f,
-            0.0f, 0.0f, 1.0f);
-    }
-    cuboid_point = mul(cuboid_point, rot_matrix);
 
     float2 uv = ((cuboid_point.xy) + 0.5f);
 
@@ -95,7 +82,7 @@ PS_OUTPUT ps_main(PS_INPUT input, bool is_front_face: SV_IsFrontFace)
     if (decal_opacity < 0.95f)
     {
         output.emission += float4(1, 0, 1, 1);
-//        discard;
+        discard;
     }
 
     float3 right = normalize(g_inv_view[0].xyz);
@@ -109,8 +96,8 @@ PS_OUTPUT ps_main(PS_INPUT input, bool is_front_face: SV_IsFrontFace)
     output.albedo = float4(input.color, 1.0);
     output.normals.xy = packOctahedron(normalize(scene_normal + result_normal));
     output.normals.zw = packOctahedron(scene_geometry_normal);
-    input.roughness = max(input.roughness, 0.01f);
-    input.metalness = max(input.metalness, 0.01f);
+    input.roughness = 1.0f;
+    input.metalness = 0.3f;
     output.roughness_metalness_transmittance_ao = float4(input.roughness, input.metalness, input.transmittance, input.ambient_occlusion);
     return output;
 }
