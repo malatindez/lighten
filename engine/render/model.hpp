@@ -77,8 +77,8 @@ namespace engine::render
         core::math::vec3 emissive_color;
         core::math::vec3 transparent_color;
         core::math::vec3 reflective_color;
-        bool enable_wireframe;
-        bool twosided;
+        bool enable_wireframe = false;
+        bool twosided = false;
         float opacity;
         float shininess;
         float shininess_strength;

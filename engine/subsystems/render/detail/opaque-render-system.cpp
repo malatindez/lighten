@@ -147,7 +147,7 @@ namespace engine::render::_opaque_detail
 
         uint32_t renderedInstances = 0;
         direct3d::api().devcon->RSSetState(direct3d::states().cull_none);
-        bool current_state_twosided = false;
+        bool current_state_twosided = true;
         for (const auto &model_instance : model_instances_)
         {
             model_instance.model.vertices.Bind(0);

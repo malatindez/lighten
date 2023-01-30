@@ -14,7 +14,6 @@ struct PS_INPUT
     float3 posWS : FRAGMENT_POSITION;
     float2 texcoord : TEXCOORD;
     float3 normal : NORMAL;
-    nointerpolation float3 half_size : HALF_SIZE;
     nointerpolation float3 color : COLOR;
     nointerpolation float texture_angle : TEXTURE_ANGLE;
     nointerpolation float roughness : ROUGHNESS;
@@ -36,6 +35,9 @@ PS_OUTPUT ps_main(PS_INPUT input, bool is_front_face: SV_IsFrontFace)
     : SV_Target
 {
     PS_OUTPUT output;
+    output.emission = float4(0, 0, 0, 0);
+    input.posVS.xy = floor(input.posVS.xy);
+
     if (input.entity_id != entity_ids.Load(int3(input.posVS.xy, 0)))
     {
         discard;
@@ -52,11 +54,11 @@ PS_OUTPUT ps_main(PS_INPUT input, bool is_front_face: SV_IsFrontFace)
     float4 tmp = mul(surface_point_WS, input.inv_world_transform);
 
     cuboid_point = tmp.xyz / tmp.w;
-    input.half_size = input.half_size * 4.0f;
-    if (abs(cuboid_point.x) > input.half_size.x ||
-        abs(cuboid_point.y) > input.half_size.y ||
-        abs(cuboid_point.z) > input.half_size.z)
+    if (abs(cuboid_point.x) > 1 ||
+        abs(cuboid_point.y) > 1 ||
+        abs(cuboid_point.z) > 1)
     {
+        output.emission += float4(1, 0, 0, 1);
         discard;
     }
 
@@ -88,23 +90,22 @@ PS_OUTPUT ps_main(PS_INPUT input, bool is_front_face: SV_IsFrontFace)
     }
     cuboid_point = mul(cuboid_point, rot_matrix);
 
-    float2 uv = ((cuboid_point.xy / input.half_size.xy) + 1.0f) * 0.5f;
+    float2 uv = ((cuboid_point.xy) + 0.5f);
 
     uv.y = 1.0f - uv.y;
 
 #if 0
     float4 normal_opacity_value = normal_opacity.SampleLevel(g_bilinear_clamp_sampler, uv, 0 );
 #else
-    float4 normal_opacity_value = normal_opacity.Sample(g_bilinear_clamp_sampler, uv);
+    float4 normal_opacity_value = normal_opacity.Sample(g_anisotropic_clamp_sampler, uv);
 #endif
     float3 decal_normal = normal_opacity_value.xyz;
     float decal_opacity = normal_opacity_value.w;
-    if (decal_opacity < 0.5f)
+    if (decal_opacity < 0.95f)
     {
+        output.emission += float4(1, 0, 1, 1);
         discard;
     }
-    // TODO(IMPORTANT !!!):
-    // fix normal rotation
 
     float3 right = normalize(g_inv_view[0].xyz);
 
@@ -120,6 +121,5 @@ PS_OUTPUT ps_main(PS_INPUT input, bool is_front_face: SV_IsFrontFace)
     input.roughness = max(input.roughness, 0.01f);
     input.metalness = max(input.metalness, 0.01f);
     output.roughness_metalness_transmittance_ao = float4(input.roughness, input.metalness, input.transmittance, input.ambient_occlusion);
-    output.emission = float4(0.0, 0.0, 0.0, 0.0);
     return output;
 }

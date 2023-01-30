@@ -9,7 +9,6 @@ struct VS_OUTPUT
     float3 posWS : FRAGMENT_POSITION;
     float2 texcoord : TEXCOORD;
     float3 normal : NORMAL;
-    nointerpolation float3 half_size : HALF_SIZE;
     nointerpolation float3 color : COLOR;
     nointerpolation float texture_angle : TEXTURE_ANGLE;
     nointerpolation float roughness : ROUGHNESS;
@@ -36,7 +35,7 @@ struct VS_INPUT
     float4 InvRowY : INV_ROWY;
     float4 InvRowZ : INV_ROWZ;
     float4 InvRowW : INV_ROWW;
-
+    // TODO: remove
     float3 half_size : HALF_SIZE;
     float3 color : BASE_COLOR;
     float texture_angle : TEXTURE_ANGLE;
@@ -108,7 +107,6 @@ VS_OUTPUT vs_main(VS_INPUT input)
     output.posWS = output.posVS.xyz;
     output.posVS = mul(output.posVS, g_view_projection);
 
-    output.half_size = input.half_size;
     output.color = input.color;
     output.texture_angle = input.texture_angle;
     output.roughness = input.roughness;

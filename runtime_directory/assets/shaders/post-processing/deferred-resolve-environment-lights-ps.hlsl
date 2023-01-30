@@ -39,11 +39,11 @@ float3 GetWorldPosition(float2 posCS, float depth)
 float4 ps_main(PS_INPUT input)
     : SV_Target
 {
-    float4 albedo = g_albedo.Sample(g_bilinear_clamp_sampler, input.uv);
-    float4 normals = g_normals.Sample(g_bilinear_clamp_sampler, input.uv);
-    float4 roughness_metalness_transmittance_ao = g_roughness_metalness_transmittance_ao.Sample(g_bilinear_clamp_sampler, input.uv);
-    float4 emission = g_emission.Sample(g_bilinear_clamp_sampler, input.uv);
-    float depth = g_depth.Sample(g_bilinear_clamp_sampler, input.uv);
+    float4 albedo = g_albedo.Sample(g_point_clamp_sampler, input.uv);
+    float4 normals = g_normals.Sample(g_point_clamp_sampler, input.uv);
+    float4 roughness_metalness_transmittance_ao = g_roughness_metalness_transmittance_ao.Sample(g_point_clamp_sampler, input.uv);
+    float4 emission = g_emission.Sample(g_point_clamp_sampler, input.uv);
+    float depth = g_depth.Sample(g_point_clamp_sampler, input.uv);
 
     PBR_Material material;
     material.albedo = albedo.rgb;

@@ -147,9 +147,12 @@ namespace engine::render::_dissolution_detail
 
         direct3d::api().devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
-        direct3d::api().devcon4->PSSetSamplers(1, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
-        direct3d::api().devcon4->PSSetSamplers(2, 1, &direct3d::states().bilinear_clamp_sampler.ptr());
-        direct3d::api().devcon4->PSSetSamplers(3, 1, &direct3d::states().comparison_linear_clamp_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(1, 1, &direct3d::states().bilinear_clamp_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(2, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(3, 1, &direct3d::states().anisotropic_clamp_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(4, 1, &direct3d::states().point_wrap_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(5, 1, &direct3d::states().point_clamp_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(6, 1, &direct3d::states().comparison_linear_clamp_sampler.ptr());
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 
         mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 2);
@@ -164,7 +167,7 @@ namespace engine::render::_dissolution_detail
         direct3d::api().devcon4->OMSetBlendState(direct3d::states().alpha_to_coverage_blend_state, nullptr, 0xffffffff);
 
         direct3d::api().devcon->RSSetState(direct3d::states().cull_none);
-        bool current_state_twosided = false;
+        bool current_state_twosided = true;
         for (const auto &model_instance : model_instances_)
         {
             model_instance.model.vertices.Bind(0);
