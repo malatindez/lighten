@@ -107,7 +107,7 @@ void Controller::OnGuiRender()
     if ((uint32_t)(sample_count) != current_sample_count) { hdr_render_pipeline_->SetSampleCount(sample_count); }
 #endif
 #if 0
-    static core::math::uivec2 poisson_disk_size = { 0.5f, 0.5f };
+    static uivec2 poisson_disk_size = { 0.5f, 0.5f };
     ImGui::InputScalar("Poisson disk size x", ImGuiDataType_U32, &poisson_disk_size.x);
     ImGui::InputScalar("Poisson disk size y", ImGuiDataType_U32, &poisson_disk_size.y);
     static uint32_t k, r;
@@ -125,7 +125,7 @@ void Controller::OnGuiRender()
             data[i * 4 + 2] = 0;
             data[i * 4 + 3] = 0;
         }
-        auto dots = core::math::random::poisson_disc::Generate(poisson_disk_size, k, r);
+        auto dots = random::poisson_disc::Generate(poisson_disk_size, k, r);
         for (auto &dot : dots)
         {
             if (dot.y > poisson_disk_size.y - 1 || dot.x > poisson_disk_size.x - 1) continue;
@@ -189,7 +189,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     auto &window_size = hdr_render_pipeline->window()->size();
     first_scene->main_camera = std::make_unique<CameraController>(&registry, main_camera_entity, window_size);
     Engine::SetScene(first_scene);
-    Engine::scene()->main_camera->SetWorldOffset(core::math::vec3{ 0.0f, 0.0f, 0.0f });
+    Engine::scene()->main_camera->SetWorldOffset(vec3{ 0.0f, 0.0f, 0.0f });
     Engine::scene()->main_camera->SetWorldAngles(0.0f, 0.0f, 0.0f);
     Engine::scene()->main_camera->SetProjectionMatrix(perspective(45.0f, static_cast<float>(window_size.x) / static_cast<float>(window_size.y), 0.001f, 100.0f));
 
@@ -633,18 +633,18 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         grass_material.UpdateTextureFlags();
 
         grass_material.wind_vector = { 1.0f, 0.0f, 1.0f };
-        grass_material.wind_amplitude = math::radians(45.0f);
+        grass_material.wind_amplitude = radians(45.0f);
         grass_material.wind_wavenumber = 2.0f;
         grass_material.wind_frequency = 1.0f;
 
-        core::math::vec4 texture_size = { 4096, 4096, 4096, 4096 };
-        std::vector<core::math::vec4> atlas_data = {
-            core::math::vec4{82, 69, 2277, 1736} / texture_size,
-            core::math::vec4{2474, 90, 4017, 1361} / texture_size,
-            core::math::vec4{377, 1810, 1761, 2697} / texture_size,
-            core::math::vec4{2228, 1480, 3894, 2893} / texture_size,
-            core::math::vec4{76, 2746, 2217, 4065} / texture_size,
-            core::math::vec4{2651, 3005, 3774, 4033} / texture_size,
+        vec4 texture_size = { 4096, 4096, 4096, 4096 };
+        std::vector<vec4> atlas_data = {
+            vec4{82, 69, 2277, 1736} / texture_size,
+            vec4{2474, 90, 4017, 1361} / texture_size,
+            vec4{377, 1810, 1761, 2697} / texture_size,
+            vec4{2228, 1480, 3894, 2893} / texture_size,
+            vec4{76, 2746, 2217, 4065} / texture_size,
+            vec4{2651, 3005, 3774, 4033} / texture_size,
         };
         grass_material.atlas_size = uivec2(texture_size.xy);
         grass_material.atlas_data = atlas_data;
@@ -734,16 +734,31 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             DecalComponent::Decal decal{};
             decal.mesh_transform = model_instance->model.meshes[mesh_id].mesh_to_model;
             mat4 inv_mat = model_instance->model.meshes[mesh_id].inv_mesh_to_model * transform.inv_model;
-            decal.relative_position = (inv_mat * vec4(nearest.point, 1.0f)).xyz;
+            vec3 relative_position = (inv_mat * vec4(nearest.point, 1.0f)).xyz;
 
-            decal.texture_angle = std::uniform_real_distribution(0.0f, 2.0f * core::math::numbers::pi_v<float>)(core::Engine::random_engine());
+            decal.texture_angle = std::uniform_real_distribution(0.0f, 2.0f * numbers::pi_v<float>)(core::Engine::random_engine());
 
-            decal.relative_scale = vec3{ 0.1f } / transform.scale;
             decal.base_color = random::RandomVector3(core::Engine::random_engine(), 0.25f, 1.0f);
             decal.roughness = 1.0f;
             decal.metalness = 0.01f;
             decal.transmittance = 0.0f;
             decal.ambient_occlusion = 1.0f;
+
+            mat3 rotation_matrix{
+                                      Engine::scene()->main_camera->right(),
+                                      -Engine::scene()->main_camera->up(),
+                                      -Engine::scene()->main_camera->forward() };
+            rotation_matrix = inv_mat.as_rmat<3, 3>() * inverse(rtranspose(rotation_matrix));
+            mat4 rotation_matrix_4x4 = mat4::identity();
+            rotation_matrix_4x4.as_rmat<3, 3>() = rotation_matrix;
+
+            
+            // this rotation should be relative to the model space, so we had to multiply it by the inverse of the model matrix
+            decal.model_to_decal = mat4::identity();
+            decal.model_to_decal = translate(decal.model_to_decal , relative_position);
+            decal.model_to_decal = decal.model_to_decal * rotation_matrix_4x4;
+            decal.model_to_decal = scale(decal.model_to_decal, vec3{ 0.05, 0.05, 0.1f });
+
             auto &decal_component = scene->registry.get_or_emplace<DecalComponent>(*entity);
             decal_component.decals.emplace_back(std::move(decal));
             timer.reset();
@@ -758,8 +773,8 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                                        return;
                                    }
                                    static utils::SteadyTimer timer;
-                                   static float kDeleteLimit = 0.5f;
-                                   if (timer.elapsed() < kDeleteLimit)
+                                   static float kSpawnLimit = 0.1f;
+                                   if (timer.elapsed() < kSpawnLimit)
                                    {
                                        return;
                                    }
@@ -771,25 +786,29 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                                    auto &transform = registry.emplace<TransformComponent>(knight);
                                    transform.position = Engine::scene()->main_camera->position() + Engine::scene()->main_camera->forward() * 2.0f;
                                    transform.position -= Engine::scene()->main_camera->up();
-                                   math::mat3 rotation_matrix{
+                                   mat3 rotation_matrix{
                                        Engine::scene()->main_camera->right(),
                                        -Engine::scene()->main_camera->up(),
                                        -Engine::scene()->main_camera->forward() };
-                                   rotation_matrix = math::inverse(math::rtranspose(rotation_matrix));
-                                   transform.rotation = math::QuaternionFromRotationMatrix(rotation_matrix);
+                                   rotation_matrix = inverse(rtranspose(rotation_matrix));
+                                   transform.rotation = QuaternionFromRotationMatrix(rotation_matrix);
                                    transform.UpdateMatrices();
                                    uint64_t model_id = ModelLoader::Load("assets\\models\\Knight\\Knight.fbx").value();
-                                   drs.AddInstance(model_id, registry, knight, core::math::vec3{ 0.0f }, std::uniform_real_distribution<float>(3.0f, 15.0f)(Engine::random_engine()));
+                                   drs.AddInstance(model_id, registry, knight, vec3{ 0.0f }, std::uniform_real_distribution<float>(3.0f, 15.0f)(Engine::random_engine()));
                                    Engine::scene()->renderer->dissolution_render_system().ScheduleInstanceUpdate();
                                    Engine::scene()->renderer->light_render_system().ScheduleShadowMapUpdate();
                                });
 
     input.AddUpdateKeyCallback(
         { Key::KEY_DELETE },
-        [&] (InputLayer::KeySeq const &, uint32_t)
+        [&] (InputLayer::KeySeq const &, uint32_t count)
         {
+            if (count == std::numeric_limits<uint32_t>::max())
+            {
+                return;
+            }
             static utils::HighResolutionTimer timer;
-            const float kDelay = 0.5f;
+            const float kDelay = 0.05f;
             if (ImGui::GetIO().WantCaptureMouse)
             {
                 return;
@@ -823,11 +842,11 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                     std::back_inserter(dissolution_materials),
                     [](render::OpaqueMaterial const *material) __lambda_force_inline->render::DissolutionMaterial
                     {
-                       auto rv = render::DissolutionMaterial::FromOpaqueMaterial(*material);
-                       rv.emissive = true;
-                       rv.appearing = false;
-                       rv.UpdateTextureFlags();
-                       return rv;
+                        auto rv = render::DissolutionMaterial::FromOpaqueMaterial(*material);
+                        rv.emissive = true;
+                        rv.appearing = false;
+                        rv.UpdateTextureFlags();
+                        return rv;
                     });
                 drs.AddInstance(opaque->model_id, registry, entity.value(), nearest.point, lifetime, std::move(dissolution_materials));
                 drs.ScheduleInstanceUpdate();
@@ -838,6 +857,49 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             }
         },
         false);
+
+    input.AddUpdateKeyCallback(InputLayer::KeySeq{ engine::core::Key::KEY_H },
+                               [&, cobblestone_material] (InputLayer::KeySeq const &, uint32_t count)
+                               {
+                                   if (count == std::numeric_limits<uint32_t>::max())
+                                   {
+                                       return;
+                                   }
+                                   if (ImGui::GetIO().WantCaptureMouse)
+                                   {
+                                       return;
+                                   }
+
+                                   auto &input = *InputLayer::instance();
+                                   auto scene = Engine::scene();
+                                   Ray ray = scene->main_camera->PixelRaycast(vec2{ input.mouse_position() });
+                                   MeshIntersection nearest{};
+                                   nearest.reset();
+                                   std::optional<entt::entity> entity = render::ModelSystem::FindIntersection(scene->registry, ray, nearest);
+                                   if (!entity.has_value())
+                                   {
+                                       return;
+                                   }
+                                   auto &registry = Engine::scene()->registry;
+                                   auto &drs = Engine::scene()->renderer->dissolution_render_system();
+                                   auto cube = registry.create();
+
+                                   auto &transform = registry.emplace<TransformComponent>(cube);
+                                   transform.position = nearest.point;
+                                   mat3 rotation_matrix{
+                                       Engine::scene()->main_camera->right(),
+                                       -Engine::scene()->main_camera->up(),
+                                       -Engine::scene()->main_camera->forward() };
+                                   rotation_matrix = inverse(rtranspose(rotation_matrix));
+                                   transform.rotation = QuaternionFromRotationMatrix(rotation_matrix);
+                                   transform.scale = vec3{ 0.05, 0.05, 0.1f };
+                                   transform.UpdateMatrices();
+                                   uint64_t model_id = render::ModelSystem::GetUnitCube();
+                                   ors.AddInstance(model_id, registry, cube, { cobblestone_material });
+
+                                   Engine::scene()->renderer->opaque_render_system().ScheduleInstanceUpdate();
+                                   Engine::scene()->renderer->light_render_system().ScheduleShadowMapUpdate();
+                               }, false);
     lrs.ScheduleShadowMapUpdate();
 }
 void Controller::OnTick([[maybe_unused]] float delta_time)

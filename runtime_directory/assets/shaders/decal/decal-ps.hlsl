@@ -40,7 +40,8 @@ PS_OUTPUT ps_main(PS_INPUT input, bool is_front_face: SV_IsFrontFace)
 
     if (input.entity_id != entity_ids.Load(int3(input.posVS.xy, 0)))
     {
-        discard;
+        output.emission += float4(1, 0, 0, 1);
+//        discard;
     }
 
     float depth_value = depth.Load(int3(input.posVS.xy, 0));
@@ -59,7 +60,7 @@ PS_OUTPUT ps_main(PS_INPUT input, bool is_front_face: SV_IsFrontFace)
         abs(cuboid_point.z) > 1)
     {
         output.emission += float4(1, 0, 0, 1);
-        discard;
+//        discard;
     }
 
     float4 scene_normals = normals.Load(int3(input.posVS.xy, 0));
@@ -67,16 +68,6 @@ PS_OUTPUT ps_main(PS_INPUT input, bool is_front_face: SV_IsFrontFace)
     float3 scene_normal = unpackOctahedron(scene_normals.xy);
     float3 scene_geometry_normal = unpackOctahedron(scene_normals.zw);
 
-    uint face = selectCubeFace(mul(float4(scene_geometry_normal, 0), input.inv_world_transform).xyz);
-
-    if (face == 0 || face == 1)
-    {
-        cuboid_point = rotate_by_y_axis(cuboid_point, 0.5f * PI);
-    }
-    if (face == 2 || face == 3)
-    {
-        cuboid_point = rotate_by_x_axis(cuboid_point, 0.5f * PI);
-    }
     // faces 4 and 5 are correct
     float3x3 rot_matrix;
 
@@ -104,7 +95,7 @@ PS_OUTPUT ps_main(PS_INPUT input, bool is_front_face: SV_IsFrontFace)
     if (decal_opacity < 0.95f)
     {
         output.emission += float4(1, 0, 1, 1);
-        discard;
+//        discard;
     }
 
     float3 right = normalize(g_inv_view[0].xyz);

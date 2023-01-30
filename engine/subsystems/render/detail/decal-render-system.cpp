@@ -73,12 +73,10 @@ namespace engine::render::_decal_detail
                 {
                     auto &decal = *it;
                     DecalInstance &instance = *(decal_instances++);
-                    instance.world_transform = transform_component.model * decal.mesh_transform;
-                    instance.world_transform = core::math::translate(instance.world_transform, decal.relative_position);
-                    instance.world_transform = core::math::scale(instance.world_transform, decal.relative_scale);
+                    instance.world_transform = transform_component.model * decal.mesh_transform * decal.model_to_decal;
+
                     instance.inv_world_transform = core::math::inverse(instance.world_transform);
                     instance.texture_angle = decal.texture_angle;
-                    instance.half_size = decal.relative_scale * transform_component.scale;
                     instance.base_color = decal.base_color;
                     instance.roughness = decal.roughness;
                     instance.metalness = decal.metalness;

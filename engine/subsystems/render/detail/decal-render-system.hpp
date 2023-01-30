@@ -20,8 +20,7 @@ namespace engine::components
         struct Decal
         {
             core::math::mat4 mesh_transform;
-            core::math::vec3 relative_position;
-            core::math::vec3 relative_scale;
+            core::math::mat4 model_to_decal;
             core::math::vec3 base_color;
             // rotation of 2d texture in radians
             float texture_angle;
