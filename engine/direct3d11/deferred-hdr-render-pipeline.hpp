@@ -52,6 +52,10 @@ namespace engine::direct3d
         std::shared_ptr<render::DeferredResolve> deferred_resolve_ = nullptr;
         std::shared_ptr<render::HDRtoLDRLayer> hdr_to_ldr_layer_ = nullptr;
         std::shared_ptr<render::PresentSwapchain> swapchain_present_ = nullptr;
+        direct3d::Texture2D depth_texture_copy_;
+        direct3d::ShaderResourceView depth_texture_copy_srv_;
+        direct3d::Texture2D normals_texture_copy_;
+        direct3d::ShaderResourceView normals_texture_copy_srv_;
         std::shared_ptr<core::Window> window_ = nullptr;
     };
 }

@@ -58,7 +58,7 @@ namespace engine::render::_particle_detail
         auto il = std::make_shared<InputLayout>(vs->blob(), d3d_input_desc);
         particle_shader_.SetVertexShader(vs).SetPixelShader(ps).SetInputLayout(il);
     }
-    void ParticleRenderSystem::OnRender(core::Scene *scene, ID3D11DepthStencilView *dsv)
+    void ParticleRenderSystem::OnRender(core::Scene *scene, ID3D11ShaderResourceView *depth_srv)
     {
         auto view = scene->registry.view<components::TransformComponent, components::ParticleEmitter>();
         if (view.size_hint() == 0)
@@ -104,57 +104,19 @@ namespace engine::render::_particle_detail
         particle_buffer_.Init(std::span<GPUParticle>(particles));
         ParticlePerFrame per_frame;
         using namespace engine::core::math;
-
-        // get depth and render targets
-        // It would be better to create srv once and reuse it, but this is quick and dirty solution
-
-        ID3D11DepthStencilView *depth_target = dsv;
-
-        ID3D11Texture2D *depth_texture = nullptr;
-        depth_target->GetResource(reinterpret_cast<ID3D11Resource **>(&depth_texture));
-
-        D3D11_TEXTURE2D_DESC depth_texture_desc = {};
-        depth_texture->GetDesc(&depth_texture_desc);
-        depth_texture_desc.Format = DXGI_FORMAT_R24G8_TYPELESS;
-        depth_texture_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-
-        depth_texture_desc.MiscFlags = 0;
-
-        ID3D11Texture2D *depth_texture_buffer = nullptr;
-        direct3d::AlwaysAssert(direct3d::api().device5->CreateTexture2D(&depth_texture_desc, nullptr, &depth_texture_buffer), "Failed to create texture2D");
-
-        direct3d::api().devcon4->CopyResource(depth_texture_buffer, depth_texture);
-
-        // srv desc
-        D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
-        srv_desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-        if (depth_texture_desc.SampleDesc.Count > 1)
-        {
-            srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
-        }
-        else
-        {
-            srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-            srv_desc.Texture2D.MipLevels = 1;
-            srv_desc.Texture2D.MostDetailedMip = 0;
-        }
-
-        ID3D11ShaderResourceView *depth_srv = nullptr;
-        direct3d::api().device5->CreateShaderResourceView(depth_texture_buffer, &srv_desc, &depth_srv);
-
         // render particles
 
         per_frame.time_since_last_tick = core::Engine::TimeFromStart() - last_tick_time_;
         per_frame.atlas_size_x = atlas_size.x;
         per_frame.atlas_size_y = atlas_size.y;
-        per_frame.use_dms_depth_texture = depth_texture_desc.SampleDesc.Count > 1;
+        per_frame.use_dms_depth_texture = 0;
         particle_per_frame_buffer_.Update(per_frame);
 
         particle_per_frame_buffer_.Bind(direct3d::ShaderType::VertexShader, 2);
         particle_per_frame_buffer_.Bind(direct3d::ShaderType::PixelShader, 2);
 
         direct3d::api().devcon4->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        core::math::vec4 blend_factor{0.0f};
+        core::math::vec4 blend_factor{ 0.0f };
         direct3d::api().devcon4->OMSetBlendState(direct3d::states().additive_blend_state_alpha.ptr(), blend_factor.data.data(), 0xffffffff);
         direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().no_depth_write.ptr(), 0);
 
@@ -168,15 +130,11 @@ namespace engine::render::_particle_detail
         direct3d::api().devcon4->PSSetShaderResources(10, 1, &emva2);
         direct3d::api().devcon4->PSSetShaderResources(11, 1, &rlt);
 
-        uint32_t const depth_offset = depth_texture_desc.SampleDesc.Count > 1 ? 1u : 0u;
-        direct3d::api().devcon4->PSSetShaderResources(12 + depth_offset, 1, &depth_srv);
+        direct3d::api().devcon4->PSSetShaderResources(12, 1, &depth_srv);
 
         direct3d::api().devcon4->DrawInstanced(6, particle_buffer_.size(), 0, 0);
 
-        direct3d::api().devcon4->PSSetShaderResources(12 + depth_offset, 1, &direct3d::null_srv);
-
-        depth_texture_buffer->Release();
-        depth_srv->Release();
+        direct3d::api().devcon4->PSSetShaderResources(12, 1, &direct3d::null_srv);
     }
 
     void ParticleRenderSystem::Tick(core::Scene *scene, float delta_time)

@@ -60,7 +60,7 @@ namespace engine::render::_decal_detail
     {
     public:
         DecalRenderSystem();
-        void OnRender(core::Scene *scene, GBuffer const &buffer, ID3D11DepthStencilView *dsv);
+        void OnRender(core::Scene *scene, GBuffer const &buffer, ID3D11DepthStencilView *dsv, ID3D11ShaderResourceView *depth_srv, ID3D11ShaderResourceView *normals_srv);
 
         void ScheduleInstanceUpdate()
         {

@@ -63,7 +63,7 @@ namespace engine::render
         class ParticleRenderSystem final : public RenderPass
         {
         public:
-            void OnRender(core::Scene *scene, ID3D11DepthStencilView *dsv);
+            void OnRender(core::Scene *scene, ID3D11ShaderResourceView * depth_srv);
             void Tick(core::Scene *scene, float delta_time);
             ParticleRenderSystem();
             ~ParticleRenderSystem() = default;

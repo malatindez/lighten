@@ -145,8 +145,9 @@ namespace engine::render
                                                             { return lhs->kPriority < rhs->kPriority; });
         }
         void FrameBegin(core::Scene *scene);
-        void DeferredRender(core::Scene *scene, GBuffer const &buffer, ID3D11DepthStencilView *dsv);
-        void ForwardRender(core::Scene *scene, render::PerFrame const &per_frame, GBuffer const &buffer, ID3D11DepthStencilView *dsv);
+        void DeferredRender(core::Scene *scene, GBuffer const &buffer);
+        void DeferredRender(core::Scene *scene, GBuffer const &buffer, ID3D11DepthStencilView *dsv, ID3D11ShaderResourceView *depth_srv, ID3D11ShaderResourceView *normals_srv);
+        void ForwardRender(core::Scene *scene, render::PerFrame const &per_frame, GBuffer const &buffer, ID3D11DepthStencilView *dsv, ID3D11ShaderResourceView *depth_srv, ID3D11ShaderResourceView *normals_srv);
         void Tick(core::Scene *scene, float delta_time);
         void Update(core::Scene *scene);
         void ScheduleInstanceUpdate();

@@ -97,9 +97,6 @@ namespace engine::direct3d
         initialized = false;
     }
 
-
-
-
     void RenderTarget::init()
     {
         if (initialized)
@@ -187,7 +184,6 @@ namespace engine::direct3d
         size_ = core::math::ivec2{ 0 };
         initialized = false;
     }
-
 
     void SwapchainRenderTarget::init(HWND hWnd, core::math::ivec2 const &window_size)
     {

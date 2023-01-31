@@ -64,7 +64,7 @@ namespace engine::render
         class EmissiveParticleRenderSystem final : public RenderPass
         {
         public:
-            void OnRender(core::Scene *scene, GBuffer const &buffer, ID3D11DepthStencilView *dsv);
+            void OnRender(ID3D11ShaderResourceView * depth_srv,  ID3D11ShaderResourceView * normals_srv);
 
             void Update(core::Scene *scene);
 
@@ -81,8 +81,8 @@ namespace engine::render
             EmissiveParticleRenderSystem &operator=(EmissiveParticleRenderSystem &&) = delete;
 
         private:
-            void update_particles(direct3d::ShaderResourceView depth_srv, direct3d::ShaderResourceView normals_srv);
-            void render_particles(direct3d::ShaderResourceView depth_srv);
+            void update_particles(ID3D11ShaderResourceView * depth_srv, ID3D11ShaderResourceView * ormals_srv);
+            void render_particles(ID3D11ShaderResourceView * depth_srv);
 
             core::math::uivec3 GetParticleRangeData();
             D3D11_DRAW_INSTANCED_INDIRECT_ARGS GetParticleIndirectArgsData();

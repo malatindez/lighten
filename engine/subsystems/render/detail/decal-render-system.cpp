@@ -84,7 +84,7 @@ namespace engine::render::_decal_detail
         }
         instance_buffer_.Unmap();
     }
-    void DecalRenderSystem::OnRender(core::Scene *scene, GBuffer const &buffer, ID3D11DepthStencilView *dsv)
+    void DecalRenderSystem::OnRender(core::Scene *scene, GBuffer const &buffer, ID3D11DepthStencilView *dsv, ID3D11ShaderResourceView *depth_srv, ID3D11ShaderResourceView *normals_srv)
     {
         if (is_instance_update_scheduled_)
         {
@@ -94,73 +94,16 @@ namespace engine::render::_decal_detail
 
         if (instance_buffer_size_ == 0)
             return;
-        direct3d::Texture2D depth_texture_copy = nullptr;
-        direct3d::ShaderResourceView depth_srv = nullptr;
-        {
-            direct3d::Texture2D depth_texture = nullptr;
-            ID3D11DepthStencilView *depth_target = dsv;
-
-            depth_target->GetResource(reinterpret_cast<ID3D11Resource **>(&depth_texture));
-
-            D3D11_TEXTURE2D_DESC depth_texture_desc = {};
-            depth_texture->GetDesc(&depth_texture_desc);
-            depth_texture_desc.Format = DXGI_FORMAT_R24G8_TYPELESS;
-            depth_texture_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-
-            depth_texture_desc.MiscFlags = 0;
-
-            direct3d::AlwaysAssert(direct3d::api().device5->CreateTexture2D(&depth_texture_desc, nullptr, &depth_texture_copy.reset()), "Failed to create texture2D");
-
-            direct3d::api().devcon4->CopyResource(depth_texture_copy, depth_texture);
-
-            // srv desc
-            D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
-            srv_desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-            if (depth_texture_desc.SampleDesc.Count > 1)
-            {
-                srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
-            }
-            else
-            {
-                srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-                srv_desc.Texture2D.MipLevels = 1;
-                srv_desc.Texture2D.MostDetailedMip = 0;
-            }
-
-            direct3d::api().device5->CreateShaderResourceView(depth_texture_copy, &srv_desc, &depth_srv.ptr());
-        }
-
-        direct3d::Texture2D normals_copy = nullptr;
-        direct3d::ShaderResourceView normals_srv = nullptr;
-        {
-            D3D11_TEXTURE2D_DESC normals_copy_desc = {};
-            buffer.normals->render_target()->GetDesc(&normals_copy_desc);
-            normals_copy_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-            normals_copy_desc.MiscFlags = 0;
-
-            direct3d::AlwaysAssert(direct3d::api().device5->CreateTexture2D(&normals_copy_desc, nullptr, &normals_copy.reset()), "Failed to create texture2D");
-
-            direct3d::api().devcon4->CopyResource(normals_copy, buffer.normals->render_target());
-
-            // srv desc
-            D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
-            srv_desc.Format = normals_copy_desc.Format;
-            srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-            srv_desc.Texture2D.MipLevels = 1;
-            srv_desc.Texture2D.MostDetailedMip = 0;
-
-            direct3d::api().device5->CreateShaderResourceView(normals_copy, &srv_desc, &normals_srv.ptr());
-        }
         std::vector<ID3D11RenderTargetView *> rtvs = {
-            buffer.albedo->render_target_view(),
-            buffer.normals->render_target_view(),
-            buffer.roughness_metalness_transmittance_ao->render_target_view(),
-            buffer.emission->render_target_view(),
-            nullptr };
+             buffer.albedo->render_target_view(),
+             buffer.normals->render_target_view(),
+             buffer.roughness_metalness_transmittance_ao->render_target_view(),
+             buffer.emission->render_target_view(),
+             nullptr };
         direct3d::api().devcon4->OMSetRenderTargets(5, rtvs.data(), dsv);
 
-        direct3d::api().devcon4->PSSetShaderResources(1, 1, &normals_srv.ptr());
-        direct3d::api().devcon4->PSSetShaderResources(2, 1, &depth_srv.ptr());
+        direct3d::api().devcon4->PSSetShaderResources(1, 1, &normals_srv);
+        direct3d::api().devcon4->PSSetShaderResources(2, 1, &depth_srv);
         direct3d::api().devcon4->PSSetShaderResources(3, 1, &buffer.entity_id->shader_resource_view());
         decal_shader_.Bind();
         instance_buffer_.Bind(1);

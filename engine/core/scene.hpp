@@ -14,15 +14,20 @@ namespace engine::core
             utils::Assert(renderer != nullptr, "Renderer is null");
             renderer->FrameBegin(this);
         }
-        void DeferredRender(render::GBuffer const &buffer, ID3D11DepthStencilView *dsv)
+        void DeferredRender(render::GBuffer const &buffer)
         {
             utils::Assert(renderer != nullptr, "Renderer is null");
-            renderer->DeferredRender(this, buffer, dsv);
+            renderer->DeferredRender(this, buffer);
         }
-        void ForwardRender(render::PerFrame const &per_frame, render::GBuffer const &buffer, ID3D11DepthStencilView *dsv)
+        void DeferredRender(render::GBuffer const &buffer, ID3D11DepthStencilView *dsv, ID3D11ShaderResourceView *depth_srv, ID3D11ShaderResourceView *normals_srv)
         {
             utils::Assert(renderer != nullptr, "Renderer is null");
-            renderer->ForwardRender(this, per_frame, buffer, dsv);
+            renderer->DeferredRender(this, buffer, dsv, depth_srv, normals_srv);
+        }
+        void ForwardRender(render::PerFrame const &per_frame, render::GBuffer const &buffer, ID3D11DepthStencilView *dsv, ID3D11ShaderResourceView *depth_srv, ID3D11ShaderResourceView *normals_srv)
+        {
+            utils::Assert(renderer != nullptr, "Renderer is null");
+            renderer->ForwardRender(this, per_frame, buffer, dsv, depth_srv, normals_srv);
         }
         void Tick(float delta_time)
         {

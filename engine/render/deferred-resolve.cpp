@@ -3,7 +3,7 @@
 
 namespace engine::render
 {
-    direct3d::RenderTargetBase &DeferredResolve::Process(render::GBuffer &g_buffer, core::Scene *scene, ID3D11DepthStencilView *depth_target)
+    direct3d::RenderTargetBase &DeferredResolve::Process(render::GBuffer &g_buffer, core::Scene *scene, ID3D11DepthStencilView *depth_target, ID3D11ShaderResourceView *depth_srv)
     {
         hdr_render_target_.SizeResources(g_buffer.albedo->size());
 
@@ -12,44 +12,6 @@ namespace engine::render
         direct3d::api().devcon4->OMSetRenderTargets(0, nullptr, nullptr);
         direct3d::api().devcon4->ClearRenderTargetView(hdr_render_target_.render_target_view(), empty_vec.data.data());
         direct3d::api().devcon4->RSSetState(direct3d::states().cull_none.ptr());
-
-        // get depth and render targets
-        // It would be better to create srv once and reuse it, but this is quick and dirty solution
-
-        ID3D11Texture2D *depth_texture = nullptr;
-        ID3D11Texture2D *depth_texture_buffer = nullptr;
-        ID3D11ShaderResourceView *depth_srv = nullptr;
-
-        {
-            depth_target->GetResource(reinterpret_cast<ID3D11Resource **>(&depth_texture));
-
-            D3D11_TEXTURE2D_DESC depth_texture_desc = {};
-            depth_texture->GetDesc(&depth_texture_desc);
-            depth_texture_desc.Format = DXGI_FORMAT_R24G8_TYPELESS;
-            depth_texture_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-
-            depth_texture_desc.MiscFlags = 0;
-
-            direct3d::AlwaysAssert(direct3d::api().device5->CreateTexture2D(&depth_texture_desc, nullptr, &depth_texture_buffer), "Failed to create texture2D");
-
-            direct3d::api().devcon4->CopyResource(depth_texture_buffer, depth_texture);
-
-            // srv desc
-            D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
-            srv_desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-            if (depth_texture_desc.SampleDesc.Count > 1)
-            {
-                srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
-            }
-            else
-            {
-                srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-                srv_desc.Texture2D.MipLevels = 1;
-                srv_desc.Texture2D.MostDetailedMip = 0;
-            }
-
-            direct3d::api().device5->CreateShaderResourceView(depth_texture_buffer, &srv_desc, &depth_srv);
-        }
 
         std::vector<PointLightInstance> point_lights;
         std::vector<SpotLightInstance> spot_lights;
@@ -215,9 +177,6 @@ namespace engine::render
 
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff);
         direct3d::api().devcon4->RSSetState(direct3d::states().cull_back.ptr());
-
-        depth_texture_buffer->Release();
-        depth_srv->Release();
 
         return hdr_render_target_;
     }

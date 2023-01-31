@@ -15,7 +15,7 @@ namespace engine::render
     {
         light_render_system_->OnRender(scene);
     }
-    void Renderer::DeferredRender(core::Scene *scene, GBuffer const &buffer, ID3D11DepthStencilView *dsv)
+    void Renderer::DeferredRender(core::Scene *scene, [[maybe_unused]] GBuffer const &buffer)
     {
         /*
         light_render_system_.RenderShadowMaps(scene);
@@ -32,15 +32,19 @@ namespace engine::render
         dissolution_render_system_->OnRender(scene);
         emissive_render_system_->OnRender(scene);
         grass_render_system_->OnRender(scene);
-        decal_render_system_->OnRender(scene, buffer, dsv);
     }
 
-    void Renderer::ForwardRender(core::Scene *scene, render::PerFrame const &per_frame, GBuffer const &buffer, ID3D11DepthStencilView *dsv)
+    void Renderer::DeferredRender(core::Scene *scene, GBuffer const &buffer, ID3D11DepthStencilView *dsv, ID3D11ShaderResourceView *depth_srv, ID3D11ShaderResourceView *normals_srv)
+    {
+        decal_render_system_->OnRender(scene, buffer, dsv, depth_srv, normals_srv);
+    }
+
+    void Renderer::ForwardRender(core::Scene *scene, render::PerFrame const &per_frame, GBuffer const &buffer, ID3D11DepthStencilView *dsv, ID3D11ShaderResourceView *depth_srv, ID3D11ShaderResourceView *normals_srv)
     {
         skybox_render_pass_->per_frame_ptr = &per_frame;
         skybox_render_pass_->OnRender(scene);
-        emissive_particle_render_system_->OnRender(scene, buffer, dsv);
-        particle_render_system_->OnRender(scene, dsv);
+        emissive_particle_render_system_->OnRender(depth_srv, normals_srv);
+        particle_render_system_->OnRender(scene, depth_srv);
     }
     void Renderer::Tick(core::Scene *scene, float delta_time)
     {

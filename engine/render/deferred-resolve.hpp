@@ -92,7 +92,7 @@ namespace engine::render
                 volume_spot_shader_.SetVertexShader(vs).SetPixelShader(ps).SetInputLayout(il);
             }
         }
-        direct3d::RenderTargetBase &Process(render::GBuffer &g_buffer, core::Scene *scene, ID3D11DepthStencilView *depth_target);
+        direct3d::RenderTargetBase &Process(render::GBuffer &g_buffer, core::Scene *scene, ID3D11DepthStencilView *depth_target, ID3D11ShaderResourceView *depth_srv);
 
         void SetIrradianceTexture(ID3D11ShaderResourceView *texture) { irradiance_texture_ = texture; }
         void SetPrefilteredTexture(ID3D11ShaderResourceView *texture) { prefiltered_texture_ = texture; }

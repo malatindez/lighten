@@ -48,6 +48,22 @@ namespace engine::direct3d
         desc.SampleDesc.Count = hdr_target_.render_target_description().SampleDesc.Count;
         desc.SampleDesc.Quality = hdr_target_.render_target_description().SampleDesc.Quality;
         depth_stencil_.init(&desc, nullptr);
+        desc.Format = DXGI_FORMAT_R24G8_TYPELESS;
+        desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+        desc.MiscFlags = 0;
+        direct3d::AlwaysAssert(direct3d::api().device->CreateTexture2D(&desc, nullptr, &depth_texture_copy_.reset()), "Failed to create depth texture copy");
+        D3D11_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
+        srv_desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+        srv_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+        srv_desc.Texture2D.MipLevels = 1;
+        srv_desc.Texture2D.MostDetailedMip = 0;
+        direct3d::AlwaysAssert(direct3d::api().device->CreateShaderResourceView(depth_texture_copy_.ptr(), &srv_desc, &depth_texture_copy_srv_.reset()), "Failed to create depth texture copy SRV");
+        desc = gbuffer_.normals->render_target_description();
+        desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+        desc.MiscFlags = 0;
+        direct3d::AlwaysAssert(direct3d::api().device->CreateTexture2D(&desc, nullptr, &normals_texture_copy_.reset()), "Failed to create normal texture copy");
+        srv_desc.Format = desc.Format;
+        direct3d::AlwaysAssert(direct3d::api().device->CreateShaderResourceView(normals_texture_copy_.ptr(), &srv_desc, &normals_texture_copy_srv_.reset()), "Failed to create normal texture copy SRV");
 
         // Set up the viewport.
         viewport_.Width = (float)size.x;
@@ -85,15 +101,20 @@ namespace engine::direct3d
         };
         api().devcon4->OMSetRenderTargets(5, gbuffer_target_views.data(), depth_stencil_.depth_stencil_view());
         direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth_write_stencil_replace, 1);
-        scene_->DeferredRender(gbuffer_, depth_stencil_.depth_stencil_view());
+        scene_->DeferredRender(gbuffer_);
+
+        direct3d::api().devcon4->CopyResource(depth_texture_copy_, depth_stencil_.depth_buffer());
+        direct3d::api().devcon4->CopyResource(normals_texture_copy_, gbuffer_.normals->render_target());
+
+        scene_->DeferredRender(gbuffer_, depth_stencil_.depth_stencil_view(), depth_texture_copy_srv_, normals_texture_copy_srv_);
 
         direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().no_depth_stencil_read, 1);
-        deferred_resolve_->Process(gbuffer_, scene_.get(), depth_stencil_.depth_stencil_view());
+        deferred_resolve_->Process(gbuffer_, scene_.get(), depth_stencil_.depth_stencil_view(), depth_texture_copy_srv_);
 
         api().devcon4->RSSetViewports(1, &viewport_);
         api().devcon4->OMSetRenderTargets(1, &hdr_target_.render_target_view(), depth_stencil_.depth_stencil_view());
 
-        scene_->ForwardRender(per_frame_, gbuffer_, depth_stencil_.depth_stencil_view());
+        scene_->ForwardRender(per_frame_, gbuffer_, depth_stencil_.depth_stencil_view(), depth_texture_copy_srv_, normals_texture_copy_srv_);
 
         hdr_to_ldr_layer_->OnProcess(hdr_target_);
 
