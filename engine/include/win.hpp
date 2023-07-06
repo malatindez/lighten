@@ -7,5 +7,7 @@
 #endif
 
 #include <windows.h>
+#include <ShObjIdl.h>
+#include <commdlg.h>
 
 #include "win-undef.hpp"
