@@ -368,7 +368,10 @@ namespace engine::render::_grass_detail
             }
             material_instance.instances.push_back(entity);
         }
-
+        if (view.empty())
+        {
+            return;
+        }
         std::vector<GPUGrassInstance> grass_instances;
         for (auto const &material : materials_)
         {
@@ -409,6 +412,10 @@ namespace engine::render::_grass_detail
             }
         }
 
+        if (grass_instances.size() <= 0)
+        {
+            return;
+        }
         instance_buffer_.Init(std::span(grass_instances));
         scene->renderer->light_render_system().ScheduleShadowMapUpdate();
     }
