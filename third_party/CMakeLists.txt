@@ -1,5 +1,4 @@
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party")
-
 set(GLM_DIR "${LIB_DIR}/glm")
 set(MATH_DIR "${LIB_DIR}/math")
 set(ASSIMP_DIR "${LIB_DIR}/assimp")
@@ -15,10 +14,10 @@ set(BENCHMARK_DIR "${LIB_DIR}/google/google_benchmark")
 set(SPDLOG_DIR "${LIB_DIR}/spdlog")
 
 # directx
-include("third_party/FindDirectX.cmake")
+include("${LIB_DIR}/FindDirectX.cmake")
 
 function(target_add_direct3d TARGET)
-  target_link_directories("${TARGET}" PRIVATE ${DirectX_LIBRARY_DIR})
+  target_link_directories("${TARGET}" PUBLIC ${DirectX_LIBRARY_DIR})
   target_link_libraries("${TARGET}" ${DirectX_LIBRARY_DIR}/d3d11.lib)
   target_link_libraries("${TARGET}" ${DirectX_LIBRARY_DIR}/d3d10.lib)
   target_link_libraries("${TARGET}" ${DirectX_LIBRARY_DIR}/dxguid.lib)
@@ -28,12 +27,12 @@ endfunction(target_add_direct3d)
 
 # glm
 function(target_add_glm TARGET)
-  target_include_directories("${TARGET}" PRIVATE "${GLM_DIR}")
+  target_include_directories("${TARGET}" PUBLIC "${GLM_DIR}")
 endfunction(target_add_glm)
 
 # math
 function(target_add_math TARGET)
-  target_include_directories("${TARGET}" PRIVATE "${MATH_DIR}")
+  target_include_directories("${TARGET}" PUBLIC "${MATH_DIR}")
 endfunction(target_add_math)
 
 # assimp
@@ -63,7 +62,7 @@ target_compile_features(imgui PUBLIC cxx_std_17)
 
 function(target_add_imgui TARGET)
   target_link_libraries("${TARGET}" imgui)
-  target_include_directories(imguizmo PRIVATE "${IMGUI_DIR}")
+  target_include_directories(imguizmo PUBLIC "${IMGUI_DIR}")
   target_sources("${TARGET}" PUBLIC "${IMGUI_DIR}/backends/imgui_impl_dx11.cpp"
     "${IMGUI_DIR}/backends/imgui_impl_win32.cpp")
 endfunction(target_add_imgui)
@@ -84,8 +83,8 @@ target_link_libraries(imgui_console PUBLIC imgui)
 
 function(target_add_imgui_console TARGET)
   target_link_libraries("${TARGET}" imgui_console)
-  target_include_directories("${TARGET}" PRIVATE "${IMGUI_CONSOLE}/include")
-  target_include_directories(imgui_console PRIVATE "${IMGUI_CONSOLE}/include/imgui_console")
+  target_include_directories("${TARGET}" PUBLIC "${IMGUI_CONSOLE}/include")
+  target_include_directories(imgui_console PUBLIC "${IMGUI_CONSOLE}/include/imgui_console")
 endfunction(target_add_imgui_console)
 
 # imguizmo
@@ -100,11 +99,11 @@ target_link_libraries(imguizmo PUBLIC imgui)
 
 function(target_add_imguizmo TARGET)
   target_link_libraries("${TARGET}" imguizmo)
-  target_include_directories(imguizmo PRIVATE "${IMGUIZMO_DIR}")
+  target_include_directories(imguizmo PUBLIC "${IMGUIZMO_DIR}")
 endfunction(target_add_imguizmo)
 
 # entt
-add_subdirectory(third_party/entt)
+add_subdirectory(${ENTT_DIR})
 
 function(target_add_entt TARGET)
   target_link_libraries("${TARGET}" EnTT::EnTT)
@@ -138,7 +137,7 @@ endfunction(target_add_benchmark)
 add_subdirectory("${SPDLOG_DIR}" EXCLUDE_FROM_ALL)
 
 function(target_add_spdlog TARGET)
-  target_include_directories("${TARGET}" PRIVATE "${SPDLOG_DIR}/include")
+  target_include_directories("${TARGET}" PUBLIC "${SPDLOG_DIR}/include")
 endfunction(target_add_spdlog)
 
 
@@ -153,7 +152,7 @@ target_add_direct3d(dds_texture_loader11)
 
 
 function(target_add_dds_texture_loader TARGET)
-  target_include_directories("${TARGET}" PRIVATE "${DDS_TEXTURE_LOADER_DIR}")
+  target_include_directories("${TARGET}" PUBLIC "${DDS_TEXTURE_LOADER_DIR}")
   target_link_libraries("${TARGET}" dds_texture_loader11)
 endfunction(target_add_dds_texture_loader)
 
@@ -166,7 +165,7 @@ target_compile_features(wic_texture_loader11 PUBLIC cxx_std_17)
 target_add_direct3d(wic_texture_loader11)
 
 function(target_add_wic_texture_loader TARGET)
-  target_include_directories("${TARGET}" PRIVATE "${WIC_TEXTURE_LOADER_DIR}")
+  target_include_directories("${TARGET}" PUBLIC "${WIC_TEXTURE_LOADER_DIR}")
   target_link_libraries("${TARGET}" wic_texture_loader11)
 endfunction(target_add_wic_texture_loader)
 
@@ -180,7 +179,7 @@ target_compile_features(DirectXTex PUBLIC cxx_std_17)
 target_add_direct3d(DirectXTex)
 
 function(target_add_directxtex TARGET)
-  target_include_directories("${TARGET}" PRIVATE "${DIRECTXTEX_DIR}/include")
+  target_include_directories("${TARGET}" PUBLIC "${DIRECTXTEX_DIR}/include")
   target_link_libraries("${TARGET}" DirectXTex)
 endfunction(target_add_directxtex)
 
@@ -252,6 +251,7 @@ function(update_sources_msvc SOURCES)
     if(IS_ABSOLUTE "${_source}")
       file(RELATIVE_PATH _source_rel "${CMAKE_CURRENT_SOURCE_DIR}" "${_source}")
     else()
+      set(_source_rel "${_source}")
       set(_source_rel "${_source}")
     endif()
 

@@ -1,4 +1,5 @@
 set(ENGINE_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/engine")
+set(ENGINE_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/engine" PARENT_SCOPE)
 file(GLOB_RECURSE ENGINE_SOURCES ${ENGINE_SOURCES_DIR}/*.*)
 
 foreach(_source IN ITEMS ${ENGINE_SOURCES})
@@ -13,10 +14,9 @@ foreach(_source IN ITEMS ${ENGINE_SOURCES})
     source_group("${_source_path_msvc}" FILES "${_source}")
 endforeach()
 
-# add_library(engine STATIC "${ENGINE_SOURCES}")
-# target_precompile_headers(engine PRIVATE "${ENGINE_SOURCES_DIR}/include/library-pch.hpp")
-# target_add_libraries(engine "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console"  "dds_texture_loader11" "wic_texture_loader11" "directxtex")
-# target_include_directories(engine PRIVATE ${ENGINE_SOURCES_DIR})
-
-# set_target_properties(engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
-# set_target_properties(engine PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
+add_library(engine STATIC "${ENGINE_SOURCES}")
+target_precompile_headers(engine PUBLIC "${ENGINE_SOURCES_DIR}/include/library-pch.hpp")
+target_add_libraries(engine "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console"  "dds_texture_loader11" "wic_texture_loader11" "directxtex")
+target_include_directories(engine PUBLIC ${ENGINE_SOURCES_DIR})
+set_target_properties(engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
+set_target_properties(engine PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
