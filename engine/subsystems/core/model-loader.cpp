@@ -12,35 +12,60 @@ namespace engine::core
     using namespace render;
     namespace
     {
-        ModelMesh SetupMesh(std::vector<Vertex> &&vertices, std::vector<uint32_t> &&indices, uint32_t material_id, aiMatrix4x4 const &transformation, MeshRange &&mesh_range)
+        ModelMesh SetupMesh(std::vector<Vertex>&& vertices, std::vector<uint32_t>&& indices, uint32_t material_id, aiMatrix4x4 const& transformation, MeshRange&& mesh_range)
         {
             auto temp = math::mat4(transformation.a1, transformation.a2, transformation.a3, transformation.a4,
-                                   transformation.b1, transformation.b2, transformation.b3, transformation.b4,
-                                   transformation.c1, transformation.c2, transformation.c3, transformation.c4,
-                                   transformation.d1, transformation.b2, transformation.d3, transformation.d4);
+                transformation.b1, transformation.b2, transformation.b3, transformation.b4,
+                transformation.c1, transformation.c2, transformation.c3, transformation.c4,
+                transformation.d1, transformation.b2, transformation.d3, transformation.d4);
             return ModelMesh(material_id, temp, std::move(mesh_range), Mesh{ .vertices = std::move(vertices), .indices = std::move(indices) });
         }
 
-        void processMesh(std::vector<Vertex> &vertices_dest,
-                         std::vector<uint32_t> &indices_dest,
-                         std::vector<ModelMesh> &meshes,
-                         aiMesh *mesh,
-                         aiMatrix4x4 const &transformation)
+        void processMesh(std::vector<Vertex>& vertices_dest,
+            std::vector<uint32_t>& indices_dest,
+            std::vector<ModelMesh>& meshes,
+            aiMesh* mesh,
+            aiMatrix4x4 const& transformation)
         {
             std::vector<Vertex> vertices;
             std::vector<uint32_t> indices;
             for (uint32_t i = 0; i < mesh->mNumVertices; i++)
             {
+                math::vec3 position = math::vec3{ 0 };
+                math::vec2 tex_coord = math::vec2{ 0 };
+                math::vec3 normal = math::vec3{ 0 };
+                math::vec3 tangent = math::vec3{ 0 };
+                math::vec3 bitangent = math::vec3{ 0 };
+                if (mesh->mVertices != nullptr)
+                {
+                    position = math::vec3{ mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
+                }
+                if (mesh->mTextureCoords != nullptr && mesh->mTextureCoords[0] != nullptr)
+                {
+                    tex_coord = math::vec2{ mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
+                }
+                if (mesh->mNormals != nullptr)
+                {
+                    normal = math::vec3{ mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
+                }
+                if (mesh->mTangents != nullptr)
+                {
+                    tangent = math::vec3{ mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
+                }
+                if (mesh->mBitangents != nullptr)
+                {
+                    bitangent = math::vec3{ mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z };
+                }
                 vertices.emplace_back(Vertex{
-                    .position = math::vec3{mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z},
-                    .tex_coord = math::vec2{mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y},
-                    .normal = math::vec3{mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z},
-                    .tangent = math::vec3{mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z},
-                    .bitangent = math::vec3{mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z} });
+                    .position = position,
+                    .tex_coord = tex_coord,
+                    .normal = normal,
+                    .tangent = tangent,
+                    .bitangent = bitangent });
             }
             for (uint32_t i = 0; i < mesh->mNumFaces; i++)
             {
-                aiFace const &face = mesh->mFaces[i];
+                aiFace const& face = mesh->mFaces[i];
                 for (uint32_t j = 0; j < face.mNumIndices; j++)
                 {
                     indices.push_back(face.mIndices[j]);
@@ -62,15 +87,15 @@ namespace engine::core
             meshes.push_back(std::move(mesh__));
         }
 
-        void processNode(std::vector<Vertex> &vertices,
-                         std::vector<uint32_t> &indices,
-                         std::vector<ModelMesh> &meshes,
-                         aiNode *node,
-                         aiScene const *scene)
+        void processNode(std::vector<Vertex>& vertices,
+            std::vector<uint32_t>& indices,
+            std::vector<ModelMesh>& meshes,
+            aiNode* node,
+            aiScene const* scene)
         {
             for (uint32_t i = 0; i < node->mNumMeshes; i++)
             {
-                aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+                aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
                 processMesh(vertices, indices, meshes, mesh, node->mTransformation);
             }
 
@@ -97,10 +122,10 @@ namespace engine::core
             default: return Material::ShadingMode::None;
             }
         }
-        void ProcessMaterials(std::vector<Material> &materials, aiScene const *scene_ptr, std::filesystem::path const &model_folder);
+        void ProcessMaterials(std::vector<Material>& materials, aiScene const* scene_ptr, std::filesystem::path const& model_folder);
     } // namespace
 
-    std::optional<uint64_t> ModelLoader::Load(std::filesystem::path const &path)
+    std::optional<uint64_t> ModelLoader::Load(std::filesystem::path const& path)
     {
         if (auto it = instance_->models_.find(std::filesystem::hash_value(path));
             it != instance_->models_.end())
@@ -109,25 +134,25 @@ namespace engine::core
         }
 
         Assimp::Importer importer;
-        aiScene const *scene_ptr = importer.ReadFile(path.string().c_str(),
-                                                     aiProcess_Triangulate |
-                                                     aiProcess_MakeLeftHanded |
-                                                     aiProcess_FlipUVs |
-                                                     aiProcess_FlipWindingOrder |
-                                                     aiProcess_JoinIdenticalVertices |
-                                                     (uint32_t)aiProcess_GenBoundingBoxes |
-                                                     aiProcess_CalcTangentSpace |
-                                                     aiProcess_OptimizeGraph |
-                                                     aiProcess_OptimizeMeshes |
-                                                     aiProcess_ImproveCacheLocality |
-                                                     aiProcess_RemoveRedundantMaterials |
-                                                     aiProcess_FindDegenerates |
-                                                     aiProcess_FindInvalidData |
-                                                     aiProcess_GenSmoothNormals |
-                                                     aiProcess_SplitLargeMeshes |
-                                                     aiProcess_SortByPType |
-                                                     aiProcess_FindInstances |
-                                                     aiProcess_ValidateDataStructure);
+        aiScene const* scene_ptr = importer.ReadFile(path.string().c_str(),
+            aiProcess_Triangulate |
+            aiProcess_MakeLeftHanded |
+            aiProcess_FlipUVs |
+            aiProcess_FlipWindingOrder |
+            aiProcess_JoinIdenticalVertices |
+            (uint32_t)aiProcess_GenBoundingBoxes |
+            aiProcess_CalcTangentSpace |
+            aiProcess_OptimizeGraph |
+            aiProcess_OptimizeMeshes |
+            aiProcess_ImproveCacheLocality |
+            aiProcess_RemoveRedundantMaterials |
+            aiProcess_FindDegenerates |
+            aiProcess_FindInvalidData |
+            aiProcess_GenSmoothNormals |
+            aiProcess_SplitLargeMeshes |
+            aiProcess_SortByPType |
+            aiProcess_FindInstances |
+            aiProcess_ValidateDataStructure);
 
         if (scene_ptr == nullptr)
         {
@@ -147,9 +172,9 @@ namespace engine::core
         math::vec3 min{ std::numeric_limits<float>::max() };
         math::vec3 max{ std::numeric_limits<float>::min() };
 
-        for (auto &mesh : meshes)
+        for (auto& mesh : meshes)
         {
-            auto &mesh_range = mesh.mesh_range;
+            auto& mesh_range = mesh.mesh_range;
             auto mesh_min = (math::vec4(mesh_range.bounding_box.min, 1) * mesh.mesh_to_model).xyz;
             auto mesh_max = (math::vec4(mesh_range.bounding_box.max, 1) * mesh.mesh_to_model).xyz;
             math::rmin(min, mesh_min);
@@ -162,7 +187,7 @@ namespace engine::core
             index_offset += mesh_range.index_count;
             vertex_offset += mesh_range.vertex_count;
         }
-        for (auto &mesh : meshes)
+        for (auto& mesh : meshes)
         {
             mesh.triangle_octree.initialize(mesh);
         }
@@ -180,7 +205,7 @@ namespace engine::core
 
     namespace
     {
-        void ProcessMaterials(std::vector<Material> &materials, aiScene const *scene_ptr, std::filesystem::path const &model_folder)
+        void ProcessMaterials(std::vector<Material>& materials, aiScene const* scene_ptr, std::filesystem::path const& model_folder)
         {
             aiString str;
             ai_real value;
@@ -189,7 +214,7 @@ namespace engine::core
 
             for (size_t material_index = 0; material_index < scene_ptr->mNumMaterials; material_index++)
             {
-                aiMaterial *material = scene_ptr->mMaterials[material_index];
+                aiMaterial* material = scene_ptr->mMaterials[material_index];
                 Material result;
                 if (AI_SUCCESS != material->Get(AI_MATKEY_NAME, str)) { str = aiString("n/a"); }
                 result.name = str.C_Str();
