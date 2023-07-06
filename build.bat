@@ -20,4 +20,3 @@ if /I "%c%" EQU "N" goto :end
 start engine.sln
 :end
 cd ..
-pause
