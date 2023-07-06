@@ -16,7 +16,7 @@ endforeach()
 
 add_library(engine STATIC "${ENGINE_SOURCES}")
 target_precompile_headers(engine PUBLIC "${ENGINE_SOURCES_DIR}/include/library-pch.hpp")
-target_add_libraries(engine "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console"  "dds_texture_loader11" "wic_texture_loader11" "directxtex")
+target_add_libraries(engine "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console" "directxtex" "dds_texture_loader11" "wic_texture_loader11" "math")
 target_include_directories(engine PUBLIC ${ENGINE_SOURCES_DIR})
 set_target_properties(engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
 set_target_properties(engine PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
