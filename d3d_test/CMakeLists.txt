@@ -34,23 +34,23 @@ file(COPY ${RESOURCES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Debug")
 file(COPY ${RESOURCES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Release")
 
 set_target_properties(d3d_test PROPERTIES LINKER_LANGUAGE CXX)
-file(WRITE "${CMAKE_BINARY_DIR}/d3d_test.vcxproj.user" "\
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/d3d_test.vcxproj.user" "\
 <?xml version=\"1.0\" encoding=\"utf-8\"?> \ 
 <Project ToolsVersion=\"Current\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\"> \ 
   <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\"> \ 
-    <LocalDebuggerWorkingDirectory>$(ProjectDir)..\\runtime_directory\\</LocalDebuggerWorkingDirectory> \ 
+    <LocalDebuggerWorkingDirectory>${CMAKE_CURRENT_SOURCE_DIR}\\runtime_directory\\</LocalDebuggerWorkingDirectory> \ 
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor> \ 
   </PropertyGroup> \ 
   <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='MinSizeRel|x64'\"> \ 
-    <LocalDebuggerWorkingDirectory>$(ProjectDir)..\\runtime_directory\\</LocalDebuggerWorkingDirectory> \ 
+    <LocalDebuggerWorkingDirectory>${CMAKE_CURRENT_SOURCE_DIR}\\runtime_directory\\</LocalDebuggerWorkingDirectory> \ 
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor> \ 
   </PropertyGroup> \ 
   <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Release|x64'\"> \ 
-    <LocalDebuggerWorkingDirectory>$(ProjectDir)..\\runtime_directory\\</LocalDebuggerWorkingDirectory> \ 
+    <LocalDebuggerWorkingDirectory>${CMAKE_CURRENT_SOURCE_DIR}\\runtime_directory\\</LocalDebuggerWorkingDirectory> \ 
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor> \ 
   </PropertyGroup> \ 
   <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'\"> \ 
-    <LocalDebuggerWorkingDirectory>$(ProjectDir)..\\runtime_directory\\</LocalDebuggerWorkingDirectory> \ 
+    <LocalDebuggerWorkingDirectory>${CMAKE_CURRENT_SOURCE_DIR}\\runtime_directory\\</LocalDebuggerWorkingDirectory> \ 
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor> \ 
   </PropertyGroup> \ 
 </Project> \ 
