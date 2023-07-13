@@ -16,8 +16,12 @@ namespace engine::core
         // io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
         float fontSize = 18.0f; // *2.0f;
+        ImFontConfig config;
+        static const ImWchar full_range[] = { 0x0020, 0xFFFF, 0 };
+        config.GlyphRanges = full_range;
         io.Fonts->AddFontFromFileTTF("assets/fonts/jetbrains-mono/JetBrainsMono-Bold.ttf", fontSize);
-        io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/jetbrains-mono/JetBrainsMono-Regular.ttf", fontSize);
+        io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/jetbrains-mono/JetBrainsMono-Regular.ttf", fontSize, &config);
+        
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
