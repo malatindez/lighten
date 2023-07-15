@@ -84,8 +84,13 @@ namespace engine::core
         else m_box.min[2] -= elongation[2];
     }
 
-    bool TriangleOctree::addTriangle(uint32_t triangleIndex, const math::vec3 &V1, const math::vec3 &V2, const math::vec3 &V3, const math::vec3 &center)
+    bool TriangleOctree::addTriangle(uint32_t triangleIndex, const math::vec3 &V1, const math::vec3 &V2, const math::vec3 &V3, const math::vec3 &center, uint32_t depth)
     {
+        if (depth > maximum_depth)
+        {
+            m_triangles.emplace_back(triangleIndex);
+            return true;
+        }
         if (!m_initialBox.contains(center) ||
             !m_box.contains(V1) ||
             !m_box.contains(V2) ||
@@ -139,7 +144,7 @@ namespace engine::core
         int i = 0;
         for (; i < 8; ++i)
         {
-            if ((*m_children)[i].addTriangle(triangleIndex, V1, V2, V3, center))
+            if ((*m_children)[i].addTriangle(triangleIndex, V1, V2, V3, center, depth + 1))
                 break;
         }
 
