@@ -8,6 +8,7 @@ namespace engine
     entt::entity SkyboxManager::LoadSkybox(entt::registry &registry, std::filesystem::path const &path)
     {
         entt::entity rv = registry.create();
+        registry.emplace<components::GameObject>(rv).name = "Skybox";
         TextureId texture_id = std::numeric_limits<TextureId>::max();
         texture_id = core::TextureManager::LoadCubemap(path);
         registry.emplace<components::SkyboxComponent>(rv, components::SkyboxComponent{ .texture_id = texture_id });

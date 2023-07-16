@@ -34,6 +34,7 @@ namespace engine::render
 
     public:
         uint64_t AddModel(Model &&model);
+        void UnloadModel(uint64_t model_id);
 
         static uint64_t GetUnitSphereFlat();
         static uint64_t GetUnitSphereLowPoly();

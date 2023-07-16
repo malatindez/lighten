@@ -72,6 +72,10 @@ namespace engine::render
         instance_->models_.emplace(current_index, std::move(model_));
         return current_index++;
     }
+    void ModelSystem::UnloadModel(uint64_t model_id)
+    {
+        instance_->models_.erase(model_id);
+    }
     uint64_t ModelSystem::GetUnitSphereFlat()
     {
         static uint64_t model_id = std::numeric_limits<uint64_t>::max();

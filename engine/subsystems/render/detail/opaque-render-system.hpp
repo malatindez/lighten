@@ -195,16 +195,7 @@ namespace engine::render::_opaque_detail
         }
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity);
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, std::vector<OpaqueMaterial> const &materials);
-        void RemoveInstance(entt::registry &registry, entt::entity entity)
-        {
-            components::OpaqueComponent &oc = registry.get<components::OpaqueComponent>(entity);
-            ModelInstance &model_instance = model_instances_.at(oc.model_instance_id);
-            uint32_t i = 0;
-            for (auto material_instance_id : oc.material_instance_id)
-            {
-                std::erase(model_instance.mesh_instances[i++].material_instances[material_instance_id].instances, entity);
-            }
-        }
+        void RemoveInstance(entt::registry& registry, entt::entity entity);
 
         void Update([[maybe_unused]] core::Scene *scene) {}
         void ScheduleInstanceUpdate()
@@ -222,7 +213,8 @@ namespace engine::render::_opaque_detail
 
         bool is_instance_update_scheduled_ = false;
 
-        std::vector<ModelInstance> model_instances_;
+        std::unordered_map<size_t, ModelInstance> model_instances_;
+        size_t model_instance_offset_ = 0;
 
         GraphicsShaderProgram opaque_cubemap_shader_;
         GraphicsShaderProgram opaque_texture_shader_;

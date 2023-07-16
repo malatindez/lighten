@@ -148,7 +148,7 @@ namespace engine::render::_opaque_detail
         uint32_t renderedInstances = 0;
         direct3d::api().devcon->RSSetState(direct3d::states().cull_none);
         bool current_state_twosided = true;
-        for (const auto &model_instance : model_instances_)
+        for (const auto &[model_instance_id, model_instance] : model_instances_)
         {
             model_instance.model.vertices.Bind(0);
             model_instance.model.indices.Bind();
@@ -199,7 +199,7 @@ namespace engine::render::_opaque_detail
         opaque_per_material_buffer_.Bind(direct3d::ShaderType::PixelShader, 2);
         instance_buffer_.Bind(1);
         uint32_t renderedInstances = 0;
-        for (const auto &model_instance : model_instances_)
+        for (const auto &[model_instance_id, model_instance] : model_instances_)
         {
             model_instance.model.vertices.Bind(0);
             model_instance.model.indices.Bind();
@@ -252,7 +252,7 @@ namespace engine::render::_opaque_detail
         instance_buffer_.Bind(1);
         uint32_t renderedInstances = 0;
 
-        for (const auto &model_instance : model_instances_)
+        for (const auto & [model_instance_id, model_instance] : model_instances_)
         {
             model_instance.model.vertices.Bind(0);
             model_instance.model.indices.Bind();
@@ -291,7 +291,7 @@ namespace engine::render::_opaque_detail
     {
         uint32_t total_instances = 0;
         for (auto &model_instance : model_instances_)
-            for (auto &mesh_instance : model_instance.mesh_instances)
+            for (auto &mesh_instance : model_instance.second.mesh_instances)
                 for (auto const &material_instance : mesh_instance.material_instances)
                     total_instances += uint32_t(material_instance.instances.size());
 
@@ -306,9 +306,9 @@ namespace engine::render::_opaque_detail
         uint32_t copiedNum = 0;
         for (auto &model_instance : model_instances_)
         {
-            for (uint32_t meshIndex = 0; meshIndex < model_instance.mesh_instances.size(); ++meshIndex)
+            for (uint32_t meshIndex = 0; meshIndex < model_instance.second.mesh_instances.size(); ++meshIndex)
             {
-                for (const auto &perMaterial : model_instance.mesh_instances[meshIndex].material_instances)
+                for (const auto &perMaterial : model_instance.second.mesh_instances[meshIndex].material_instances)
                 {
                     auto &instances = perMaterial.instances;
                     for (auto entity : instances)
@@ -328,23 +328,23 @@ namespace engine::render::_opaque_detail
     ModelInstance *OpaqueRenderSystem::GetInstancePtr(uint64_t model_id)
     {
         auto it = std::find_if(model_instances_.begin(), model_instances_.end(), [&model_id] (auto const &instance)
-                               { return instance.model_id == model_id; });
+                               { return instance.second.model_id == model_id; });
         if (it != model_instances_.end())
         {
-            return &(*it);
+            return &(it->second);
         }
         return nullptr;
     }
     size_t OpaqueRenderSystem::GetInstanceId(uint64_t model_id)
     {
         auto it = std::find_if(model_instances_.begin(), model_instances_.end(), [&model_id] (auto const &instance)
-                               { return instance.model_id == model_id; });
+                               { return instance.second.model_id == model_id; });
         if (it != model_instances_.end())
         {
             return std::distance(model_instances_.begin(), it);
         }
-        model_instances_.emplace_back(ModelInstance{ .model = ModelSystem::GetModel(model_id), .model_id = model_id });
-        auto &instance = model_instances_.back();
+        model_instances_.insert({ model_instance_offset_++, ModelInstance{.model = ModelSystem::GetModel(model_id), .model_id = model_id } });
+        auto &instance = model_instances_.at(model_instance_offset_ - 1);
         for (auto const &mesh : instance.model.meshes)
         {
             MeshInstance value;
@@ -352,7 +352,7 @@ namespace engine::render::_opaque_detail
             value.material_instances.emplace_back(std::move(material_instance));
             instance.mesh_instances.emplace_back(std::move(value));
         }
-        return model_instances_.size() - 1;
+        return model_instance_offset_ - 1;
     }
 
     void OpaqueRenderSystem::AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity)
@@ -421,5 +421,28 @@ namespace engine::render::_opaque_detail
         auto &opaque_instance = registry.emplace_or_replace<components::OpaqueComponent>(entity, components::OpaqueComponent(model_id));
         opaque_instance.model_instance_id = instance_id;
         opaque_instance.material_instance_id = std::move(material_instance_id);
+    }
+
+    void OpaqueRenderSystem::RemoveInstance(entt::registry& registry, entt::entity entity)
+    {
+        components::OpaqueComponent& oc = registry.get<components::OpaqueComponent>(entity);
+        ModelInstance& model_instance = model_instances_.at(oc.model_instance_id);
+        uint32_t i = 0;
+        for (auto material_instance_id : oc.material_instance_id)
+        {
+            std::erase(model_instance.mesh_instances[i++].material_instances[material_instance_id].instances, entity);
+        }
+        uint32_t count = 0;
+        for (auto& mesh_instance : model_instance.mesh_instances)
+        {
+            for (auto& material_instance : mesh_instance.material_instances)
+            {
+                count += material_instance.instances.size();
+            }
+        }
+        if (count == 0)
+        {
+            model_instances_.erase(oc.model_instance_id);
+        }
     }
 }
