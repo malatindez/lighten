@@ -41,7 +41,7 @@ namespace engine::utils
     template <auto begin, auto end, auto inc, class F>
     constexpr void constexpr_for(F &&f)
     {
-        if (not f(std::integral_constant<decltype(begin), begin>{}))
+        if (!f(std::integral_constant<decltype(begin), begin>{}))
         {
             return;
         }
