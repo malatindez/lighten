@@ -341,7 +341,7 @@ namespace engine::render::_opaque_detail
                                { return instance.second.model_id == model_id; });
         if (it != model_instances_.end())
         {
-            return std::distance(model_instances_.begin(), it);
+            return it->first;
         }
         model_instances_.insert({ model_instance_offset_++, ModelInstance{.model = ModelSystem::GetModel(model_id), .model_id = model_id } });
         auto &instance = model_instances_.at(model_instance_offset_ - 1);
