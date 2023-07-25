@@ -218,7 +218,20 @@ namespace engine::utils::uuid {
     template <typename RNG>
     class UUIDGenerator {
     public:
-        UUIDGenerator() : generator(new RNG(std::random_device()())), distribution(std::numeric_limits<uint64_t>::min(), std::numeric_limits<uint64_t>::max())
+    
+
+        static uint64_t random_seed()
+        {
+            try {
+                std::random_device rd;
+                return rd();
+            }
+            catch (const std::exception& e) {
+                return std::chrono::system_clock::now().time_since_epoch().count();
+            }
+        }
+
+        UUIDGenerator() : generator(new RNG(random_seed())), distribution(std::numeric_limits<uint64_t>::min(), std::numeric_limits<uint64_t>::max())
         {}
 
         UUIDGenerator(uint64_t seed) : generator(new RNG(seed)), distribution(std::numeric_limits<uint64_t>::min(), std::numeric_limits<uint64_t>::max())

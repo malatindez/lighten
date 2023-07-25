@@ -165,8 +165,19 @@ namespace engine::core
         utils::Measurer<std::chrono::high_resolution_clock> tick_measurer{ "Engine::Tick()", false };
 #endif
 
-        [[nodiscard]] static inline std::random_device &random_device() { return application_->random_device_; }
-        [[nodiscard]] static inline std::mt19937 &random_engine() { return application_->random_engine_; }
+
+        [[nodiscard]] static uint64_t random_seed()
+        {
+            try {
+                std::random_device rd;
+                return rd();
+            }
+            catch ([[maybe_unused]] const std::exception& e) {
+                return std::chrono::system_clock::now().time_since_epoch().count();
+            }
+        }
+
+        [[nodiscard]] static inline std::mt19937 &random_engine() { return *application_->random_engine_; }
 
     private:
         /**
@@ -202,8 +213,7 @@ namespace engine::core
         Engine(Engine const &) = delete;
         Engine &operator=(Engine &&) = delete;
         Engine &operator=(Engine const &) = delete;
-        std::random_device random_device_;
-        std::mt19937 random_engine_;
+        std::unique_ptr<std::mt19937> random_engine_;
 
         std::shared_ptr<Scene> scene_ = nullptr;
 

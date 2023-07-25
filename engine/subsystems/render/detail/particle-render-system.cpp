@@ -38,7 +38,7 @@ namespace engine::render::_particle_detail
 {
     ParticleRenderSystem::ParticleRenderSystem() : RenderPass(0x30000)
     {
-        random_engine_.seed(std::random_device()());
+        random_engine_.seed(engine::core::Engine::random_seed());
         auto path = std::filesystem::current_path();
         std::vector<D3D11_INPUT_ELEMENT_DESC> d3d_input_desc{
             { "POSITION",        0, DXGI_FORMAT_R32G32B32_FLOAT,     1, 0,                            D3D11_INPUT_PER_INSTANCE_DATA, 1},

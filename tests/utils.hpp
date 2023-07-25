@@ -3,8 +3,20 @@
 #undef CreateFile
 namespace utils
 {
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
+    
+
+        uint64_t random_seed()
+        {
+            try {
+                std::random_device rd;
+                return rd();
+            }
+            catch (const std::exception& e) {
+                return std::chrono::system_clock::now().time_since_epoch().count();
+            }
+        }
+
+    static std::mt19937 gen(random_seed());
 
     namespace fs = std::filesystem;
     namespace _detail
