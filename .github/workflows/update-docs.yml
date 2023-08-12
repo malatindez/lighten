@@ -12,7 +12,7 @@ jobs:
     
     - name: "Install dependencies"
       run: |
-        sudo apt-get update && sudo apt-get install graphviz texmaker
+        sudo apt-get update && sudo apt-get install graphviz texmaker 
 
     - name: "Checkout" 
       uses: actions/checkout@v2
