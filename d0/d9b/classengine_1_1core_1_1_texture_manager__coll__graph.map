@@ -1,0 +1,14 @@
+<map id="engine::core::TextureManager" name="engine::core::TextureManager">
+<area shape="rect" id="Node000001" title=" " alt="" coords="595,115,784,140"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="891,107,1054,148"/>
+<area shape="poly" id="edge2_Node000002_Node000001" title=" " alt="" coords="799,125,891,125,891,130,799,130"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="877,151,867,152,805,152,747,143,748,138,806,146,867,146,876,145"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="281,5,439,76"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="454,62,638,111,637,116,452,68"/>
+<area shape="rect" id="Node000004" href="$df/d47/classengine_1_1direct3d_1_1d3d__resource__wrapper.html" title="The d3d resource wrapper class." alt="" coords="5,20,167,61"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="182,38,281,38,281,43,182,43"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="272,100,448,155"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="463,125,595,125,595,130,463,130"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="271,179,449,220"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="463,174,626,138,628,143,464,179"/>
+</map>

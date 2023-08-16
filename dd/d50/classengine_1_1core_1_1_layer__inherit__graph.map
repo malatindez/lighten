@@ -1,0 +1,35 @@
+<map id="engine::core::Layer" name="engine::core::Layer">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,179,134,204"/>
+<area shape="rect" id="Node000002" href="$d8/d87/class_controller.html" title=" " alt="" coords="243,5,320,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="81,164,119,101,147,68,180,40,211,26,242,19,243,24,212,31,183,44,151,72,123,104,85,167"/>
+<area shape="rect" id="Node000003" href="$da/d3d/classengine_1_1core_1_1_im_gui_layer.html" title=" " alt="" coords="200,55,363,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="89,165,129,126,154,106,180,89,206,78,208,83,183,94,157,110,132,130,93,169"/>
+<area shape="rect" id="Node000004" href="$da/df3/classengine_1_1core_1_1_input_layer.html" title=" " alt="" coords="203,104,360,130"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="108,169,181,138,216,128,218,133,183,143,110,174"/>
+<area shape="rect" id="Node000005" href="$d6/d88/classengine_1_1core_1_1_layer_stack.html" title=" " alt="" coords="200,153,363,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="148,179,200,173,200,179,149,185"/>
+<area shape="rect" id="Node000010" href="$d1/d8a/classengine_1_1core_1_1_shader_manager.html" title=" " alt="" coords="188,203,375,228"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="149,198,187,202,187,207,148,203"/>
+<area shape="rect" id="Node000011" href="$dd/d52/classengine_1_1core_1_1_window.html" title=" " alt="" coords="210,252,353,278"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="111,209,183,238,218,249,217,254,181,243,109,213"/>
+<area shape="rect" id="Node000013" href="$d9/d60/classengine_1_1render_1_1_post_processing_layer.html" title=" " alt="" coords="182,302,381,343"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="94,214,133,252,183,288,206,299,203,304,180,292,130,256,90,217"/>
+<area shape="rect" id="Node000017" href="$d9/d64/classengine_1_1utils_1_1_file_watcher.html" title=" " alt="" coords="199,367,364,392"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="84,217,100,249,121,285,149,322,183,352,206,364,203,368,180,356,145,325,117,288,95,251,79,219"/>
+<area shape="rect" id="Node000006" href="$d2/d5c/classengine_1_1core_1_1_layer_stack_threadsafe.html" title=" " alt="" coords="456,99,618,140"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="370,147,455,132,456,137,371,153"/>
+<area shape="rect" id="Node000008" href="$d9/d15/classengine_1_1core_1_1_render_pipeline.html" title=" " alt="" coords="446,164,629,190"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="378,167,445,170,445,176,377,173"/>
+<area shape="rect" id="Node000007" href="$da/d33/classengine_1_1core_1_1_engine.html" title="Represents the core of the engine." alt="" coords="709,107,844,132"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="633,117,709,117,709,122,633,122"/>
+<area shape="rect" id="Node000009" href="$d9/d04/classengine_1_1direct3d_1_1_deferred_h_d_r_render_pipeline.html" title=" " alt="" coords="693,157,860,197"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="644,174,693,174,693,180,644,180"/>
+<area shape="rect" id="Node000012" href="$d0/de6/classengine_1_1platform_1_1windows_1_1_window.html" title=" " alt="" coords="453,234,622,275"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="367,259,452,255,452,260,367,264"/>
+<area shape="rect" id="Node000014" href="$dd/d52/classengine_1_1render_1_1_h_d_rto_l_d_r_layer.html" title=" " alt="" coords="435,299,639,324"/>
+<area shape="poly" id="edge13_Node000013_Node000014" title=" " alt="" coords="396,315,434,313,435,318,396,320"/>
+<area shape="rect" id="Node000015" href="$df/df1/classengine_1_1render_1_1_post_processing.html" title=" " alt="" coords="438,348,637,374"/>
+<area shape="poly" id="edge14_Node000013_Node000015" title=" " alt="" coords="396,337,448,345,447,350,396,342"/>
+<area shape="rect" id="Node000016" href="$d3/df2/classengine_1_1render_1_1_present_swapchain.html" title=" " alt="" coords="429,397,645,423"/>
+<area shape="poly" id="edge15_Node000013_Node000016" title=" " alt="" coords="369,346,382,352,406,368,430,384,461,394,459,399,428,389,403,373,380,356,367,351"/>
+</map>

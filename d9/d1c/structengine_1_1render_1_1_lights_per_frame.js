@@ -1,0 +1,25 @@
+var structengine_1_1render_1_1_lights_per_frame =
+[
+    [ "directional_light_shadow_resolution", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#ad96effbb85fbfd58a99f3d19884d16c1", null ],
+    [ "directional_lights", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#a650b5a5ac78b966da7ff8e745acf9bf0", null ],
+    [ "g_lights_per_frame_padding_0", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#abca04c5b2099cb0232ec1e3dbedd2bee", null ],
+    [ "kMaxDirectionalLights", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#a4d56c5922f38ef41d1b4e1c75f92e36d", null ],
+    [ "kMaxPointLights", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#a8a3798dfe830ede2950454bf00c9af37", null ],
+    [ "kMaxShadowDirectionalLights", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#a06c99b256ddb1cb989868ef6e99b815e", null ],
+    [ "kMaxShadowPointLights", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#ac98b53b65cbc5ee9f1353e8cd1f959a0", null ],
+    [ "kMaxShadowSpotLights", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#af8e6662ea4aab739318bd0e69a4ce3dd", null ],
+    [ "kMaxSpotLights", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#a3b77bde5c40032bdb3036a660036e64a", null ],
+    [ "num_directional_lights", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#af48f0cef30a8a2b721e0611b9113e770", null ],
+    [ "num_point_lights", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#a91a4f0ec1f3780680935474312fc381f", null ],
+    [ "num_spot_lights", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#ae0785e9cd6a67c626ebfa10468441ffc", null ],
+    [ "point_light_shadow_resolution", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#a43bfbd3669d8f37d6dc41c9a239b37c8", null ],
+    [ "point_lights", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#ad3ed677eb7cc1c7fc98cd91f370d7a46", null ],
+    [ "shadow_directional_lights", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#ac95eef4eadaa5703f511e2459eeef35e", null ],
+    [ "shadow_num_directional_lights", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#a8e9cf26c0d0a48e8aa04bca592b37f3b", null ],
+    [ "shadow_num_point_lights", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#ab37cc56047340d58b25d9e61d8718c04", null ],
+    [ "shadow_num_spot_lights", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#a1c94fa647de637d657f9e82fa8ec0f89", null ],
+    [ "shadow_point_lights", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#aded44954bd0a6fa7891ba703f6e3ea89", null ],
+    [ "shadow_spot_lights", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#ae8618f6003f0bcbbf8e671ad906b8a95", null ],
+    [ "spot_light_shadow_resolution", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#ae481f9a1ff749c6faab0be37e0b172a3", null ],
+    [ "spot_lights", "d9/d1c/structengine_1_1render_1_1_lights_per_frame.html#a2fb0f687f21c06b333f7e8b6dbcd8af6", null ]
+];

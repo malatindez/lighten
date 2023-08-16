@@ -1,0 +1,15 @@
+<map id="engine::core::Layer::HandleRender" name="engine::core::Layer::HandleRender">
+<area shape="rect" id="Node000001" title=" " alt="" coords="224,5,352,46"/>
+<area shape="rect" id="Node000002" href="$d6/d88/classengine_1_1core_1_1_layer_stack.html" title=" " alt="" coords="104,94,266,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="253,57,203,96,199,91,249,53"/>
+<area shape="rect" id="Node000007" href="$df/df1/classengine_1_1render_1_1_post_processing.html" title=" " alt="" coords="291,94,490,120"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="326,53,376,91,373,96,323,57"/>
+<area shape="rect" id="Node000003" href="$d2/d5c/classengine_1_1core_1_1_layer_stack_threadsafe.html" title=" " alt="" coords="5,168,168,208"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="161,131,113,169,109,165,157,127"/>
+<area shape="rect" id="Node000005" href="$d9/d15/classengine_1_1core_1_1_render_pipeline.html" title=" " alt="" coords="192,175,376,201"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="213,127,270,173,267,177,210,131"/>
+<area shape="rect" id="Node000004" href="$da/d33/classengine_1_1core_1_1_engine.html" title="Represents the core of the engine." alt="" coords="19,264,154,290"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="89,223,89,264,84,264,84,223"/>
+<area shape="rect" id="Node000006" href="$d9/d04/classengine_1_1direct3d_1_1_deferred_h_d_r_render_pipeline.html" title=" " alt="" coords="201,256,367,297"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="287,216,287,256,281,256,281,216"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="engine::render::ShadowMap" name="engine::render::ShadowMap">
+<area shape="rect" id="Node000001" title=" " alt="" coords="826,52,1005,78"/>
+<area shape="rect" id="Node000002" href="$df/d47/classengine_1_1direct3d_1_1d3d__resource__wrapper.html" title=" " alt="" coords="430,5,656,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="671,41,826,55,825,60,670,47"/>
+<area shape="rect" id="Node000003" href="$d9/d3c/classengine_1_1direct3d_1_1_depth_stencil.html" title=" " alt="" coords="447,86,639,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="653,87,802,74,825,71,826,77,802,79,654,92"/>
+<area shape="rect" id="Node000004" href="$df/d47/classengine_1_1direct3d_1_1d3d__resource__wrapper.html" title=" " alt="" coords="5,42,261,83"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="276,72,447,87,446,93,275,78"/>
+<area shape="rect" id="Node000005" href="$df/d47/classengine_1_1direct3d_1_1d3d__resource__wrapper.html" title=" " alt="" coords="23,107,243,162"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="257,121,446,104,447,110,258,126"/>
+</map>

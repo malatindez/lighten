@@ -1,0 +1,25 @@
+var structengine_1_1render_1_1_dissolution_material =
+[
+    [ "DissolutionMaterial", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#afa2cdccbe1d1be27d56616c309afc089", null ],
+    [ "DissolutionMaterial", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#a1879730ea4f92798f3a49c1751dd36f7", null ],
+    [ "Bind", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#a5957e547341cbe265f48d3cec99cea94", null ],
+    [ "BindTextures", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#ac8af7c8bc366d2049e78ae59ce4196ed", null ],
+    [ "FromOpaqueMaterial", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#acc6046d7357fd903809ccb37f1625b56", null ],
+    [ "reset", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#aa5b5743c1fee1a3524098f78d3444199", null ],
+    [ "ToOpaqueMaterial", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#aeea43f651a592f05336144b3b3595f65", null ],
+    [ "UpdateTextureFlags", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#a39a94e7e16bdd3848e6f8d48d1347219", null ],
+    [ "albedo_color", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#aafb9cec8f01878ad4060017b99b4965d", null ],
+    [ "albedo_map", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#a5ca83cf8d203f69170cfcb843214888c", null ],
+    [ "appearing", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#a8e14c2306e6f77a7272eb82a66038a4c", null ],
+    [ "emissive", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#af1adf3fde7e00d9ab19cdb124fd7acba", null ],
+    [ "flags", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#ab9135dafbd1d334d9ed63f49980c549f", null ],
+    [ "metalness_map", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#a42510b8064c7bc7cb94bb05b6967c775", null ],
+    [ "metalness_value", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#aeae4ee422532e2e2f417893f3dcc4040", null ],
+    [ "normal_map", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#a7189a48bb2a32379abf6ae03536bc302", null ],
+    [ "opacity_map", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#a3a496be4b3ad7e9c9cb78f21f174852f", null ],
+    [ "reverse_normal_y", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#a3aba7a33d165f4423307b26f5b7ddb0a", null ],
+    [ "roughness_map", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#ac7cdffeba940e2a181dbbe8d47ee082b", null ],
+    [ "roughness_value", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#aa4c350dc2879a5b51174aa6045387beb", null ],
+    [ "twosided", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#ad4fbcd7b3650788a29263ff0e6828f09", null ],
+    [ "uv_multiplier", "d6/df2/structengine_1_1render_1_1_dissolution_material.html#a74400cb547a8a700b733f85d04f462fb", null ]
+];

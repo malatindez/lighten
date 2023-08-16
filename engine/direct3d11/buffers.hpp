@@ -1,7 +1,0 @@
-#include "buffers/default-buffer.hpp"
-#include "buffers/immutable-buffer.hpp"
-#include "buffers/dynamic-buffer.hpp"
-#include "buffers/staging-buffer.hpp"
-#include "buffers/vertex-buffers.hpp"
-#include "buffers/index-buffers.hpp"
-#include "buffers/uniform-buffers.hpp"

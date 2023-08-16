@@ -1,0 +1,12 @@
+<map id="engine::ini::Section" name="engine::ini::Section">
+<area shape="rect" id="Node000001" title="The section of the ini file." alt="" coords="12,391,140,417"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,273,147,328"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="79,343,79,391,73,391,73,343"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="37,95,115,121"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="75,136,70,184,71,231,75,272,69,272,65,231,65,184,70,136"/>
+<area shape="rect" id="Node000005" href="$df/da4/classengine_1_1ini_1_1_entry.html" title="Class representing an entry in the ini file." alt="" coords="109,184,222,210"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="101,129,155,182,151,186,97,133"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="14,5,138,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="79,61,79,95,73,95,73,61"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="147,223,102,274,98,270,143,219"/>
+</map>

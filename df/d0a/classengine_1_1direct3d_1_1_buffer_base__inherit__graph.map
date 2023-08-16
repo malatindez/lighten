@@ -1,0 +1,141 @@
+<map id="engine::direct3d::BufferBase&lt; T &gt;" name="engine::direct3d::BufferBase&lt; T &gt;">
+<area shape="rect" id="Node000001" title="Buffer Base class that contains the common functions for all the buffers." alt="" coords="205,1399,356,1440"/>
+<area shape="rect" id="Node000003" href="$da/d25/classengine_1_1direct3d_1_1_default_buffer.html" title=" " alt="" coords="442,5,615,76"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="280,1384,290,1112,313,701,329,493,349,308,373,166,387,118,402,87,419,70,441,57,443,62,423,74,406,90,392,120,379,167,355,308,335,493,318,702,296,1113,285,1384"/>
+<area shape="rect" id="Node000004" href="$da/d25/classengine_1_1direct3d_1_1_default_buffer.html" title=" " alt="" coords="450,100,608,141"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="280,1384,290,1123,312,731,328,533,349,358,373,225,387,179,402,151,423,134,448,124,450,129,426,138,406,154,392,181,378,226,354,359,334,533,317,732,295,1123,285,1384"/>
+<area shape="rect" id="Node000005" href="$da/d25/classengine_1_1direct3d_1_1_default_buffer.html" title=" " alt="" coords="412,165,646,221"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="280,1384,292,1138,316,772,332,588,352,425,375,300,388,258,402,231,414,219,418,223,406,234,393,260,380,301,357,425,338,588,321,773,297,1138,286,1384"/>
+<area shape="rect" id="Node000006" href="$da/d25/classengine_1_1direct3d_1_1_default_buffer.html" title=" " alt="" coords="438,244,619,285"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="281,1384,293,1150,317,805,333,631,353,478,376,361,388,321,402,296,418,282,436,273,439,277,421,287,406,300,393,323,381,362,358,478,339,631,322,805,298,1150,286,1384"/>
+<area shape="rect" id="Node000007" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="436,310,621,350"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="281,1384,294,1161,319,837,335,674,355,530,377,421,389,384,402,360,417,347,435,338,437,343,420,351,406,364,394,386,382,422,360,531,341,674,324,837,299,1162,286,1384"/>
+<area shape="rect" id="Node000008" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="445,374,612,430"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="279,1384,280,1191,285,1055,294,909,309,763,331,629,345,569,361,517,380,474,402,440,421,424,443,412,446,417,424,428,406,444,385,476,366,519,350,571,336,630,314,764,299,909,290,1056,285,1191,284,1384"/>
+<area shape="rect" id="Node000009" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="406,454,652,510"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="279,1384,283,1205,288,1081,298,947,314,814,335,692,364,591,382,551,402,520,414,508,418,512,406,524,386,553,369,592,340,693,319,815,304,947,294,1081,288,1205,284,1384"/>
+<area shape="rect" id="Node000010" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="404,534,653,590"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="279,1384,285,1219,303,985,319,865,340,755,367,664,383,628,402,600,414,589,418,592,406,604,388,630,372,665,345,756,324,866,308,986,291,1219,285,1384"/>
+<area shape="rect" id="Node000011" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="406,614,652,670"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="280,1384,288,1234,308,1024,324,916,344,818,370,737,385,705,402,680,415,668,419,672,406,684,390,708,375,739,349,819,329,917,313,1024,293,1234,285,1384"/>
+<area shape="rect" id="Node000012" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="441,694,616,750"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="281,1384,291,1248,313,1062,329,967,349,881,373,810,387,782,402,760,419,745,439,735,442,739,422,750,406,764,391,785,378,812,354,882,334,968,318,1063,296,1249,286,1384"/>
+<area shape="rect" id="Node000013" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="427,774,630,830"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="282,1384,294,1263,318,1100,334,1018,353,943,376,882,402,839,425,821,428,825,406,842,380,884,358,945,339,1019,323,1101,300,1263,287,1384"/>
+<area shape="rect" id="Node000014" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="419,853,638,924"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="284,1384,299,1281,325,1147,359,1019,380,969,402,934,417,920,421,924,406,937,385,971,365,1021,330,1149,305,1282,289,1385"/>
+<area shape="rect" id="Node000015" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="419,948,638,1019"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="280,1384,287,1311,306,1216,322,1166,343,1117,369,1070,402,1028,417,1015,420,1019,406,1032,374,1073,347,1119,327,1168,312,1218,293,1312,285,1384"/>
+<area shape="rect" id="Node000016" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="427,1043,631,1113"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="285,1384,297,1328,319,1259,354,1187,376,1154,402,1124,425,1107,428,1111,406,1128,380,1157,358,1190,324,1261,302,1329,290,1385"/>
+<area shape="rect" id="Node000017" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="443,1138,615,1178"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="288,1384,303,1339,326,1286,359,1233,379,1209,402,1188,441,1168,443,1173,406,1192,383,1213,363,1236,331,1289,308,1341,293,1386"/>
+<area shape="rect" id="Node000018" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="427,1203,631,1273"/>
+<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="302,1385,345,1333,372,1306,402,1282,425,1269,428,1274,406,1287,376,1310,349,1337,306,1389"/>
+<area shape="rect" id="Node000019" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="417,1297,641,1368"/>
+<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="354,1391,425,1366,427,1371,356,1396"/>
+<area shape="rect" id="Node000020" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="407,1392,651,1447"/>
+<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="371,1417,406,1417,406,1422,371,1422"/>
+<area shape="rect" id="Node000021" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="442,1471,615,1541"/>
+<area shape="poly" id="edge20_Node000001_Node000021" title=" " alt="" coords="355,1443,442,1473,441,1478,354,1448"/>
+<area shape="rect" id="Node000022" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="442,1565,615,1636"/>
+<area shape="poly" id="edge21_Node000001_Node000022" title=" " alt="" coords="306,1450,349,1502,376,1528,405,1552,443,1572,441,1577,403,1556,372,1532,345,1505,302,1453"/>
+<area shape="rect" id="Node000023" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="414,1660,644,1731"/>
+<area shape="poly" id="edge22_Node000001_Node000023" title=" " alt="" coords="294,1453,310,1496,333,1548,365,1601,406,1647,420,1657,417,1662,402,1651,361,1604,328,1551,305,1498,289,1455"/>
+<area shape="rect" id="Node000024" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="411,1754,646,1810"/>
+<area shape="poly" id="edge23_Node000001_Node000024" title=" " alt="" coords="288,1454,298,1516,318,1593,334,1633,353,1673,377,1709,406,1741,419,1752,416,1756,402,1745,373,1712,349,1675,329,1636,313,1595,293,1517,282,1455"/>
+<area shape="rect" id="Node000025" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="418,1834,640,1890"/>
+<area shape="poly" id="edge24_Node000001_Node000025" title=" " alt="" coords="285,1454,290,1530,308,1628,324,1680,345,1730,372,1778,406,1820,420,1832,416,1836,402,1824,367,1781,340,1733,319,1681,303,1629,285,1530,279,1455"/>
+<area shape="rect" id="Node000026" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="445,1914,612,1970"/>
+<area shape="poly" id="edge25_Node000001_Node000026" title=" " alt="" coords="289,1454,304,1557,329,1690,346,1757,364,1817,384,1867,406,1900,424,1915,446,1926,444,1930,421,1920,402,1904,379,1869,359,1819,340,1758,324,1691,299,1557,283,1455"/>
+<area shape="rect" id="Node000027" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="408,1994,650,2050"/>
+<area shape="poly" id="edge26_Node000001_Node000027" title=" " alt="" coords="287,1454,300,1572,324,1730,340,1809,359,1881,381,1940,406,1980,419,1992,415,1996,402,1984,376,1942,354,1883,335,1810,319,1731,295,1573,282,1455"/>
+<area shape="rect" id="Node000028" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="416,2074,642,2130"/>
+<area shape="poly" id="edge27_Node000001_Node000028" title=" " alt="" coords="286,1454,297,1587,319,1769,335,1861,355,1945,378,2013,392,2040,406,2060,419,2072,415,2076,402,2064,387,2043,373,2015,350,1946,330,1862,314,1770,292,1588,281,1455"/>
+<area shape="rect" id="Node000029" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="437,2153,621,2224"/>
+<area shape="poly" id="edge28_Node000001_Node000029" title=" " alt="" coords="286,1454,295,1602,315,1806,331,1911,351,2007,376,2086,390,2117,406,2140,420,2154,437,2165,434,2169,417,2158,402,2144,386,2119,371,2088,346,2008,326,1912,310,1807,289,1602,280,1455"/>
+<area shape="rect" id="Node000030" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="427,2248,631,2303"/>
+<area shape="poly" id="edge29_Node000001_Node000030" title=" " alt="" coords="285,1455,290,1619,308,1853,324,1973,344,2083,372,2173,388,2208,406,2235,428,2253,425,2257,402,2238,383,2211,367,2175,339,2084,318,1974,303,1854,285,1620,279,1455"/>
+<area shape="rect" id="Node000031" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title=" " alt="" coords="442,2327,616,2368"/>
+<area shape="poly" id="edge30_Node000001_Node000031" title=" " alt="" coords="284,1455,287,1634,292,1758,302,1892,317,2025,339,2146,352,2200,368,2246,386,2284,406,2314,422,2327,442,2336,440,2341,420,2332,402,2317,381,2287,363,2248,347,2201,333,2147,312,2026,297,1893,287,1759,282,1634,279,1455"/>
+<area shape="rect" id="Node000032" href="$d3/d29/classengine_1_1direct3d_1_1_immutable_buffer.html" title=" " alt="" coords="440,2392,618,2447"/>
+<area shape="poly" id="edge31_Node000001_Node000032" title=" " alt="" coords="284,1455,286,1644,291,1777,300,1921,315,2064,337,2195,351,2253,367,2304,385,2346,406,2378,422,2392,441,2402,438,2407,419,2396,402,2381,381,2348,362,2305,346,2254,332,2196,310,2065,295,1921,285,1778,281,1645,279,1455"/>
+<area shape="rect" id="Node000033" href="$d3/d29/classengine_1_1direct3d_1_1_immutable_buffer.html" title=" " alt="" coords="440,2471,618,2512"/>
+<area shape="poly" id="edge32_Node000001_Node000033" title=" " alt="" coords="286,1454,299,1674,324,1993,341,2153,361,2294,382,2400,394,2436,406,2458,421,2471,440,2480,438,2485,419,2475,402,2461,389,2438,377,2402,355,2294,336,2153,319,1993,294,1674,281,1455"/>
+<area shape="rect" id="Node000034" href="$da/d25/classengine_1_1direct3d_1_1_default_buffer.html" title="The default buffer class." alt="" coords="450,2536,608,2577"/>
+<area shape="poly" id="edge33_Node000001_Node000034" title=" " alt="" coords="286,1454,298,1685,323,2025,339,2196,359,2346,381,2460,393,2499,406,2522,426,2538,450,2548,448,2553,423,2542,402,2525,389,2501,376,2462,354,2347,334,2196,317,2025,293,1686,281,1455"/>
+<area shape="rect" id="Node000036" href="$df/d0e/classengine_1_1direct3d_1_1_dynamic_buffer.html" title="The dynamic buffer class." alt="" coords="445,2602,612,2642"/>
+<area shape="poly" id="edge35_Node000001_Node000036" title=" " alt="" coords="286,1455,297,1698,321,2058,337,2240,357,2400,380,2521,393,2562,406,2587,424,2602,446,2612,443,2617,421,2606,402,2590,388,2564,375,2523,352,2401,332,2240,315,2059,292,1698,280,1455"/>
+<area shape="rect" id="Node000065" href="$d3/d29/classengine_1_1direct3d_1_1_immutable_buffer.html" title="The immutable buffer class." alt="" coords="440,3727,618,3768"/>
+<area shape="poly" id="edge64_Node000001_Node000065" title=" " alt="" coords="288,1454,333,1931,407,2654,479,3311,528,3726,522,3727,474,3312,401,2654,328,1931,282,1455"/>
+<area shape="rect" id="Node000070" href="$dd/da9/classengine_1_1direct3d_1_1_staging_buffer.html" title="The staging buffer class." alt="" coords="448,3792,609,3833"/>
+<area shape="poly" id="edge69_Node000001_Node000070" title=" " alt="" coords="285,1455,296,1926,319,2689,336,3078,356,3416,380,3664,393,3740,406,3778,425,3794,449,3804,447,3809,422,3798,402,3781,388,3741,374,3664,351,3417,331,3078,314,2690,290,1926,280,1455"/>
+<area shape="rect" id="Node000002" href="$d6/de4/classengine_1_1direct3d_1_1_buffer_wrapper.html" title="A wrapper for a D3D11 buffer." alt="" coords="5,1399,157,1440"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,1417,204,1417,204,1422,172,1422"/>
+<area shape="rect" id="Node000035" href="$d6/d4c/classengine_1_1direct3d_1_1_default_uniform_buffer.html" title="Default uniform buffer class." alt="" coords="755,1275,913,1316"/>
+<area shape="poly" id="edge34_Node000034_Node000035" title=" " alt="" coords="621,2544,638,2535,651,2522,664,2493,673,2446,681,2307,680,2126,674,1925,668,1724,667,1543,670,1467,676,1404,685,1356,699,1326,724,1306,754,1295,755,1300,727,1311,703,1329,690,1357,681,1404,675,1467,673,1543,674,1724,680,1925,685,2126,687,2307,678,2447,669,2495,656,2525,641,2539,623,2548"/>
+<area shape="rect" id="Node000037" href="$d2/db0/classengine_1_1direct3d_1_1_dynamic_uniform_buffer.html" title=" " alt="" coords="748,1340,920,1395"/>
+<area shape="poly" id="edge36_Node000036_Node000037" title=" " alt="" coords="625,2607,639,2598,651,2587,664,2559,673,2512,681,2375,681,2197,675,1999,670,1800,669,1621,677,1483,686,1436,699,1406,720,1387,746,1375,748,1379,723,1391,703,1409,691,1437,682,1484,674,1621,675,1800,681,1998,686,2197,687,2375,678,2513,669,2560,656,2590,643,2603,628,2612"/>
+<area shape="rect" id="Node000038" href="$d2/db0/classengine_1_1direct3d_1_1_dynamic_uniform_buffer.html" title=" " alt="" coords="750,1420,918,1475"/>
+<area shape="poly" id="edge37_Node000036_Node000038" title=" " alt="" coords="625,2607,639,2598,651,2587,663,2561,672,2518,680,2390,680,2224,675,2039,671,1853,670,1687,678,1558,687,1514,699,1486,722,1466,749,1454,751,1459,724,1470,703,1489,692,1515,684,1559,676,1687,676,1853,681,2038,685,2224,685,2390,677,2518,668,2562,656,2590,643,2603,628,2612"/>
+<area shape="rect" id="Node000039" href="$d2/db0/classengine_1_1direct3d_1_1_dynamic_uniform_buffer.html" title=" " alt="" coords="750,1499,918,1569"/>
+<area shape="poly" id="edge38_Node000036_Node000039" title=" " alt="" coords="625,2607,639,2598,651,2587,662,2563,670,2524,678,2407,679,2255,676,2086,673,1916,673,1764,680,1646,688,1605,699,1579,722,1558,749,1545,751,1550,725,1563,704,1582,693,1607,686,1647,678,1764,678,1916,681,2086,684,2255,684,2407,675,2524,667,2565,656,2590,643,2603,628,2612"/>
+<area shape="rect" id="Node000040" href="$d2/db0/classengine_1_1direct3d_1_1_dynamic_uniform_buffer.html" title=" " alt="" coords="728,1593,940,1649"/>
+<area shape="poly" id="edge39_Node000036_Node000040" title=" " alt="" coords="625,2607,639,2598,651,2587,671,2552,685,2509,692,2457,695,2399,689,2268,676,2126,662,1984,656,1852,658,1793,665,1740,679,1695,699,1659,726,1637,730,1641,703,1662,684,1697,671,1741,663,1793,661,1852,667,1983,681,2125,695,2267,700,2399,698,2458,690,2510,676,2555,655,2590,643,2603,628,2612"/>
+<area shape="rect" id="Node000041" href="$d2/db0/classengine_1_1direct3d_1_1_dynamic_uniform_buffer.html" title=" " alt="" coords="741,1672,927,1743"/>
+<area shape="poly" id="edge40_Node000036_Node000041" title=" " alt="" coords="625,2607,639,2598,651,2587,669,2556,682,2517,689,2471,692,2419,688,2301,677,2174,666,2047,661,1928,663,1875,670,1827,681,1787,699,1754,717,1736,739,1723,742,1728,721,1740,703,1757,686,1789,675,1829,669,1875,666,1928,671,2046,682,2174,693,2301,697,2419,694,2471,687,2518,674,2558,655,2590,643,2603,628,2612"/>
+<area shape="rect" id="Node000042" href="$d2/db0/classengine_1_1direct3d_1_1_dynamic_uniform_buffer.html" title=" " alt="" coords="747,1767,921,1837"/>
+<area shape="poly" id="edge41_Node000036_Node000042" title=" " alt="" coords="625,2607,639,2598,651,2587,668,2560,679,2525,685,2484,688,2438,686,2334,677,2221,668,2108,664,2003,667,1956,673,1914,683,1878,699,1848,720,1829,745,1815,748,1820,723,1833,703,1852,688,1880,678,1915,672,1956,670,2003,673,2108,682,2221,691,2334,694,2438,691,2485,684,2526,672,2562,655,2590,643,2603,628,2612"/>
+<area shape="rect" id="Node000043" href="$d2/db0/classengine_1_1direct3d_1_1_dynamic_uniform_buffer.html" title=" " alt="" coords="749,1861,919,1932"/>
+<area shape="poly" id="edge42_Node000036_Node000043" title=" " alt="" coords="625,2607,639,2598,651,2587,666,2563,676,2533,682,2497,685,2457,683,2366,676,2267,669,2169,667,2077,675,1999,685,1967,699,1942,721,1922,747,1908,750,1913,724,1926,703,1945,690,1969,681,2000,673,2077,675,2168,682,2267,688,2366,690,2457,687,2498,681,2534,670,2566,655,2590,642,2603,627,2611"/>
+<area shape="rect" id="Node000044" href="$d2/db0/classengine_1_1direct3d_1_1_dynamic_uniform_buffer.html" title=" " alt="" coords="748,1956,920,2011"/>
+<area shape="poly" id="edge43_Node000036_Node000044" title=" " alt="" coords="624,2607,651,2587,664,2566,673,2540,681,2473,680,2393,675,2307,670,2220,669,2139,677,2071,686,2044,699,2022,721,2003,746,1991,749,1996,724,2007,703,2025,691,2046,682,2072,674,2140,675,2220,681,2306,686,2393,686,2473,678,2541,669,2569,655,2590,628,2611"/>
+<area shape="rect" id="Node000045" href="$d2/db0/classengine_1_1direct3d_1_1_dynamic_uniform_buffer.html" title=" " alt="" coords="750,2035,918,2105"/>
+<area shape="poly" id="edge44_Node000036_Node000045" title=" " alt="" coords="625,2607,651,2587,673,2557,687,2528,695,2499,697,2471,692,2414,677,2356,663,2298,656,2239,658,2209,665,2178,679,2148,699,2116,722,2096,749,2082,751,2087,725,2100,703,2120,683,2150,670,2180,663,2210,661,2239,668,2297,683,2355,697,2413,703,2471,700,2500,692,2530,677,2560,655,2591,628,2611"/>
+<area shape="rect" id="Node000046" href="$d2/db0/classengine_1_1direct3d_1_1_dynamic_uniform_buffer.html" title=" " alt="" coords="748,2129,920,2200"/>
+<area shape="poly" id="edge45_Node000036_Node000046" title=" " alt="" coords="625,2606,651,2587,669,2564,680,2540,687,2518,690,2495,687,2449,677,2403,667,2356,662,2309,665,2285,671,2261,682,2236,699,2211,721,2191,747,2178,749,2183,724,2196,703,2214,687,2238,676,2262,670,2286,668,2309,672,2356,682,2402,692,2448,695,2495,692,2519,685,2542,673,2566,655,2591,628,2611"/>
+<area shape="rect" id="Node000047" href="$d2/db0/classengine_1_1direct3d_1_1_dynamic_uniform_buffer.html" title=" " alt="" coords="748,2224,920,2295"/>
+<area shape="poly" id="edge46_Node000036_Node000047" title=" " alt="" coords="625,2606,651,2587,674,2553,683,2519,682,2484,676,2450,670,2415,669,2379,677,2343,699,2306,721,2287,746,2273,749,2278,724,2291,703,2309,682,2345,674,2379,676,2414,682,2449,687,2484,688,2519,679,2555,655,2591,628,2610"/>
+<area shape="rect" id="Node000048" href="$d2/db0/classengine_1_1direct3d_1_1_dynamic_uniform_buffer.html" title=" " alt="" coords="723,2319,945,2389"/>
+<area shape="poly" id="edge47_Node000036_Node000048" title=" " alt="" coords="625,2605,651,2587,668,2565,676,2542,677,2520,676,2496,675,2449,683,2425,699,2400,721,2382,724,2386,703,2404,688,2427,681,2450,681,2496,682,2520,681,2543,673,2567,655,2591,628,2609"/>
+<area shape="rect" id="Node000049" href="$d2/db0/classengine_1_1direct3d_1_1_dynamic_uniform_buffer.html" title=" " alt="" coords="733,2413,935,2484"/>
+<area shape="poly" id="edge48_Node000036_Node000049" title=" " alt="" coords="625,2602,652,2587,669,2565,675,2542,682,2518,700,2493,731,2473,734,2477,703,2497,687,2520,680,2543,674,2567,655,2591,628,2607"/>
+<area shape="rect" id="Node000050" href="$d2/db0/classengine_1_1direct3d_1_1_dynamic_uniform_buffer.html" title=" " alt="" coords="750,2508,918,2563"/>
+<area shape="poly" id="edge49_Node000036_Node000050" title=" " alt="" coords="622,2595,653,2586,749,2558,751,2563,654,2591,623,2600"/>
+<area shape="rect" id="Node000051" href="$d2/db0/classengine_1_1direct3d_1_1_dynamic_uniform_buffer.html" title=" " alt="" coords="750,2587,918,2657"/>
+<area shape="poly" id="edge50_Node000036_Node000051" title=" " alt="" coords="627,2619,750,2619,750,2625,627,2625"/>
+<area shape="rect" id="Node000052" href="$d2/db0/classengine_1_1direct3d_1_1_dynamic_uniform_buffer.html" title=" " alt="" coords="750,2681,918,2752"/>
+<area shape="poly" id="edge51_Node000036_Node000052" title=" " alt="" coords="611,2645,751,2688,749,2693,610,2650"/>
+<area shape="rect" id="Node000053" href="$d2/db0/classengine_1_1direct3d_1_1_dynamic_uniform_buffer.html" title=" " alt="" coords="748,2776,920,2831"/>
+<area shape="poly" id="edge52_Node000036_Node000053" title=" " alt="" coords="561,2651,623,2708,662,2737,703,2762,748,2781,746,2786,700,2767,659,2741,620,2712,557,2655"/>
+<area shape="rect" id="Node000054" href="$d5/dbb/classengine_1_1direct3d_1_1_dynamic_vertex_buffer.html" title=" " alt="" coords="709,2856,959,2911"/>
+<area shape="poly" id="edge53_Node000036_Node000054" title=" " alt="" coords="549,2654,574,2696,609,2747,652,2798,703,2841,723,2853,720,2857,700,2846,648,2802,605,2750,570,2699,545,2656"/>
+<area shape="rect" id="Node000055" href="$d5/dbb/classengine_1_1direct3d_1_1_dynamic_vertex_buffer.html" title=" " alt="" coords="711,2936,957,2991"/>
+<area shape="poly" id="edge54_Node000036_Node000055" title=" " alt="" coords="543,2655,564,2713,597,2785,643,2859,671,2892,703,2921,720,2933,717,2937,700,2925,668,2896,639,2862,592,2788,559,2715,538,2657"/>
+<area shape="rect" id="Node000056" href="$d5/dbb/classengine_1_1direct3d_1_1_dynamic_vertex_buffer.html" title=" " alt="" coords="732,3016,936,3071"/>
+<area shape="poly" id="edge55_Node000036_Node000056" title=" " alt="" coords="538,2657,555,2729,586,2822,608,2871,634,2918,666,2963,703,3001,733,3020,730,3025,700,3005,662,2966,630,2921,603,2873,581,2824,550,2730,533,2658"/>
+<area shape="rect" id="Node000057" href="$d5/dbb/classengine_1_1direct3d_1_1_dynamic_vertex_buffer.html" title=" " alt="" coords="701,3096,967,3151"/>
+<area shape="poly" id="edge56_Node000036_Node000057" title=" " alt="" coords="535,2656,547,2742,559,2797,575,2857,597,2917,625,2977,660,3033,703,3081,718,3093,715,3097,700,3085,656,3036,620,2980,592,2919,570,2858,554,2798,542,2743,530,2657"/>
+<area shape="rect" id="Node000058" href="$d5/dbb/classengine_1_1direct3d_1_1_dynamic_vertex_buffer.html" title=" " alt="" coords="712,3176,956,3231"/>
+<area shape="poly" id="edge57_Node000036_Node000058" title=" " alt="" coords="533,2657,541,2756,550,2820,565,2891,587,2964,616,3036,654,3103,703,3161,717,3173,714,3177,699,3165,650,3106,611,3038,582,2966,560,2892,545,2821,535,2756,528,2657"/>
+<area shape="rect" id="Node000059" href="$d5/dbb/classengine_1_1direct3d_1_1_dynamic_vertex_buffer.html" title=" " alt="" coords="716,3256,952,3311"/>
+<area shape="poly" id="edge58_Node000036_Node000059" title=" " alt="" coords="538,2656,559,2785,596,2961,619,3050,645,3131,673,3197,703,3242,718,3254,714,3258,699,3245,668,3199,640,3133,614,3052,591,2962,554,2786,532,2657"/>
+<area shape="rect" id="Node000060" href="$d5/dbb/classengine_1_1direct3d_1_1_dynamic_vertex_buffer.html" title=" " alt="" coords="721,3336,947,3391"/>
+<area shape="poly" id="edge59_Node000036_Node000060" title=" " alt="" coords="537,2657,556,2801,591,3001,614,3102,640,3195,670,3270,686,3299,703,3321,722,3336,719,3341,699,3325,682,3302,665,3273,635,3196,609,3103,586,3002,551,2802,531,2658"/>
+<area shape="rect" id="Node000061" href="$d5/dbb/classengine_1_1direct3d_1_1_dynamic_vertex_buffer.html" title=" " alt="" coords="732,3416,936,3471"/>
+<area shape="poly" id="edge60_Node000036_Node000061" title=" " alt="" coords="536,2657,553,2816,586,3039,608,3154,636,3258,667,3344,685,3377,703,3401,733,3423,730,3427,699,3405,680,3379,662,3346,631,3260,603,3155,580,3040,547,2816,530,2658"/>
+<area shape="rect" id="Node000062" href="$de/da1/classengine_1_1direct3d_1_1_dynamic_index_buffer.html" title="The dynamic index buffer class." alt="" coords="750,3495,918,3536"/>
+<area shape="poly" id="edge61_Node000036_Node000062" title=" " alt="" coords="535,2657,549,2831,562,2950,579,3079,601,3206,629,3323,663,3418,682,3454,703,3481,725,3497,751,3507,749,3512,722,3502,699,3485,678,3457,658,3420,624,3324,596,3207,574,3080,556,2951,543,2831,529,2657"/>
+<area shape="rect" id="Node000063" href="$d2/db0/classengine_1_1direct3d_1_1_dynamic_uniform_buffer.html" title="Dynamic uniform buffer class." alt="" coords="750,3560,918,3601"/>
+<area shape="poly" id="edge62_Node000036_Node000063" title=" " alt="" coords="534,2657,546,2842,558,2971,575,3109,597,3247,626,3373,643,3428,661,3476,681,3516,703,3545,725,3562,751,3572,749,3577,722,3566,699,3549,677,3519,656,3478,638,3430,621,3374,592,3248,570,3110,553,2971,541,2842,529,2657"/>
+<area shape="rect" id="Node000064" href="$d5/dbb/classengine_1_1direct3d_1_1_dynamic_vertex_buffer.html" title="The dynamic vertex buffer class." alt="" coords="750,3626,918,3666"/>
+<area shape="poly" id="edge63_Node000036_Node000064" title=" " alt="" coords="534,2657,544,2853,555,2991,571,3141,593,3289,622,3425,639,3484,659,3536,680,3579,703,3611,725,3627,751,3638,749,3642,722,3632,699,3615,675,3581,654,3538,634,3486,617,3426,588,3290,566,3141,550,2992,539,2854,528,2657"/>
+<area shape="rect" id="Node000066" href="$db/dc4/classengine_1_1direct3d_1_1_immutable_index_buffer.html" title=" " alt="" coords="745,3691,923,3732"/>
+<area shape="poly" id="edge65_Node000065_Node000066" title=" " alt="" coords="632,3732,744,3719,745,3725,633,3738"/>
+<area shape="rect" id="Node000067" href="$d0/dc3/classengine_1_1direct3d_1_1_immutable_vertex_buffer.html" title=" " alt="" coords="742,3756,926,3811"/>
+<area shape="poly" id="edge66_Node000065_Node000067" title=" " alt="" coords="633,3757,742,3770,742,3775,632,3762"/>
+<area shape="rect" id="Node000068" href="$db/dc4/classengine_1_1direct3d_1_1_immutable_index_buffer.html" title="The immutable index buffer class." alt="" coords="745,3835,923,3876"/>
+<area shape="poly" id="edge67_Node000065_Node000068" title=" " alt="" coords="633,3768,655,3778,670,3789,679,3800,688,3811,703,3821,745,3838,743,3843,700,3826,685,3815,675,3804,666,3793,652,3783,631,3773"/>
+<area shape="rect" id="Node000069" href="$d0/dc3/classengine_1_1direct3d_1_1_immutable_vertex_buffer.html" title="The immutable vertex buffer class." alt="" coords="745,3900,923,3941"/>
+<area shape="poly" id="edge68_Node000065_Node000069" title=" " alt="" coords="633,3764,655,3779,667,3792,674,3806,680,3834,685,3860,692,3873,703,3885,723,3898,745,3907,743,3912,720,3903,700,3889,687,3876,680,3862,675,3835,669,3808,663,3795,652,3783,630,3769"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="engine::render::_opaque_detail::MeshInstance" name="engine::render::_opaque_detail::MeshInstance">
+<area shape="rect" id="Node000001" title=" " alt="" coords="118,331,275,372"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="118,213,275,268"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="199,283,199,331,194,331,194,283"/>
+<area shape="rect" id="Node000003" href="$d7/d5f/structengine_1_1render_1_1__opaque__detail_1_1_material_instance.html" title=" " alt="" coords="116,109,277,150"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="199,164,199,212,194,212,194,164"/>
+<area shape="rect" id="Node000004" href="$d6/d56/structengine_1_1render_1_1_opaque_material.html" title=" " alt="" coords="5,13,204,39"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="127,48,181,107,177,110,123,51"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="228,5,349,46"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="263,59,216,110,212,107,259,56"/>
+</map>

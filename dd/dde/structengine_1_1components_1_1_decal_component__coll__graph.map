@@ -1,0 +1,7 @@
+<map id="engine::components::DecalComponent" name="engine::components::DecalComponent">
+<area shape="rect" id="Node000001" title=" " alt="" coords="39,228,175,268"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,109,209,165"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,179,110,227,104,227,104,179"/>
+<area shape="rect" id="Node000003" href="$d3/d94/structengine_1_1components_1_1_decal_component_1_1_decal.html" title=" " alt="" coords="24,5,190,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="110,61,110,109,104,109,104,61"/>
+</map>

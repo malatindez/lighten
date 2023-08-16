@@ -1,0 +1,9 @@
+<map id="engine::direct3d::DefaultBuffer&lt; T &gt;" name="engine::direct3d::DefaultBuffer&lt; T &gt;">
+<area shape="rect" id="Node000001" title="The default buffer class." alt="" coords="5,183,164,223"/>
+<area shape="rect" id="Node000004" href="$d6/d4c/classengine_1_1direct3d_1_1_default_uniform_buffer.html" title="Default uniform buffer class." alt="" coords="5,271,164,312"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="87,238,87,271,82,271,82,238"/>
+<area shape="rect" id="Node000002" href="$d9/db4/classengine_1_1direct3d_1_1_buffer_base.html" title="Buffer Base class that contains the common functions for all the buffers." alt="" coords="9,94,160,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,149,87,182,82,182,82,149"/>
+<area shape="rect" id="Node000003" href="$d6/de4/classengine_1_1direct3d_1_1_buffer_wrapper.html" title="A wrapper for a D3D11 buffer." alt="" coords="9,5,160,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="87,61,87,94,82,94,82,61"/>
+</map>

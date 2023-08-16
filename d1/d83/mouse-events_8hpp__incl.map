@@ -1,0 +1,10 @@
+<map id="engine/core/events/mouse&#45;events.hpp" name="engine/core/events/mouse&#45;events.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="61,5,192,46"/>
+<area shape="rect" id="Node000002" href="$d4/d78/math_8hpp.html" title=" " alt="" coords="5,94,109,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,48,79,84,75,81,107,45"/>
+<area shape="rect" id="Node000003" href="$dc/d94/event_8hpp.html" title=" " alt="" coords="157,94,234,120"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="145,45,177,81,173,84,141,48"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="97,91,123,93,132,98,135,107,128,118,112,123,110,118,125,114,130,107,128,102,121,98,96,96"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="169,168,222,193"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="198,120,198,153,193,153,193,120"/>
+</map>

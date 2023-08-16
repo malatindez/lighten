@@ -1,0 +1,5 @@
+<map id="engine::direct3d::SwapchainRenderTarget" name="engine::direct3d::SwapchainRenderTarget">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,94,187,135"/>
+<area shape="rect" id="Node000002" href="$df/de1/classengine_1_1direct3d_1_1_render_target_base.html" title="The render target base class." alt="" coords="17,5,175,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,61,99,94,93,94,93,61"/>
+</map>

@@ -1,0 +1,31 @@
+<map id="engine/subsystems/render/post&#45;processing.inl" name="engine/subsystems/render/post&#45;processing.inl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="342,5,515,46"/>
+<area shape="rect" id="Node000002" href="$d2/d42/post-processing_8hpp.html" title=" " alt="" coords="342,94,515,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="422,61,423,93,418,94,417,61"/>
+<area shape="poly" id="edge17_Node000002_Node000001" title=" " alt="" coords="434,79,433,47,439,46,440,79"/>
+<area shape="rect" id="Node000003" href="$db/df9/deferred-hdr-render-pipeline_8hpp.html" title=" " alt="" coords="230,271,405,312"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="383,146,362,163,345,184,334,206,327,229,321,271,316,271,322,228,329,204,341,181,358,160,380,142"/>
+<area shape="rect" id="Node000008" href="$de/d8e/deferred-resolve_8hpp.html" title=" " alt="" coords="525,183,675,223"/>
+<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="482,139,562,180,560,185,479,144"/>
+<area shape="rect" id="Node000010" href="$d2/deb/hdr-to-ldr-layer_8hpp.html" title=" " alt="" coords="144,183,280,223"/>
+<area shape="poly" id="edge11_Node000002_Node000010" title=" " alt="" coords="367,143,262,185,260,180,365,138"/>
+<area shape="rect" id="Node000011" href="$da/d7b/present-swapchain_8hpp.html" title=" " alt="" coords="355,183,501,223"/>
+<area shape="poly" id="edge13_Node000002_Node000011" title=" " alt="" coords="431,149,431,182,426,182,426,149"/>
+<area shape="rect" id="Node000012" href="$d1/d3c/post-processing_8cpp.html" title=" " alt="" coords="699,183,872,223"/>
+<area shape="poly" id="edge16_Node000002_Node000012" title=" " alt="" coords="524,136,705,180,704,185,523,141"/>
+<area shape="rect" id="Node000004" href="$dc/dfb/controller_8hpp.html" title=" " alt="" coords="28,368,180,393"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="257,320,135,369,133,365,255,315"/>
+<area shape="rect" id="Node000006" href="$d9/d0f/main_8cc.html" title=" " alt="" coords="181,449,302,474"/>
+<area shape="poly" id="edge6_Node000003_Node000006" title=" " alt="" coords="276,323,258,341,245,361,239,384,237,408,241,448,236,449,232,408,233,383,240,359,254,337,272,319"/>
+<area shape="rect" id="Node000007" href="$d1/da2/deferred-hdr-render-pipeline_8cpp.html" title=" " alt="" coords="254,360,429,401"/>
+<area shape="poly" id="edge7_Node000003_Node000007" title=" " alt="" coords="329,326,339,359,334,360,324,327"/>
+<area shape="rect" id="Node000005" href="$d1/d47/controller_8cpp.html" title=" " alt="" coords="5,449,158,474"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="99,408,88,449,82,447,94,407"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="139,398,222,446,219,450,136,403"/>
+<area shape="poly" id="edge9_Node000008_Node000003" title=" " alt="" coords="523,231,382,273,381,268,521,226"/>
+<area shape="rect" id="Node000009" href="$d4/d7c/deferred-resolve_8cpp.html" title=" " alt="" coords="525,271,675,312"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="603,238,603,271,598,271,598,238"/>
+<area shape="poly" id="edge12_Node000010_Node000003" title=" " alt="" coords="249,231,295,269,292,273,246,235"/>
+<area shape="poly" id="edge15_Node000011_Node000003" title=" " alt="" coords="393,235,344,273,341,269,390,230"/>
+<area shape="poly" id="edge14_Node000011_Node000006" title=" " alt="" coords="445,237,456,274,463,317,460,362,453,383,442,402,413,429,378,447,339,458,303,463,302,457,338,453,376,442,410,425,438,399,449,381,455,361,457,317,451,275,440,238"/>
+</map>

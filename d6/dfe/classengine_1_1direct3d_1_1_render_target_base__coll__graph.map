@@ -1,0 +1,9 @@
+<map id="engine::direct3d::RenderTargetBase" name="engine::direct3d::RenderTargetBase">
+<area shape="rect" id="Node000001" title="The render target base class." alt="" coords="449,77,607,118"/>
+<area shape="rect" id="Node000002" href="$df/d47/classengine_1_1direct3d_1_1d3d__resource__wrapper.html" title=" " alt="" coords="5,5,261,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="269,47,425,75,449,80,448,85,424,80,268,52"/>
+<area shape="rect" id="Node000003" href="$df/d47/classengine_1_1direct3d_1_1d3d__resource__wrapper.html" title=" " alt="" coords="20,70,246,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="261,95,448,95,448,100,261,100"/>
+<area shape="rect" id="Node000004" href="$df/d47/classengine_1_1direct3d_1_1d3d__resource__wrapper.html" title=" " alt="" coords="20,150,246,206"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="260,149,448,111,449,116,261,154"/>
+</map>
