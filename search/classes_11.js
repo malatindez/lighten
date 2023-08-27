@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['underlyingstack_0',['UnderlyingStack',['../d2/d80/classengine_1_1core_1_1__layer__stack__detail_1_1_underlying_stack.html',1,'engine::core::_layer_stack_detail::UnderlyingStack&lt; T &gt;'],['../de/d5d/classengine_1_1render_1_1__post__processing__detail_1_1_underlying_stack.html',1,'engine::render::_post_processing_detail::UnderlyingStack&lt; T &gt;']]],
+  ['underlyingstack_0',['underlyingstack',['../d2/d80/classengine_1_1core_1_1__layer__stack__detail_1_1_underlying_stack.html',1,'engine::core::_layer_stack_detail::UnderlyingStack&lt; T &gt;'],['../de/d5d/classengine_1_1render_1_1__post__processing__detail_1_1_underlying_stack.html',1,'engine::render::_post_processing_detail::UnderlyingStack&lt; T &gt;']]],
   ['underlyingstack_3c_20engine_3a_3acore_3a_3alayer_3a_3ahandleevent_20_3e_1',['UnderlyingStack&lt; engine::core::Layer::HandleEvent &gt;',['../d2/d80/classengine_1_1core_1_1__layer__stack__detail_1_1_underlying_stack.html',1,'engine::core::_layer_stack_detail']]],
   ['underlyingstack_3c_20engine_3a_3acore_3a_3alayer_3a_3ahandleguirender_20_3e_2',['UnderlyingStack&lt; engine::core::Layer::HandleGuiRender &gt;',['../d2/d80/classengine_1_1core_1_1__layer__stack__detail_1_1_underlying_stack.html',1,'engine::core::_layer_stack_detail']]],
   ['underlyingstack_3c_20engine_3a_3acore_3a_3alayer_3a_3ahandlerender_20_3e_3',['UnderlyingStack&lt; engine::core::Layer::HandleRender &gt;',['../d2/d80/classengine_1_1core_1_1__layer__stack__detail_1_1_underlying_stack.html',1,'engine::core::_layer_stack_detail']]],

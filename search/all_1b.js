@@ -35,5 +35,5 @@ var searchData=
   ['_7espotlight_32',['~SpotLight',['../d9/dfc/structengine_1_1components_1_1_spot_light.html#a4cdd272947122ef0807def7b49cb8fa7',1,'engine::components::SpotLight']]],
   ['_7eswapchainrendertarget_33',['~SwapchainRenderTarget',['../dc/d43/classengine_1_1direct3d_1_1_swapchain_render_target.html#aefea61869d8f9541636d0ad77537603a',1,'engine::direct3d::SwapchainRenderTarget']]],
   ['_7etransformcomponent_34',['~TransformComponent',['../d1/d6e/structengine_1_1components_1_1_transform_component.html#ad0a6959b3cde9618b2450dc989fe1e09',1,'engine::components::TransformComponent']]],
-  ['_7ewindow_35',['~Window',['../dd/d52/classengine_1_1core_1_1_window.html#ab9d8deb806bfa9ee68c0816037e615e7',1,'engine::core::Window::~Window()'],['../d0/de6/classengine_1_1platform_1_1windows_1_1_window.html#a06ae4fe10dc5b40d8c4b2a067b43c989',1,'engine::platform::windows::Window::~Window()']]]
+  ['_7ewindow_35',['~window',['../dd/d52/classengine_1_1core_1_1_window.html#ab9d8deb806bfa9ee68c0816037e615e7',1,'engine::core::Window::~Window()'],['../d0/de6/classengine_1_1platform_1_1windows_1_1_window.html#a06ae4fe10dc5b40d8c4b2a067b43c989',1,'engine::platform::windows::Window::~Window()']]]
 ];

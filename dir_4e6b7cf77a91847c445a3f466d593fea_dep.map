@@ -1,12 +1,16 @@
 <map id="engine/subsystems/render/detail/misc" name="engine/subsystems/render/detail/misc">
 <area shape="rect" id="node1" href="dir_4e6b7cf77a91847c445a3f466d593fea.html" title="misc" alt="" coords="156,52,205,78"/>
 <area shape="rect" id="node2" href="dir_52bb8edc54208f47f87ae9b01b1d12a6.html" title="direct3d11" alt="" coords="5,126,87,152"/>
+<area shape="poly" id="edge1" href="dir_000023_000010.html" alt="" coords="159,81,83,121,81,116,157,76"/>
 <area shape="rect" id="edge1-headlabel" href="dir_000023_000010.html" title="1" alt="" coords="85,117,92,132"/>
 <area shape="rect" id="node3" href="dir_6eaa9a4b68db9d3a4b16103d94f334fb.html" title="render" alt="" coords="111,126,168,152"/>
+<area shape="poly" id="edge2" href="dir_000023_000030.html" alt="" coords="176,80,156,114,151,112,172,77"/>
 <area shape="rect" id="edge2-headlabel" href="dir_000023_000030.html" title="1" alt="" coords="159,107,166,122"/>
 <area shape="rect" id="node4" href="dir_bafa501d493553e442f19f5f8dd7b29c.html" title="include" alt="" coords="192,126,255,152"/>
+<area shape="poly" id="edge3" href="dir_000023_000019.html" alt="" coords="190,77,211,112,206,115,185,80"/>
 <area shape="rect" id="edge3-headlabel" href="dir_000023_000019.html" title="1" alt="" coords="211,98,218,113"/>
 <area shape="rect" id="node5" href="dir_fffb0536444c266989e4fa626fabed06.html" title="core" alt="" coords="279,126,325,152"/>
+<area shape="poly" id="edge4" href="dir_000023_000005.html" alt="" coords="203,76,270,116,267,120,200,81"/>
 <area shape="rect" id="edge4-headlabel" href="dir_000023_000005.html" title="1" alt="" coords="266,101,273,116"/>
 <area shape="rect" id="clust1" href="dir_9d75d78bff579dfd76de3e7111e79cbd.html" title="detail" alt="" coords="145,16,217,89"/>
 </map>
