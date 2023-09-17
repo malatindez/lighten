@@ -1,9 +1,9 @@
 <map id="engine::components::ParticleEmitter" name="engine::components::ParticleEmitter">
 <area shape="rect" id="Node000001" title="Particle emitter component." alt="" coords="561,41,697,82"/>
 <area shape="rect" id="Node000002" href="$d6/dd6/structengine_1_1components_1_1_component.html" title="Base class for all components." alt="" coords="298,5,435,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="450,34,561,50,560,55,449,40"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="450,34,561,50,560,55,450,40"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="272,70,461,126"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="476,80,560,68,561,74,476,85"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="476,80,560,68,561,74,477,85"/>
 <area shape="rect" id="Node000004" href="$d3/d36/structengine_1_1components_1_1_particle_emitter_1_1_particle.html" title="CPU particle class." alt="" coords="5,77,168,118"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="182,95,271,95,271,100,182,100"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="183,95,271,95,271,100,183,100"/>
 </map>

@@ -1,15 +1,15 @@
 <map id="engine::components::GameObject" name="engine::components::GameObject">
 <area shape="rect" id="Node000001" title="Component that contains the name of the object and its tag." alt="" coords="436,93,573,134"/>
 <area shape="rect" id="Node000002" href="$d6/dd6/structengine_1_1components_1_1_component.html" title="Base class for all components." alt="" coords="204,5,340,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="347,49,413,74,454,90,452,95,411,79,345,54"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="348,49,413,74,454,90,452,95,411,79,346,54"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="217,70,328,96"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="342,90,436,102,436,107,342,95"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="343,90,436,102,436,107,343,95"/>
 <area shape="rect" id="Node000004" title=" " alt="" coords="5,60,155,101"/>
 <area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="170,79,216,80,216,85,170,84"/>
 <area shape="rect" id="Node000005" title=" " alt="" coords="234,132,311,157"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="326,141,412,134,436,130,437,135,413,140,326,147"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="327,141,412,134,436,130,437,135,413,140,327,147"/>
 <area shape="rect" id="Node000006" title=" " alt="" coords="18,125,142,166"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="156,142,233,142,233,147,156,148"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="157,142,233,142,233,147,157,148"/>
 <area shape="rect" id="Node000007" title=" " alt="" coords="212,181,332,222"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="346,182,411,161,468,132,471,137,413,166,348,187"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="347,182,411,161,468,132,471,137,413,166,348,187"/>
 </map>

@@ -1,11 +1,11 @@
 <map id="engine::utils::Measurer&lt; clock &gt;" name="engine::utils::Measurer&lt; clock &gt;">
 <area shape="rect" id="Node000001" title=" " alt="" coords="68,213,218,253"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="34,117,111,142"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,153,131,211,127,214,87,156"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="92,154,131,211,127,214,87,157"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="5,5,129,46"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="71,61,74,116,69,116,66,61"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="71,61,74,116,69,116,66,62"/>
 <area shape="rect" id="Node000004" title=" " alt="" coords="144,109,302,150"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="201,163,160,214,156,211,197,160"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="200,164,160,214,156,211,196,160"/>
 <area shape="rect" id="Node000005" href="$df/d28/structengine_1_1utils_1_1_measurer_1_1_entry.html" title=" " alt="" coords="152,5,302,46"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="228,61,226,109,221,108,223,61"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="228,62,226,109,221,108,223,62"/>
 </map>

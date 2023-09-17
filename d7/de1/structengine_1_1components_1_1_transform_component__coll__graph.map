@@ -1,9 +1,9 @@
 <map id="engine::components::TransformComponent" name="engine::components::TransformComponent">
 <area shape="rect" id="Node000001" title="Component that contains the transform of the object." alt="" coords="19,199,171,240"/>
 <area shape="rect" id="Node000002" href="$d6/dd6/structengine_1_1components_1_1_component.html" title="Base class for all components." alt="" coords="5,95,142,136"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,150,93,198,88,199,78,151"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,151,93,198,88,199,78,152"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="166,103,277,129"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="197,140,121,200,118,196,194,136"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="196,141,121,200,118,196,193,136"/>
 <area shape="rect" id="Node000004" title=" " alt="" coords="147,5,296,46"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="224,61,224,102,219,102,219,61"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="224,62,224,102,219,102,219,62"/>
 </map>

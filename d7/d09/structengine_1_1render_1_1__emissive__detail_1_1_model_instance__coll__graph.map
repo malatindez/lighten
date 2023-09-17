@@ -1,60 +1,60 @@
 <map id="engine::render::_emissive_detail::ModelInstance" name="engine::render::_emissive_detail::ModelInstance">
 <area shape="rect" id="Node000001" title=" " alt="" coords="2104,367,2270,408"/>
 <area shape="rect" id="Node000002" href="$dd/db5/structengine_1_1render_1_1_model.html" title=" " alt="" coords="1807,330,1950,355"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1965,352,2104,373,2103,378,1964,357"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1965,352,2104,373,2103,378,1964,358"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="885,220,963,246"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="978,228,1105,226,1284,229,1489,242,1594,255,1696,272,1740,283,1782,297,1851,327,1849,332,1780,302,1738,288,1695,277,1593,260,1488,247,1284,234,1105,231,978,233"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="978,228,1106,226,1284,229,1489,242,1594,255,1696,272,1740,283,1782,297,1851,327,1849,332,1780,302,1738,288,1695,277,1593,260,1489,247,1284,234,1106,231,978,233"/>
 <area shape="rect" id="Node000016" href="$d0/d01/structengine_1_1render_1_1_material.html" title=" " alt="" coords="1239,179,1393,205"/>
-<area shape="poly" id="edge19_Node000016_Node000003" title=" " alt="" coords="977,225,1238,197,1239,202,978,230"/>
+<area shape="poly" id="edge19_Node000016_Node000003" title=" " alt="" coords="978,225,1238,197,1239,202,978,230"/>
 <area shape="rect" id="Node000004" title=" " alt="" coords="595,213,718,253"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="733,230,885,230,885,236,733,236"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="734,230,885,230,885,236,734,236"/>
 <area shape="rect" id="Node000005" title=" " alt="" coords="1530,518,1677,559"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="1683,509,1694,502,1726,471,1746,441,1765,410,1798,378,1840,353,1843,358,1801,382,1769,413,1750,444,1730,475,1697,506,1685,513"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="1683,508,1694,502,1726,471,1746,441,1765,410,1798,378,1840,353,1843,358,1801,382,1769,413,1750,444,1730,475,1697,506,1686,513"/>
 <area shape="rect" id="Node000006" href="$df/d91/structengine_1_1render_1_1_model_mesh.html" title=" " alt="" coords="1229,546,1403,571"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="1418,549,1530,541,1530,546,1418,554"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="1418,549,1530,541,1530,546,1419,554"/>
 <area shape="rect" id="Node000007" href="$d1/d87/structengine_1_1render_1_1_mesh_range.html" title=" " alt="" coords="836,560,1012,586"/>
 <area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="1027,576,1113,577,1202,573,1240,569,1240,574,1203,579,1113,582,1027,581"/>
 <area shape="rect" id="Node000008" href="$d7/d90/structengine_1_1render_1_1_mesh.html" title=" " alt="" coords="587,568,726,594"/>
-<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="731,595,834,611,938,617,1019,613,1099,601,1202,581,1258,569,1259,574,1203,586,1100,606,1019,618,937,622,833,616,730,600"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="731,595,834,611,938,617,1019,613,1099,601,1202,581,1258,569,1259,574,1203,586,1100,606,1019,618,937,622,833,616,731,600"/>
 <area shape="rect" id="Node000012" href="$db/df4/classengine_1_1core_1_1_triangle_octree.html" title=" " alt="" coords="833,498,1015,523"/>
-<area shape="poly" id="edge12_Node000012_Node000008" title=" " alt="" coords="729,562,809,541,878,521,880,526,810,547,731,567"/>
+<area shape="poly" id="edge12_Node000012_Node000008" title=" " alt="" coords="730,561,809,541,878,521,880,526,810,547,731,567"/>
 <area shape="rect" id="Node000009" title=" " alt="" coords="304,570,434,611"/>
-<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="449,589,557,587,586,585,587,590,557,592,449,594"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="450,589,557,587,586,585,587,590,557,592,450,594"/>
 <area shape="rect" id="Node000010" href="$d0/dc6/structengine_1_1render_1_1_vertex.html" title=" " alt="" coords="5,578,150,603"/>
-<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="164,588,303,588,303,593,164,593"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="165,588,303,588,303,593,165,593"/>
 <area shape="rect" id="Node000011" title=" " alt="" coords="294,508,444,534"/>
 <area shape="poly" id="edge10_Node000008_Node000011" title=" " alt="" coords="449,535,592,565,591,570,448,540"/>
 <area shape="poly" id="edge13_Node000012_Node000011" title=" " alt="" coords="459,517,833,509,833,515,459,522"/>
-<area shape="poly" id="edge11_Node000006_Node000012" title=" " alt="" coords="1010,524,1039,528,1229,549,1228,554,1038,533,1009,529"/>
+<area shape="poly" id="edge11_Node000006_Node000012" title=" " alt="" coords="1011,524,1039,528,1229,549,1228,554,1038,533,1010,529"/>
 <area shape="rect" id="Node000014" title=" " alt="" coords="1232,417,1400,457"/>
-<area shape="poly" id="edge16_Node000014_Node000012" title=" " alt="" coords="981,490,1038,476,1138,457,1231,444,1232,449,1139,463,1039,481,983,495"/>
+<area shape="poly" id="edge16_Node000014_Node000012" title=" " alt="" coords="982,490,1038,476,1138,457,1231,444,1232,449,1139,463,1039,481,983,495"/>
 <area shape="rect" id="Node000013" title=" " alt="" coords="1530,436,1678,492"/>
-<area shape="poly" id="edge14_Node000012_Node000013" title=" " alt="" coords="1515,476,1405,487,1195,500,1015,509,1015,504,1195,495,1405,481,1514,471"/>
-<area shape="poly" id="edge15_Node000013_Node000014" title=" " alt="" coords="1415,443,1529,454,1529,459,1414,449"/>
+<area shape="poly" id="edge14_Node000012_Node000013" title=" " alt="" coords="1514,476,1405,487,1195,500,1015,509,1015,504,1195,495,1405,481,1513,471"/>
+<area shape="poly" id="edge15_Node000013_Node000014" title=" " alt="" coords="1416,444,1529,454,1529,459,1415,449"/>
 <area shape="rect" id="Node000015" title=" " alt="" coords="1539,171,1669,212"/>
-<area shape="poly" id="edge17_Node000002_Node000015" title=" " alt="" coords="1685,197,1731,208,1777,228,1808,251,1835,278,1871,327,1867,330,1831,282,1804,255,1774,233,1730,213,1683,202"/>
+<area shape="poly" id="edge17_Node000002_Node000015" title=" " alt="" coords="1685,197,1732,208,1777,228,1808,251,1835,278,1871,327,1867,330,1831,282,1804,255,1774,233,1730,213,1684,202"/>
 <area shape="poly" id="edge18_Node000015_Node000016" title=" " alt="" coords="1408,189,1538,189,1538,194,1408,194"/>
 <area shape="rect" id="Node000017" title=" " alt="" coords="836,139,1012,180"/>
-<area shape="poly" id="edge20_Node000016_Node000017" title=" " alt="" coords="1027,165,1239,183,1238,188,1027,171"/>
+<area shape="poly" id="edge20_Node000016_Node000017" title=" " alt="" coords="1028,165,1239,183,1238,188,1028,171"/>
 <area shape="rect" id="Node000018" href="$d0/dc3/classengine_1_1direct3d_1_1_immutable_vertex_buffer.html" title=" " alt="" coords="1512,351,1695,406"/>
-<area shape="poly" id="edge21_Node000002_Node000018" title=" " alt="" coords="1710,369,1775,361,1820,353,1821,358,1776,367,1710,374"/>
+<area shape="poly" id="edge21_Node000002_Node000018" title=" " alt="" coords="1710,369,1775,361,1820,353,1821,358,1776,367,1711,374"/>
 <area shape="rect" id="Node000019" href="$d3/d29/classengine_1_1direct3d_1_1_immutable_buffer.html" title="The immutable buffer class." alt="" coords="1227,351,1405,392"/>
-<area shape="poly" id="edge22_Node000018_Node000019" title=" " alt="" coords="1420,371,1512,374,1511,379,1420,377"/>
+<area shape="poly" id="edge22_Node000018_Node000019" title=" " alt="" coords="1421,371,1512,374,1511,379,1421,377"/>
 <area shape="rect" id="Node000020" href="$d9/db4/classengine_1_1direct3d_1_1_buffer_base.html" title="Buffer Base class that contains the common functions for all the buffers." alt="" coords="848,315,1000,356"/>
-<area shape="poly" id="edge23_Node000019_Node000020" title=" " alt="" coords="1015,341,1226,361,1226,366,1014,347"/>
+<area shape="poly" id="edge23_Node000019_Node000020" title=" " alt="" coords="1015,341,1226,361,1226,366,1015,347"/>
 <area shape="rect" id="Node000024" href="$d3/d29/classengine_1_1direct3d_1_1_immutable_buffer.html" title="The immutable buffer class." alt="" coords="1227,286,1405,327"/>
-<area shape="poly" id="edge28_Node000024_Node000020" title=" " alt="" coords="1014,326,1226,310,1226,316,1015,332"/>
+<area shape="poly" id="edge28_Node000024_Node000020" title=" " alt="" coords="1015,326,1226,310,1226,316,1015,332"/>
 <area shape="rect" id="Node000021" href="$d6/de4/classengine_1_1direct3d_1_1_buffer_wrapper.html" title="A wrapper for a D3D11 buffer." alt="" coords="581,315,732,356"/>
-<area shape="poly" id="edge24_Node000020_Node000021" title=" " alt="" coords="747,333,848,333,848,338,747,338"/>
+<area shape="poly" id="edge24_Node000020_Node000021" title=" " alt="" coords="748,333,848,333,848,338,748,338"/>
 <area shape="rect" id="Node000022" href="$df/d47/classengine_1_1direct3d_1_1d3d__resource__wrapper.html" title=" " alt="" coords="254,315,484,356"/>
-<area shape="poly" id="edge25_Node000021_Node000022" title=" " alt="" coords="499,333,581,333,581,338,499,338"/>
+<area shape="poly" id="edge25_Node000021_Node000022" title=" " alt="" coords="500,333,581,333,581,338,500,338"/>
 <area shape="rect" id="Node000023" href="$db/dc4/classengine_1_1direct3d_1_1_immutable_index_buffer.html" title=" " alt="" coords="1515,286,1693,327"/>
-<area shape="poly" id="edge26_Node000002_Node000023" title=" " alt="" coords="1708,317,1807,330,1807,336,1707,323"/>
-<area shape="poly" id="edge27_Node000023_Node000024" title=" " alt="" coords="1420,304,1514,304,1514,309,1420,309"/>
+<area shape="poly" id="edge26_Node000002_Node000023" title=" " alt="" coords="1709,317,1807,330,1807,336,1708,323"/>
+<area shape="poly" id="edge27_Node000023_Node000024" title=" " alt="" coords="1421,304,1514,304,1514,309,1421,309"/>
 <area shape="rect" id="Node000025" title=" " alt="" coords="1799,392,1958,448"/>
-<area shape="poly" id="edge29_Node000001_Node000025" title=" " alt="" coords="1973,411,2079,401,2103,398,2104,404,2080,407,1973,416"/>
+<area shape="poly" id="edge29_Node000001_Node000025" title=" " alt="" coords="1973,411,2079,401,2103,398,2104,404,2080,407,1974,416"/>
 <area shape="rect" id="Node000026" href="$d3/d44/structengine_1_1render_1_1__emissive__detail_1_1_mesh_instance.html" title=" " alt="" coords="1521,587,1687,628"/>
-<area shape="poly" id="edge30_Node000025_Node000026" title=" " alt="" coords="1675,578,1694,568,1738,539,1780,506,1847,446,1851,450,1783,510,1741,543,1697,573,1677,583"/>
+<area shape="poly" id="edge30_Node000025_Node000026" title=" " alt="" coords="1676,578,1694,568,1738,539,1780,506,1847,446,1851,450,1783,510,1741,543,1697,573,1678,583"/>
 <area shape="rect" id="Node000027" title=" " alt="" coords="1256,595,1376,636"/>
-<area shape="poly" id="edge31_Node000026_Node000027" title=" " alt="" coords="1391,611,1520,607,1520,613,1391,616"/>
+<area shape="poly" id="edge31_Node000026_Node000027" title=" " alt="" coords="1392,611,1520,607,1520,613,1392,616"/>
 </map>

@@ -1,7 +1,7 @@
 <map id="engine/direct3d11/buffers" name="engine/direct3d11/buffers">
 <area shape="rect" id="node1" href="dir_a90e6dba9306c22cb15c23481e5b9c4a.html" title="buffers" alt="" coords="27,52,88,78"/>
 <area shape="rect" id="node2" href="dir_961895bef81e67620a5b47a62fb3cb48.html" title="utils" alt="" coords="35,126,80,152"/>
-<area shape="poly" id="edge1" href="dir_000001_000040.html" alt="" coords="60,78,60,111,55,111,55,78"/>
+<area shape="poly" id="edge1" href="dir_000001_000040.html" alt="" coords="60,78,60,110,55,110,55,78"/>
 <area shape="rect" id="edge1-headlabel" href="dir_000001_000040.html" title="1" alt="" coords="62,100,69,115"/>
 <area shape="rect" id="clust1" href="dir_52bb8edc54208f47f87ae9b01b1d12a6.html" title="direct3d11" alt="" coords="16,16,99,89"/>
 </map>

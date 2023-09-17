@@ -1,7 +1,7 @@
 <map id="d3d_test/object&#45;editor.hpp" name="d3d_test/object&#45;editor.hpp">
 <area shape="rect" id="Node000001" title=" " alt="" coords="182,5,352,31"/>
 <area shape="rect" id="Node000002" href="$d1/d47/controller_8cpp.html" title=" " alt="" coords="5,79,158,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="223,39,114,81,112,76,221,34"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="222,39,114,81,112,76,220,34"/>
 <area shape="rect" id="Node000003" href="$d4/d94/object-editor_8cpp.html" title=" " alt="" coords="182,79,352,105"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="270,46,270,79,264,79,264,46"/>
 <area shape="rect" id="Node000004" href="$d0/d38/scene-viewer_8cpp.html" title=" " alt="" coords="376,79,552,105"/>

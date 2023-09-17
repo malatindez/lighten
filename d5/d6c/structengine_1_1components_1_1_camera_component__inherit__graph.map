@@ -1,5 +1,5 @@
 <map id="engine::components::CameraComponent" name="engine::components::CameraComponent">
 <area shape="rect" id="Node000001" title="Component that contains the camera of the object." alt="" coords="5,94,144,135"/>
 <area shape="rect" id="Node000002" href="$d6/dd6/structengine_1_1components_1_1_component.html" title="Base class for all components." alt="" coords="6,5,143,46"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="77,61,77,94,72,94,72,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="77,62,77,94,72,94,72,62"/>
 </map>

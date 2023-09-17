@@ -1,11 +1,11 @@
 <map id="engine::direct3d::ImmutableIndexBuffer&lt; T &gt;" name="engine::direct3d::ImmutableIndexBuffer&lt; T &gt;">
 <area shape="rect" id="Node000001" title="The immutable index buffer class." alt="" coords="31,379,210,420"/>
 <area shape="rect" id="Node000002" href="$d3/d29/classengine_1_1direct3d_1_1_immutable_buffer.html" title="The immutable buffer class." alt="" coords="31,289,210,330"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,344,123,379,118,379,118,344"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,345,123,379,118,379,118,345"/>
 <area shape="rect" id="Node000003" href="$d9/db4/classengine_1_1direct3d_1_1_buffer_base.html" title="Buffer Base class that contains the common functions for all the buffers." alt="" coords="45,199,196,240"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="123,254,123,289,118,289,118,254"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="123,255,123,289,118,289,118,255"/>
 <area shape="rect" id="Node000004" href="$d6/de4/classengine_1_1direct3d_1_1_buffer_wrapper.html" title="A wrapper for a D3D11 buffer." alt="" coords="45,109,196,150"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="123,164,123,199,118,199,118,164"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="123,165,123,199,118,199,118,165"/>
 <area shape="rect" id="Node000005" href="$df/d47/classengine_1_1direct3d_1_1d3d__resource__wrapper.html" title=" " alt="" coords="5,5,236,46"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="123,61,123,109,118,109,118,61"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="123,62,123,109,118,109,118,62"/>
 </map>

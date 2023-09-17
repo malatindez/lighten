@@ -1,29 +1,29 @@
 <map id="engine::direct3d::readonly_d3d_resource_wrapper&lt; T &gt;" name="engine::direct3d::readonly_d3d_resource_wrapper&lt; T &gt;">
 <area shape="rect" id="Node000001" title="The readonly d3d resource wrapper class." alt="" coords="215,457,404,498"/>
 <area shape="rect" id="Node000003" href="$df/da2/classengine_1_1direct3d_1_1__api__detail_1_1api__readonly__wrapper.html" title=" " alt="" coords="485,5,660,61"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="310,441,320,366,343,267,361,214,384,162,414,114,450,71,483,49,486,54,454,75,418,117,389,165,366,216,348,268,325,366,316,442"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="310,441,320,365,343,266,361,214,385,162,414,114,450,71,483,49,486,54,454,75,418,117,389,165,366,216,348,268,325,366,316,442"/>
 <area shape="rect" id="Node000004" href="$df/da2/classengine_1_1direct3d_1_1__api__detail_1_1api__readonly__wrapper.html" title=" " alt="" coords="482,85,664,141"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="314,441,328,380,354,302,372,261,394,221,420,184,450,151,480,132,483,136,454,155,424,187,398,224,376,263,359,304,333,381,319,443"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="314,441,328,379,354,301,372,261,394,221,420,184,450,151,480,132,483,136,454,155,424,187,398,224,377,263,359,303,333,381,319,442"/>
 <area shape="rect" id="Node000005" href="$df/da2/classengine_1_1direct3d_1_1__api__detail_1_1api__readonly__wrapper.html" title=" " alt="" coords="483,165,662,221"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="319,442,338,395,365,338,403,281,425,254,450,231,481,212,484,217,454,235,429,258,407,284,370,341,343,397,324,444"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="319,441,338,394,366,338,403,281,425,254,450,231,481,212,484,217,454,235,429,258,407,284,370,340,343,396,324,443"/>
 <area shape="rect" id="Node000006" href="$df/da2/classengine_1_1direct3d_1_1__api__detail_1_1api__readonly__wrapper.html" title=" " alt="" coords="480,245,666,301"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="329,443,379,376,413,341,451,311,478,296,480,301,453,315,416,345,383,380,333,446"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="329,442,379,376,413,341,451,311,478,296,480,301,453,315,416,345,383,380,333,445"/>
 <area shape="rect" id="Node000007" href="$df/da2/classengine_1_1direct3d_1_1__api__detail_1_1api__readonly__wrapper.html" title=" " alt="" coords="461,325,684,381"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="352,446,399,418,451,391,479,379,481,384,453,396,401,423,355,451"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="352,446,399,418,451,391,479,379,481,384,453,396,402,422,355,451"/>
 <area shape="rect" id="Node000008" href="$df/da2/classengine_1_1direct3d_1_1__api__detail_1_1api__readonly__wrapper.html" title=" " alt="" coords="458,405,688,461"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="418,456,457,450,458,455,419,462"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="419,456,457,450,458,455,420,461"/>
 <area shape="rect" id="Node000009" href="$df/d6a/classengine_1_1direct3d_1_1__state__detail_1_1state__readonly__wrapper.html" title=" " alt="" coords="452,485,693,555"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="419,492,452,498,451,503,418,497"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="420,492,452,498,451,503,419,498"/>
 <area shape="rect" id="Node000010" href="$df/d6a/classengine_1_1direct3d_1_1__state__detail_1_1state__readonly__wrapper.html" title=" " alt="" coords="464,579,681,650"/>
-<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="353,504,400,535,453,565,476,576,474,581,451,570,397,540,350,509"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="353,504,400,535,453,565,476,576,474,581,451,570,398,540,350,509"/>
 <area shape="rect" id="Node000011" href="$df/d6a/classengine_1_1direct3d_1_1__state__detail_1_1state__readonly__wrapper.html" title=" " alt="" coords="457,674,688,745"/>
-<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="331,509,380,585,415,625,454,660,470,671,467,676,450,665,411,629,376,588,326,512"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="331,510,381,585,415,625,454,660,470,671,467,676,450,665,411,629,376,588,327,513"/>
 <area shape="rect" id="Node000012" href="$df/d6a/classengine_1_1direct3d_1_1__state__detail_1_1state__readonly__wrapper.html" title=" " alt="" coords="465,769,681,839"/>
-<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="322,511,339,564,366,629,404,697,427,728,454,755,467,766,464,770,450,759,423,731,399,699,361,632,334,566,317,512"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="322,512,339,565,366,630,404,697,427,728,454,755,467,766,464,770,450,759,423,731,400,700,361,632,334,567,317,513"/>
 <area shape="rect" id="Node000013" href="$df/da2/classengine_1_1direct3d_1_1__api__detail_1_1api__readonly__wrapper.html" title="The readonly_d3d_resource_wrapper class is a wrapper for readonly d3d resources." alt="" coords="492,863,653,918"/>
-<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="317,512,328,582,351,673,369,721,392,768,420,811,454,850,472,863,493,873,490,878,469,868,450,854,416,815,387,770,364,723,346,675,323,583,311,513"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="317,513,328,583,352,674,370,722,392,768,420,812,454,850,472,863,493,873,490,878,469,868,450,854,416,815,388,771,365,724,347,676,323,584,311,513"/>
 <area shape="rect" id="Node000014" href="$df/d6a/classengine_1_1direct3d_1_1__state__detail_1_1state__readonly__wrapper.html" title="The state_readonly_wrapper class is a wrapper for readonly state d3d resources." alt="" coords="493,943,652,998"/>
-<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="314,512,321,596,342,708,360,767,384,826,415,880,454,929,472,943,494,953,492,958,469,948,450,932,410,883,379,828,355,769,337,709,316,597,309,513"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="314,513,321,597,342,708,360,768,384,826,415,880,454,929,472,943,494,953,492,958,469,948,450,932,410,883,379,828,355,769,337,710,316,598,309,513"/>
 <area shape="rect" id="Node000002" href="$df/d47/classengine_1_1direct3d_1_1d3d__resource__wrapper.html" title="The d3d resource wrapper class." alt="" coords="5,457,167,498"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="182,475,214,475,214,480,182,480"/>
 </map>
