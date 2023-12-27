@@ -35,3 +35,9 @@
 [submodule "third_party/math"]
 	path = third_party/math
 	url = https://github.com/malatindez/math
+[submodule "third_party/yaml"]
+	path = third_party/yaml
+	url = https://github.com/jbeder/yaml-cpp
+[submodule "third_party/json"]
+	path = third_party/json
+	url = https://github.com/nlohmann/json
