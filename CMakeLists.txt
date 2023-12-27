@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 3.21)
 
-
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(engine LANGUAGES CXX)
+cmake_policy(SET CMP0060 NEW)
+
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Rpass=inline -Winline -W4")
@@ -22,3 +23,4 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/third_party/CMakeLists.txt")
 include("${CMAKE_CURRENT_SOURCE_DIR}/engine/CMakeLists.txt")
 include("${CMAKE_CURRENT_SOURCE_DIR}/d3d_test/CMakeLists.txt")
 include("${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt")
+include("${CMAKE_CURRENT_SOURCE_DIR}/server/CMakeLists.txt")

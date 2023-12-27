@@ -1,5 +1,5 @@
 set(ENGINE_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/engine")
-set(ENGINE_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/engine" PARENT_SCOPE)
+set(ENGINE_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/engine")
 file(GLOB_RECURSE ENGINE_SOURCES ${ENGINE_SOURCES_DIR}/*.*)
 
 foreach(_source IN ITEMS ${ENGINE_SOURCES})
@@ -16,7 +16,8 @@ endforeach()
 
 add_library(engine STATIC "${ENGINE_SOURCES}")
 #target_precompile_headers(engine PUBLIC "${ENGINE_SOURCES_DIR}/include/library-pch.hpp")
-target_add_libraries(engine "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console" "directxtex" "dds_texture_loader11" "wic_texture_loader11" "math")
+target_add_libraries(engine "entt" "spdlog" "directx" "assimp" "imgui" "imguizmo" "imgui_console" "directxtex" "dds_texture_loader11" "wic_texture_loader11" "math" "mal-packet-weaver" "mal-toolkit")
 target_include_directories(engine PUBLIC ${ENGINE_SOURCES_DIR})
 set_target_properties(engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
 set_target_properties(engine PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
+set_target_properties(engine PROPERTIES UNITY_BUILD_MODE BATCH)
