@@ -7,7 +7,7 @@ namespace engine::core
                                            ShaderCompileInput const &input,
                                            std::vector<std::filesystem::path> const &dependent_files)
     {
-        utils::Assert(utils::for_each_true(
+        mal_toolkit::Assert(mal_toolkit::for_each_true(
             dependent_files.cbegin(),
             dependent_files.cend(),
             [](auto const &it) __lambda_force_inline -> bool
@@ -31,7 +31,7 @@ namespace engine::core
     template <typename T>
     std::shared_ptr<T> ShaderManager::CompileShader(ShaderCompileInput const &input)
     {
-        utils::Assert(T::kType == input.type);
+        mal_toolkit::Assert(T::kType == input.type);
         ShaderCompileOutput out;
         ShaderCompiler::CompileShader(input, out);
         auto rv = std::make_shared<T>(out.blob);

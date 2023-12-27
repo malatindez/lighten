@@ -1,5 +1,7 @@
 #pragma once
 #include "shader-compiler.hpp"
+#include "core/layers/layer.hpp"
+#include "misc/file-watcher.hpp"
 namespace engine::core
 {
     class Engine;
@@ -41,12 +43,12 @@ namespace engine::core
 
         void OnAttach() override
         {
-            utils::Assert(!attached_);
+            mal_toolkit::Assert(!attached_);
             attached_ = true;
         }
         void OnDetach() override
         {
-            utils::Assert(attached_);
+            mal_toolkit::Assert(attached_);
             attached_ = false;
         }
 
@@ -55,7 +57,7 @@ namespace engine::core
 
         static void Init()
         {
-            utils::Assert(instance_ == nullptr);
+            mal_toolkit::Assert(instance_ == nullptr);
             instance_ = std::shared_ptr<ShaderManager>(new ShaderManager());
         }
         static void Deinit() { instance_ = nullptr; }
@@ -78,7 +80,7 @@ namespace engine::core
         bool attached_ = false;
         std::unordered_map<size_t, std::unordered_set<std::shared_ptr<render::Shader>>> dependent_shaders_map_{};
         std::unordered_map<std::shared_ptr<render::Shader>, ShaderCompileInput> shader_inputs_{};
-        utils::FileWatcher watcher_;
+        misc::FileWatcher watcher_;
     };
 }
 #include "shader-manager.inl"

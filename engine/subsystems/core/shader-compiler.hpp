@@ -53,14 +53,14 @@ namespace std
         size_t operator()(engine::core::ShaderCompileInput const &input) const
         {
             size_t hash = 0;
-            engine::utils::hash_combine(hash, input.type);
-            engine::utils::hash_combine(hash, input.source_file.string());
-            engine::utils::hash_combine(hash, input.entrypoint);
-            engine::utils::hash_combine(hash, input.flags);
+            mal_toolkit::hash_combine(hash, input.type);
+            mal_toolkit::hash_combine(hash, input.source_file.string());
+            mal_toolkit::hash_combine(hash, input.entrypoint);
+            mal_toolkit::hash_combine(hash, input.flags);
             for (auto const &macro : input.macros)
             {
-                engine::utils::hash_combine(hash, macro.name);
-                engine::utils::hash_combine(hash, macro.definition);
+                mal_toolkit::hash_combine(hash, macro.name);
+                mal_toolkit::hash_combine(hash, macro.definition);
             }
             return hash;
         }

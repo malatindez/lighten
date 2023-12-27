@@ -1,6 +1,6 @@
 #include "shader-compiler.hpp"
-#include "utils/utils.hpp"
-#include "utils/win-utils.hpp"
+#include "mal-toolkit/mal-toolkit.hpp"
+#include "mal-toolkit/win-utils.hpp"
 namespace engine::core
 {
     using namespace render;
@@ -38,7 +38,7 @@ namespace engine::core
                     final_path = file_name;
                     break;
                 default:
-                    utils::AlwaysAssert(false);
+                    mal_toolkit::AlwaysAssert(false);
                 }
                 includes_.push_back(std::filesystem::absolute(final_path));
                 std::ifstream file_stream(final_path.string());
@@ -84,7 +84,7 @@ namespace engine::core
         {
             direct3d::Blob pBytecodeBlob = nullptr;
 
-            utils::AlwaysAssert(D3DReadFileToBlob(filename.wstring().c_str(), &pBytecodeBlob.ptr()) >= 0, "Failed to read file to blob");
+            mal_toolkit::AlwaysAssert(D3DReadFileToBlob(filename.wstring().c_str(), &pBytecodeBlob.ptr()) >= 0, "Failed to read file to blob");
 
             blob.bytecode.resize(pBytecodeBlob->GetBufferSize());
             std::memcpy(blob.ptr(), pBytecodeBlob->GetBufferPointer(), blob.size());
@@ -121,7 +121,7 @@ namespace engine::core
                 model = "cs_5_0";
                 break;
             default:
-                utils::Assert(false, "Unknown shader type");
+                mal_toolkit::Assert(false, "Unknown shader type");
             }
 
             entrypoint = input.entrypoint.empty() ? entrypoint : input.entrypoint;

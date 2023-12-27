@@ -42,7 +42,7 @@ show_direct3d_debug_output = false
     class Config final : public ini::Ini
     {
     public:
-        [[nodiscard]] static inline Config &instance() noexcept { utils::Assert(instance_ != nullptr, "Config is not initialized!"); return *instance_; }
+        [[nodiscard]] static inline Config &instance() noexcept { mal_toolkit::Assert(instance_ != nullptr, "Config is not initialized!"); return *instance_; }
     private:
         Config(Config &&) = delete;
         Config(Config const &) = delete;

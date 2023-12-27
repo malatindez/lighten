@@ -26,18 +26,21 @@ namespace engine::render
         ID3D11ShaderResourceView *normal_map = nullptr;
         ID3D11ShaderResourceView *metalness_map = nullptr;
         ID3D11ShaderResourceView *roughness_map = nullptr;
+        ID3D11ShaderResourceView *sheen_map = nullptr;
 
         // Used only to discard pixels with opacity < 0.5
         ID3D11ShaderResourceView *opacity_map = nullptr;
-        core::math::vec3 albedo_color;
-        float metalness_value;
-        float roughness_value;
+        core::math::vec3 albedo_color{ 0.0f };
+        float metalness_value = 0.0f;
+        float roughness_value = 0.0f;
+        core::math::vec3 sheen_color{ 0.0f };
+        float sheen_roughness = 0.0f;
         uint32_t texture_flags;
         bool reverse_normal_y = false;
-        bool twosided = false;
+        bool twosided = true;
         core::math::vec2 uv_multiplier{ 1 };
         void UpdateTextureFlags();
-        OpaqueMaterial() = default;
+        OpaqueMaterial() { reset(); }
         void BindTextures() const;
         void Bind(direct3d::DynamicUniformBuffer<_opaque_detail::OpaquePerMaterial> &uniform_buffer) const;
         explicit OpaqueMaterial(Material const &material);
@@ -51,9 +54,11 @@ namespace engine::render
             albedo_color = core::math::vec3{ 0.0f };
             metalness_value = 0.01f;
             roughness_value = 0.01f;
+            sheen_color = core::math::vec3{0.0f};
+            sheen_roughness = 0.00f;
             texture_flags = 0;
             reverse_normal_y = false;
-            twosided = false;
+            twosided = true;
             uv_multiplier = core::math::vec2{ 1 };
         }
     };
@@ -65,16 +70,16 @@ namespace std {
         std::size_t operator()(engine::render::OpaqueMaterial const &material) const
         {
             size_t seed = 0;
-            engine::utils::hash_combine(seed, material.albedo_map);
-            engine::utils::hash_combine(seed, material.normal_map);
-            engine::utils::hash_combine(seed, material.metalness_map);
-            engine::utils::hash_combine(seed, material.roughness_map);
-            engine::utils::hash_combine(seed, material.albedo_color);
-            engine::utils::hash_combine(seed, material.metalness_value);
-            engine::utils::hash_combine(seed, material.roughness_value);
-            engine::utils::hash_combine(seed, material.texture_flags);
-            engine::utils::hash_combine(seed, material.reverse_normal_y);
-            engine::utils::hash_combine(seed, material.uv_multiplier);
+            mal_toolkit::hash_combine(seed, material.albedo_map);
+            mal_toolkit::hash_combine(seed, material.normal_map);
+            mal_toolkit::hash_combine(seed, material.metalness_map);
+            mal_toolkit::hash_combine(seed, material.roughness_map);
+            mal_toolkit::hash_combine(seed, material.albedo_color);
+            mal_toolkit::hash_combine(seed, material.metalness_value);
+            mal_toolkit::hash_combine(seed, material.roughness_value);
+            mal_toolkit::hash_combine(seed, material.texture_flags);
+            mal_toolkit::hash_combine(seed, material.reverse_normal_y);
+            mal_toolkit::hash_combine(seed, material.uv_multiplier);
             return seed;
         }
     };
@@ -120,6 +125,8 @@ namespace engine::render::_opaque_detail
         core::math::vec3 albedo_color;
         float metalness;
         float roughness;
+        core::math::vec3 sheen_color;
+        float sheen;
         uint32_t enabled_texture_flags;
         core::math::vec2 uv_multiplier;
     };

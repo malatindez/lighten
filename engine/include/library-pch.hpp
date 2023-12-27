@@ -33,6 +33,7 @@
 #include <thread>
 #include <type_traits>
 #include <unordered_set>
+#include <unordered_map>
 #include <variant>
 #include <vector>
 #include <algorithm>
@@ -42,6 +43,7 @@
 
 #include "common-typedefs.hpp"
 #include "core/math.hpp"
+#include "core/layers/layer.hpp"
 
 #ifdef __clang__
 #define __lambda_force_inline __attribute__((always_inline))

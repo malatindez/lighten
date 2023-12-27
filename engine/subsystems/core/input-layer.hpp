@@ -202,12 +202,12 @@ namespace engine::core
         static std::shared_ptr<InputLayer> instance() { return instance_; }
         void OnAttach() override
         {
-            utils::Assert(!attached_);
+            mal_toolkit::Assert(!attached_);
             attached_ = true;
         }
         void OnDetach() override
         {
-            utils::Assert(attached_);
+            mal_toolkit::Assert(attached_);
             attached_ = false;
         }
 
@@ -216,7 +216,7 @@ namespace engine::core
 
         static void Init()
         {
-            utils::Assert(instance_ == nullptr);
+            mal_toolkit::Assert(instance_ == nullptr);
             instance_ = std::shared_ptr<InputLayer>(new InputLayer());
         }
         static void Deinit() { instance_ = nullptr; }

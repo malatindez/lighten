@@ -1,7 +1,7 @@
 #pragma once
 #include "dynamic-buffer.hpp"
 #include "default-buffer.hpp"
-#include "utils/utils.hpp"
+#include "mal-toolkit/mal-toolkit.hpp"
 #if !defined(_ENGINE_UNIFORM_BUFFERS_CHECK_IF_TYPE_IS_CORRECT)
 #   if defined(_DEBUG) || defined(DEBUG)
 #       define _ENGINE_UNIFORM_BUFFERS_CHECK_IF_TYPE_IS_CORRECT 1

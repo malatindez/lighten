@@ -132,9 +132,9 @@ namespace engine::render::misc
         //     TGS=256 is a good intermediate value
 
         unsigned int numThreadGroups = ((max_size - 1) >> 9) + 1;
-        utils::Assert(numThreadGroups <= kMaxNumTG, "Too many thread groups: " + std::to_string(numThreadGroups) + "! Max is " + std::to_string(kMaxNumTG));
+        mal_toolkit::Assert(numThreadGroups <= kMaxNumTG, "Too many thread groups: " + std::to_string(numThreadGroups) + "! Max is " + std::to_string(kMaxNumTG));
         // To disable std::to_string on release builds
-        utils::AlwaysAssert(numThreadGroups <= kMaxNumTG);
+        mal_toolkit::AlwaysAssert(numThreadGroups <= kMaxNumTG);
 
         if (numThreadGroups > 1)
             bDone = false;

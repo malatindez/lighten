@@ -132,7 +132,7 @@ namespace engine::render
         inline void AddRenderPass(std::shared_ptr<T> const &ptr)
         {
             auto render_pass = static_pointer_cast<RenderPass>(ptr);
-            utils::SortedInsert<std::shared_ptr<RenderPass>>(render_passes_, std::move(render_pass),
+            mal_toolkit::SortedInsert<std::shared_ptr<RenderPass>>(render_passes_, std::move(render_pass),
                                                              [](auto const &lhs, auto const &rhs) __lambda_force_inline -> bool
                                                              { return lhs->kPriority < rhs->kPriority; });
         }
@@ -140,7 +140,7 @@ namespace engine::render
         inline void RemoveRenderPass(std::shared_ptr<T> const &ptr)
         {
             auto render_pass = static_pointer_cast<RenderPass>(ptr);
-            utils::SortedErase<std::shared_ptr<RenderPass>>(render_passes_, std::move(render_pass),
+            mal_toolkit::SortedErase<std::shared_ptr<RenderPass>>(render_passes_, std::move(render_pass),
                                                             [](auto const &lhs, auto const &rhs) __lambda_force_inline -> bool
                                                             { return lhs->kPriority < rhs->kPriority; });
         }

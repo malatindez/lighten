@@ -1,7 +1,7 @@
 #pragma once
 #include "api.hpp"
-#include "utils/debug.hpp"
-#include "utils/win-utils.hpp"
+#include "mal-toolkit/debug.hpp"
+#include "mal-toolkit/win-utils.hpp"
 #include <system_error>
 namespace engine::direct3d
 {
@@ -13,7 +13,7 @@ namespace engine::direct3d
         inline std::string GetLastErrorInfo(HRESULT hr)
         {
             DWORD last_error = ::GetLastError();
-            return std::system_category().message(hr) + ". Last error: " + utils::FormatErrorAsString(last_error) + " or " + std::to_string(last_error);
+            return std::system_category().message(hr) + ". Last error: " + mal_toolkit::FormatErrorAsString(last_error) + " or " + std::to_string(last_error);
         }
     }
     /// @brief Logs the debug information that is stored in the debug info queue
@@ -48,12 +48,12 @@ namespace engine::direct3d
 
 #ifdef ENGINE_NO_SOURCE_LOCATION
     /// @brief Asserts that the HRESULT is SUCCEEDED
-    /// @detail This function is only available if DEBUG_UTILS_DEBUG_ENABLED is defined(it is automatically defined in debug mode)
+    /// @detail This function is only available if MAL_TOOLKIT_ASSERT_ENABLED is defined(it is automatically defined in debug mode)
     /// @param hr The HRESULT
     /// @param message The message to print if the assert fails
     inline void Assert(HRESULT hr, std::string_view message = "")
     {
-        if constexpr (!DEBUG_UTILS_DEBUG_ENABLED)
+        if constexpr (!MAL_TOOLKIT_ASSERT_ENABLED)
         {
             return;
         }
@@ -62,7 +62,7 @@ namespace engine::direct3d
             return;
         }
         LogDebugInfoQueue();
-        utils::Assert(SUCCEEDED(hr), std::basic_string(message) + " " + _detail::GetLastErrorInfo(hr));
+        mal_toolkit::Assert(SUCCEEDED(hr), std::basic_string(message) + " " + _detail::GetLastErrorInfo(hr));
     }
     /// @brief Asserts that the HRESULT is SUCCEEDED
     /// @detail This function Asserts even in release mode. It is used for critical errors.
@@ -75,17 +75,17 @@ namespace engine::direct3d
             return;
         }
         LogDebugInfoQueue();
-        utils::Assert(SUCCEEDED(hr), std::basic_string(message) + " " + _detail::GetLastErrorInfo(hr));
+        mal_toolkit::Assert(SUCCEEDED(hr), std::basic_string(message) + " " + _detail::GetLastErrorInfo(hr));
     }
 #else
     /// @brief Asserts that the HRESULT is SUCCEEDED
-    /// @detail This function is only available if DEBUG_UTILS_DEBUG_ENABLED is defined(it is automatically defined in debug mode)
+    /// @detail This function is only available if MAL_TOOLKIT_ASSERT_ENABLED is defined(it is automatically defined in debug mode)
     /// @param hr The HRESULT
     /// @param message The message to print if the assert fails
     /// @param location The source location of the assert
     inline void Assert(HRESULT hr, std::string_view message = "", std::source_location location = std::source_location::current())
     {
-        if constexpr (!DEBUG_UTILS_DEBUG_ENABLED)
+        if constexpr (!MAL_TOOLKIT_ASSERT_ENABLED)
         {
             return;
         }
@@ -94,7 +94,7 @@ namespace engine::direct3d
             return;
         }
         LogDebugInfoQueue();
-        utils::Assert(SUCCEEDED(hr), std::basic_string(message) + " " + _detail::GetLastErrorInfo(hr), location);
+        mal_toolkit::Assert(SUCCEEDED(hr), std::basic_string(message) + " " + _detail::GetLastErrorInfo(hr), location);
     }
     /// @brief Asserts that the HRESULT is SUCCEEDED
     /// @detail This function Asserts even in release mode. It is used for critical errors.
@@ -108,7 +108,7 @@ namespace engine::direct3d
             return;
         }
         LogDebugInfoQueue();
-        utils::AlwaysAssert(SUCCEEDED(hr), std::basic_string(message) + " " + _detail::GetLastErrorInfo(hr), location);
+        mal_toolkit::AlwaysAssert(SUCCEEDED(hr), std::basic_string(message) + " " + _detail::GetLastErrorInfo(hr), location);
     }
 
 #endif

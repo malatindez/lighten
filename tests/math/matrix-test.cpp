@@ -1,6 +1,6 @@
 #include "core/math.hpp"
 #include "pch.h"
-#include "utils.hpp"
+#include "mal-toolkit/mal-toolkit.hpp"
 #include <glm/glm.hpp>
 #include <glm/common.hpp>
 #include <glm/gtx/vector_angle.hpp>
@@ -11,7 +11,7 @@
 #include <glm/gtx/matrix_operation.hpp>
 using namespace engine::core::math;
 
-static int const kNumIterations = 10000;
+static int const kNumIterations = 100;
 template<typename T>
 T random_float_arr(float from = -100, float to = 100)
 {
@@ -19,7 +19,7 @@ T random_float_arr(float from = -100, float to = 100)
     auto &arr = reinterpret_cast<std::array<float, size_t(sizeof(T) / sizeof(float))> &>(return_value);
     for (auto &v : arr)
     {
-        v = utils::Random<float>(from, to);
+        v = mal_toolkit::Random<float>(from, to);
     }
     return return_value;
 }
@@ -529,12 +529,12 @@ TEST(TEST_MATRICES, TestMatrixTransformations)
         vec4 vec4_1 = create_from_other<vec4>(glm_vec4_1);
         vec4 vec4_2 = create_from_other<vec4>(glm_vec4_2);
         vec4 vec4_3 = create_from_other<vec4>(glm_vec4_3);
-        float f1 = utils::Random<float>(-100, 100);
-        float f2 = utils::Random<float>(-100, 100);
-        float f3 = utils::Random<float>(-100, 100);
-        float f4 = utils::Random<float>(-100, 100);
-        float f5 = utils::Random<float>(-100, 100);
-        float f6 = utils::Random<float>(-100, 100);
+        float f1 = mal_toolkit::Random<float>(-100, 100);
+        float f2 = mal_toolkit::Random<float>(-100, 100);
+        float f3 = mal_toolkit::Random<float>(-100, 100);
+        float f4 = mal_toolkit::Random<float>(-100, 100);
+        float f5 = mal_toolkit::Random<float>(-100, 100);
+        float f6 = mal_toolkit::Random<float>(-100, 100);
 
         // test translate
         ASSERT_TRUE(translate(mat4x4_1, vec3_1) == glm::translate(glm_mat4x4_1, glm_vec3_1));

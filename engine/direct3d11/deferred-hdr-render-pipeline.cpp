@@ -27,6 +27,7 @@ namespace engine::direct3d
         gbuffer_.normals = std::make_shared<direct3d::RenderTarget>(DXGI_FORMAT_R16G16B16A16_SNORM);
         gbuffer_.albedo = std::make_shared<direct3d::RenderTarget>(DXGI_FORMAT_R16G16B16A16_FLOAT);
         gbuffer_.roughness_metalness_transmittance_ao = std::make_shared<direct3d::RenderTarget>(DXGI_FORMAT_R16G16B16A16_SNORM);
+        gbuffer_.sheen = std::make_shared<direct3d::RenderTarget>(DXGI_FORMAT_R16G16B16A16_SNORM);
         gbuffer_.emission = std::make_shared<direct3d::RenderTarget>(DXGI_FORMAT_R16G16B16A16_FLOAT);
         gbuffer_.entity_id = std::make_shared<direct3d::RenderTarget>(DXGI_FORMAT_R32_UINT);
     }
@@ -37,6 +38,7 @@ namespace engine::direct3d
         gbuffer_.normals->SizeResources(size);
         gbuffer_.albedo->SizeResources(size);
         gbuffer_.roughness_metalness_transmittance_ao->SizeResources(size);
+        gbuffer_.sheen->SizeResources(size);
         gbuffer_.emission->SizeResources(size);
         gbuffer_.entity_id->SizeResources(size);
 
@@ -96,6 +98,7 @@ namespace engine::direct3d
                                      gbuffer_.albedo->render_target_view(),
                                      gbuffer_.normals->render_target_view(),
                                      gbuffer_.roughness_metalness_transmittance_ao->render_target_view(),
+                                     gbuffer_.sheen->render_target_view(),
                                      gbuffer_.emission->render_target_view(),
                                      gbuffer_.entity_id->render_target_view()
         };
@@ -153,6 +156,7 @@ namespace engine::direct3d
         api().devcon4->ClearRenderTargetView(gbuffer_.normals->render_target_view(), empty_vec.data.data());
         api().devcon4->ClearRenderTargetView(gbuffer_.albedo->render_target_view(), empty_vec.data.data());
         api().devcon4->ClearRenderTargetView(gbuffer_.roughness_metalness_transmittance_ao->render_target_view(), empty_vec.data.data());
+        api().devcon4->ClearRenderTargetView(gbuffer_.sheen->render_target_view(), empty_vec.data.data());
         api().devcon4->ClearRenderTargetView(gbuffer_.emission->render_target_view(), empty_vec.data.data());
         api().devcon4->ClearRenderTargetView(gbuffer_.entity_id->render_target_view(), empty_vec.data.data());
         api().devcon4->ClearDepthStencilView(depth_stencil_.depth_stencil_view(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0);

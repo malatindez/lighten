@@ -3,6 +3,10 @@
 #include "core/triangle-octree.hpp"
 #include "direct3d11/direct3d11.hpp"
 #include "include/library-pch.hpp"
+namespace engine
+{
+    using ModelId = uint64_t;
+};
 namespace engine::render
 {
     // Global material properties loaded from assimp
@@ -98,6 +102,7 @@ namespace engine::render
         float specular;
         float glossiness;
         core::math::vec3 sheen_color;
+        float sheen_roughness;
         float clearcoat;
         float clearcoat_roughness;
         float transmission;

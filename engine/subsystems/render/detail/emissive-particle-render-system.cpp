@@ -105,8 +105,9 @@ namespace engine::render::_emissive_particle_detail
 
     void EmissiveParticleRenderSystem::OnRender(ID3D11ShaderResourceView * depth_srv,  ID3D11ShaderResourceView * normals_srv)
     {
-        update_particles(depth_srv, normals_srv);
-        render_particles(depth_srv);
+        
+        //update_particles(depth_srv, normals_srv);
+        //render_particles(depth_srv);
     }
 
     void EmissiveParticleRenderSystem::update_particles(ID3D11ShaderResourceView * depth_srv, ID3D11ShaderResourceView * normals_srv)
@@ -261,7 +262,7 @@ namespace engine::render::_emissive_particle_detail
         spdlog::info("Previous render args:\n VertexCountPerInstance: {}\n InstanceCount {}\nStartVertexLocation: {}\nStartInstanceLocation {}", tmp2.VertexCountPerInstance, tmp2.InstanceCount, tmp2.StartVertexLocation, tmp2.StartInstanceLocation);
 #endif
 #if 0
-        static utils::SteadyTimer timer;
+        static mal_toolkit::SteadyTimer timer;
         // Dump particle data
 
         if (timer.elapsed() > 1.5f)

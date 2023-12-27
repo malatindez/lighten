@@ -193,7 +193,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     Engine::scene()->main_camera->SetWorldAngles(0.0f, 0.0f, 0.0f);
     Engine::scene()->main_camera->SetProjectionMatrix(perspective(45.0f, static_cast<float>(window_size.x) / static_cast<float>(window_size.y), 0.001f, 100.0f));
 
-    int amount = 10;
+    int amount = 0;
     for (int i = 0; i < amount; i++)
     {
         auto knight = registry.create();
@@ -249,7 +249,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     white_half_metal.reset();
     white_porcelain.reset();
     blue_rubber.reset();
-    {
+    if(false) {
         {cobblestone_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_albedo.dds");
         cobblestone_material.normal_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_normal.dds");
         cobblestone_material.roughness_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_roughness.dds");
@@ -301,7 +301,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             blue_rubber.roughness_value = 0.7f;
         }
     }
-    {
+    if(false){
         entt::entity cubes = registry.create();
         auto &cubes_game_object = registry.emplace<GameObject>(cubes);
         cubes_game_object.name = "Cubes";
@@ -353,7 +353,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         }
     }
     // ------------------------- CUBES -------------------------
-    {
+    if (false){
         entt::entity floor = registry.create();
         auto &floor_game_object = registry.emplace<GameObject>(floor);
         floor_game_object.name = "Floor";
@@ -372,7 +372,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             ors.AddInstance(model_id, registry, cube, { stone_material });
         }
     }
-    {
+    if(false) {
         auto model_id = render::ModelSystem::GetUnitCube();
         auto wall = registry.create();
         auto &wall_game_object = registry.emplace<GameObject>(wall);
@@ -450,7 +450,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         emissive.emissive_color = point_light.color;
         emissive.power = point_light.power;
     }
-    if (false)
+    if (true)
     {
         for (int i = 0; i < 24; i++)
         {
@@ -461,14 +461,14 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             game_object.parent = lights;
             lights_game_object.children.push_back(entity);
             auto &transform = registry.emplace<TransformComponent>(entity);
-            transform.scale = vec3{ 0.1f };
-            transform.position = vec3{ 0, 0.025f, 0 };
-            transform.position += vec3{ std::cosf(float(i) / 24 * 2 * std::numbers::pi_v<float>), 0, std::sinf(float(i) / 24 * 2 * std::numbers::pi_v<float>) } *1.0f;
+            transform.scale = vec3{ 0.5f };
+            transform.position = vec3{ 0, 0.0f, 0 };
+            transform.position += vec3{ std::cosf(float(i) / 24 * 2 * std::numbers::pi_v<float>), 0, std::sinf(float(i) / 24 * 2 * std::numbers::pi_v<float>) } *15.0f;
             transform.UpdateMatrices();
             auto &point_light = registry.emplace<PointLight>(entity);
             point_light.color = vec3{ (i + 1) % 2, (i + 1) % 3, (i + 1) % 5 };
             point_light.color = normalize(point_light.color);
-            point_light.power = 25.0f;
+            point_light.power = 500.0f;
             point_light.casts_shadows = false;
             ers.AddInstance(model_id, registry, entity);
             auto &emissive = registry.get<EmissiveComponent>(entity);
@@ -478,7 +478,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     }
 
     // add directional light
-    if (true)
+    if (false)
     {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
@@ -535,7 +535,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     first_scene->renderer->particle_render_system().atlas_size = { 8, 8 };
 
     // add particle emitters
-    if (true)
+    if (false)
     {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
@@ -566,7 +566,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         particle_emitter.maximum_amount_of_particles = 200;
         ors.AddInstance(model_id, registry, entity, { white_porcelain });
     }
-    if (true)
+    if (false)
     {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
@@ -597,7 +597,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         particle_emitter.maximum_amount_of_particles = 300;
         ors.AddInstance(model_id, registry, entity, { white_porcelain });
     }
-    if (true)
+    if (false)
     {
         auto grass = registry.create();
         auto &game_object = registry.emplace<GameObject>(grass);
@@ -680,7 +680,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         { Key::KEY_F },
         [&] (InputLayer::KeySeq const &, uint32_t)
         {
-            static utils::HighResolutionTimer timer;
+            static mal_toolkit::HighResolutionTimer timer;
             const float kDelay = 1.0f / 15.0f;
             if (ImGui::GetIO().WantCaptureMouse)
             {
@@ -776,7 +776,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                                    {
                                        return;
                                    }
-                                   static utils::SteadyTimer timer;
+                                   static mal_toolkit::SteadyTimer timer;
                                    static float kSpawnLimit = 0.1f;
                                    if (timer.elapsed() < kSpawnLimit)
                                    {
@@ -811,7 +811,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             {
                 return;
             }
-            static utils::HighResolutionTimer timer;
+            static mal_toolkit::HighResolutionTimer timer;
             const float kDelay = 0.05f;
             if (ImGui::GetIO().WantCaptureMouse)
             {

@@ -54,7 +54,7 @@ namespace engine::render
         float roughness_value = 0.01f;
         uint32_t flags = 0;
         bool reverse_normal_y = false;
-        bool twosided = false;
+        bool twosided = true;
         bool appearing = true;
         bool emissive = true;
         core::math::vec2 uv_multiplier{ 1 };
@@ -111,19 +111,19 @@ namespace std {
         std::size_t operator()(engine::render::DissolutionMaterial const &material) const
         {
             size_t seed = 0;
-            engine::utils::hash_combine(seed, material.albedo_map);
-            engine::utils::hash_combine(seed, material.normal_map);
-            engine::utils::hash_combine(seed, material.metalness_map);
-            engine::utils::hash_combine(seed, material.roughness_map);
-            engine::utils::hash_combine(seed, material.albedo_color);
-            engine::utils::hash_combine(seed, material.metalness_value);
-            engine::utils::hash_combine(seed, material.roughness_value);
-            engine::utils::hash_combine(seed, material.flags);
-            engine::utils::hash_combine(seed, material.reverse_normal_y);
-            engine::utils::hash_combine(seed, material.twosided);
-            engine::utils::hash_combine(seed, material.appearing);
-            engine::utils::hash_combine(seed, material.emissive);
-            engine::utils::hash_combine(seed, material.uv_multiplier);
+            mal_toolkit::hash_combine(seed, material.albedo_map);
+            mal_toolkit::hash_combine(seed, material.normal_map);
+            mal_toolkit::hash_combine(seed, material.metalness_map);
+            mal_toolkit::hash_combine(seed, material.roughness_map);
+            mal_toolkit::hash_combine(seed, material.albedo_color);
+            mal_toolkit::hash_combine(seed, material.metalness_value);
+            mal_toolkit::hash_combine(seed, material.roughness_value);
+            mal_toolkit::hash_combine(seed, material.flags);
+            mal_toolkit::hash_combine(seed, material.reverse_normal_y);
+            mal_toolkit::hash_combine(seed, material.twosided);
+            mal_toolkit::hash_combine(seed, material.appearing);
+            mal_toolkit::hash_combine(seed, material.emissive);
+            mal_toolkit::hash_combine(seed, material.uv_multiplier);
             return seed;
         }
     };
@@ -210,10 +210,10 @@ namespace engine::render::_dissolution_detail
 
         void TransitInstances(core::Scene *scene);
 
-        utils::SteadyTimer update_timer_;
+        mal_toolkit::SteadyTimer update_timer_;
         float update_time_ = 0.1f;
 
-        utils::SteadyTimer particle_spawn_timer_;
+        mal_toolkit::SteadyTimer particle_spawn_timer_;
         // TODO:
         // This is a hack, we need to make it configurable in the shader
         // This is taken from spawn-particle-vs.hlsl

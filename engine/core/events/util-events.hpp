@@ -3,7 +3,7 @@
 #include "event.hpp"
 namespace engine::core::events
 {
-    // Event that is caused by engine::utils::FileWatcher
+    // Event that is caused by misc::FileWatcher
     class FilesChangedEvent final : public Event
     {
     public:

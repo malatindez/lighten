@@ -5,7 +5,7 @@
 #include "core/engine.hpp"
 #include "core/scene.hpp"
 #include "subsystems/core/texture-manager.hpp"
-#include "utils/utils.hpp"
+#include "mal-toolkit/mal-toolkit.hpp"
 
 namespace engine::render::_decal_detail
 {
@@ -86,6 +86,7 @@ namespace engine::render::_decal_detail
     }
     void DecalRenderSystem::OnRender(core::Scene *scene, GBuffer const &buffer, ID3D11DepthStencilView *dsv, ID3D11ShaderResourceView *depth_srv, ID3D11ShaderResourceView *normals_srv)
     {
+        direct3d::api().devcon4->OMSetRenderTargets(0, nullptr, nullptr);
         if (is_instance_update_scheduled_)
         {
             UpdateInstances(scene->registry);
@@ -98,6 +99,7 @@ namespace engine::render::_decal_detail
              buffer.albedo->render_target_view(),
              buffer.normals->render_target_view(),
              buffer.roughness_metalness_transmittance_ao->render_target_view(),
+             buffer.sheen->render_target_view(),
              buffer.emission->render_target_view(),
              nullptr };
         direct3d::api().devcon4->OMSetRenderTargets(5, rtvs.data(), dsv);

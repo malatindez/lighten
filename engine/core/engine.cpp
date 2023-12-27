@@ -5,7 +5,7 @@ namespace engine::core
 {
     using namespace events;
     std::unique_ptr<Engine> Engine::application_;
-    utils::SteadyTimer Engine::from_start_;
+    mal_toolkit::SteadyTimer Engine::from_start_;
 
     void Engine::Init()
     {
@@ -143,10 +143,18 @@ namespace engine::core
             if (file.path().filename() == "latest.log")
             {
                 std::ifstream log(file.path());
+                std::streampos fsize = log.tellg();
+                log.seekg(0, std::ios::end);
+                fsize = log.tellg() - fsize;
+                log.seekg(0, std::ios::beg);
+                if (fsize <= 25)
+                {
+                    break;
+                }
                 char buffer[25];
                 log.read(buffer, 24);
                 buffer[24] = '\0';
-
+                
                 std::string date(buffer + 1);
                 std::ranges::replace(date, ' ', '_');
                 std::ranges::replace(date, ':', '-');

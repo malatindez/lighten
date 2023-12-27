@@ -113,6 +113,7 @@ namespace engine::render
         direct3d::api().devcon4->PSSetShaderResources(5, 1, &irradiance_texture_);
         direct3d::api().devcon4->PSSetShaderResources(6, 1, &prefiltered_texture_);
         direct3d::api().devcon4->PSSetShaderResources(7, 1, &brdf_texture_);
+        direct3d::api().devcon4->PSSetShaderResources(11, 1, &g_buffer.sheen->shader_resource_view());
         lrs.BindPointShadowMaps(8);
         lrs.BindSpotShadowMaps(9);
         lrs.BindDirectionalShadowMaps(10);
@@ -174,6 +175,8 @@ namespace engine::render
         direct3d::api().devcon4->PSSetShaderResources(8, 1, &direct3d::null_srv);
         direct3d::api().devcon4->PSSetShaderResources(9, 1, &direct3d::null_srv);
         direct3d::api().devcon4->PSSetShaderResources(10, 1, &direct3d::null_srv);
+
+        direct3d::api().devcon4->PSSetShaderResources(11, 1, &direct3d::null_srv);
 
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff);
         direct3d::api().devcon4->RSSetState(direct3d::states().cull_back.ptr());

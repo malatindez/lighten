@@ -125,8 +125,14 @@ namespace engine::core
         void ProcessMaterials(std::vector<Material>& materials, aiScene const* scene_ptr, std::filesystem::path const& model_folder);
     } // namespace
 
-    std::optional<uint64_t> ModelLoader::Load(std::filesystem::path const& path)
+    
+    std::optional<ModelId> ModelLoader::Load(std::filesystem::path const& input_path)
     {
+        std::filesystem::path path = input_path;
+        if (!path.is_absolute())
+        {
+            path = std::filesystem::absolute(input_path);
+        }
         if (auto it = instance_->models_.find(std::filesystem::hash_value(path));
             it != instance_->models_.end())
         {
@@ -153,10 +159,10 @@ namespace engine::core
             aiProcess_SortByPType |
             aiProcess_FindInstances |
             aiProcess_ValidateDataStructure);
-
         if (scene_ptr == nullptr)
         {
-            utils::AlwaysAssert(false, "Failed to load model @ " + path.string());
+            spdlog::warn("Failed to load model @ " + path.string());
+            spdlog::warn(importer.GetErrorString());
             return std::nullopt;
         }
         auto model_folder = std::filesystem::absolute(path.parent_path());
@@ -192,14 +198,17 @@ namespace engine::core
             mesh.triangle_octree.initialize(mesh);
         }
 
-        uint64_t rv = ModelSystem::instance().AddModel(Model{
+        ModelId rv = render::ModelSystem::instance().AddModel(Model{
                 .name = scene_ptr->mName.C_Str(),
                 .bounding_box = math::Box{.min = min, .max = max},
                 .meshes = std::move(meshes),
                 .materials = std::move(materials),
                 .vertices = direct3d::ImmutableVertexBuffer<Vertex>(vertices),
                 .indices = direct3d::ImmutableIndexBuffer<uint32_t>(indices) });
-        instance_->models_.emplace(std::pair<size_t, uint64_t>{std::filesystem::hash_value(path), rv});
+        auto hash = std::filesystem::hash_value(path);
+        instance_->models_.emplace(std::pair<FilepathHash, ModelId>{hash, rv});
+        instance_->models_inverse_.emplace(std::pair<ModelId, FilepathHash>{rv, hash});
+        instance_->loaded_models_.emplace(std::pair< FilepathHash, ModelInfo>{hash, ModelInfo{ path, rv, std::string_view{scene_ptr->mName.C_Str()} }});
         return rv;
     }
 
@@ -280,6 +289,8 @@ namespace engine::core
                 result.glossiness = value;
                 if (AI_SUCCESS != material->Get(AI_MATKEY_SHEEN_COLOR_FACTOR, color)) { color = aiColor3D(0.0f, 0.0f, 0.0f); }
                 result.sheen_color = core::math::vec3{ color.r, color.g, color.b };
+                if (AI_SUCCESS != material->Get(AI_MATKEY_SHEEN_ROUGHNESS_FACTOR, value)) { value = 0.0f; }
+                result.sheen_roughness = value;
                 if (AI_SUCCESS != material->Get(AI_MATKEY_CLEARCOAT_FACTOR, value)) { value = 0.0f; }
                 result.clearcoat = value;
                 if (AI_SUCCESS != material->Get(AI_MATKEY_CLEARCOAT_ROUGHNESS_FACTOR, value)) { value = 0.0f; }

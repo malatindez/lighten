@@ -67,19 +67,20 @@ namespace engine::render
         nearest.point = mesh_intersection.point;
         return rv;
     }
-    uint64_t ModelSystem::AddModel(Model &&model_)
+    ModelId ModelSystem::AddModel(Model &&model_)
     {
-        instance_->models_.emplace(current_index, std::move(model_));
-        return current_index++;
+        instance_->models_.emplace(instance_->current_index, std::move(model_));
+        return instance_->current_index++;
     }
-    void ModelSystem::UnloadModel(uint64_t model_id)
+    void ModelSystem::UnloadModel(ModelId model_id)
     {
         instance_->models_.erase(model_id);
+        ::engine::core::ModelLoader::UnloadModel(model_id);
     }
-    uint64_t ModelSystem::GetUnitSphereFlat()
+    ModelId ModelSystem::GetUnitSphereFlat()
     {
-        static uint64_t model_id = std::numeric_limits<uint64_t>::max();
-        if (model_id != std::numeric_limits<uint64_t>::max())
+        static ModelId model_id = std::numeric_limits<ModelId>::max();
+        if (model_id != std::numeric_limits<ModelId>::max())
         {
             return model_id;
         }
@@ -228,12 +229,15 @@ namespace engine::render
         model.meshes[0].triangle_octree.initialize(model.meshes[0]);
 
         model_id = instance().AddModel(std::move(model));
+        ::engine::core::ModelLoader::instance_->models_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
+        ::engine::core::ModelLoader::instance_->models_inverse_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
+        ::engine::core::ModelLoader::instance_->loaded_models_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ::engine::core::ModelLoader::ModelInfo>{model_id, ::engine::core::ModelLoader::ModelInfo{"", model_id, "UnitSphere"}});
         return model_id;
     }
-    uint64_t ModelSystem::GetUnitSphereLowPoly()
+    ModelId ModelSystem::GetUnitSphereLowPoly()
     {
-        static uint64_t model_id = std::numeric_limits<uint64_t>::max();
-        if (model_id != std::numeric_limits<uint64_t>::max())
+        static ModelId model_id = std::numeric_limits<ModelId>::max();
+        if (model_id != std::numeric_limits<ModelId>::max())
         {
             return model_id;
         }
@@ -384,12 +388,15 @@ namespace engine::render
         model.meshes[0].triangle_octree.initialize(model.meshes[0]);
 
         model_id = instance().AddModel(std::move(model));
+        ::engine::core::ModelLoader::instance_->models_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
+        ::engine::core::ModelLoader::instance_->models_inverse_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
+        ::engine::core::ModelLoader::instance_->loaded_models_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ::engine::core::ModelLoader::ModelInfo>{model_id, ::engine::core::ModelLoader::ModelInfo{ "", model_id, "UnitSphereLowPoly" }});
         return model_id;
     }
-    uint64_t ModelSystem::GetUnitCube()
+    ModelId ModelSystem::GetUnitCube()
     {
-        static uint64_t model_id = std::numeric_limits<uint64_t>::max();
-        if (model_id != std::numeric_limits<uint64_t>::max())
+        static ModelId model_id = std::numeric_limits<ModelId>::max();
+        if (model_id != std::numeric_limits<ModelId>::max())
         {
             return model_id;
         }
@@ -535,6 +542,9 @@ namespace engine::render
         model.meshes[0].triangle_octree.initialize(model.meshes[0]);
 
         model_id = instance().AddModel(std::move(model));
+        ::engine::core::ModelLoader::instance_->models_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
+        ::engine::core::ModelLoader::instance_->models_inverse_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
+        ::engine::core::ModelLoader::instance_->loaded_models_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ::engine::core::ModelLoader::ModelInfo>{model_id, ::engine::core::ModelLoader::ModelInfo{ "", model_id, "UnitCube" }});
         return model_id;
     }
 } // namespace engine::render

@@ -1,7 +1,7 @@
 #include "ini.hpp"
 namespace
 {
-    using namespace engine::utils;
+    using namespace mal_toolkit;
 }
 namespace engine::ini
 {
@@ -12,7 +12,7 @@ namespace engine::ini
     }
     Entry &Section::operator[](std::string_view key)
     {
-        if (utils::trimview(key) != key)
+        if (mal_toolkit::trimview(key) != key)
         {
             throw std::invalid_argument("The input string should be trimmed!");
         }
@@ -88,7 +88,7 @@ namespace engine::ini
 
     Section &Ini::CreateSection(std::string const &key)
     {
-        if (utils::trimview(key) != key)
+        if (mal_toolkit::trimview(key) != key)
         {
             throw std::invalid_argument("The input string should be trimmed!");
         } /* creating temporary object because Section() constructor is private */
@@ -160,8 +160,8 @@ namespace engine::ini
         {
             return;
         }
-        std::string key{ utils::trimview(std::string_view{line.begin(), line.begin() + pos}) };
-        std::string value{ utils::trimview(std::string_view{line.begin() + pos + 1, line.end()}) };
+        std::string key{ mal_toolkit::trimview(std::string_view{line.begin(), line.begin() + pos}) };
+        std::string value{ mal_toolkit::trimview(std::string_view{line.begin() + pos + 1, line.end()}) };
         char *pEnd;
         int64_t ll = strtoll(value.c_str(), &pEnd, 10);
         if (value.c_str() != pEnd && *pEnd == '\0')

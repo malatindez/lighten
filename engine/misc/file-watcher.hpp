@@ -1,6 +1,6 @@
 #pragma once
 #include "core/layers/layer.hpp"
-namespace engine::utils
+namespace engine::misc
 {
     class FileWatcher : public core::Layer, public core::Layer::HandleUpdate
     {

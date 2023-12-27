@@ -101,6 +101,7 @@ namespace engine::render
         std::shared_ptr<direct3d::RenderTarget> albedo;
         std::shared_ptr<direct3d::RenderTarget> normals;
         std::shared_ptr<direct3d::RenderTarget> roughness_metalness_transmittance_ao;
+        std::shared_ptr<direct3d::RenderTarget> sheen;
         std::shared_ptr<direct3d::RenderTarget> emission;
         std::shared_ptr<direct3d::RenderTarget> entity_id;
     };

@@ -1,4 +1,4 @@
-#include "utils.hpp"
+#include "mal-toolkit/mal-toolkit.hpp"
 namespace fs = std::filesystem;
 namespace utils
 {
@@ -60,7 +60,7 @@ namespace utils
 
     [[nodiscard]] inline std::string RandomUTF8Char(uint32_t const &from, uint32_t const &to)
     {
-        return Uint32ToUTF8(Random(from, to));
+        return Uint32ToUTF8(::malatindez::math::random::Random(from, to));
     }
 
     [[nodiscard]] std::string RandomUTF8String(size_t const &size)

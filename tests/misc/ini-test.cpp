@@ -5,11 +5,9 @@
 #include <set>
 
 #include "pch.h"
-#include "utils.hpp"
-#include "utils/utils.hpp"
+#include "mal-toolkit/mal-toolkit.hpp"
 using namespace engine;
-using namespace engine::utils;
-using namespace ::utils;
+using namespace mal_toolkit;
 
 namespace fs = std::filesystem;
 TEST(TEST_INI, TestSaving)

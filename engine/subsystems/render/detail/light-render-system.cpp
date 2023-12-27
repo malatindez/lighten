@@ -249,7 +249,7 @@ namespace engine::render::_light_detail
                     opaque_point_light.radius = length(registry_transform.scale) / sqrt(3.1f);
                     if (++per_frame.num_point_lights >= LightsPerFrame::kMaxPointLights)
                     {
-                        utils::AlwaysAssert(false, "Amount of point lights on the scene went beyond the maximum amount.");
+                        mal_toolkit::AlwaysAssert(false, "Amount of point lights on the scene went beyond the maximum amount.");
                         break;
                     }
                 }
@@ -267,7 +267,7 @@ namespace engine::render::_light_detail
                     point_light_shadow_map_indices_[entity] = per_frame.shadow_num_point_lights;
                     if (++per_frame.shadow_num_point_lights >= LightsPerFrame::kMaxPointLights)
                     {
-                        utils::AlwaysAssert(false, "Amount of point lights on the scene went beyond the maximum amount.");
+                        mal_toolkit::AlwaysAssert(false, "Amount of point lights on the scene went beyond the maximum amount.");
                         break;
                     }
                 }
@@ -287,7 +287,7 @@ namespace engine::render::_light_detail
                     opaque_spot_light.outer_cutoff = registry_spot_light.outer_cutoff;
                     if (++per_frame.num_spot_lights >= LightsPerFrame::kMaxSpotLights)
                     {
-                        utils::AlwaysAssert(false, "Amount of spot lights on the scene went beyond the maximum amount.");
+                        mal_toolkit::AlwaysAssert(false, "Amount of spot lights on the scene went beyond the maximum amount.");
                         break;
                     }
                 }
@@ -308,7 +308,7 @@ namespace engine::render::_light_detail
                     spot_light_shadow_map_indices_[entity] = per_frame.shadow_num_spot_lights;
                     if (++per_frame.shadow_num_spot_lights >= LightsPerFrame::kMaxSpotLights)
                     {
-                        utils::AlwaysAssert(false, "Amount of spot lights on the scene went beyond the maximum amount.");
+                        mal_toolkit::AlwaysAssert(false, "Amount of spot lights on the scene went beyond the maximum amount.");
                         break;
                     }
                 }
@@ -325,7 +325,7 @@ namespace engine::render::_light_detail
                     opaque_directional_light.solid_angle = registry_directional_light.solid_angle;
                     if (++per_frame.num_directional_lights >= LightsPerFrame::kMaxDirectionalLights)
                     {
-                        utils::AlwaysAssert(false, "Amount of directional lights on the scene went beyond the maximum amount.");
+                        mal_toolkit::AlwaysAssert(false, "Amount of directional lights on the scene went beyond the maximum amount.");
                         break;
                     }
                 }
@@ -343,7 +343,7 @@ namespace engine::render::_light_detail
                     directional_light_shadow_map_indices_[entity] = per_frame.shadow_num_directional_lights;
                     if (++per_frame.shadow_num_directional_lights >= LightsPerFrame::kMaxDirectionalLights)
                     {
-                        utils::AlwaysAssert(false, "Amount of directional lights on the scene went beyond the maximum amount.");
+                        mal_toolkit::AlwaysAssert(false, "Amount of directional lights on the scene went beyond the maximum amount.");
                         break;
                     }
                 }

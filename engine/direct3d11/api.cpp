@@ -1,6 +1,6 @@
 #include "api.hpp"
-#include "utils/utils.hpp"
-#include "utils/win-utils.hpp"
+#include "mal-toolkit/mal-toolkit.hpp"
+#include "mal-toolkit/win-utils.hpp"
 #include "d3d-debug.hpp"
 #include "states.hpp"
 #include "core/config.hpp"
@@ -29,7 +29,7 @@ namespace engine::direct3d
                 std::stringstream output;
                 output << "GPU #";
                 output << index << " ";
-                output << utils::wstring_to_string(temp);
+                output << mal_toolkit::wstring_to_string(temp);
                 spdlog::info(output.str());
             }
         }
@@ -49,7 +49,7 @@ namespace engine::direct3d
                                        &kFeatureLevelRequested, 1, D3D11_SDK_VERSION, &instance_->device.reset(), &featureLevelInitialized, &instance_->devcon.reset()),
                      "Failed to create device and devcon");
 
-        utils::AlwaysAssert(kFeatureLevelRequested == featureLevelInitialized, "featureLevelInitialized != D3D_FEATURE_LEVEL_11_0");
+        mal_toolkit::AlwaysAssert(kFeatureLevelRequested == featureLevelInitialized, "featureLevelInitialized != D3D_FEATURE_LEVEL_11_0");
 
         AlwaysAssert(instance_->device->QueryInterface(__uuidof(ID3D11Device5), (void **)&instance_->device5.reset()),
                      "Failed to query ID3D11Device5");

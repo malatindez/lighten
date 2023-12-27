@@ -1,5 +1,6 @@
 #pragma once
 #include "include/library-pch.hpp"
+#include "misc/math-serialization.hpp"
 // forward declaration
 namespace engine::render::_particle_detail
 {
@@ -41,12 +42,12 @@ namespace engine::render::_particle_detail
  * this will lead to problems with header including mentioned above
  *
  @todo Add the python pre-build step that will gather all the components identifying them by Component parent class, and then generate the header files that will contain all the components.
- * This header file will contain `utils::parameter_pack_info<Component, Component, ...>` as the list of types and corresponding `std::array<std::string, N>` as the list of component names
+ * This header file will contain `mal_toolkit::parameter_pack_info<Component, Component, ...>` as the list of types and corresponding `std::array<std::string, N>` as the list of component names
  * It will modify the `engine\components\generated\components-info.hpp` file
  *
  * To iterate through all the component types you can use the following code:
  \code{.cpp}
-     utils::for_constexpr<0, components::kAmount, 1>([](auto i) constexpr -> bool {
+     mal_toolkit::for_constexpr<0, components::kAmount, 1>([](auto i) constexpr -> bool {
      using component = components::component_by_id<i>;
      std::cout << component::name << std::endl;
      return true; // if false is returned the loop will break
@@ -165,10 +166,10 @@ struct std::hash<engine::components::ComponentName>
     std::size_t operator()(const engine::components::ComponentName &component) const noexcept
     {
         std::size_t seed = 0;
-        engine::utils::hash_combine (member1);
-        engine::utils::hash_combine (member2);
+        mal_toolkit::hash_combine (member1);
+        mal_toolkit::hash_combine (member2);
         ...
-        engine::utils::hash_combine (memberN);
+        mal_toolkit::hash_combine (memberN);
         // !! each public member should have the std::hash<T>{} specialization
         return seed;
     }
@@ -209,6 +210,15 @@ namespace engine::components
         entt::entity parent = entt::null;
         /// @brief Children of the object
         std::vector<entt::entity> children;
+
+    private:
+        friend class boost::serialization::access;
+        template <class Archive>
+        void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {
+            ar & name;
+            ar & tag;
+            ar & parent;
+        }
     };
     /// @brief Component that contains the transform of the object
     struct TransformComponent final : Component
@@ -264,6 +274,14 @@ namespace engine::components
         core::math::mat4 world;
         /// @brief Inverse of the world matrix
         core::math::mat4 inv_world;
+    private:
+        friend class boost::serialization::access;
+        template <class Archive>
+        void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {
+            ar & position;
+            ar & scale;
+            ar & rotation;
+        }
     };
     /// @brief Component that contains the camera of the object
     struct CameraComponent final : Component
@@ -364,6 +382,16 @@ namespace engine::components
         float radius;
         /// @brief If the light casts shadows
         bool casts_shadows = false;
+    private:
+        friend class boost::serialization::access;
+        template <class Archive>
+        void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {
+            ar & position;
+            ar & color;
+            ar & power;
+            ar & radius;
+            ar & casts_shadows;
+        }
     };
     /// @brief Directional light component
     struct DirectionalLight final : Component
@@ -382,6 +410,15 @@ namespace engine::components
         float power;
         /// @brief If the light casts shadows
         bool casts_shadows = false;
+    private:
+        friend class boost::serialization::access;
+        template <class Archive>
+        void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {
+            ar & solid_angle;
+            ar & color;
+            ar & power;
+            ar & casts_shadows;
+        }
     };
     /// @brief Spot light component
     struct SpotLight final : Component
@@ -408,6 +445,18 @@ namespace engine::components
         float outer_cutoff;
         /// @brief If the light casts shadows
         bool casts_shadows = false;
+    private:
+            friend class boost::serialization::access;
+            template <class Archive>
+            void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {
+                ar & position;
+                ar & radius;
+                ar & color;
+                ar & power;
+                ar & inner_cutoff;
+                ar & outer_cutoff;
+                ar & casts_shadows;
+            }
     };
 
     /**
@@ -602,6 +651,28 @@ namespace engine::components
         float last_second_count;
         /// @brief Amount of particles that were emitted in the last second
         uint32_t particles_last_second_count;
+
+        friend class boost::serialization::access;
+        template <class Archive>
+        void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {
+            ar & position_yaw_pitch_range;
+            ar & position_radius;
+            ar & velocity_yaw_pitch_range;
+            ar & velocity_radius;
+            ar & base_diffuse_color;
+            ar & diffuse_variation;
+            ar & particle_lifespan_range;
+            ar & begin_size_range;
+            ar & end_size_range;
+            ar & mass_range;
+            ar & thickness_range;
+            ar & emit_rate;
+            ar & rotation_range;
+            ar & rotation_speed_range;
+            ar & particle_acceleration;
+            ar & maximum_amount_of_particles;
+            ar & freeze;
+        }
     };
     /// @brief Force field type
     /// @warning This class is unused for now
@@ -663,6 +734,16 @@ namespace engine::components
         ///
         /// This variable is used to calculate how fast the force decreases with distance
         float falloff;
+
+    private:
+        friend class boost::serialization::access;
+        template <class Archive>
+        void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {
+            ar & type;
+            ar & force;
+            ar & radius;
+            ar & falloff;
+        }
     };
 
     /**
@@ -695,6 +776,14 @@ namespace engine::components
         core::math::vec3 half_extents;
         /// radius of the sphere collider
         float radius;
+    private:
+        friend class boost::serialization::access;
+        template <class Archive>
+        void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {
+            ar & type;
+            ar & half_extents;
+            ar & radius;
+        }
     };
 #ifdef _MSC_VER
 #pragma warning(pop)

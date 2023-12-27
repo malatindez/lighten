@@ -58,7 +58,7 @@ namespace engine::core
 
         static void Init()
         {
-            utils::Assert(instance_ == nullptr);
+            mal_toolkit::Assert(instance_ == nullptr);
             instance_ = std::unique_ptr<TextureManager>(new TextureManager());
         }
         static void Deinit() { instance_ = nullptr; }

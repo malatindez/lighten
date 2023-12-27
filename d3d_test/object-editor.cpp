@@ -8,6 +8,51 @@ using namespace components;
 
 namespace object_editor
 {
+
+    template <AnyVec Vector>
+    inline std::string FormatToString(Vector vec, uint32_t precision = 3)
+    {
+        std::stringstream ss;
+        size_t max = 0;
+        for (size_t i = 0; i < Vector::size; i++)
+        {
+            std::stringstream ss2;
+            ss2 << std::setprecision(precision) << vec[i];
+            max = std::max(max, ss2.str().size());
+        }
+        size_t size = max + 1 + precision;
+        for (size_t i = 0; i < Vector::size; i++)
+        {
+            ss << std::left << std::setw(size) << std::setprecision(precision) << vec[i];
+            ss << " ";
+        }
+        return ss.str();
+    }
+
+    template <AnyMat Matrix>
+    inline std::string FormatToString(Matrix mat, uint32_t precision = 3)
+    {
+        std::stringstream ss;
+        size_t max = 0;
+        for (size_t i = 0; i < Matrix::size.x * Matrix::size.y; i++)
+        {
+            std::stringstream ss2;
+            ss2 << std::setprecision(precision) << mat.arr[i];
+            max = std::max(max, ss2.str().size());
+        }
+        uint32_t size = (uint32_t)max;
+        for (size_t column = 0; column < Matrix::size.y; column++)
+        {
+            for (size_t row = 0; row < Matrix::size.x; row++)
+            {
+                ss << std::left << std::setw(size) << std::setprecision(precision) << mat[column][row];
+                ss << " ";
+            }
+            ss << std::endl;
+        }
+        return ss.str();
+    }
+
     std::shared_ptr<engine::core::Scene> selected_scene = nullptr;
     entt::entity selected_entity = entt::null;
     render::Mesh const *selected_mesh = nullptr;
@@ -92,7 +137,7 @@ namespace object_editor
                 ImGui::InputFloat("Scale Snap", &snap.x);
                 break;
             default:
-                utils::AlwaysAssert(false);
+                mal_toolkit::AlwaysAssert(false);
                 break;
             }
             if (ImGui::Button("Reset"))
@@ -226,6 +271,9 @@ namespace object_editor
             static uint64_t metallic_map_texture_id = 0;
             static uint64_t saved_metallic_map_texture_id = 0;
             static bool metallic_map_texture_enabled = false;
+            static uint64_t sheen_map_texture_id = 0;
+            static uint64_t saved_sheen_map_texture_id = 0;
+            static bool sheen_map_texture_enabled = false;
             if (entity != selected_entity)
             {
                 entity = selected_entity;
@@ -233,10 +281,12 @@ namespace object_editor
                 saved_normal_map_texture_id = normal_map_texture_id = TextureManager::GetTextureIdByPointer(material->normal_map);
                 saved_roughness_map_texture_id = roughness_map_texture_id = TextureManager::GetTextureIdByPointer(material->roughness_map);
                 saved_metallic_map_texture_id = metallic_map_texture_id = TextureManager::GetTextureIdByPointer(material->metalness_map);
+                saved_sheen_map_texture_id = sheen_map_texture_id = TextureManager::GetTextureIdByPointer(material->sheen_map);
                 albedo_map_texture_enabled = albedo_map_texture_id != kInvalidTextureId;
                 normal_map_texture_enabled = normal_map_texture_id != kInvalidTextureId;
                 roughness_map_texture_enabled = roughness_map_texture_id != kInvalidTextureId;
                 metallic_map_texture_enabled = metallic_map_texture_id != kInvalidTextureId;
+                sheen_map_texture_enabled = sheen_map_texture_id != kInvalidTextureId;
             }
             ImGui::Checkbox("##albedo_map_enabled", &albedo_map_texture_enabled);
             ImGui::SameLine();
@@ -258,9 +308,18 @@ namespace object_editor
             ImGui::BeginDisabled(!metallic_map_texture_enabled);
             ImGui::InputScalar("Metallic map texture ID", ImGuiDataType_U64, &metallic_map_texture_id, nullptr, nullptr, "%llu");
             ImGui::EndDisabled();
+            
+            ImGui::Checkbox("##sheen_map_enabled", &metallic_map_texture_enabled);
+            ImGui::SameLine();
+            ImGui::BeginDisabled(!metallic_map_texture_enabled);
+            ImGui::InputScalar("Sheen map texture ID", ImGuiDataType_U64, &sheen_map_texture_id, nullptr, nullptr, "%llu");
+            ImGui::EndDisabled();
+
             ImGui::ColorEdit3("Albedo color", material->albedo_color.data.data());
             ImGui::SliderFloat("Metalness", &material->metalness_value, 0.001f, 1.0f);
             ImGui::SliderFloat("Roughness", &material->roughness_value, 0.001f, 1.0f);
+            ImGui::ColorEdit3("Sheen color", material->sheen_color.data.data());
+            ImGui::SliderFloat("Sheen Roughness", &material->sheen_roughness, 0.001f, 1.0f);
             auto width = ::ImGui::GetContentRegionMax().x - 200;
             ImGui::PushItemWidth(width / 2);
             ImGui::SliderFloat("X", &material->uv_multiplier.x, 1, 100);
@@ -278,6 +337,8 @@ namespace object_editor
                 roughness_map_texture_id = kInvalidTextureId;
             if (!metallic_map_texture_enabled)
                 metallic_map_texture_id = kInvalidTextureId;
+            if (!sheen_map_texture_enabled)
+                sheen_map_texture_id = kInvalidTextureId;
             if (saved_albedo_map_texture_id != albedo_map_texture_id)
             {
                 material->albedo_map = TextureManager::GetTextureView(albedo_map_texture_id);
@@ -297,6 +358,11 @@ namespace object_editor
             {
                 material->metalness_map = TextureManager::GetTextureView(metallic_map_texture_id);
                 saved_metallic_map_texture_id = metallic_map_texture_id;
+            }
+            if (saved_sheen_map_texture_id != sheen_map_texture_id)
+            {
+                material->metalness_map = TextureManager::GetTextureView(sheen_map_texture_id);
+                saved_sheen_map_texture_id = sheen_map_texture_id;
             }
             material->UpdateTextureFlags();
         }
@@ -655,12 +721,12 @@ namespace object_editor
             }
             if (ImGui::CollapsingHeader("Camera data: "))
             {
-                std::string view = utils::FormatToString(camera.view);
-                std::string projection = utils::FormatToString(camera.view);
-                std::string view_projection = utils::FormatToString(camera.view);
-                std::string inv_view = utils::FormatToString(camera.view);
-                std::string inv_projection = utils::FormatToString(camera.view);
-                std::string inv_view_projection = utils::FormatToString(camera.view);
+                std::string view = FormatToString(camera.view);
+                std::string projection = FormatToString(camera.view);
+                std::string view_projection = FormatToString(camera.view);
+                std::string inv_view = FormatToString(camera.view);
+                std::string inv_projection = FormatToString(camera.view);
+                std::string inv_view_projection = FormatToString(camera.view);
                 ImGui::Text("View matrix: ");
                 ImGui::Text("%s", view.c_str());
                 ImGui::Text("Projection matrix: ");
@@ -853,7 +919,7 @@ namespace object_editor
                "Particle emitter",
                "Skybox" });
 
-    using kComponentTypes = utils::parameter_pack_info<
+    using kComponentTypes = mal_toolkit::parameter_pack_info<
         CameraComponent,
         //      TransformComponent,
         //      render::OpaqueMaterial,
@@ -885,7 +951,7 @@ namespace object_editor
         ImGui::SameLine();
         if (ImGui::Button("Attach"))
         {
-            utils::constexpr_for<0, kComponentNames.size(), 1>([&] (auto i) constexpr -> bool
+            mal_toolkit::constexpr_for<0, kComponentNames.size(), 1>([&] (auto i) constexpr -> bool
                                                                {
                                                                    if (i != selected_component)
                                                                    {
@@ -922,7 +988,7 @@ namespace object_editor
         ImGui::SameLine();
         if (ImGui::Button("Remove"))
         {
-            utils::constexpr_for<0, kComponentNames.size(), 1>([&] (auto i) constexpr  -> bool
+            mal_toolkit::constexpr_for<0, kComponentNames.size(), 1>([&] (auto i) constexpr  -> bool
                                                                {
                                                                    if (i != selected_component)
                                                                    {

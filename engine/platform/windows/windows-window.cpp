@@ -1,7 +1,7 @@
 #include "windows-window.hpp"
 #include "include/imgui.hpp"
 #include <ImGuizmo.h>
-#include "utils/win-utils.hpp"
+#include "mal-toolkit/win-utils.hpp"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace engine::platform::windows
@@ -26,7 +26,7 @@ namespace engine::platform::windows
 
         RegisterClassExW(&wc);
 
-        handle_ = CreateWindowExW(NULL, wc.lpszClassName, utils::string_to_wstring(title_).c_str(),
+        handle_ = CreateWindowExW(NULL, wc.lpszClassName, mal_toolkit::string_to_wstring(title_).c_str(),
                                   WS_OVERLAPPEDWINDOW | WS_VISIBLE,
                                   position_.x, position_.y, size_.x, size_.y,
                                   nullptr, nullptr, GetModuleHandle(NULL), nullptr);

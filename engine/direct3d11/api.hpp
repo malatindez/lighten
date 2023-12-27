@@ -1,6 +1,6 @@
 #pragma once
 #include "d3d-common.hpp"
-#include "utils/utils.hpp"
+#include "mal-toolkit/mal-toolkit.hpp"
 namespace engine::core
 {
     class Engine;
@@ -71,7 +71,7 @@ namespace engine::direct3d
         static void public_deinit() { Deinit(); }
 #endif
         /// @brief The instance function returns a reference to the instance of the Api class
-        [[nodiscard]] static inline Api &instance() { utils::Assert(instance_ != nullptr); return *instance_; }
+        [[nodiscard]] static inline Api &instance() { mal_toolkit::Assert(instance_ != nullptr); return *instance_; }
     private:
         Api() = default;
         // delete move & copy semantics

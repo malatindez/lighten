@@ -5,7 +5,7 @@
 #include "core/engine.hpp"
 #include "core/scene.hpp"
 #include "subsystems/core/texture-manager.hpp"
-#include "utils/utils.hpp"
+#include "mal-toolkit/mal-toolkit.hpp"
 
 namespace engine::render
 {
@@ -498,7 +498,7 @@ namespace engine::render::_dissolution_detail
     void DissolutionRenderSystem::AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, core::math::vec3 const &click_point, float lifetime, std::vector<DissolutionMaterial> const &materials)
     {
         auto &instance = GetInstance(model_id);
-        utils::Assert(materials.size() == instance.mesh_instances.size());
+        mal_toolkit::Assert(materials.size() == instance.mesh_instances.size());
         for (size_t mesh_index = 0; mesh_index < instance.model.meshes.size(); mesh_index++)
         {
             auto &material_instances = instance.mesh_instances[mesh_index].material_instances;

@@ -16,7 +16,7 @@ namespace engine::core
         {
             static direct3d::Resource texture_resource;
             direct3d::ShaderResourceView shader_resource_view;
-            std::string extension = utils::as_lowercase(path.extension().string());
+            std::string extension = mal_toolkit::as_lowercase(path.extension().string());
             if (extension == ".dds")
             {
                 direct3d::AlwaysAssert(
@@ -25,7 +25,7 @@ namespace engine::core
             }
             else if (extension == ".hdr")
             {
-                utils::AlwaysAssert(
+                mal_toolkit::AlwaysAssert(
                     false,
                     "HDR textures are not implemented" + path.string());
             }
@@ -101,7 +101,7 @@ namespace engine::core
 
         std::unique_ptr<DirectX::ScratchImage> LoadImageFromPath(std::filesystem::path const &path)
         {
-            std::string extension = utils::as_lowercase(path.extension().string());
+            std::string extension = mal_toolkit::as_lowercase(path.extension().string());
             auto image = std::make_unique<DirectX::ScratchImage>();
             DirectX::TexMetadata metadata;
             if (extension == ".tga")
@@ -139,7 +139,7 @@ namespace engine::core
         case 2: desc.Format = DXGI_FORMAT_R8G8_UNORM; break;
         case 3: desc.Format = DXGI_FORMAT_B8G8R8X8_UNORM_SRGB; break;
         case 4: desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; break;
-        default: utils::AlwaysAssert(false, "Invalid number of channels");
+        default: mal_toolkit::AlwaysAssert(false, "Invalid number of channels");
         }
         direct3d::Texture2D texture;
         D3D11_SUBRESOURCE_DATA srd;
@@ -173,8 +173,8 @@ namespace engine::core
     }
     TextureId TextureManager::LoadTexture(std::filesystem::path const &input_path, bool generate_mipmaps)
     {
-        utils::AlwaysAssert(input_path.is_absolute(), "Paths provided to texture manager should be absolute!");
-        utils::Assert(input_path.has_extension(), "Path to texture should have an extension");
+        mal_toolkit::AlwaysAssert(input_path.is_absolute(), "Paths provided to texture manager should be absolute!");
+        mal_toolkit::Assert(input_path.has_extension(), "Path to texture should have an extension");
         auto path = input_path.parent_path().parent_path() / "dds" / (input_path.stem().string() + ".dds");
         if (!std::filesystem::exists(path))
         {
@@ -197,8 +197,8 @@ namespace engine::core
 
     TextureId TextureManager::LoadCubemap(std::filesystem::path const &path)
     {
-        std::string extension = utils::as_lowercase(path.extension().string());
-        utils::Assert(extension == ".dds", "Single-file cubemap has to be in DDS format");
+        std::string extension = mal_toolkit::as_lowercase(path.extension().string());
+        mal_toolkit::Assert(extension == ".dds", "Single-file cubemap has to be in DDS format");
         if (auto it = instance_->texture_hashes_.find(std::filesystem::hash_value(path));
             it != instance_->texture_hashes_.end())
         {

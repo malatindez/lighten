@@ -159,27 +159,6 @@ namespace camera_movement
 
     void OnUpdate()
     {
-        // TODO:
-        // find an issue that causes objects to tremble while moving with camera using RMB
-        // Code below outputs the object position each update, but for some reason it shows the correct position values
-        // I have no clue for now what causes this issue.
-        // Probably something's off with the per_frame or transform updates, but it's hard to tell.
-        // I'll leave this code here for now, but it's not used.
-        // I'll try to fix this issue later.
-        return;
-#if 0
-        auto scene = Engine::scene();
-        if (!scene->registry.valid(selected_entity))
-        {
-            return;
-        }
-        auto *transform_ptr = scene->registry.try_get<TransformComponent>(selected_entity);
-        if (transform_ptr == nullptr)
-        {
-            return;
-        }
-        auto &transform = *transform_ptr;
-        spdlog::info(utils::FormatToString(transform.position));
-#endif
+     
     }
 }

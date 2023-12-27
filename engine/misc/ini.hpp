@@ -1,5 +1,5 @@
 #pragma once
-#include "utils/utils.hpp"
+#include "mal-toolkit/mal-toolkit.hpp"
 namespace engine::ini
 {
     /**
@@ -116,7 +116,7 @@ namespace engine::ini
         constexpr Entry &operator=(T t)
             requires(std::is_constructible_v<std::string, T>)
         {
-            if (utils::trim(t) != t)
+            if (mal_toolkit::trim(t) != t)
             {
                 throw std::invalid_argument("The input string should be trimmed!");
             }
@@ -227,7 +227,7 @@ namespace engine::ini
             }
             else if (type_ == Type::kString)
             {
-                std::string temp = utils::as_lowercase(value_);
+                std::string temp = mal_toolkit::as_lowercase(value_);
                 if (temp == "yes" || temp == "true" || temp == "on")
                 {
                     return true;

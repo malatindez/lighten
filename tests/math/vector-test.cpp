@@ -1,6 +1,6 @@
 #include "include/library-pch.hpp"
 #include "pch.h"
-#include "utils.hpp"
+#include "mal-toolkit/mal-toolkit.hpp"
 #include <glm/glm.hpp>
 #include <glm/common.hpp>
 #include <glm/gtx/vector_angle.hpp>
@@ -16,7 +16,7 @@ void vec_test_basic_arithmetic_same_types()
     std::array<T, size> arr;
     for (int i = 0; i < arr.size(); ++i)
     {
-        arr[i] = utils::Random<T>(1);
+        arr[i] = mal_toolkit::Random<T>(1);
     }
     std::array<T, size> invalid_array = arr;
     vec<size, T> vec1{ invalid_array };
@@ -31,7 +31,7 @@ void vec_test_basic_arithmetic_same_types()
     ASSERT_TRUE((vec1 == vec<size, T>{arr}));
     for (int i = 0; i < arr.size(); ++i)
     {
-        vec1[i] = utils::Random<T>(1);
+        vec1[i] = mal_toolkit::Random<T>(1);
     }
 
     vec<size, T> add{ vec1 + vec2 };
@@ -66,7 +66,7 @@ void vec_test_basic_arithmetic_same_types()
         }
     }
 
-    T random_number = utils::Random<T>(1);
+    T random_number = mal_toolkit::Random<T>(1);
 
     add = vec1 + random_number;
     sub = vec1 - random_number;
@@ -121,16 +121,16 @@ TEST(TEST_VECTORS_ARITHMETIC, DefaultTestSameTypes)
 
 TEST(TEST_VECTORS_ARITHMETIC, RandomTestSameTypes)
 {
-    for (size_t i = 0; i < utils::RandomConstexpr(-1, 10, 25); i++)
+    for (size_t i = 0; i < mal_toolkit::RandomConstexpr(-1, 10, 25); i++)
     {
-        vec_test_basic_arithmetic_same_types_all<utils::RandomConstexpr(0, 2, 256)>();
-        vec_test_basic_arithmetic_same_types_all<utils::RandomConstexpr(1, 2, 256)>();
-        vec_test_basic_arithmetic_same_types_all<utils::RandomConstexpr(2, 2, 256)>();
-        vec_test_basic_arithmetic_same_types_all<utils::RandomConstexpr(3, 2, 256)>();
-        vec_test_basic_arithmetic_same_types_all<utils::RandomConstexpr(4, 2, 256)>();
-        vec_test_basic_arithmetic_same_types_all<utils::RandomConstexpr(5, 2, 256)>();
-        vec_test_basic_arithmetic_same_types_all<utils::RandomConstexpr(6, 2, 256)>();
-        vec_test_basic_arithmetic_same_types_all<utils::RandomConstexpr(7, 2, 256)>();
+        vec_test_basic_arithmetic_same_types_all<mal_toolkit::RandomConstexpr(0, 2, 256)>();
+        vec_test_basic_arithmetic_same_types_all<mal_toolkit::RandomConstexpr(1, 2, 256)>();
+        vec_test_basic_arithmetic_same_types_all<mal_toolkit::RandomConstexpr(2, 2, 256)>();
+        vec_test_basic_arithmetic_same_types_all<mal_toolkit::RandomConstexpr(3, 2, 256)>();
+        vec_test_basic_arithmetic_same_types_all<mal_toolkit::RandomConstexpr(4, 2, 256)>();
+        vec_test_basic_arithmetic_same_types_all<mal_toolkit::RandomConstexpr(5, 2, 256)>();
+        vec_test_basic_arithmetic_same_types_all<mal_toolkit::RandomConstexpr(6, 2, 256)>();
+        vec_test_basic_arithmetic_same_types_all<mal_toolkit::RandomConstexpr(7, 2, 256)>();
     }
 }
 template <size_t size, typename T, typename U>
@@ -141,11 +141,11 @@ void vec_test_basic_arithmetic_different_types()
 
     for (int i = 0; i < size; ++i)
     {
-        vec1[i] = utils::Random<T>(1);
+        vec1[i] = mal_toolkit::Random<T>(1);
     }
     for (int i = 0; i < size; ++i)
     {
-        vec2[i] = utils::Random<U>(1);
+        vec2[i] = mal_toolkit::Random<U>(1);
     }
     vec<size, U> _test1{ vec1 };
     vec<size, T> _test2{ vec2 };
@@ -188,7 +188,7 @@ void vec_test_basic_arithmetic_different_types()
         }
     }
 
-    T random_number = utils::Random<T>(1);
+    T random_number = mal_toolkit::Random<T>(1);
 
     add = vec1 + random_number;
     sub = vec1 - random_number;
@@ -255,10 +255,10 @@ TEST(TEST_VECTORS_ARITHMETIC, DefaultTestDifferentTypes)
 
 TEST(TEST_VECTORS_ARITHMETIC, RandomTestDifferentTypes)
 {
-    for (size_t i = 0; i < utils::RandomConstexpr(-1, 10, 25); i++)
+    for (size_t i = 0; i < mal_toolkit::RandomConstexpr(-1, 10, 25); i++)
     {
-        vec_test_basic_arithmetic_different_types_all<utils::RandomConstexpr(15, 4, 10)>();
-        vec_test_basic_arithmetic_different_types_all<utils::RandomConstexpr(34, 4, 10)>();
+        vec_test_basic_arithmetic_different_types_all<mal_toolkit::RandomConstexpr(15, 4, 10)>();
+        vec_test_basic_arithmetic_different_types_all<mal_toolkit::RandomConstexpr(34, 4, 10)>();
     }
 }
 
@@ -285,15 +285,15 @@ TEST(TEST_VECTORS_GLM, TestBasicArithmetic)
 {
     for (int i = 0; i < kNumIterations; i++)
     {
-        glm::vec2 glm_vec2_1 = glm::vec2(utils::Random<float>(-100, 100), utils::Random<float>(-100, 100));
-        glm::vec2 glm_vec2_2 = glm::vec2(utils::Random<float>(-100, 100), utils::Random<float>(-100, 100));
-        glm::vec2 glm_vec2_3 = glm::vec2(utils::Random<float>(-100, 100), utils::Random<float>(-100, 100));
-        glm::vec3 glm_vec3_1 = glm::vec3(utils::Random<float>(-100, 100), utils::Random<float>(-100, 100), utils::Random<float>(-100, 100));
-        glm::vec3 glm_vec3_2 = glm::vec3(utils::Random<float>(-100, 100), utils::Random<float>(-100, 100), utils::Random<float>(-100, 100));
-        glm::vec3 glm_vec3_3 = glm::vec3(utils::Random<float>(-100, 100), utils::Random<float>(-100, 100), utils::Random<float>(-100, 100));
-        glm::vec4 glm_vec4_1 = glm::vec4(utils::Random<float>(-100, 100), utils::Random<float>(-100, 100), utils::Random<float>(-100, 100), utils::Random<float>(-100, 100));
-        glm::vec4 glm_vec4_2 = glm::vec4(utils::Random<float>(-100, 100), utils::Random<float>(-100, 100), utils::Random<float>(-100, 100), utils::Random<float>(-100, 100));
-        glm::vec4 glm_vec4_3 = glm::vec4(utils::Random<float>(-100, 100), utils::Random<float>(-100, 100), utils::Random<float>(-100, 100), utils::Random<float>(-100, 100));
+        glm::vec2 glm_vec2_1 = glm::vec2(mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100));
+        glm::vec2 glm_vec2_2 = glm::vec2(mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100));
+        glm::vec2 glm_vec2_3 = glm::vec2(mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100));
+        glm::vec3 glm_vec3_1 = glm::vec3(mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100));
+        glm::vec3 glm_vec3_2 = glm::vec3(mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100));
+        glm::vec3 glm_vec3_3 = glm::vec3(mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100));
+        glm::vec4 glm_vec4_1 = glm::vec4(mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100));
+        glm::vec4 glm_vec4_2 = glm::vec4(mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100));
+        glm::vec4 glm_vec4_3 = glm::vec4(mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100));
         vec2 vec2_1 = vec2(glm_vec2_1.x, glm_vec2_1.y);
         vec2 vec2_2 = vec2(glm_vec2_2.x, glm_vec2_2.y);
         vec2 vec2_3 = vec2(glm_vec2_3.x, glm_vec2_3.y);
@@ -496,12 +496,12 @@ TEST(TEST_VECTORS_GLM, TestTrigonometricFunctions)
 {
     for (int i = 0; i < kNumIterations; i++)
     {
-        glm::vec2 glm_vec2_1 = glm::vec2(utils::Random<float>(-1, 1), utils::Random<float>(-1, 1));
-        glm::vec2 glm_vec2_2 = glm::vec2(utils::Random<float>(-1, 1), utils::Random<float>(-1, 1));
-        glm::vec3 glm_vec3_1 = glm::vec3(utils::Random<float>(-1, 1), utils::Random<float>(-1, 1), utils::Random<float>(-1, 1));
-        glm::vec3 glm_vec3_2 = glm::vec3(utils::Random<float>(-1, 1), utils::Random<float>(-1, 1), utils::Random<float>(-1, 1));
-        glm::vec4 glm_vec4_1 = glm::vec4(utils::Random<float>(-1, 1), utils::Random<float>(-1, 1), utils::Random<float>(-1, 1), utils::Random<float>(-1, 1));
-        glm::vec4 glm_vec4_2 = glm::vec4(utils::Random<float>(-1, 1), utils::Random<float>(-1, 1), utils::Random<float>(-1, 1), utils::Random<float>(-1, 1));
+        glm::vec2 glm_vec2_1 = glm::vec2(mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1));
+        glm::vec2 glm_vec2_2 = glm::vec2(mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1));
+        glm::vec3 glm_vec3_1 = glm::vec3(mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1));
+        glm::vec3 glm_vec3_2 = glm::vec3(mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1));
+        glm::vec4 glm_vec4_1 = glm::vec4(mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1));
+        glm::vec4 glm_vec4_2 = glm::vec4(mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1));
         vec2 vec2_1 = vec2(glm_vec2_1.x, glm_vec2_1.y);
         vec2 vec2_2 = vec2(glm_vec2_2.x, glm_vec2_2.y);
         vec3 vec3_1 = vec3(glm_vec3_1.x, glm_vec3_1.y, glm_vec3_1.z);
@@ -554,12 +554,12 @@ TEST(TEST_VECTORS_GLM, TestExponentialFunctions)
 {
     for (int i = 0; i < kNumIterations; i++)
     {
-        glm::vec2 glm_vec2_1 = glm::vec2(utils::Random<float>(-100, 100), utils::Random<float>(-100, 100));
-        glm::vec2 glm_vec2_2 = glm::vec2(utils::Random<float>(-100, 100), utils::Random<float>(-100, 100));
-        glm::vec3 glm_vec3_1 = glm::vec3(utils::Random<float>(-100, 100), utils::Random<float>(-100, 100), utils::Random<float>(-100, 100));
-        glm::vec3 glm_vec3_2 = glm::vec3(utils::Random<float>(-100, 100), utils::Random<float>(-100, 100), utils::Random<float>(-100, 100));
-        glm::vec4 glm_vec4_1 = glm::vec4(utils::Random<float>(-100, 100), utils::Random<float>(-100, 100), utils::Random<float>(-100, 100), utils::Random<float>(-100, 100));
-        glm::vec4 glm_vec4_2 = glm::vec4(utils::Random<float>(-100, 100), utils::Random<float>(-100, 100), utils::Random<float>(-100, 100), utils::Random<float>(-100, 100));
+        glm::vec2 glm_vec2_1 = glm::vec2(mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100));
+        glm::vec2 glm_vec2_2 = glm::vec2(mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100));
+        glm::vec3 glm_vec3_1 = glm::vec3(mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100));
+        glm::vec3 glm_vec3_2 = glm::vec3(mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100));
+        glm::vec4 glm_vec4_1 = glm::vec4(mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100));
+        glm::vec4 glm_vec4_2 = glm::vec4(mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100), mal_toolkit::Random<float>(-100, 100));
         vec2 vec2_1 = vec2(glm_vec2_1.x, glm_vec2_1.y);
         vec2 vec2_2 = vec2(glm_vec2_2.x, glm_vec2_2.y);
         vec3 vec3_1 = vec3(glm_vec3_1.x, glm_vec3_1.y, glm_vec3_1.z);
@@ -593,15 +593,15 @@ TEST(TEST_VECTORS_GLM, TestCommonFunctions)
 {
     for (int i = 0; i < kNumIterations; i++)
     {
-        glm::vec2 glm_vec2_1 = glm::vec2(utils::Random<float>(-1, 1), utils::Random<float>(-1, 1));
-        glm::vec2 glm_vec2_2 = glm::vec2(utils::Random<float>(-1, 1), utils::Random<float>(-1, 1));
-        glm::vec2 glm_vec2_3 = glm::vec2(utils::Random<float>(-1, 1), utils::Random<float>(-1, 1));
-        glm::vec3 glm_vec3_1 = glm::vec3(utils::Random<float>(-1, 1), utils::Random<float>(-1, 1), utils::Random<float>(-1, 1));
-        glm::vec3 glm_vec3_2 = glm::vec3(utils::Random<float>(-1, 1), utils::Random<float>(-1, 1), utils::Random<float>(-1, 1));
-        glm::vec3 glm_vec3_3 = glm::vec3(utils::Random<float>(-1, 1), utils::Random<float>(-1, 1), utils::Random<float>(-1, 1));
-        glm::vec4 glm_vec4_1 = glm::vec4(utils::Random<float>(-1, 1), utils::Random<float>(-1, 1), utils::Random<float>(-1, 1), utils::Random<float>(-1, 1));
-        glm::vec4 glm_vec4_2 = glm::vec4(utils::Random<float>(-1, 1), utils::Random<float>(-1, 1), utils::Random<float>(-1, 1), utils::Random<float>(-1, 1));
-        glm::vec4 glm_vec4_3 = glm::vec4(utils::Random<float>(-1, 1), utils::Random<float>(-1, 1), utils::Random<float>(-1, 1), utils::Random<float>(-1, 1));
+        glm::vec2 glm_vec2_1 = glm::vec2(mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1));
+        glm::vec2 glm_vec2_2 = glm::vec2(mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1));
+        glm::vec2 glm_vec2_3 = glm::vec2(mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1));
+        glm::vec3 glm_vec3_1 = glm::vec3(mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1));
+        glm::vec3 glm_vec3_2 = glm::vec3(mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1));
+        glm::vec3 glm_vec3_3 = glm::vec3(mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1));
+        glm::vec4 glm_vec4_1 = glm::vec4(mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1));
+        glm::vec4 glm_vec4_2 = glm::vec4(mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1));
+        glm::vec4 glm_vec4_3 = glm::vec4(mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1), mal_toolkit::Random<float>(-1, 1));
         vec2 vec2_1 = vec2(glm_vec2_1.x, glm_vec2_1.y);
         vec2 vec2_2 = vec2(glm_vec2_2.x, glm_vec2_2.y);
         vec2 vec2_3 = vec2(glm_vec2_3.x, glm_vec2_3.y);

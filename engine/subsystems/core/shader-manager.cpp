@@ -25,7 +25,7 @@ namespace engine::core
                     }
                     ShaderCompileOutput out;
 
-                    utils::HighResolutionTimer timer;
+                    mal_toolkit::HighResolutionTimer timer;
                     try
                     {
                         ShaderCompiler::CompileShader(shader_inputs_[shader], out);
@@ -55,7 +55,7 @@ namespace engine::core
                         }
                     }
                 };
-                utils::HighResolutionTimer timer;
+                mal_toolkit::HighResolutionTimer timer;
                 {
                     std::vector<std::jthread> threads;
 

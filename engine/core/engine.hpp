@@ -5,7 +5,7 @@
 #include "core/scene.hpp"
 #include "subsystems/core/core.hpp"
 #include "subsystems/render/render.hpp"
-#include "utils/utils.hpp"
+#include "mal-toolkit/mal-toolkit.hpp"
 namespace engine::core
 {
     // TODO: move to config file
@@ -160,9 +160,9 @@ namespace engine::core
         [[nodiscard]] static inline float maximum_update_rate() { return application_->update_rate_; }
 
 #ifdef _DEBUG
-        utils::Measurer<std::chrono::high_resolution_clock> update_measurer{ "Engine::Update()", false };
-        utils::Measurer<std::chrono::high_resolution_clock> render_measurer{ "Engine::Render()", false };
-        utils::Measurer<std::chrono::high_resolution_clock> tick_measurer{ "Engine::Tick()", false };
+        mal_toolkit::Measurer<std::chrono::high_resolution_clock> update_measurer{ "Engine::Update()", false };
+        mal_toolkit::Measurer<std::chrono::high_resolution_clock> render_measurer{ "Engine::Render()", false };
+        mal_toolkit::Measurer<std::chrono::high_resolution_clock> tick_measurer{ "Engine::Tick()", false };
 #endif
 
 
@@ -219,16 +219,16 @@ namespace engine::core
 
         bool running_ = true;
 
-        utils::SteadyTimer update_;
-        utils::SteadyTimer render_;
-        utils::SteadyTimer tick_;
+        mal_toolkit::SteadyTimer update_;
+        mal_toolkit::SteadyTimer render_;
+        mal_toolkit::SteadyTimer tick_;
 
         EventCallbackFn event_function_;
 
         std::shared_ptr<spdlog::logger> logger_;
 
         static std::unique_ptr<Engine> application_;
-        static utils::SteadyTimer from_start_;
+        static mal_toolkit::SteadyTimer from_start_;
 
         float update_rate_ = kUpdateLimit;
         float tickrate_ = kTickrate;

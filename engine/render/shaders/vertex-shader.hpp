@@ -11,7 +11,7 @@ namespace engine::render
 
         VertexShader(ShaderBlob const &shader_blob) : Shader(shader_blob, direct3d::ShaderType::VertexShader)
         {
-            utils::AlwaysAssert(direct3d::api().device->CreateVertexShader(blob().ptr(), blob().size(), nullptr, &vs.ptr()) >= 0,
+            mal_toolkit::AlwaysAssert(direct3d::api().device->CreateVertexShader(blob().ptr(), blob().size(), nullptr, &vs.ptr()) >= 0,
                                 "Failed to create vertex shader");
         }
         void Bind() override
@@ -26,7 +26,7 @@ namespace engine::render
         {
             blob() = new_blob;
             vs = nullptr;
-            utils::AlwaysAssert(direct3d::api().device->CreateVertexShader(blob().ptr(), blob().size(), nullptr, &vs.ptr()) >= 0,
+            mal_toolkit::AlwaysAssert(direct3d::api().device->CreateVertexShader(blob().ptr(), blob().size(), nullptr, &vs.ptr()) >= 0,
                                 "Failed to recreate vertex shader");
         }
 

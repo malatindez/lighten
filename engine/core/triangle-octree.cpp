@@ -17,7 +17,7 @@ namespace engine::core
         const math::vec3 eps{ 1e-5f, 1e-5f, 1e-5f };
         m_box = m_initialBox = math::Box{ model_mesh.mesh_range.bounding_box.min - eps, model_mesh.mesh_range.bounding_box.max + eps };
 
-        for (size_t i = 0; i < mesh.indices.size();)
+        for (size_t i = 0; i < mesh.indices.size() - 2;)
         {
             auto const &V1 = mesh.vertices[mesh.indices[i++]].position;
             auto const &V2 = mesh.vertices[mesh.indices[i++]].position;
@@ -28,7 +28,7 @@ namespace engine::core
             bool inserted = addTriangle((uint32_t)(i / 3 - 1), V1, V2, V3, center);
             if (!inserted)
             {
-                utils::Assert(inserted, "Failed to insert triangle");
+                mal_toolkit::Assert(inserted, "Failed to insert triangle");
             }
         }
     }

@@ -71,7 +71,7 @@ namespace engine::direct3d
         /// @param width The size of the data to initialize the buffer with, in bytes
         inline void Init(D3D11_BUFFER_DESC &&desc, void *ptr, uint32_t width)
         {
-            utils::Assert(desc.Usage == kUsage);
+            mal_toolkit::Assert(desc.Usage == kUsage);
             desc.ByteWidth = width;
             D3D11_SUBRESOURCE_DATA data;
             data.pSysMem = ptr;
@@ -81,7 +81,7 @@ namespace engine::direct3d
         /// @param desc The description of the buffer
         inline void Init(D3D11_BUFFER_DESC &&desc)
         {
-            utils::Assert(desc.Usage == kUsage);
+            mal_toolkit::Assert(desc.Usage == kUsage);
             BufferWrapper::Init(std::move(desc));
         }
         /// @brief Initialize the buffer

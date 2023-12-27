@@ -1,5 +1,5 @@
 #include "file-watcher.hpp"
-namespace engine::utils
+namespace engine::misc
 {
     void FileWatcher::AddPathToWatch(std::filesystem::path const &path, bool recursive)
     {

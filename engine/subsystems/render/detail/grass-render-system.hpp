@@ -114,22 +114,22 @@ namespace std
         std::size_t operator()(engine::render::GrassMaterial const &material) const
         {
             size_t seed = 0;
-            engine::utils::hash_combine(seed, material.albedo_texture);
-            engine::utils::hash_combine(seed, material.ao_texture);
-            engine::utils::hash_combine(seed, material.bump_texture);
-            engine::utils::hash_combine(seed, material.cavity_texture);
-            engine::utils::hash_combine(seed, material.displacement_texture);
-            engine::utils::hash_combine(seed, material.gloss_texture);
-            engine::utils::hash_combine(seed, material.normal_texture);
-            engine::utils::hash_combine(seed, material.opacity_texture);
-            engine::utils::hash_combine(seed, material.roughness_texture);
-            engine::utils::hash_combine(seed, material.specular_texture);
-            engine::utils::hash_combine(seed, material.translucency_texture);
-            engine::utils::hash_combine(seed, material.metalness_texture);
-            engine::utils::hash_combine(seed, material.reverse_normal_y);
-            engine::utils::hash_combine(seed, material.texture_flags);
-            engine::utils::hash_combine(seed, material.planes_count);
-            engine::utils::hash_combine(seed, material.section_count);
+            mal_toolkit::hash_combine(seed, material.albedo_texture);
+            mal_toolkit::hash_combine(seed, material.ao_texture);
+            mal_toolkit::hash_combine(seed, material.bump_texture);
+            mal_toolkit::hash_combine(seed, material.cavity_texture);
+            mal_toolkit::hash_combine(seed, material.displacement_texture);
+            mal_toolkit::hash_combine(seed, material.gloss_texture);
+            mal_toolkit::hash_combine(seed, material.normal_texture);
+            mal_toolkit::hash_combine(seed, material.opacity_texture);
+            mal_toolkit::hash_combine(seed, material.roughness_texture);
+            mal_toolkit::hash_combine(seed, material.specular_texture);
+            mal_toolkit::hash_combine(seed, material.translucency_texture);
+            mal_toolkit::hash_combine(seed, material.metalness_texture);
+            mal_toolkit::hash_combine(seed, material.reverse_normal_y);
+            mal_toolkit::hash_combine(seed, material.texture_flags);
+            mal_toolkit::hash_combine(seed, material.planes_count);
+            mal_toolkit::hash_combine(seed, material.section_count);
             return seed;
         }
     };

@@ -27,7 +27,7 @@ namespace engine::components
                 .size = size_normalized,
                 .rotation = rotation_distribution(random_engine),
                 .atlas_id = atlas_id};
-            utils::SortedInsert<GrassInstance>(grass_instances_, std::move(grass_instance), [](auto const &lhs, auto const &rhs) constexpr -> bool
+            mal_toolkit::SortedInsert<GrassInstance>(grass_instances_, std::move(grass_instance), [](auto const &lhs, auto const &rhs) constexpr -> bool
                                                { return lhs.atlas_id < rhs.atlas_id; });
         }
     }

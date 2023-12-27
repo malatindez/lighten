@@ -95,7 +95,8 @@ struct PS_OUTPUT
     float4 albedo : SV_TARGET0;
     float4 normals : SV_TARGET1;
     float4 roughness_metalness_transmittance_ao : SV_TARGET2;
-    float4 emission : SV_TARGET3;
+    float4 sheen : SV_TARGET3;
+    float4 emission : SV_TARGET4;
 };
 
 PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
@@ -196,6 +197,7 @@ PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
     output.normals.xy = packOctahedron(normal);
     output.normals.zw = packOctahedron(geometry_normal);
     output.emission = float4(0, 0, 0, 0);
+    output.sheen = float4(0,0,0,0);
 
     return output;
 }

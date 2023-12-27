@@ -2,7 +2,7 @@
 #include "../../core/shader-manager.hpp"
 #include "../model-system.hpp"
 #include "components/components.hpp"
-#include "utils/utils.hpp"
+#include "mal-toolkit/mal-toolkit.hpp"
 #include "core/scene.hpp"
 
 namespace engine::render
@@ -15,6 +15,7 @@ namespace engine::render
         texture_flags |= (metalness_map != nullptr) ? 1 << 2 : 0;
         texture_flags |= (roughness_map != nullptr) ? 1 << 3 : 0;
         texture_flags |= (opacity_map != nullptr) ? 1 << 4 : 0;
+        texture_flags |= (sheen_map != nullptr) ? 1 << 5 : 0;
         texture_flags |= (reverse_normal_y) ? 1 << 24 : 0;
     }
     void OpaqueMaterial::BindTextures() const
@@ -34,6 +35,9 @@ namespace engine::render
         if (opacity_map != nullptr) {
             direct3d::api().devcon4->PSSetShaderResources(4, 1, &opacity_map);
         }
+        if (sheen_map != nullptr) {
+            direct3d::api().devcon4->PSSetShaderResources(15, 1, &sheen_map);
+        }
     }
     void OpaqueMaterial::Bind(direct3d::DynamicUniformBuffer<_opaque_detail::OpaquePerMaterial> &uniform_buffer) const
     {
@@ -41,6 +45,8 @@ namespace engine::render
         temporary.albedo_color = albedo_color;
         temporary.metalness = metalness_value;
         temporary.roughness = roughness_value;
+        temporary.sheen_color = sheen_color;
+        temporary.sheen = sheen_roughness;
         temporary.enabled_texture_flags = texture_flags;
         temporary.uv_multiplier = uv_multiplier;
         uniform_buffer.Update(temporary);
@@ -71,11 +77,16 @@ namespace engine::render
         {
             opacity_map = material.opacity_textures.front();
         }
+        if(material.sheen_textures.size() > 0)
+        {
+            sheen_map = material.sheen_textures.front();
+        }
         texture_flags = 0;
         UpdateTextureFlags();
         albedo_color = material.diffuse_color;
         metalness_value = material.metalness;
         roughness_value = material.roughness;
+        sheen_color = material.sheen_color;
         twosided = material.twosided;
     }
 }
@@ -169,7 +180,7 @@ namespace engine::render::_opaque_detail
                     material.BindTextures();
                     if (material.twosided != current_state_twosided)
                     {
-                        direct3d::api().devcon->RSSetState(material.twosided ? direct3d::states().cull_none : direct3d::states().cull_back);
+                        direct3d::api().devcon->RSSetState(material.twosided ? direct3d::states().cull_none : direct3d::states().cull_none);
                         current_state_twosided = material.twosided;
                     }
 
@@ -394,7 +405,7 @@ namespace engine::render::_opaque_detail
         auto instance_id = GetInstanceId(model_id);
         auto &model_instance = model_instances_.at(instance_id);
         std::vector<size_t> material_instance_id;
-        utils::Assert(materials.size() == model_instance.mesh_instances.size());
+        mal_toolkit::Assert(materials.size() == model_instance.mesh_instances.size());
         for (size_t mesh_index = 0; mesh_index < model_instance.model.meshes.size(); mesh_index++)
         {
             auto &material_instances = model_instance.mesh_instances[mesh_index].material_instances;

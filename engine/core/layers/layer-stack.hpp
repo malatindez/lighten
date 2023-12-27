@@ -1,6 +1,6 @@
 #pragma once
 #include "include/engine-pch.hpp"
-
+#include "layer.hpp"
 namespace engine::core::_layer_stack_detail
 {
     using LayerPtrVec = std::vector<std::shared_ptr<Layer>>;

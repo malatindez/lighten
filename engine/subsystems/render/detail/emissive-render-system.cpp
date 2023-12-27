@@ -3,7 +3,7 @@
 #include "../model-system.hpp"
 #include "components/components.hpp"
 #include "core/scene.hpp"
-#include "utils/utils.hpp"
+#include "mal-toolkit/mal-toolkit.hpp"
 
 namespace engine::render::_emissive_detail
 {
@@ -41,7 +41,7 @@ namespace engine::render::_emissive_detail
         emissive_shader_.Bind();
 
         direct3d::api().devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        direct3d::api().devcon4->RSSetState(direct3d::states().cull_back);
+        direct3d::api().devcon4->RSSetState(direct3d::states().cull_none);
         direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
         direct3d::api().devcon4->PSSetSamplers(1, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
