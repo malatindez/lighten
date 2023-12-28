@@ -1,6 +1,6 @@
 #include "include/library-pch.hpp"
 #include "pch.h"
-#include "mal-toolkit/mal-toolkit.hpp"
+#include "utils.hpp"
 #include <glm/glm.hpp>
 #include <glm/common.hpp>
 #include <glm/gtx/vector_angle.hpp>
@@ -24,7 +24,7 @@ T random_float_arr(float from = -100, float to = 100)
     auto &arr = reinterpret_cast<std::array<float, size_t(sizeof(T) / sizeof(float))> &>(return_value);
     for (auto &v : arr)
     {
-        v = mal_toolkit::Random<float>(from, to);
+        v = utils::Random<float>(from, to);
     }
     return return_value;
 }
@@ -129,7 +129,7 @@ TEST(TEST_QUATERNIONS, TestBasicArithmetic)
         ASSERT_TRUE(quat1 * quat2 * quat3 == glm_quat1 * glm_quat2 * glm_quat3);
         ASSERT_TRUE(quat1 * quat2 + quat3 == glm_quat1 * glm_quat2 + glm_quat3);
         ASSERT_TRUE(quat1 * quat2 - quat3 == glm_quat1 * glm_quat2 - glm_quat3);
-        float scalar = mal_toolkit::Random<float>(-100, 100);
+        float scalar = utils::Random<float>(-100, 100);
         ASSERT_TRUE(quat1 * scalar == glm_quat1 * scalar);
         ASSERT_TRUE(quat1 / scalar == glm_quat1 / scalar);
         ASSERT_TRUE(scalar * quat1 == scalar * glm_quat1);

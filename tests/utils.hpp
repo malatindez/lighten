@@ -3,20 +3,21 @@
 #undef CreateFile
 namespace utils
 {
-    
 
-        uint64_t random_seed()
+    inline uint64_t random_seed()
+    {
+        try
         {
-            try {
-                std::random_device rd;
-                return rd();
-            }
-            catch (const std::exception& e) {
-                return std::chrono::system_clock::now().time_since_epoch().count();
-            }
+            std::random_device rd;
+            return rd();
         }
+        catch (const std::exception &)
+        {
+            return std::chrono::system_clock::now().time_since_epoch().count();
+        }
+    }
 
-    static std::mt19937 gen(random_seed());
+    static std::mt19937 gen(static_cast<uint32_t>(random_seed()));
 
     namespace fs = std::filesystem;
     namespace _detail
@@ -88,14 +89,14 @@ namespace utils
     template <std::integral T>
     [[nodiscard]] T Random(T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
     {
-        std::uniform_int_distribution dis{ min, max };
+        std::uniform_int_distribution dis{min, max};
         return dis(gen);
     }
 
     template <std::floating_point T>
     [[nodiscard]] T Random(T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
     {
-        std::uniform_real_distribution dis{ min, max };
+        std::uniform_real_distribution dis{min, max};
         return dis(gen);
     }
     const std::string kAsciiCharacters =
@@ -106,8 +107,8 @@ namespace utils
 
     [[nodiscard]] inline std::string ExcludeString(std::string const &a, std::string_view const b)
     {
-        std::string return_value{ a };
-        std::erase_if(return_value, [&b] (char const &c)
+        std::string return_value{a};
+        std::erase_if(return_value, [&b](char const &c)
                       { return std::ranges::find(b, c) != b.end(); });
         return return_value;
     }

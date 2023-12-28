@@ -25,11 +25,6 @@ if(test)
   target_compile_options(runUnitTests PRIVATE /bigobj)
 
   add_test(NAME TEST COMMAND runUnitTests)
-
-  set_target_properties(runUnitTests PROPERTIES UNITY_BUILD TRUE)
-  set_target_properties(runUnitTests PROPERTIES UNITY_BUILD_MODE BATCH)
-  set_target_properties(runUnitTests PROPERTIES UNITY_BUILD_BATCH_SIZE 16)
-  
   set_target_properties(runUnitTests PROPERTIES LINKER_LANGUAGE CXX)
   set_target_properties(runUnitTests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
   target_compile_options(runUnitTests PRIVATE "${INLINING_FLAG}" "${MAXIMUM_WARNING_FLAG}" "/MP")
