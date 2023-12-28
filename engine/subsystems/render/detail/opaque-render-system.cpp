@@ -443,17 +443,16 @@ namespace engine::render::_opaque_detail
         {
             std::erase(model_instance.mesh_instances[i++].material_instances[material_instance_id].instances, entity);
         }
-        uint32_t count = 0;
         for (auto& mesh_instance : model_instance.mesh_instances)
         {
             for (auto& material_instance : mesh_instance.material_instances)
             {
-                count += material_instance.instances.size();
+                if (material_instance.instances.size())
+                {
+                    return;
+                }
             }
         }
-        if (count == 0)
-        {
-            model_instances_.erase(oc.model_instance_id);
-        }
+        model_instances_.erase(oc.model_instance_id);
     }
 }

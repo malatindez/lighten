@@ -48,11 +48,11 @@ namespace engine::render::_decal_detail
     {
         auto group = registry.group<components::DecalComponent, components::TransformComponent>();
         material_instances_.clear();
-        size_t instances_count = 0;
+        uint32_t instances_count = 0;
         for (auto entity : group)
         {
             auto &decal_component = group.get<components::DecalComponent>(entity);
-            instances_count += decal_component.decals.size();
+            instances_count += static_cast<uint32_t>(decal_component.decals.size());
         }
         instance_buffer_size_ = instances_count;
 

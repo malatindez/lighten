@@ -39,7 +39,7 @@ namespace engine::render
         decal_render_system_->OnRender(scene, buffer, dsv, depth_srv, normals_srv);
     }
 
-    void Renderer::ForwardRender(core::Scene *scene, render::PerFrame const &per_frame, GBuffer const &buffer, ID3D11DepthStencilView *dsv, ID3D11ShaderResourceView *depth_srv, ID3D11ShaderResourceView *normals_srv)
+    void Renderer::ForwardRender(core::Scene *scene, render::PerFrame const &per_frame, [[maybe_unused]] GBuffer const &buffer, [[maybe_unused]] ID3D11DepthStencilView *dsv, ID3D11ShaderResourceView *depth_srv, ID3D11ShaderResourceView *normals_srv)
     {
         skybox_render_pass_->per_frame_ptr = &per_frame;
         skybox_render_pass_->OnRender(scene);

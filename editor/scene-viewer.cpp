@@ -193,7 +193,7 @@ namespace scene_viewer
                     opt_model_id.has_value())
                 {
                     auto const& model_id = opt_model_id.value();
-                    auto& model = render::ModelSystem::GetModel(model_id);
+//                    auto& model = render::ModelSystem::GetModel(model_id);
                     render::ModelSystem::UnloadModel(model_id);
                     
                     if (ModelLoader::loaded_models().size() > 1)

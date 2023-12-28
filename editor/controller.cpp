@@ -885,7 +885,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                                        return;
                                    }
                                    auto &registry = Engine::scene()->registry;
-                                   auto &drs = Engine::scene()->renderer->dissolution_render_system();
+//                                   auto &drs = Engine::scene()->renderer->dissolution_render_system();
                                    auto cube = registry.create();
 
                                    auto &transform = registry.emplace<TransformComponent>(cube);

@@ -7,6 +7,7 @@
 #include "texture-manager.hpp"
 #include "../render/model-system.hpp"
 
+
 namespace engine::core
 {
     using namespace render;
@@ -40,7 +41,7 @@ namespace engine::core
                 {
                     position = math::vec3{ mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
                 }
-                if (mesh->mTextureCoords != nullptr && mesh->mTextureCoords[0] != nullptr)
+                if (mesh->mTextureCoords[0] != nullptr)
                 {
                     tex_coord = math::vec2{ mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
                 }

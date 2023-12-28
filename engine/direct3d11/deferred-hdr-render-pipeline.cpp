@@ -3,7 +3,6 @@
 #include "subsystems/core/input-layer.hpp"
 #include "subsystems/render/skybox-manager.hpp"
 #include "core/engine.hpp"
-#include "core/../../d3d_test/object-editor.hpp"
 namespace engine::direct3d
 {
     DeferredHDRRenderPipeline::DeferredHDRRenderPipeline(std::shared_ptr<core::Window> window, std::shared_ptr<SwapchainRenderTarget> const &output_target)

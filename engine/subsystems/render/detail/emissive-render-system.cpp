@@ -90,7 +90,6 @@ namespace engine::render::_emissive_detail
         auto mapping = instance_buffer_.Map();
         EmissiveInstance *dst = static_cast<EmissiveInstance *>(mapping.pData);
         auto instance_group = registry.group<components::EmissiveComponent>(entt::get<components::TransformComponent>);
-        uint32_t copiedNum = 0;
         for (auto &model_instance : model_instances_)
         {
             for (uint32_t meshIndex = 0; meshIndex < model_instance.mesh_instances.size(); ++meshIndex)
@@ -127,7 +126,7 @@ namespace engine::render::_emissive_detail
         }
         model_instances_.emplace_back(ModelInstance{ .model = ModelSystem::GetModel(model_id), .model_id = model_id });
         auto &instance = model_instances_.at(model_instances_.size() - 1);
-        for (auto const &mesh : instance.model.meshes)
+        for ([[maybe_unused]] auto const &_: instance.model.meshes)
         {
             MeshInstance value;
             instance.mesh_instances.emplace_back(std::move(value));

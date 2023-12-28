@@ -103,7 +103,7 @@ namespace engine::render::_emissive_particle_detail
         noise_texture_ = core::TextureManager::GetTextureView(path / "assets/dissolution_perlin_noise.dds");
     }
 
-    void EmissiveParticleRenderSystem::OnRender(ID3D11ShaderResourceView * depth_srv,  ID3D11ShaderResourceView * normals_srv)
+    void EmissiveParticleRenderSystem::OnRender([[maybe_unused]] ID3D11ShaderResourceView * depth_srv, [[maybe_unused]] ID3D11ShaderResourceView * normals_srv)
     {
         
         //update_particles(depth_srv, normals_srv);

@@ -9,7 +9,15 @@
 #endif
 
 #if defined(__clang__)
-// TODO
+#ifndef _SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
+#define _SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
+#define KEEP_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING 0
+#else
+#define KEEP_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING 1
+#endif
+
+#pragma clang diagnostic push
+
 #elif defined(__GNUC__) || defined(__GNUG__)
 // TODO
 #elif defined(_MSC_VER)
@@ -32,7 +40,14 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 #if defined(__clang__)
-// TODO
+
+#pragma clang diagnostic pop
+
+#if !KEEP_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
+#undef _SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
+#endif
+#undef KEEP_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
+
 #elif defined(__GNUC__) || defined(__GNUG__)
 // TODO
 #elif defined(_MSC_VER)

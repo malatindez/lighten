@@ -38,7 +38,7 @@ namespace engine::render::_particle_detail
 {
     ParticleRenderSystem::ParticleRenderSystem() : RenderPass(0x30000)
     {
-        random_engine_.seed(engine::core::Engine::random_seed());
+        random_engine_.seed(static_cast<uint32_t>(engine::core::Engine::random_seed()));
         auto path = std::filesystem::current_path();
         std::vector<D3D11_INPUT_ELEMENT_DESC> d3d_input_desc{
             { "POSITION",        0, DXGI_FORMAT_R32G32B32_FLOAT,     1, 0,                            D3D11_INPUT_PER_INSTANCE_DATA, 1},
@@ -66,7 +66,6 @@ namespace engine::render::_particle_detail
             return;
         }
 
-        uint32_t amount_of_particles = 0;
         std::vector<GPUParticle> particles;
         float render_start_timestamp = core::Engine::TimeFromStart();
         for (auto entity : view)
@@ -88,7 +87,6 @@ namespace engine::render::_particle_detail
                     emitter.freeze ? 0.0f : particle.rotation_speed,
                     1.0f - (particle.life_end - render_start_timestamp) / (particle.life_end - particle.life_begin),
                     particle.thickness });
-                amount_of_particles++;
             }
         }
         if (particles.size() == 0)
