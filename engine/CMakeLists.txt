@@ -16,7 +16,10 @@ update_sources_msvc("${CMAKE_CURRENT_SOURCE_DIR}" "${ENGINE_SOURCES}")
 add_library(engine STATIC "${ENGINE_SOURCES}")
 target_include_directories(engine PUBLIC ${MATH_INCLUDE_DIRS})
 target_include_directories(engine PUBLIC ${ENGINE_SOURCES_DIR})
-target_link_libraries(engine PUBLIC EnTT::EnTT spdlog::spdlog_header_only)
+target_link_libraries(engine PUBLIC 
+    EnTT::EnTT 
+    spdlog::spdlog_header_only
+)
 
 target_include_directories(engine PUBLIC 
     ${DirectX_D3D11_INCLUDE_DIRS}
@@ -29,6 +32,9 @@ target_include_directories(engine PUBLIC
     ${DIRECTXTEX_INCLUDE_DIRS}
     ${MAL_PACKET_WEAVER_INCLUDE_DIRS}
     ${MAL_TOOLKIT_INCLUDE_DIRS}
+    ${JSON_INCLUDE_DIRS}
+    ${YAML_CPP_INCLUDE_DIRS}
+    ${CEREAL_INCLUDE_DIRS}
 )
 target_link_libraries(engine PUBLIC 
     ${DirectX_D3D11_LIBRARIES}
@@ -41,6 +47,8 @@ target_link_libraries(engine PUBLIC
     ${DIRECTXTEX_LIBRARIES}
     ${MAL_PACKET_WEAVER_LIBRARIES}
     ${MAL_TOOLKIT_LIBRARIES}
+    ${YAML_CPP_LIBRARIES}
+    ${CEREAL_LIBRARIES}
 )
 
 target_sources(engine PUBLIC "${IMGUI_DIR}/backends/imgui_impl_dx11.cpp" "${IMGUI_DIR}/backends/imgui_impl_win32.cpp")
@@ -55,5 +63,5 @@ set_target_properties(engine PROPERTIES UNITY_BUILD_BATCH_SIZE 4)
 target_compile_definitions(engine PUBLIC _SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS)
 
 target_compile_options(engine PRIVATE ${INLINING_FLAG} ${MAXIMUM_WARNING_FLAG} /MP)
-update_runtime_directory_msvc(engine ${CMAKE_CURRENT_SOURCE_DIR}/../runtime_directory)
+update_runtime_directory_msvc(engine "${CMAKE_CURRENT_SOURCE_DIR}/../runtime_directory")
 

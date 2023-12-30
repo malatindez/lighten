@@ -17,6 +17,9 @@ set(BENCHMARK_DIR "${LIB_DIR}/google/google_benchmark")
 set(SPDLOG_DIR "${LIB_DIR}/spdlog")
 set(MAL_PACKET_WEAVER_DIR "${LIB_DIR}/mal-packet-weaver")
 set(MAL_TOOLKIT_DIR "${MAL_PACKET_WEAVER_DIR}/third_party/mal-toolkit/")
+set(JSON_DIR "${LIB_DIR}/json")
+set(YAML_CPP_DIR "${LIB_DIR}/yaml")
+set(CEREAL_DIR "${LIB_DIR}/cereal")
 
 find_package(Boost REQUIRED COMPONENTS system serialization context coroutine HINTS "
   C:/" 
@@ -154,5 +157,14 @@ set(MAL_PACKET_WEAVER_LIBRARIES mal-packet-weaver)
 set(MAL_TOOLKIT_INCLUDE_DIRS "${MAL_TOOLKIT_DIR}/mal-toolkit")
 set(MAL_TOOLKIT_LIBRARIES mal-toolkit)
 
+set(JSON_INCLUDE_DIRS "${JSON_DIR}/single_include/nlohmann")
+
+add_subdirectory(${YAML_CPP_DIR})
+set(YAML_CPP_INCLUDE_DIRS "${YAML_CPP_DIR}/include")
+set(YAML_CPP_LIBRARIES yaml-cpp)
+
+add_subdirectory(${CEREAL_DIR})
+set(CEREAL_INCLUDE_DIRS "${CEREAL_DIR}/include")
+set(CEREAL_LIBRARIES cereal::cereal)
 
 message(STATUS "Third party libraries initialized")
