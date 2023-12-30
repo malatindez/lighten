@@ -148,7 +148,7 @@ namespace scene_viewer
         auto& ors = Engine::scene()->renderer->opaque_render_system();
         auto entity = registry.create();
         auto& game_object = registry.emplace<GameObject>(entity);
-        auto& transform = registry.emplace<TransformComponent>(entity);
+        auto& transform = registry.emplace<Transform>(entity);
         transform.reset();
         transform.UpdateMatrices();
         auto& model_obj = render::ModelSystem::GetModel(model_id);

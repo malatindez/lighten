@@ -8,7 +8,7 @@ namespace engine::render
     namespace
     {
         bool CheckForIntersection(Model const &model,
-                                  components::TransformComponent transform,
+                                  components::Transform transform,
                                   Ray const &ray,
                                   core::MeshIntersection &nearest)
         {
@@ -35,9 +35,9 @@ namespace engine::render
                                                               Ray const &ray,
                                                               core::MeshIntersection &nearest)
     {
-        auto group1 = registry.group<components::OpaqueComponent>(entt::get<components::TransformComponent>);
-        auto group2 = registry.group<components::EmissiveComponent>(entt::get<components::TransformComponent>);
-        auto group3 = registry.group<components::DissolutionComponent>(entt::get<components::TransformComponent>);
+        auto group1 = registry.group<components::OpaqueComponent>(entt::get<components::Transform>);
+        auto group2 = registry.group<components::EmissiveComponent>(entt::get<components::Transform>);
+        auto group3 = registry.group<components::DissolutionComponent>(entt::get<components::Transform>);
         std::optional<entt::entity> rv = std::nullopt;
         auto const &func = [&rv, &ray, &nearest] (auto const entity, auto const &model_instance, auto const &transform) -> void
         {

@@ -2,7 +2,6 @@
 #include "render/model.hpp"
 #include "render/shader-program.hpp"
 #include "render/shadow-map.hpp"
-#include "entt/entt.hpp"
 #include "core/math.hpp"
 #include "components/components.hpp"
 #include "render/common.hpp"

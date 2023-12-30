@@ -313,7 +313,7 @@ namespace engine::render::_opaque_detail
 
         auto mapping = instance_buffer_.Map();
         OpaqueInstance *dst = static_cast<OpaqueInstance *>(mapping.pData);
-        auto instance_group = registry.group<components::OpaqueComponent>(entt::get<components::TransformComponent>);
+        auto instance_group = registry.group<components::OpaqueComponent>(entt::get<components::Transform>);
         uint32_t copiedNum = 0;
         for (auto &model_instance : model_instances_)
         {
@@ -326,7 +326,7 @@ namespace engine::render::_opaque_detail
                     {
                         dst[copiedNum++] = OpaqueInstance
                         {
-                            .world_transform = instance_group.get<components::TransformComponent>(entity).model,
+                            .world_transform = instance_group.get<components::Transform>(entity).model,
                             .entity_id = static_cast<uint32_t>(entity)
                         };
                     }

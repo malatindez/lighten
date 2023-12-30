@@ -180,7 +180,7 @@ namespace engine::render::_emissive_particle_detail
         // this is a hack, we shouldn't be using the DissolutionComponent, this system should be independent of it
         // but it's a quick fix for now
         auto &dissolution_component = registry.get<components::DissolutionComponent>(entity);
-        auto &transform = registry.get<components::TransformComponent>(entity);
+        auto &transform = registry.get<components::Transform>(entity);
         auto &model = ModelSystem::GetModel(dissolution_component.model_id);
 
         PerMesh per_mesh{

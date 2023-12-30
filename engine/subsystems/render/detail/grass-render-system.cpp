@@ -196,7 +196,7 @@ namespace engine::render::_grass_detail
             for (auto entity : material.instances)
             {
                 auto &grass_component = view.get<components::GrassComponent>(entity);
-                auto &transform = scene->registry.get<components::TransformComponent>(entity);
+                auto &transform = scene->registry.get<components::Transform>(entity);
 
                 grass_transform_buffer_.Update(GPUTransformInfo{.rotation_matrix = transpose(transform.rotation.as_mat4()), .position = transform.position});
                 material.material.Bind(grass_per_material_buffer_);
@@ -249,7 +249,7 @@ namespace engine::render::_grass_detail
             for (auto entity : material.instances)
             {
                 auto &grass_component = view.get<components::GrassComponent>(entity);
-                auto &transform = scene->registry.get<components::TransformComponent>(entity);
+                auto &transform = scene->registry.get<components::Transform>(entity);
 
                 grass_transform_buffer_.Update(GPUTransformInfo{.rotation_matrix = transpose(transform.rotation.as_mat4()), .position = transform.position});
 
@@ -307,7 +307,7 @@ namespace engine::render::_grass_detail
             for (auto entity : material.instances)
             {
                 auto &grass_component = view.get<components::GrassComponent>(entity);
-                auto &transform = scene->registry.get<components::TransformComponent>(entity);
+                auto &transform = scene->registry.get<components::Transform>(entity);
 
                 grass_transform_buffer_.Update(GPUTransformInfo{.rotation_matrix = transpose(transform.rotation.as_mat4()), .position = transform.position});
                 material.material.Bind(grass_per_material_buffer_);

@@ -9,12 +9,12 @@ namespace engine::render::_light_detail
     {
         auto &registry = scene->registry;
         std::vector<entt::entity> point_light_entities;
-        for (auto const &entity : registry.view<components::TransformComponent, components::PointLight>())
+        for (auto const &entity : registry.view<components::Transform, components::PointLight>())
         {
             point_light_entities.push_back(entity);
         }
         std::vector<entt::entity> spot_light_entities;
-        for (auto const &entity : registry.view<components::TransformComponent, components::SpotLight>())
+        for (auto const &entity : registry.view<components::Transform, components::SpotLight>())
         {
             spot_light_entities.push_back(entity);
         }
@@ -70,7 +70,7 @@ namespace engine::render::_light_detail
             auto const &point_light = registry.get<components::PointLight>(entity);
             if (point_light.casts_shadows == false)
                 continue;
-            auto const &transform = registry.get<components::TransformComponent>(entity);
+            auto const &transform = registry.get<components::Transform>(entity);
             _opaque_detail::OpaquePerDepthCubemap cubemap;
             auto &g_view_projection = cubemap.g_view_projection;
             cubemap.g_slice_offset = i;
@@ -104,7 +104,7 @@ namespace engine::render::_light_detail
             auto const &spot_light = registry.get<components::SpotLight>(entity);
             if (spot_light.casts_shadows == false)
                 continue;
-            auto const &transform = registry.get<components::TransformComponent>(entity);
+            auto const &transform = registry.get<components::Transform>(entity);
             _opaque_detail::OpaquePerDepthTexture texture;
             vec3 forward = normalize(transform.rotation * core::math::vec3{ 0, 0, -1 });
             vec3 up = normalize(transform.rotation * core::math::vec3{ 0, 1, 0 });
@@ -133,7 +133,7 @@ namespace engine::render::_light_detail
             auto const &directional_light = registry.get<components::DirectionalLight>(entity);
             if (directional_light.casts_shadows == false)
                 continue;
-            auto const &transform = registry.get<components::TransformComponent>(entity);
+            auto const &transform = registry.get<components::Transform>(entity);
             _opaque_detail::OpaquePerDepthTexture texture;
             vec3 forward = normalize(transform.rotation * core::math::vec3{ 0, 1, 0 });
             vec3 camera_position = core::Engine::scene()->main_camera->position() - forward * 30;
@@ -240,7 +240,7 @@ namespace engine::render::_light_detail
             for (entt::entity entity : point_lights)
             {
                 auto &registry_point_light = registry.get<components::PointLight>(entity);
-                auto &registry_transform = registry.get<components::TransformComponent>(entity);
+                auto &registry_transform = registry.get<components::Transform>(entity);
                 if (registry_point_light.casts_shadows == false)
                 {
                     auto &opaque_point_light = per_frame.point_lights[per_frame.num_point_lights];
@@ -275,7 +275,7 @@ namespace engine::render::_light_detail
             for (entt::entity entity : spot_lights)
             {
                 auto &registry_spot_light = registry.get<components::SpotLight>(entity);
-                auto &registry_transform = registry.get<components::TransformComponent>(entity);
+                auto &registry_transform = registry.get<components::Transform>(entity);
                 if (registry_spot_light.casts_shadows == false)
                 {
                     auto &opaque_spot_light = per_frame.spot_lights[per_frame.num_spot_lights];
@@ -316,7 +316,7 @@ namespace engine::render::_light_detail
             for (entt::entity entity : directional_lights)
             {
                 auto &registry_directional_light = registry.get<components::DirectionalLight>(entity);
-                auto &registry_transform = registry.get<components::TransformComponent>(entity);
+                auto &registry_transform = registry.get<components::Transform>(entity);
                 if (registry_directional_light.casts_shadows == false)
                 {
                     auto &opaque_directional_light = per_frame.directional_lights[per_frame.num_directional_lights];

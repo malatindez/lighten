@@ -165,6 +165,6 @@ set(YAML_CPP_LIBRARIES yaml-cpp)
 
 add_subdirectory(${CEREAL_DIR})
 set(CEREAL_INCLUDE_DIRS "${CEREAL_DIR}/include")
-set(CEREAL_LIBRARIES cereal::cereal)
+set(CEREAL_LIBRARIES)
 
 message(STATUS "Third party libraries initialized")

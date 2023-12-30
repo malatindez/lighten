@@ -93,7 +93,7 @@ namespace object_editor
         }
     }
 
-    void EditTransform([[maybe_unused]] CameraController const &camera, TransformComponent &transform)
+    void EditTransform([[maybe_unused]] CameraController const &camera, Transform &transform)
     {
         mat4 &matrix = transform.model;
         float matrixTranslation[3], matrixRotation[3], matrixScale[3];
@@ -177,7 +177,7 @@ namespace object_editor
         }
     }
 
-    void RenderGizmo(CameraController const &camera, TransformComponent &transform, ivec2 const &window_pos, ivec2 const &window_size, Box const &bounding_box)
+    void RenderGizmo(CameraController const &camera, Transform &transform, ivec2 const &window_pos, ivec2 const &window_size, Box const &bounding_box)
     {
         mat4 &matrix = transform.model;
         float matrixTranslation[3], matrixRotation[3], matrixScale[3];
@@ -202,16 +202,16 @@ namespace object_editor
     }
     void EditTransform()
     {
-        static TransformComponent empty;
+        static Transform empty;
         if (selected_entity != entt::null && selected_scene == Engine::scene())
         {
             // check if has transform else return
-            auto *transform_ptr = Engine::scene()->registry.try_get<TransformComponent>(selected_entity);
+            auto *transform_ptr = Engine::scene()->registry.try_get<Transform>(selected_entity);
             if (transform_ptr == nullptr)
             {
                 return;
             }
-            TransformComponent &transform = *transform_ptr;
+            Transform &transform = *transform_ptr;
             EditTransform(*Engine::scene()->main_camera, transform);
         }
         else
@@ -225,12 +225,12 @@ namespace object_editor
     {
         if (selected_entity != entt::null && selected_scene == Engine::scene() && InputLayer::instance()->key_state(engine::core::Key::KEY_CONTROL))
         {
-            auto *transform_ptr = Engine::scene()->registry.try_get<TransformComponent>(selected_entity);
+            auto *transform_ptr = Engine::scene()->registry.try_get<Transform>(selected_entity);
             if (transform_ptr == nullptr)
             {
                 return;
             }
-            TransformComponent &transform = *transform_ptr;
+            Transform &transform = *transform_ptr;
             uint64_t id = 0;
 
             if (auto const *opaque = Engine::scene()->registry.try_get<OpaqueComponent>(selected_entity);
@@ -692,7 +692,7 @@ namespace object_editor
         }
     }
 
-    void EditCameraComponent()
+    void EditCamera()
     {
         auto &scene = *Engine::scene();
         auto &registry = scene.registry;
@@ -921,7 +921,7 @@ namespace object_editor
 
     using kComponentTypes = mal_toolkit::parameter_pack_info<
         CameraComponent,
-        //      TransformComponent,
+        //      Transform,
         //      render::OpaqueMaterial,
          //     render::EmissiveMaterial,
         PointLight,
@@ -1015,7 +1015,7 @@ namespace object_editor
         ImGui::Begin("Component editor");
         EditGameObject();
         ImGui::Spacing();
-        EditCameraComponent();
+        EditCamera();
         ImGui::Spacing();
         EditTransform();
         ImGui::Spacing();

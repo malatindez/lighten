@@ -1,7 +1,5 @@
 #pragma once
 
-#include "entt/entt.hpp"
-
 #include <algorithm>
 #include <array>
 #include <assert.h>
@@ -40,6 +38,8 @@
 #include <chrono>
 #include <fstream>
 #include <random>
+
+#include "include/entt.hpp"
 
 #include "common-typedefs.hpp"
 #include "core/math.hpp"

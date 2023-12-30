@@ -2,7 +2,6 @@
 #include "render/model.hpp"
 #include "render/shader-program.hpp"
 #include "render/common.hpp"
-#include "entt/entt.hpp"
 namespace engine::core
 {
     class Scene;

@@ -46,7 +46,7 @@ namespace engine::render::_decal_detail
     }
     void DecalRenderSystem::UpdateInstances(entt::registry &registry)
     {
-        auto group = registry.group<components::DecalComponent, components::TransformComponent>();
+        auto group = registry.group<components::DecalComponent, components::Transform>();
         material_instances_.clear();
         uint32_t instances_count = 0;
         for (auto entity : group)
@@ -66,7 +66,7 @@ namespace engine::render::_decal_detail
             for (auto entity : group)
             {
                 auto &decal_component = group.get<components::DecalComponent>(entity);
-                auto &transform_component = group.get<components::TransformComponent>(entity);
+                auto &transform_component = group.get<components::Transform>(entity);
                 for (auto it = decal_component.decals.begin(); it != decal_component.decals.end(); ++it)
                 {
                     auto &decal = *it;

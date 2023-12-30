@@ -404,7 +404,7 @@ namespace engine::render::_dissolution_detail
         instance_buffer_size_ = total_instances;
         auto mapping = instance_buffer_.Map();
         DissolutionInstance *dst = static_cast<DissolutionInstance *>(mapping.pData);
-        auto instance_group = registry.group<components::DissolutionComponent>(entt::get<components::TransformComponent>);
+        auto instance_group = registry.group<components::DissolutionComponent>(entt::get<components::Transform>);
         uint32_t copiedNum = 0;
         for (auto &model_instance : model_instances_)
         {
@@ -415,7 +415,7 @@ namespace engine::render::_dissolution_detail
                     auto &instances = perMaterial.instances;
                     for (auto entity : instances)
                     {
-                        auto &transform = instance_group.get<components::TransformComponent>(entity);
+                        auto &transform = instance_group.get<components::Transform>(entity);
                         auto &dissolution = instance_group.get<components::DissolutionComponent>(entity);
                         dst[copiedNum++] = DissolutionInstance{ .world_transform = transform.model,
                                                                 .time_begin = dissolution.time_begin,

@@ -60,7 +60,7 @@ namespace engine::render::_particle_detail
     }
     void ParticleRenderSystem::OnRender(core::Scene *scene, ID3D11ShaderResourceView *depth_srv)
     {
-        auto view = scene->registry.view<components::TransformComponent, components::ParticleEmitter>();
+        auto view = scene->registry.view<components::Transform, components::ParticleEmitter>();
         if (view.size_hint() == 0)
         {
             return;
@@ -137,14 +137,14 @@ namespace engine::render::_particle_detail
 
     void ParticleRenderSystem::Tick(core::Scene *scene, float delta_time)
     {
-        auto view = scene->registry.view<components::TransformComponent, components::ParticleEmitter>();
+        auto view = scene->registry.view<components::Transform, components::ParticleEmitter>();
         float time_now = core::Engine::TimeFromStart();
 
         last_tick_time_ = time_now;
 
         for (auto entity : view)
         {
-            auto &transform = view.get<components::TransformComponent>(entity);
+            auto &transform = view.get<components::Transform>(entity);
             auto &emitter = view.get<components::ParticleEmitter>(entity);
             if (emitter.freeze)
             {

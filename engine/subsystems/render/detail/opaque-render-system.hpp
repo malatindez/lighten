@@ -1,7 +1,6 @@
 #pragma once
 #include "render/model.hpp"
 #include "render/shader-program.hpp"
-#include "entt/entt.hpp"
 #include "components/components.hpp"
 #include "render/common.hpp"
 namespace engine::core

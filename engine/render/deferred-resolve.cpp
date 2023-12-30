@@ -38,7 +38,7 @@ namespace engine::render
             for (auto const &entity : lrs.point_light_entities())
             {
                 auto &light = registry.get<components::PointLight>(entity);
-                auto &transform = registry.get<components::TransformComponent>(entity);
+                auto &transform = registry.get<components::Transform>(entity);
                 auto instance_matrix = core::math::mat4::identity();
                 instance_matrix = core::math::translate(instance_matrix, transform.position);
                 float radius = length(transform.scale) / sqrtf(3.1f);
@@ -61,7 +61,7 @@ namespace engine::render
             for (auto const &entity : lrs.spot_light_entities())
             {
                 auto &light = registry.get<components::SpotLight>(entity);
-                auto &transform = registry.get<components::TransformComponent>(entity);
+                auto &transform = registry.get<components::Transform>(entity);
 
                 auto instance_matrix = core::math::mat4::identity();
                 instance_matrix = core::math::translate(instance_matrix, transform.position);

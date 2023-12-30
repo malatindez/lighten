@@ -6,10 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(editor LANGUAGES CXX)
 cmake_policy(SET CMP0060 NEW)
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/../cmake-tools/common.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/../cmake-tools/third_party.cmake")
-
-
 set(CPP_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 file(GLOB_RECURSE CPP_SOURCES ${CPP_SOURCES_DIR} *.*)
 list(FILTER CPP_SOURCES INCLUDE REGEX ${CPP_SOURCES_DIR}/*)
@@ -48,3 +44,5 @@ update_runtime_directory_msvc(editor "${CMAKE_CURRENT_SOURCE_DIR}/..//runtime_di
 target_compile_options(editor PRIVATE "${INLINING_FLAG}" "${MAXIMUM_WARNING_FLAG}" "/MP")
 set_target_properties(editor PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
 
+
+run_reflection_tool(editor)

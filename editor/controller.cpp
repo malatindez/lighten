@@ -185,7 +185,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     auto &registry = first_scene->registry;
     main_camera_entity = registry.create();
     registry.emplace<CameraComponent>(main_camera_entity, CameraComponent());
-    registry.emplace<TransformComponent>(main_camera_entity, TransformComponent());
+    registry.emplace<Transform>(main_camera_entity, Transform());
     auto &window_size = hdr_render_pipeline->window()->size();
     first_scene->main_camera = std::make_unique<CameraController>(&registry, main_camera_entity, window_size);
     Engine::SetScene(first_scene);
@@ -193,14 +193,14 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     Engine::scene()->main_camera->SetWorldAngles(0.0f, 0.0f, 0.0f);
     Engine::scene()->main_camera->SetProjectionMatrix(perspective(45.0f, static_cast<float>(window_size.x) / static_cast<float>(window_size.y), 0.001f, 100.0f));
 
-    int amount = 0;
+    int amount = 12;
     for (int i = 0; i < amount; i++)
     {
         auto knight = registry.create();
         auto &game_object = registry.emplace<GameObject>(knight);
 
         last_created_knight = knight;
-        auto &transform = registry.emplace<TransformComponent>(knight);
+        auto &transform = registry.emplace<Transform>(knight);
         uint64_t model_id = ModelLoader::Load("assets\\models\\Knight\\Knight.fbx").value();
         game_object.name = "Knight";
         if (i % 4 == 1)
@@ -301,7 +301,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             blue_rubber.roughness_value = 0.7f;
         }
     }
-    if(false){
+    if(true){
         entt::entity cubes = registry.create();
         auto &cubes_game_object = registry.emplace<GameObject>(cubes);
         cubes_game_object.name = "Cubes";
@@ -315,14 +315,14 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             game_object.name = material_names[i];
             game_object.parent = cubes;
             cubes_game_object.children.push_back(cube);
-            auto &transform = registry.emplace<TransformComponent>(cube);
+            auto &transform = registry.emplace<Transform>(cube);
             transform.position = vec3{ (int32_t)i - (int32_t)materials.size() / 2, 0, -8 };
             transform.scale = vec3{ 1 };
             transform.UpdateMatrices();
             ors.AddInstance(model_id, registry, cube, { materials[i] });
         }
     }
-    if (false)
+    if (true)
     {
         entt::entity spheres = registry.create();
         auto &spheres_game_object = registry.emplace<GameObject>(spheres);
@@ -337,7 +337,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                 game_object.name = "Sphere";
                 game_object.parent = spheres;
                 spheres_game_object.children.push_back(sphere);
-                auto &transform = registry.emplace<TransformComponent>(sphere);
+                auto &transform = registry.emplace<Transform>(sphere);
                 transform.position = vec3{ i - 5, j, 5 };
                 transform.scale = vec3{ 0.375f };
                 transform.UpdateMatrices();
@@ -353,7 +353,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         }
     }
     // ------------------------- CUBES -------------------------
-    if (false){
+    if (true){
         entt::entity floor = registry.create();
         auto &floor_game_object = registry.emplace<GameObject>(floor);
         floor_game_object.name = "Floor";
@@ -365,19 +365,19 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             game_object.name = "Floor part #" + std::to_string(i);
             game_object.parent = floor;
             floor_game_object.children.push_back(cube);
-            auto &transform = registry.emplace<TransformComponent>(cube);
+            auto &transform = registry.emplace<Transform>(cube);
             transform.position = vec3{ 0, -0.5f, 0 } + vec3{ i < 2 ? -1 : 1, 0, i % 2 == 0 ? -1 : 1 } *2.5f;
             transform.scale = vec3{ 5, 0.1, 5 };
             transform.UpdateMatrices();
             ors.AddInstance(model_id, registry, cube, { stone_material });
         }
     }
-    if(false) {
+    if(true) {
         auto model_id = render::ModelSystem::GetUnitCube();
         auto wall = registry.create();
         auto &wall_game_object = registry.emplace<GameObject>(wall);
         wall_game_object.name = "Wall";
-        auto &transform = registry.emplace<TransformComponent>(wall);
+        auto &transform = registry.emplace<Transform>(wall);
         transform.position = vec3{ -5, 4.5f, 0 };
         transform.scale = vec3{ 10, 0.1, 10 };
         transform.rotation = QuaternionFromEuler(0.0f, 0.0f, radians(90.0f));
@@ -395,7 +395,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         game_object.name = "White point light";
         game_object.parent = lights;
         lights_game_object.children.push_back(entity);
-        auto &transform = registry.emplace<TransformComponent>(entity);
+        auto &transform = registry.emplace<Transform>(entity);
         transform.scale = vec3{ 0.15f };
         transform.position = vec3{ 0, 3, -2 };
         transform.UpdateMatrices();
@@ -416,7 +416,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         game_object.name = "Red point light";
         game_object.parent = lights;
         lights_game_object.children.push_back(entity);
-        auto &transform = registry.emplace<TransformComponent>(entity);
+        auto &transform = registry.emplace<Transform>(entity);
         transform.scale = vec3{ 0.15f };
         transform.position = vec3{ 0, 3, 2 };
         transform.UpdateMatrices();
@@ -429,7 +429,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         emissive.emissive_color = point_light.color;
         emissive.power = point_light.power;
     }
-    if (false)
+    if (true)
     {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
@@ -437,7 +437,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         game_object.name = "Green point light";
         game_object.parent = lights;
         lights_game_object.children.push_back(entity);
-        auto &transform = registry.emplace<TransformComponent>(entity);
+        auto &transform = registry.emplace<Transform>(entity);
         transform.scale = vec3{ 0.15f };
         transform.position = vec3{ 0, 2, -8 };
         transform.UpdateMatrices();
@@ -460,7 +460,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             game_object.name = "Point light";
             game_object.parent = lights;
             lights_game_object.children.push_back(entity);
-            auto &transform = registry.emplace<TransformComponent>(entity);
+            auto &transform = registry.emplace<Transform>(entity);
             transform.scale = vec3{ 0.5f };
             transform.position = vec3{ 0, 0.0f, 0 };
             transform.position += vec3{ std::cosf(float(i) / 24 * 2 * std::numbers::pi_v<float>), 0, std::sinf(float(i) / 24 * 2 * std::numbers::pi_v<float>) } *15.0f;
@@ -478,11 +478,11 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     }
 
     // add directional light
-    if (false)
+    if (true)
     {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
-        auto &transform = registry.emplace<TransformComponent>(entity);
+        auto &transform = registry.emplace<Transform>(entity);
         auto &game_object = registry.emplace<GameObject>(entity);
         game_object.name = "Directional light";
         game_object.parent = lights;
@@ -505,7 +505,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
-        auto &transform = registry.emplace<TransformComponent>(entity);
+        auto &transform = registry.emplace<Transform>(entity);
 
         auto &game_object = registry.emplace<GameObject>(entity);
         game_object.name = "Spot light";
@@ -535,13 +535,13 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     first_scene->renderer->particle_render_system().atlas_size = { 8, 8 };
 
     // add particle emitters
-    if (false)
+    if (true)
     {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
         auto &game_object = registry.emplace<GameObject>(entity);
         game_object.name = "Particle emitter";
-        auto &transform = registry.emplace<TransformComponent>(entity);
+        auto &transform = registry.emplace<Transform>(entity);
         transform.scale = vec3{ 0.15f };
         transform.position = vec3{ -3.5, 2, -8 };
         transform.rotation = QuaternionFromEuler(vec3{ 0, 0, radians(-90.0f) });
@@ -572,7 +572,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         auto entity = registry.create();
         auto &game_object = registry.emplace<GameObject>(entity);
         game_object.name = "Particle emitter";
-        auto &transform = registry.emplace<TransformComponent>(entity);
+        auto &transform = registry.emplace<Transform>(entity);
         transform.scale = vec3{ 0.15f };
         transform.position = vec3{ 4, 2, -8 };
         transform.rotation = QuaternionFromEuler(vec3{ 0, 0, radians(-90.0f) });
@@ -597,12 +597,12 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         particle_emitter.maximum_amount_of_particles = 300;
         ors.AddInstance(model_id, registry, entity, { white_porcelain });
     }
-    if (false)
+    if (true)
     {
         auto grass = registry.create();
         auto &game_object = registry.emplace<GameObject>(grass);
         game_object.name = "Grass";
-        auto &transform = registry.emplace<TransformComponent>(grass);
+        auto &transform = registry.emplace<Transform>(grass);
         transform.scale = vec3{ 2.0f, 0.1f, 2.0f };
         transform.position = vec3{ 0, 0, -12 };
         transform.UpdateMatrices();
@@ -706,7 +706,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             {
                 return;
             }
-            auto &transform = scene->registry.get<TransformComponent>(*entity);
+            auto &transform = scene->registry.get<Transform>(*entity);
             uint32_t mesh_id = std::numeric_limits<uint32_t>::max();
             auto *model_instance = Engine::scene()->renderer->opaque_render_system().GetInstancePtr(opaque_component->model_id);
             {
@@ -787,7 +787,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                                    auto &drs = Engine::scene()->renderer->dissolution_render_system();
                                    auto knight = registry.create();
 
-                                   auto &transform = registry.emplace<TransformComponent>(knight);
+                                   auto &transform = registry.emplace<Transform>(knight);
                                    transform.position = Engine::scene()->main_camera->position() + Engine::scene()->main_camera->forward() * 2.0f;
                                    transform.position -= Engine::scene()->main_camera->up();
                                    mat3 rotation_matrix{
@@ -888,7 +888,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
 //                                   auto &drs = Engine::scene()->renderer->dissolution_render_system();
                                    auto cube = registry.create();
 
-                                   auto &transform = registry.emplace<TransformComponent>(cube);
+                                   auto &transform = registry.emplace<Transform>(cube);
                                    transform.position = nearest.point;
                                    mat3 rotation_matrix{
                                        Engine::scene()->main_camera->right(),

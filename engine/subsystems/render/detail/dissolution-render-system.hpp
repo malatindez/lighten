@@ -20,7 +20,7 @@
 // Also the constructor should have the boolean parameter that will specify if shadows are enabled
 // This way the code will be much simpler to read and maintain
 
-// The descendant class should only implement the on_construct, on_destroy and on_update functions for RegistryInstance and TransformComponent
+// The descendant class should only implement the on_construct, on_destroy and on_update functions for RegistryInstance and Transform
 // It can overload OnRender function if needed
 // RegistryInstance should have size_t model_id as a member variable
 

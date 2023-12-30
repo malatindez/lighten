@@ -16,7 +16,7 @@ namespace engine::packets
                                                 
     constexpr mal_packet_weaver::PacketSubsystemID PacketSubsystemComponentSynchro = 0x0002;
 //    MAL_PACKET_WEAVER_DECLARE_DERIVED_PACKET_WITHOUT_PAYLOAD(GameObjectPacket, (components::GameObject), PacketSubsystemComponentSynchro, 0, 120.0f)
-//    MAL_PACKET_WEAVER_DECLARE_DERIVED_PACKET_WITHOUT_PAYLOAD(TransformComponentPacket, (components::TransformComponent), PacketSubsystemComponentSynchro, 1, 120.0f)
+//    MAL_PACKET_WEAVER_DECLARE_DERIVED_PACKET_WITHOUT_PAYLOAD(TransformPacket, (components::Transform), PacketSubsystemComponentSynchro, 1, 120.0f)
 //    MAL_PACKET_WEAVER_DECLARE_DERIVED_PACKET_WITHOUT_PAYLOAD(PointLightPacket, (components::PointLight), PacketSubsystemComponentSynchro, 2, 120.0f)
 //    MAL_PACKET_WEAVER_DECLARE_DERIVED_PACKET_WITHOUT_PAYLOAD(DirectionalLightPacket, (components::DirectionalLight), PacketSubsystemComponentSynchro, 3, 120.0f)
 //    MAL_PACKET_WEAVER_DECLARE_DERIVED_PACKET_WITHOUT_PAYLOAD(SpotLightPacket, (components::SpotLight), PacketSubsystemComponentSynchro, 4, 120.0f)

@@ -56,9 +56,9 @@ namespace engine
         }
 
         [[nodiscard]] inline components::CameraComponent const &camera() const noexcept { return registry_->get<components::CameraComponent>(camera_); }
-        [[nodiscard]] inline components::TransformComponent const &transform() const noexcept { return registry_->get<components::TransformComponent>(camera_); }
+        [[nodiscard]] inline components::Transform const &transform() const noexcept { return registry_->get<components::Transform>(camera_); }
         [[nodiscard]] inline components::CameraComponent &camera() noexcept { return registry_->get<components::CameraComponent>(camera_); }
-        [[nodiscard]] inline components::TransformComponent &transform() noexcept { return registry_->get<components::TransformComponent>(camera_); }
+        [[nodiscard]] inline components::Transform &transform() noexcept { return registry_->get<components::Transform>(camera_); }
 
         [[nodiscard]] constexpr core::math::ivec2 const &window_size() const noexcept { return window_size_; }
         [[nodiscard]] inline core::math::vec3 const &position() const noexcept { return transform().position; }

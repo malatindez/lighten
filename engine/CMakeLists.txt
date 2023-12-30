@@ -6,9 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(engine LANGUAGES CXX)
 cmake_policy(SET CMP0060 NEW)
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/../cmake-tools/common.cmake")
-include("${CMAKE_CURRENT_SOURCE_DIR}/../cmake-tools/third_party.cmake")
-
 set(ENGINE_SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 file(GLOB_RECURSE ENGINE_SOURCES ${ENGINE_SOURCES_DIR}/*.*)
 update_sources_msvc("${CMAKE_CURRENT_SOURCE_DIR}" "${ENGINE_SOURCES}")
@@ -65,3 +62,4 @@ target_compile_definitions(engine PUBLIC _SILENCE_ALL_MS_EXT_DEPRECATION_WARNING
 target_compile_options(engine PRIVATE ${INLINING_FLAG} ${MAXIMUM_WARNING_FLAG} /MP)
 update_runtime_directory_msvc(engine "${CMAKE_CURRENT_SOURCE_DIR}/../runtime_directory")
 
+run_reflection_tool(engine)
