@@ -21,6 +21,10 @@ set(JSON_DIR "${LIB_DIR}/json")
 set(YAML_CPP_DIR "${LIB_DIR}/yaml")
 set(CEREAL_DIR "${LIB_DIR}/cereal")
 
+add_subdirectory(${GLM_DIR})
+set(GLM_INCLUDE_DIRS "${GLM_DIR}")
+set(GLM_LIBRARIES glm)
+
 find_package(Boost REQUIRED COMPONENTS system serialization context coroutine HINTS "
   C:/" 
   "C:/Boost" 
@@ -104,6 +108,9 @@ set(GTEST_LIBRARIES gtest gtest_main)
 
 add_subdirectory("${BENCHMARK_DIR}" EXCLUDE_FROM_ALL)
 
+set_target_properties(benchmark PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
+set_target_properties(benchmark PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
+
 #  target_link_libraries("${TARGET}" benchmark)
 
 # spdlog
@@ -162,6 +169,8 @@ set(JSON_INCLUDE_DIRS "${JSON_DIR}/single_include/nlohmann")
 add_subdirectory(${YAML_CPP_DIR})
 set(YAML_CPP_INCLUDE_DIRS "${YAML_CPP_DIR}/include")
 set(YAML_CPP_LIBRARIES yaml-cpp)
+set_target_properties(yaml-cpp PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
+set_target_properties(yaml-cpp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
 
 add_subdirectory(${CEREAL_DIR})
 set(CEREAL_INCLUDE_DIRS "${CEREAL_DIR}/include")
