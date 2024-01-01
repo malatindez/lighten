@@ -9,42 +9,41 @@
 #include <math.hpp>
 #define TEST_ARRAY_SIZE 10000
 
+#define FILL_ARRAY(position, scale, quat)                 \
+    state.PauseTiming();                                  \
+    for (int i = 0; i < TEST_ARRAY_SIZE; i++)             \
+    {                                                     \
+        position.x = static_cast<float>(rand()) / rand(); \
+        position.y = static_cast<float>(rand()) / rand(); \
+        position.z = static_cast<float>(rand()) / rand(); \
+        scale.x = static_cast<float>(rand()) / rand();    \
+        scale.y = static_cast<float>(rand()) / rand();    \
+        scale.z = static_cast<float>(rand()) / rand();    \
+        quat.x = static_cast<float>(rand()) / rand();     \
+        quat.y = static_cast<float>(rand()) / rand();     \
+        quat.z = static_cast<float>(rand()) / rand();     \
+        quat.w = static_cast<float>(rand()) / rand();     \
+    }                                                     \
+    state.ResumeTiming();
 
-#define FILL_ARRAY(position, scale, quat)               \
-state.PauseTiming();                                    \
-for (int i = 0; i < TEST_ARRAY_SIZE; i++)               \
-{                                                       \
-    position.x = static_cast<float>(rand()) / rand();   \
-    position.y = static_cast<float>(rand()) / rand();   \
-    position.z = static_cast<float>(rand()) / rand();   \
-    scale.x = static_cast<float>(rand()) / rand();      \
-    scale.y = static_cast<float>(rand()) / rand();      \
-    scale.z = static_cast<float>(rand()) / rand();      \
-    quat.x = static_cast<float>(rand()) / rand();       \
-    quat.y = static_cast<float>(rand()) / rand();       \
-    quat.z = static_cast<float>(rand()) / rand();       \
-    quat.w = static_cast<float>(rand()) / rand();       \
-}   										            \
-state.ResumeTiming();                                    \
+#define FILL_ARRAY_FLOAT_SCALE(position, scale, quat)     \
+    state.PauseTiming();                                  \
+    for (int i = 0; i < TEST_ARRAY_SIZE; i++)             \
+    {                                                     \
+        position.x = static_cast<float>(rand()) / rand(); \
+        position.y = static_cast<float>(rand()) / rand(); \
+        position.z = static_cast<float>(rand()) / rand(); \
+        scale = static_cast<float>(rand()) / rand();      \
+        quat.x = static_cast<float>(rand()) / rand();     \
+        quat.y = static_cast<float>(rand()) / rand();     \
+        quat.z = static_cast<float>(rand()) / rand();     \
+        quat.w = static_cast<float>(rand()) / rand();     \
+    }                                                     \
+    state.ResumeTiming();
 
-#define FILL_ARRAY_FLOAT_SCALE(position, scale, quat)   \
-state.PauseTiming();                                    \
-for (int i = 0; i < TEST_ARRAY_SIZE; i++)               \
-{                                                       \
-    position.x = static_cast<float>(rand()) / rand();   \
-    position.y = static_cast<float>(rand()) / rand();   \
-    position.z = static_cast<float>(rand()) / rand();   \
-    scale = static_cast<float>(rand()) / rand();      \
-    quat.x = static_cast<float>(rand()) / rand();       \
-    quat.y = static_cast<float>(rand()) / rand();       \
-    quat.z = static_cast<float>(rand()) / rand();       \
-    quat.w = static_cast<float>(rand()) / rand();       \
-}   										            \
-state.ResumeTiming();                                    \
-
-void ComputeWorldTransform(glm::vec3 const& position, glm::vec3 const& scale, glm::quat const& quat, glm::mat4& model, glm::mat4& inv_model)
+void ComputeWorldTransform(glm::vec3 const &position, glm::vec3 const &scale, glm::quat const &quat, glm::mat4 &model, glm::mat4 &inv_model)
 {
-    model = glm::translate(glm::mat4{ 1.0f }, position);
+    model = glm::translate(glm::mat4{1.0f}, position);
     model = model * glm::mat4_cast(quat);
     model = glm::scale(model, scale);
     inv_model = glm::inverse(model);
@@ -65,18 +64,20 @@ namespace test1
         glm::mat4 inv_model;
     };
 
-    static void GLM_Transform_SeparateMatrix_AoS(benchmark::State& state) {
+    static void GLM_Transform_SeparateMatrix_AoS(benchmark::State &state)
+    {
         srand(0xABCDEF00);
-        Transform* transforms = new Transform[TEST_ARRAY_SIZE];
-        WorldTransform* world_transforms = new WorldTransform[TEST_ARRAY_SIZE];
+        Transform *transforms = new Transform[TEST_ARRAY_SIZE];
+        WorldTransform *world_transforms = new WorldTransform[TEST_ARRAY_SIZE];
         // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
+        for (auto _ : state)
+        {
             FILL_ARRAY(transforms[i].position, transforms[i].scale, transforms[i].quat)
-                for (int i = 0; i < TEST_ARRAY_SIZE; i++)
-                {
-                    ComputeWorldTransform(transforms[i].position, transforms[i].scale, transforms[i].quat, world_transforms[i].model, world_transforms[i].inv_model);
-                    benchmark::DoNotOptimize(world_transforms[i]);
-                }
+            for (int i = 0; i < TEST_ARRAY_SIZE; i++)
+            {
+                ComputeWorldTransform(transforms[i].position, transforms[i].scale, transforms[i].quat, world_transforms[i].model, world_transforms[i].inv_model);
+                benchmark::DoNotOptimize(world_transforms[i]);
+            }
         }
         delete[] transforms;
         delete[] world_transforms;
@@ -84,7 +85,6 @@ namespace test1
 }
 // Register the function as a benchmark
 BENCHMARK(test1::GLM_Transform_SeparateMatrix_AoS);
-
 
 namespace test2
 {
@@ -102,12 +102,14 @@ namespace test2
         glm::mat4 model;
         glm::mat4 inv_model;
     };
-    static void GLM_Transform_SeparateMatrix_AoS_Aligned(benchmark::State& state) {
+    static void GLM_Transform_SeparateMatrix_AoS_Aligned(benchmark::State &state)
+    {
         srand(0xABCDEF00);
-        Transform* transforms = new Transform[TEST_ARRAY_SIZE];
-        WorldTransform* world_transforms = new WorldTransform[TEST_ARRAY_SIZE];
+        Transform *transforms = new Transform[TEST_ARRAY_SIZE];
+        WorldTransform *world_transforms = new WorldTransform[TEST_ARRAY_SIZE];
         // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
+        for (auto _ : state)
+        {
             FILL_ARRAY(transforms[i].position, transforms[i].scale, transforms[i].quat);
             for (int i = 0; i < TEST_ARRAY_SIZE; i++)
             {
@@ -124,15 +126,17 @@ BENCHMARK(test2::GLM_Transform_SeparateMatrix_AoS_Aligned);
 
 namespace test3
 {
-    static void GLM_Transform_SeparateMatrix_SoA(benchmark::State& state) {
+    static void GLM_Transform_SeparateMatrix_SoA(benchmark::State &state)
+    {
         srand(0xABCDEF00);
-        glm::vec3* positions = new glm::vec3[TEST_ARRAY_SIZE];
-        glm::vec3* scales = new glm::vec3[TEST_ARRAY_SIZE];
-        glm::quat* quats = new glm::quat[TEST_ARRAY_SIZE];
-        glm::mat4* world_transforms = new glm::mat4[TEST_ARRAY_SIZE];
-        glm::mat4* inv_world_transforms = new glm::mat4[TEST_ARRAY_SIZE];
+        glm::vec3 *positions = new glm::vec3[TEST_ARRAY_SIZE];
+        glm::vec3 *scales = new glm::vec3[TEST_ARRAY_SIZE];
+        glm::quat *quats = new glm::quat[TEST_ARRAY_SIZE];
+        glm::mat4 *world_transforms = new glm::mat4[TEST_ARRAY_SIZE];
+        glm::mat4 *inv_world_transforms = new glm::mat4[TEST_ARRAY_SIZE];
         // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
+        for (auto _ : state)
+        {
             FILL_ARRAY(positions[i], scales[i], quats[i]);
             for (int i = 0; i < TEST_ARRAY_SIZE; i++)
             {
@@ -153,20 +157,22 @@ BENCHMARK(test3::GLM_Transform_SeparateMatrix_SoA);
 
 namespace test4
 {
-    static void GLM_Transform_SeparateMatrix_SoA_Aligned(benchmark::State& state) {
+    static void GLM_Transform_SeparateMatrix_SoA_Aligned(benchmark::State &state)
+    {
         srand(0xABCDEF00);
-        glm::vec4* positions = new glm::vec4[TEST_ARRAY_SIZE];
-        glm::vec4* scales = new glm::vec4[TEST_ARRAY_SIZE];
-        glm::quat* quats = new glm::quat[TEST_ARRAY_SIZE];
-        glm::mat4* world_transforms = new glm::mat4[TEST_ARRAY_SIZE];
-        glm::mat4* inv_world_transforms = new glm::mat4[TEST_ARRAY_SIZE];
+        glm::vec4 *positions = new glm::vec4[TEST_ARRAY_SIZE];
+        glm::vec4 *scales = new glm::vec4[TEST_ARRAY_SIZE];
+        glm::quat *quats = new glm::quat[TEST_ARRAY_SIZE];
+        glm::mat4 *world_transforms = new glm::mat4[TEST_ARRAY_SIZE];
+        glm::mat4 *inv_world_transforms = new glm::mat4[TEST_ARRAY_SIZE];
         // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
+        for (auto _ : state)
+        {
             FILL_ARRAY(positions[i], scales[i], quats[i]);
             for (int i = 0; i < TEST_ARRAY_SIZE; i++)
             {
-                glm::vec3& position = reinterpret_cast<glm::vec3&>(positions[i]);
-                glm::vec3& scale = reinterpret_cast<glm::vec3&>(scales[i]);
+                glm::vec3 &position = reinterpret_cast<glm::vec3 &>(positions[i]);
+                glm::vec3 &scale = reinterpret_cast<glm::vec3 &>(scales[i]);
                 ComputeWorldTransform(position, scale, quats[i], world_transforms[i], inv_world_transforms[i]);
                 benchmark::DoNotOptimize(world_transforms[i]);
                 benchmark::DoNotOptimize(inv_world_transforms[i]);
@@ -195,12 +201,13 @@ namespace test5
         glm::mat4 inv_model;
     };
 
-
-    static void GLM_Transform_MatrixTogether_SoA_Aligned(benchmark::State& state) {
+    static void GLM_Transform_MatrixTogether_SoA_Aligned(benchmark::State &state)
+    {
         srand(0xABCDEF00);
-        Transform* transforms = new Transform[TEST_ARRAY_SIZE];
+        Transform *transforms = new Transform[TEST_ARRAY_SIZE];
         // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
+        for (auto _ : state)
+        {
             FILL_ARRAY(transforms[i].position, transforms[i].scale, transforms[i].quat);
             for (int i = 0; i < TEST_ARRAY_SIZE; i++)
             {
@@ -226,12 +233,13 @@ namespace test6
         glm::mat4 inv_model;
     };
 
-
-    static void GLM_Transform_MatrixTogether_SoA(benchmark::State& state) {
+    static void GLM_Transform_MatrixTogether_SoA(benchmark::State &state)
+    {
         srand(0xABCDEF00);
-        Transform* transforms = new Transform[TEST_ARRAY_SIZE];
+        Transform *transforms = new Transform[TEST_ARRAY_SIZE];
         // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
+        for (auto _ : state)
+        {
             FILL_ARRAY(transforms[i].position, transforms[i].scale, transforms[i].quat);
             for (int i = 0; i < TEST_ARRAY_SIZE; i++)
             {
@@ -247,12 +255,11 @@ namespace test6
 // Register the function as a benchmark
 BENCHMARK(test6::GLM_Transform_MatrixTogether_SoA);
 
-
-void ComputeWorldTransform(glm::vec3 const& position, float const& scale, glm::quat const& quat, glm::mat4& model, glm::mat4& inv_model)
+void ComputeWorldTransform(glm::vec3 const &position, float const &scale, glm::quat const &quat, glm::mat4 &model, glm::mat4 &inv_model)
 {
-    model = glm::translate(glm::mat4{ 1.0f }, position);
+    model = glm::translate(glm::mat4{1.0f}, position);
     model = model * glm::mat4_cast(quat);
-    model = glm::scale(model, glm::vec3{ scale });
+    model = glm::scale(model, glm::vec3{scale});
     inv_model = glm::inverse(model);
 }
 
@@ -271,18 +278,20 @@ namespace test7
         glm::mat4 inv_model;
     };
 
-    static void GLM_TransformFloatScale_SeparateMatrix_AoS(benchmark::State& state) {
+    static void GLM_TransformFloatScale_SeparateMatrix_AoS(benchmark::State &state)
+    {
         srand(0xABCDEF00);
-        Transform* transforms = new Transform[TEST_ARRAY_SIZE];
-        WorldTransform* world_transforms = new WorldTransform[TEST_ARRAY_SIZE];
+        Transform *transforms = new Transform[TEST_ARRAY_SIZE];
+        WorldTransform *world_transforms = new WorldTransform[TEST_ARRAY_SIZE];
         // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
+        for (auto _ : state)
+        {
             FILL_ARRAY_FLOAT_SCALE(transforms[i].position, transforms[i].scale, transforms[i].quat)
-                for (int i = 0; i < TEST_ARRAY_SIZE; i++)
-                {
-                    ComputeWorldTransform(transforms[i].position, transforms[i].scale, transforms[i].quat, world_transforms[i].model, world_transforms[i].inv_model);
-                    benchmark::DoNotOptimize(world_transforms[i]);
-                }
+            for (int i = 0; i < TEST_ARRAY_SIZE; i++)
+            {
+                ComputeWorldTransform(transforms[i].position, transforms[i].scale, transforms[i].quat, world_transforms[i].model, world_transforms[i].inv_model);
+                benchmark::DoNotOptimize(world_transforms[i]);
+            }
         }
         delete[] transforms;
         delete[] world_transforms;
@@ -293,15 +302,17 @@ BENCHMARK(test7::GLM_TransformFloatScale_SeparateMatrix_AoS);
 
 namespace test8
 {
-    static void GLM_TransformFloatScale_SeparateMatrix_SoA(benchmark::State& state) {
+    static void GLM_TransformFloatScale_SeparateMatrix_SoA(benchmark::State &state)
+    {
         srand(0xABCDEF00);
-        glm::vec3* positions = new glm::vec3[TEST_ARRAY_SIZE];
-        float* scales = new float[TEST_ARRAY_SIZE];
-        glm::quat* quats = new glm::quat[TEST_ARRAY_SIZE];
-        glm::mat4* world_transforms = new glm::mat4[TEST_ARRAY_SIZE];
-        glm::mat4* inv_world_transforms = new glm::mat4[TEST_ARRAY_SIZE];
+        glm::vec3 *positions = new glm::vec3[TEST_ARRAY_SIZE];
+        float *scales = new float[TEST_ARRAY_SIZE];
+        glm::quat *quats = new glm::quat[TEST_ARRAY_SIZE];
+        glm::mat4 *world_transforms = new glm::mat4[TEST_ARRAY_SIZE];
+        glm::mat4 *inv_world_transforms = new glm::mat4[TEST_ARRAY_SIZE];
         // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
+        for (auto _ : state)
+        {
             FILL_ARRAY_FLOAT_SCALE(positions[i], scales[i], quats[i]);
             for (int i = 0; i < TEST_ARRAY_SIZE; i++)
             {
@@ -322,20 +333,22 @@ BENCHMARK(test8::GLM_TransformFloatScale_SeparateMatrix_SoA);
 
 namespace test9
 {
-    static void GLM_TransformFloatScale_SeparateMatrix_SoA_Aligned(benchmark::State& state) {
+    static void GLM_TransformFloatScale_SeparateMatrix_SoA_Aligned(benchmark::State &state)
+    {
         srand(0xABCDEF00);
-        glm::vec4* positions = new glm::vec4[TEST_ARRAY_SIZE];
-        float* scales = new float[TEST_ARRAY_SIZE];
-        glm::quat* quats = new glm::quat[TEST_ARRAY_SIZE];
-        glm::mat4* world_transforms = new glm::mat4[TEST_ARRAY_SIZE];
-        glm::mat4* inv_world_transforms = new glm::mat4[TEST_ARRAY_SIZE];
+        glm::vec4 *positions = new glm::vec4[TEST_ARRAY_SIZE];
+        float *scales = new float[TEST_ARRAY_SIZE];
+        glm::quat *quats = new glm::quat[TEST_ARRAY_SIZE];
+        glm::mat4 *world_transforms = new glm::mat4[TEST_ARRAY_SIZE];
+        glm::mat4 *inv_world_transforms = new glm::mat4[TEST_ARRAY_SIZE];
         // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
+        for (auto _ : state)
+        {
             FILL_ARRAY_FLOAT_SCALE(positions[i], scales[i], quats[i]);
             for (int i = 0; i < TEST_ARRAY_SIZE; i++)
             {
-                glm::vec3& position = reinterpret_cast<glm::vec3&>(positions[i]);
-                glm::vec3& scale = reinterpret_cast<glm::vec3&>(scales[i]);
+                glm::vec3 &position = reinterpret_cast<glm::vec3 &>(positions[i]);
+                glm::vec3 &scale = reinterpret_cast<glm::vec3 &>(scales[i]);
                 ComputeWorldTransform(position, scale, quats[i], world_transforms[i], inv_world_transforms[i]);
                 benchmark::DoNotOptimize(world_transforms[i]);
                 benchmark::DoNotOptimize(inv_world_transforms[i]);
@@ -362,12 +375,13 @@ namespace test10
         glm::mat4 inv_model;
     };
 
-
-    static void GLM_TransformFloatScale_MatrixTogether_SoA_Aligned(benchmark::State& state) {
+    static void GLM_TransformFloatScale_MatrixTogether_SoA_Aligned(benchmark::State &state)
+    {
         srand(0xABCDEF00);
-        Transform* transforms = new Transform[TEST_ARRAY_SIZE];
+        Transform *transforms = new Transform[TEST_ARRAY_SIZE];
         // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
+        for (auto _ : state)
+        {
             FILL_ARRAY_FLOAT_SCALE(transforms[i].position, transforms[i].scale, transforms[i].quat);
             for (int i = 0; i < TEST_ARRAY_SIZE; i++)
             {
@@ -381,348 +395,6 @@ namespace test10
 }
 // Register the function as a benchmark
 BENCHMARK(test10::GLM_TransformFloatScale_MatrixTogether_SoA_Aligned);
-
-
-
-void ComputeWorldTransform(mal_math::vec3 const& position, mal_math::vec3 const& scale, mal_math::quat const& quat, mal_math::mat4& model, mal_math::mat4& inv_model)
-{
-    model = mal_math::translate(mal_math::mat4{ 1.0f }, position);
-    model = model * quat.as_mat4();
-    model = mal_math::scale(model, scale);
-    inv_model = mal_math::inverse(model);
-}
-
-namespace test11
-{
-    struct Transform
-    {
-        mal_math::vec3 position;
-        mal_math::vec3 scale;
-        mal_math::quat quat;
-    };
-
-    struct WorldTransform
-    {
-        mal_math::mat4 model;
-        mal_math::mat4 inv_model;
-    };
-
-    static void MAL_MATH_Transform_SeparateMatrix_AoS(benchmark::State& state) {
-        srand(0xABCDEF00);
-        Transform* transforms = new Transform[TEST_ARRAY_SIZE];
-        WorldTransform* world_transforms = new WorldTransform[TEST_ARRAY_SIZE];
-        // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
-            FILL_ARRAY(transforms[i].position, transforms[i].scale, transforms[i].quat);
-            for (int i = 0; i < TEST_ARRAY_SIZE; i++)
-            {
-                ComputeWorldTransform(transforms[i].position, transforms[i].scale, transforms[i].quat, world_transforms[i].model, world_transforms[i].inv_model);
-                benchmark::DoNotOptimize(world_transforms[i]);
-            }
-        }
-        delete[] transforms;
-    }
-}
-// Register the function as a benchmark
-BENCHMARK(test11::MAL_MATH_Transform_SeparateMatrix_AoS);
-
-namespace test12
-{
-    struct Transform
-    {
-        mal_math::vec3 position;
-        float padding0;
-        mal_math::vec3 scale;
-        float padding1;
-        mal_math::quat quat;
-    };
-
-    struct WorldTransform
-    {
-        mal_math::mat4 model;
-        mal_math::mat4 inv_model;
-    };
-
-    static void MAL_MATH_Transform_SeparateMatrix_AoS_Aligned(benchmark::State& state) {
-        srand(0xABCDEF00);
-        Transform* transforms = new Transform[TEST_ARRAY_SIZE];
-        WorldTransform* world_transforms = new WorldTransform[TEST_ARRAY_SIZE];
-        // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
-            FILL_ARRAY(transforms[i].position, transforms[i].scale, transforms[i].quat);
-            for (int i = 0; i < TEST_ARRAY_SIZE; i++)
-            {
-                ComputeWorldTransform(transforms[i].position, transforms[i].scale, transforms[i].quat, world_transforms[i].model, world_transforms[i].inv_model);
-                benchmark::DoNotOptimize(world_transforms[i]);
-            }
-        }
-        delete[] transforms;
-        delete[] world_transforms;
-    }
-}
-// Register the function as a benchmark
-BENCHMARK(test12::MAL_MATH_Transform_SeparateMatrix_AoS_Aligned);
-
-namespace test13
-{
-    static void MAL_MATH_Transform_SeparateMatrix_SoA(benchmark::State& state) {
-        srand(0xABCDEF00);
-        mal_math::vec3* positions = new mal_math::vec3[TEST_ARRAY_SIZE];
-        mal_math::vec3* scales = new mal_math::vec3[TEST_ARRAY_SIZE];
-        mal_math::quat* quats = new mal_math::quat[TEST_ARRAY_SIZE];
-        mal_math::mat4* world_transforms = new mal_math::mat4[TEST_ARRAY_SIZE];
-        mal_math::mat4* inv_world_transforms = new mal_math::mat4[TEST_ARRAY_SIZE];
-        // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
-            FILL_ARRAY(positions[i], scales[i], quats[i]);
-            for (int i = 0; i < TEST_ARRAY_SIZE; i++)
-            {
-                ComputeWorldTransform(positions[i], scales[i], quats[i], world_transforms[i], inv_world_transforms[i]);
-                benchmark::DoNotOptimize(world_transforms[i]);
-                benchmark::DoNotOptimize(inv_world_transforms[i]);
-            }
-        }
-        delete[] positions;
-        delete[] scales;
-        delete[] quats;
-        delete[] world_transforms;
-        delete[] inv_world_transforms;
-    }
-}
-
-// Register the function as a benchmark
-BENCHMARK(test13::MAL_MATH_Transform_SeparateMatrix_SoA);
-
-namespace test14
-{
-    static void MAL_MATH_Transform_SeparateMatrix_SoA_Aligned(benchmark::State& state) {
-        srand(0xABCDEF00);
-        mal_math::vec4* positions = new mal_math::vec4[TEST_ARRAY_SIZE];
-        mal_math::vec4* scales = new mal_math::vec4[TEST_ARRAY_SIZE];
-        mal_math::quat* quats = new mal_math::quat[TEST_ARRAY_SIZE];
-        mal_math::mat4* world_transforms = new mal_math::mat4[TEST_ARRAY_SIZE];
-        mal_math::mat4* inv_world_transforms = new mal_math::mat4[TEST_ARRAY_SIZE];
-        // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
-            FILL_ARRAY(positions[i], scales[i], quats[i]);
-            for (int i = 0; i < TEST_ARRAY_SIZE; i++)
-            {
-                mal_math::vec3& position = reinterpret_cast<mal_math::vec3&>(positions[i]);
-                mal_math::vec3& scale = reinterpret_cast<mal_math::vec3&>(scales[i]);
-                ComputeWorldTransform(position, scale, quats[i], world_transforms[i], inv_world_transforms[i]);
-                benchmark::DoNotOptimize(world_transforms[i]);
-                benchmark::DoNotOptimize(inv_world_transforms[i]);
-            }
-        }
-        delete[] positions;
-        delete[] scales;
-        delete[] quats;
-        delete[] world_transforms;
-        delete[] inv_world_transforms;
-    }
-}
-
-// Register the function as a benchmark
-BENCHMARK(test14::MAL_MATH_Transform_SeparateMatrix_SoA_Aligned);
-namespace test15
-{
-    struct Transform
-    {
-        mal_math::vec3 position;
-        float padding0;
-        mal_math::vec3 scale;
-        float padding1;
-        mal_math::quat quat;
-        mal_math::mat4 model;
-        mal_math::mat4 inv_model;
-    };
-
-
-    static void MAL_MATH_Transform_MatrixTogether_SoA_Aligned(benchmark::State& state) {
-        srand(0xABCDEF00);
-        Transform* transforms = new Transform[TEST_ARRAY_SIZE];
-        // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
-            FILL_ARRAY(transforms[i].position, transforms[i].scale, transforms[i].quat);
-            for (int i = 0; i < TEST_ARRAY_SIZE; i++)
-            {
-                ComputeWorldTransform(transforms[i].position, transforms[i].scale, transforms[i].quat, transforms[i].model, transforms[i].inv_model);
-                benchmark::DoNotOptimize(transforms[i].model);
-                benchmark::DoNotOptimize(transforms[i].inv_model);
-            }
-        }
-        delete[] transforms;
-    }
-}
-// Register the function as a benchmark
-BENCHMARK(test15::MAL_MATH_Transform_MatrixTogether_SoA_Aligned);
-
-namespace test16
-{
-    struct Transform
-    {
-        mal_math::vec3 position;
-        mal_math::vec3 scale;
-        mal_math::quat quat;
-        mal_math::mat4 model;
-        mal_math::mat4 inv_model;
-    };
-
-    static void MAL_MATH_Transform_MatrixTogether_SoA(benchmark::State& state) {
-        srand(0xABCDEF00);
-        Transform* transforms = new Transform[TEST_ARRAY_SIZE];
-        // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
-            FILL_ARRAY(transforms[i].position, transforms[i].scale, transforms[i].quat);
-            for (int i = 0; i < TEST_ARRAY_SIZE; i++)
-            {
-                ComputeWorldTransform(transforms[i].position, transforms[i].scale, transforms[i].quat, transforms[i].model, transforms[i].inv_model);
-                benchmark::DoNotOptimize(transforms[i].model);
-                benchmark::DoNotOptimize(transforms[i].inv_model);
-            }
-        }
-        delete[] transforms;
-    }
-}
-
-// Register the function as a benchmark
-BENCHMARK(test16::MAL_MATH_Transform_MatrixTogether_SoA);
-
-
-void ComputeWorldTransform(mal_math::vec3 const& position, float const& scale, mal_math::quat const& quat, mal_math::mat4& model, mal_math::mat4& inv_model)
-{
-    model = mal_math::translate(mal_math::mat4{ 1.0f }, position);
-    model = model * quat.as_mat4();
-    model = mal_math::scale(model, mal_math::vec3{ scale });
-    inv_model = mal_math::inverse(model);
-}
-
-namespace test17
-{
-    struct Transform
-    {
-        mal_math::vec3 position;
-        float scale;
-        mal_math::quat quat;
-    };
-
-    struct WorldTransform
-    {
-        mal_math::mat4 model;
-        mal_math::mat4 inv_model;
-    };
-
-    static void MAL_MATH_TransformFloatScale_SeparateMatrix_AoS(benchmark::State& state) {
-        srand(0xABCDEF00);
-        Transform* transforms = new Transform[TEST_ARRAY_SIZE];
-        WorldTransform* world_transforms = new WorldTransform[TEST_ARRAY_SIZE];
-        // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
-            FILL_ARRAY_FLOAT_SCALE(transforms[i].position, transforms[i].scale, transforms[i].quat)
-                for (int i = 0; i < TEST_ARRAY_SIZE; i++)
-                {
-                    ComputeWorldTransform(transforms[i].position, transforms[i].scale, transforms[i].quat, world_transforms[i].model, world_transforms[i].inv_model);
-                    benchmark::DoNotOptimize(world_transforms[i]);
-                }
-        }
-        delete[] transforms;
-        delete[] world_transforms;
-    }
-}
-// Register the function as a benchmark
-BENCHMARK(test17::MAL_MATH_TransformFloatScale_SeparateMatrix_AoS);
-
-namespace test18
-{
-    static void MAL_MATH_TransformFloatScale_SeparateMatrix_SoA(benchmark::State& state) {
-        srand(0xABCDEF00);
-        mal_math::vec3* positions = new mal_math::vec3[TEST_ARRAY_SIZE];
-        float* scales = new float[TEST_ARRAY_SIZE];
-        mal_math::quat* quats = new mal_math::quat[TEST_ARRAY_SIZE];
-        mal_math::mat4* world_transforms = new mal_math::mat4[TEST_ARRAY_SIZE];
-        mal_math::mat4* inv_world_transforms = new mal_math::mat4[TEST_ARRAY_SIZE];
-        // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
-            FILL_ARRAY_FLOAT_SCALE(positions[i], scales[i], quats[i]);
-            for (int i = 0; i < TEST_ARRAY_SIZE; i++)
-            {
-                ComputeWorldTransform(positions[i], scales[i], quats[i], world_transforms[i], inv_world_transforms[i]);
-                benchmark::DoNotOptimize(world_transforms[i]);
-                benchmark::DoNotOptimize(inv_world_transforms[i]);
-            }
-        }
-        delete[] positions;
-        delete[] scales;
-        delete[] quats;
-        delete[] world_transforms;
-        delete[] inv_world_transforms;
-    }
-}
-// Register the function as a benchmark
-BENCHMARK(test18::MAL_MATH_TransformFloatScale_SeparateMatrix_SoA);
-
-namespace test19
-{
-    static void MAL_MATH_TransformFloatScale_SeparateMatrix_SoA_Aligned(benchmark::State& state) {
-        srand(0xABCDEF00);
-        mal_math::vec4* positions = new mal_math::vec4[TEST_ARRAY_SIZE];
-        float* scales = new float[TEST_ARRAY_SIZE];
-        mal_math::quat* quats = new mal_math::quat[TEST_ARRAY_SIZE];
-        mal_math::mat4* world_transforms = new mal_math::mat4[TEST_ARRAY_SIZE];
-        mal_math::mat4* inv_world_transforms = new mal_math::mat4[TEST_ARRAY_SIZE];
-        // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
-            FILL_ARRAY_FLOAT_SCALE(positions[i], scales[i], quats[i]);
-            for (int i = 0; i < TEST_ARRAY_SIZE; i++)
-            {
-                mal_math::vec3& position = reinterpret_cast<mal_math::vec3&>(positions[i]);
-                mal_math::vec3& scale = reinterpret_cast<mal_math::vec3&>(scales[i]);
-                ComputeWorldTransform(position, scale, quats[i], world_transforms[i], inv_world_transforms[i]);
-                benchmark::DoNotOptimize(world_transforms[i]);
-                benchmark::DoNotOptimize(inv_world_transforms[i]);
-            }
-        }
-        delete[] positions;
-        delete[] scales;
-        delete[] quats;
-        delete[] world_transforms;
-        delete[] inv_world_transforms;
-    }
-}
-// Register the function as a benchmark
-BENCHMARK(test19::MAL_MATH_TransformFloatScale_SeparateMatrix_SoA_Aligned);
-
-namespace test20
-{
-    struct Transform
-    {
-        mal_math::vec3 position;
-        float scale;
-        mal_math::quat quat;
-        mal_math::mat4 model;
-        mal_math::mat4 inv_model;
-    };
-
-
-    static void MAL_MATH_TransformFloatScale_MatrixTogether_SoA_Aligned(benchmark::State& state) {
-        srand(0xABCDEF00);
-        Transform* transforms = new Transform[TEST_ARRAY_SIZE];
-        // Code inside this loop is measured repeatedly
-        for (auto _ : state) {
-            FILL_ARRAY_FLOAT_SCALE(transforms[i].position, transforms[i].scale, transforms[i].quat);
-            for (int i = 0; i < TEST_ARRAY_SIZE; i++)
-            {
-                ComputeWorldTransform(transforms[i].position, transforms[i].scale, transforms[i].quat, transforms[i].model, transforms[i].inv_model);
-                benchmark::DoNotOptimize(transforms[i].model);
-                benchmark::DoNotOptimize(transforms[i].inv_model);
-            }
-        }
-        delete[] transforms;
-    }
-}
-// Register the function as a benchmark
-BENCHMARK(test20::MAL_MATH_TransformFloatScale_MatrixTogether_SoA_Aligned);
-
 
 BENCHMARK_MAIN();
 
@@ -808,27 +480,27 @@ Compiled with MSVC v143 14.38.33130,
 --------------------------------------------------------------------------------------------------------------------------------------------
 Benchmark                                                                Time             CPU   Iterations   Time/Transform   CPU/Transform
 --------------------------------------------------------------------------------------------------------------------------------------------
-test1::GLM_Transform_SeparateMatrix_AoS                             796701 ns       171611 ns         3733       79.6701 ns       17.1611 ns  
-test2::GLM_Transform_SeparateMatrix_AoS_Aligned                     780208 ns       244827 ns         4978       78.0208 ns       24.4827 ns  
-test3::GLM_Transform_SeparateMatrix_SoA                             816678 ns       207456 ns         3088       81.6678 ns       20.7456 ns  
-test4::GLM_Transform_SeparateMatrix_SoA_Aligned                     792412 ns       213109 ns         3446       79.2412 ns       21.3109 ns  
-test5::GLM_Transform_MatrixTogether_SoA_Aligned                     801012 ns       207162 ns         2489       80.1012 ns       20.7162 ns  
-test6::GLM_Transform_MatrixTogether_SoA                             797334 ns       241683 ns         4073       79.7334 ns       24.1683 ns  
-test7::GLM_TransformFloatScale_SeparateMatrix_AoS                   775058 ns       296779 ns         1948       77.5058 ns       29.6779 ns  
-test8::GLM_TransformFloatScale_SeparateMatrix_SoA                   796040 ns       219544 ns         3345       79.6040 ns       21.9544 ns  
-test9::GLM_TransformFloatScale_SeparateMatrix_SoA_Aligned           796974 ns       258789 ns         3200       79.6974 ns       25.8789 ns  
-test10::GLM_TransformFloatScale_MatrixTogether_SoA_Aligned          792882 ns       234375 ns         3200       79.2882 ns       23.4375 ns  
+test1::GLM_Transform_SeparateMatrix_AoS                             796701 ns       171611 ns         3733       79.6701 ns       17.1611 ns
+test2::GLM_Transform_SeparateMatrix_AoS_Aligned                     780208 ns       244827 ns         4978       78.0208 ns       24.4827 ns
+test3::GLM_Transform_SeparateMatrix_SoA                             816678 ns       207456 ns         3088       81.6678 ns       20.7456 ns
+test4::GLM_Transform_SeparateMatrix_SoA_Aligned                     792412 ns       213109 ns         3446       79.2412 ns       21.3109 ns
+test5::GLM_Transform_MatrixTogether_SoA_Aligned                     801012 ns       207162 ns         2489       80.1012 ns       20.7162 ns
+test6::GLM_Transform_MatrixTogether_SoA                             797334 ns       241683 ns         4073       79.7334 ns       24.1683 ns
+test7::GLM_TransformFloatScale_SeparateMatrix_AoS                   775058 ns       296779 ns         1948       77.5058 ns       29.6779 ns
+test8::GLM_TransformFloatScale_SeparateMatrix_SoA                   796040 ns       219544 ns         3345       79.6040 ns       21.9544 ns
+test9::GLM_TransformFloatScale_SeparateMatrix_SoA_Aligned           796974 ns       258789 ns         3200       79.6974 ns       25.8789 ns
+test10::GLM_TransformFloatScale_MatrixTogether_SoA_Aligned          792882 ns       234375 ns         3200       79.2882 ns       23.4375 ns
 
-test11::MAL_MATH_Transform_SeparateMatrix_AoS                      2582630 ns       767299 ns          896      258.2630 ns       76.7299 ns  
-test12::MAL_MATH_Transform_SeparateMatrix_AoS_Aligned              2575747 ns       828125 ns         1000      257.5747 ns       82.8125 ns  
-test13::MAL_MATH_Transform_SeparateMatrix_SoA                      2513879 ns       836680 ns          747      251.3879 ns       83.6680 ns  
-test14::MAL_MATH_Transform_SeparateMatrix_SoA_Aligned              2529358 ns       711178 ns          747      252.9358 ns       71.1178 ns  
-test15::MAL_MATH_Transform_MatrixTogether_SoA_Aligned              2568256 ns       794798 ns          865      256.8256 ns       79.4798 ns  
-test16::MAL_MATH_Transform_MatrixTogether_SoA                      2536071 ns       784988 ns          836      253.6071 ns       78.4988 ns  
-test17::MAL_MATH_TransformFloatScale_SeparateMatrix_AoS            2591373 ns       751831 ns          956      259.1373 ns       75.1831 ns  
-test18::MAL_MATH_TransformFloatScale_SeparateMatrix_SoA            2552267 ns       796875 ns         1000      255.2267 ns       79.6875 ns  
-test19::MAL_MATH_TransformFloatScale_SeparateMatrix_SoA_Aligned    2517748 ns       767299 ns         1120      251.7748 ns       76.7299 ns  
-test20::MAL_MATH_TransformFloatScale_MatrixTogether_SoA_Aligned    2562456 ns       655692 ns         1120      256.2456 ns       65.5692 ns  
+test11::MAL_MATH_Transform_SeparateMatrix_AoS                      2582630 ns       767299 ns          896      258.2630 ns       76.7299 ns
+test12::MAL_MATH_Transform_SeparateMatrix_AoS_Aligned              2575747 ns       828125 ns         1000      257.5747 ns       82.8125 ns
+test13::MAL_MATH_Transform_SeparateMatrix_SoA                      2513879 ns       836680 ns          747      251.3879 ns       83.6680 ns
+test14::MAL_MATH_Transform_SeparateMatrix_SoA_Aligned              2529358 ns       711178 ns          747      252.9358 ns       71.1178 ns
+test15::MAL_MATH_Transform_MatrixTogether_SoA_Aligned              2568256 ns       794798 ns          865      256.8256 ns       79.4798 ns
+test16::MAL_MATH_Transform_MatrixTogether_SoA                      2536071 ns       784988 ns          836      253.6071 ns       78.4988 ns
+test17::MAL_MATH_TransformFloatScale_SeparateMatrix_AoS            2591373 ns       751831 ns          956      259.1373 ns       75.1831 ns
+test18::MAL_MATH_TransformFloatScale_SeparateMatrix_SoA            2552267 ns       796875 ns         1000      255.2267 ns       79.6875 ns
+test19::MAL_MATH_TransformFloatScale_SeparateMatrix_SoA_Aligned    2517748 ns       767299 ns         1120      251.7748 ns       76.7299 ns
+test20::MAL_MATH_TransformFloatScale_MatrixTogether_SoA_Aligned    2562456 ns       655692 ns         1120      256.2456 ns       65.5692 ns
 
 Compiled with Clang 16,
             /MP /GS /W4 /O2 /Ob2 /fp:fast /WX- /arch:AVX2 /Gd /Oi /MD /std:c++20 /EHsc /nologo /Ot /diagnostics:column

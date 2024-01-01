@@ -47,7 +47,7 @@ namespace engine
             uint32_t spot_light_shadow_resolution;
             uint32_t directional_light_shadow_resolution;
 
-            core::math::vec3 g_lights_per_frame_padding_0;
+            glm::vec3 g_lights_per_frame_padding_0;
         };
     }
 }
@@ -71,20 +71,26 @@ namespace engine::render::_light_detail
         [[nodiscard]] auto const &point_light_shadow_maps() const noexcept { return point_light_shadow_maps_; }
         [[nodiscard]] auto const &spot_light_shadow_maps() const noexcept { return spot_light_shadow_maps_; }
         [[nodiscard]] auto const &directional_light_shadow_maps() const noexcept { return directional_light_shadow_maps_; }
-        [[nodiscard]] int32_t get_point_light_index(entt::entity entity) const noexcept {
-            if (point_light_shadow_map_indices_.contains(entity)) {
+        [[nodiscard]] int32_t get_point_light_index(entt::entity entity) const noexcept
+        {
+            if (point_light_shadow_map_indices_.contains(entity))
+            {
                 return point_light_shadow_map_indices_.at(entity);
             }
             return -1;
         }
-        [[nodiscard]] int32_t get_spot_light_index(entt::entity entity) const noexcept {
-            if (spot_light_shadow_map_indices_.contains(entity)) {
+        [[nodiscard]] int32_t get_spot_light_index(entt::entity entity) const noexcept
+        {
+            if (spot_light_shadow_map_indices_.contains(entity))
+            {
                 return spot_light_shadow_map_indices_.at(entity);
             }
             return -1;
         }
-        [[nodiscard]] int32_t get_directional_light_index(entt::entity entity) const noexcept {
-            if (directional_light_shadow_map_indices_.contains(entity)) {
+        [[nodiscard]] int32_t get_directional_light_index(entt::entity entity) const noexcept
+        {
+            if (directional_light_shadow_map_indices_.contains(entity))
+            {
                 return directional_light_shadow_map_indices_.at(entity);
             }
             return -1;
@@ -132,9 +138,9 @@ namespace engine::render::_light_detail
         std::vector<entt::entity> point_light_entities_temp_;
         std::vector<entt::entity> spot_light_entities_temp_;
         std::vector<entt::entity> directional_light_entities_temp_;
-        std::unordered_map<entt::entity, std::array<core::math::mat4, 6>> point_light_shadow_matrices_;
-        std::unordered_map<entt::entity, core::math::mat4> spot_light_shadow_matrices_;
-        std::unordered_map<entt::entity, core::math::mat4> directional_light_shadow_matrices_;
+        std::unordered_map<entt::entity, std::array<glm::mat4, 6>> point_light_shadow_matrices_;
+        std::unordered_map<entt::entity, glm::mat4> spot_light_shadow_matrices_;
+        std::unordered_map<entt::entity, glm::mat4> directional_light_shadow_matrices_;
         std::unordered_map<entt::entity, uint32_t> point_light_shadow_map_indices_;
         std::unordered_map<entt::entity, uint32_t> spot_light_shadow_map_indices_;
         std::unordered_map<entt::entity, uint32_t> directional_light_shadow_map_indices_;

@@ -12,6 +12,7 @@ namespace engine::core
     {
     private:
         using TextureHash = size_t;
+
     public:
         static TextureId LoadTexture(uint8_t *data, size_t width, size_t height, size_t channels, bool generate_mips = true);
         static TextureId LoadTexture(std::filesystem::path const &path, bool generate_mipmaps = true);
@@ -53,6 +54,7 @@ namespace engine::core
         [[nodiscard]] static inline auto const &GetTextures() noexcept { return instance_->textures_; }
         [[nodiscard]] static inline auto const &GetTexturePaths() noexcept { return instance_->texture_paths_; }
         [[nodiscard]] static inline auto const &GetTextureHashes() noexcept { return instance_->texture_hashes_; }
+
     private:
         friend class ::engine::core::Engine;
 

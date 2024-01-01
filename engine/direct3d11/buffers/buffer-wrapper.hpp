@@ -43,10 +43,11 @@ namespace engine::direct3d
         {
             direct3d::api().devcon4->Unmap(buffer_.ptr(), subresource);
         }
+
     protected:
         /**
          * @brief Initializes the buffer
-         * 
+         *
          * @param desc Buffer description
          * @param initial_data Initial data
          */
@@ -58,7 +59,7 @@ namespace engine::direct3d
         }
         /**
          * @brief Initializes the buffer
-         * 
+         *
          * @param desc Buffer description
          */
         inline void Init(D3D11_BUFFER_DESC &&desc)
@@ -68,15 +69,13 @@ namespace engine::direct3d
             description_ = desc;
         }
 #pragma warning(push)
-#pragma warning(disable:26495)
+#pragma warning(disable : 26495)
         /**
          * @brief Buffer description
-         * 
+         *
          */
-        D3D11_BUFFER_DESC description_
-        {
-            0, D3D11_USAGE_DEFAULT, 0, 0, 0, 0
-        };
+        D3D11_BUFFER_DESC description_{
+            0, D3D11_USAGE_DEFAULT, 0, 0, 0, 0};
 #pragma warning(pop)
     private:
         /// @brief Underlying buffer

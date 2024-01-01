@@ -12,9 +12,9 @@ namespace engine::direct3d
         DepthStencil() noexcept = default;
         ~DepthStencil() noexcept = default;
         DepthStencil(DepthStencil &&) noexcept = default;
-        DepthStencil &operator= (DepthStencil &&) noexcept = default;
+        DepthStencil &operator=(DepthStencil &&) noexcept = default;
         DepthStencil(DepthStencil const &) noexcept = default;
-        DepthStencil &operator= (DepthStencil const &) noexcept = default;
+        DepthStencil &operator=(DepthStencil const &) noexcept = default;
 
         [[nodiscard]] ID3D11Texture2D const *const &depth_buffer() const noexcept { return depth_buffer_.ptr(); }
         [[nodiscard]] ID3D11DepthStencilView const *const &depth_stencil_view() const noexcept { return depth_stencil_view_.ptr(); }
@@ -30,7 +30,7 @@ namespace engine::direct3d
             AlwaysAssert(api().device->CreateTexture2D(depth_buffer_desc, nullptr, &depth_buffer_.reset()), "Failed to create depth stencil texture");
             AlwaysAssert(api().device->CreateDepthStencilView(depth_buffer_.ptr(), depth_stencil_view_desc, &depth_stencil_view_.reset()), "Failed to create depth stencil view");
         }
-        void init(core::math::ivec2 const &size)
+        void init(glm::ivec2 const &size)
         {
             // initialize depth buffer
             D3D11_TEXTURE2D_DESC depth_buffer_desc;
@@ -54,6 +54,7 @@ namespace engine::direct3d
             depth_stencil_view_desc.Flags = 0;
             init(&depth_buffer_desc, &depth_stencil_view_desc);
         }
+
     private:
         Texture2D depth_buffer_;
         DepthStencilView depth_stencil_view_;

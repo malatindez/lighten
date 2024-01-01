@@ -15,11 +15,12 @@ namespace engine::render
         {
             direct3d::api().devcon4->PSSetShaderResources(slot, 1, &depth_texture_view_.ptr());
         }
-        void Resize(uint32_t resolution, uint32_t  size, bool cubemap = true);
+        void Resize(uint32_t resolution, uint32_t size, bool cubemap = true);
         [[nodiscard]] inline uint32_t size() const noexcept { return size_; }
         [[nodiscard]] direct3d::ShaderResourceView depth_texture_view() const { return depth_texture_view_; }
         [[nodiscard]] direct3d::DepthStencil const &depth_stencil() const { return depth_stencil_; }
         [[nodiscard]] direct3d::DepthStencil &depth_stencil() { return depth_stencil_; }
+
     private:
         direct3d::ShaderResourceView depth_texture_view_ = nullptr;
         direct3d::DepthStencil depth_stencil_;

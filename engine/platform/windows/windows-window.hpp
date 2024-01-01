@@ -18,8 +18,8 @@ namespace engine::platform::windows
         };
 
         Window(core::Window::Props const &props = core::Window::Props(core::config()["Window"]["title"].to_string(),
-                                                                      core::math::ivec2{ core::config()["Window"]["width"].to_int(), core::config()["Window"]["height"].to_int() },
-                                                                      core::math::ivec2{ core::config()["Window"]["posx"].to_int(), core::config()["Window"]["posy"].to_int() }));
+                                                                      glm::ivec2{core::config()["Window"]["width"].to_int(), core::config()["Window"]["height"].to_int()},
+                                                                      glm::ivec2{core::config()["Window"]["posx"].to_int(), core::config()["Window"]["posy"].to_int()}));
 
         virtual ~Window() { DestroyWindow(handle_); }
 

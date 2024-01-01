@@ -26,7 +26,7 @@ namespace engine::components
      * * PBR
      * * GPU support
      */
-    LIGHTEN_COMPONENT(name="Particle Emitter", category="Core")
+    LIGHTEN_COMPONENT(name = "Particle Emitter", category = "Core")
     struct ParticleEmitter final
     {
         /**
@@ -34,66 +34,66 @@ namespace engine::components
          *
          * The position yaw range is a vector with the following format: (x, y, z, w) = (min_yaw, min_pitch, max_yaw, max_pitch)
          */
-        LIGHTEN_PROPERTY(serialize, save_game, name="Position Yaw Pitch Range")
-        core::math::vec4 position_yaw_pitch_range;
+        LIGHTEN_PROPERTY(serialize, save_game, name = "Position Yaw Pitch Range")
+        glm::vec4 position_yaw_pitch_range;
         /**
          * @brief This is the radius range in which the particles will be emitted
          *
          * The position radius is a vector with the following format: (x, y) = (min_distance, max_distance)
          */
-        LIGHTEN_PROPERTY(serialize, save_game, name="Position Radius Range")
-        core::math::vec2 position_radius;
+        LIGHTEN_PROPERTY(serialize, save_game, name = "Position Radius Range")
+        glm::vec2 position_radius;
 
         /**
          * @brief This is the angle range in which the yaw and pitch will be randomized to rotate the base velocity vector
          *
          * The velocity yaw range is a vector with the following format: (x, y, z, w) = (min_yaw, min_pitch, max_yaw, max_pitch)
          */
-        LIGHTEN_PROPERTY(serialize, save_game, name="Velocity Yaw Pitch Range")
-        core::math::vec4 velocity_yaw_pitch_range;
+        LIGHTEN_PROPERTY(serialize, save_game, name = "Velocity Yaw Pitch Range")
+        glm::vec4 velocity_yaw_pitch_range;
         /**
          * @brief This is the radius range in which the velocity will be randomized
          *
          * The velocity radius is a vector with the following format: (x, y) = (min_velocity, max_velocity)
          */
-        LIGHTEN_PROPERTY(serialize, save_game, name="Velocity Radius Range")
-        core::math::vec2 velocity_radius;
+        LIGHTEN_PROPERTY(serialize, save_game, name = "Velocity Radius Range")
+        glm::vec2 velocity_radius;
 
         /// @brief Base HDR color of the particle
-        LIGHTEN_PROPERTY(serialize, save_game, name="Base Diffuse Color")
-        core::math::vec4 base_diffuse_color;
+        LIGHTEN_PROPERTY(serialize, save_game, name = "Base Diffuse Color")
+        glm::vec4 base_diffuse_color;
         /**
          * @brief This is the range in which the diffuse color will be randomized
          *
          * The diffuse variation is a vector with the following format: (x, y, z, w) = (r_deviation, g_deviation, b_deviation, a_deviation)
          *
          * It works like this:
-         * particle_color = base_diffuse_color + (random_vec4(-1, 1) * diffuse_variation)
+         * particle_color = base_diffuse_color + (randomglm::_vec4(-1, 1) * diffuse_variation)
          */
-        LIGHTEN_PROPERTY(serialize, save_game, name="Diffuse Color Variation")
-        core::math::vec4 diffuse_variation;
+        LIGHTEN_PROPERTY(serialize, save_game, name = "Diffuse Color Variation")
+        glm::vec4 diffuse_variation;
 
         /**
          * @brief This is the range in which the particle lifespan will be randomized
          *
          * The particle lifespan is a vector with the following format: (x, y) = (min_lifespan, max_lifespan)
          */
-        LIGHTEN_PROPERTY(serialize, save_game, name="Particle Lifespan Range")
-        core::math::vec2 particle_lifespan_range;
+        LIGHTEN_PROPERTY(serialize, save_game, name = "Particle Lifespan Range")
+        glm::vec2 particle_lifespan_range;
         /**
          * @brief This is the range in which the particle start size will be randomized
          *
          * The particle start size is a vector with the following format: (x, y) = (min_start_size, max_start_size)
          */
-        LIGHTEN_PROPERTY(serialize, save_game, name="Begin Size Range")
-        core::math::vec2 begin_size_range;
+        LIGHTEN_PROPERTY(serialize, save_game, name = "Begin Size Range")
+        glm::vec2 begin_size_range;
         /**
          * @brief This is the range in which the particle end size will be randomized
          *
          * The particle end size is a vector with the following format: (x, y) = (min_end_size, max_end_size)
          */
-        LIGHTEN_PROPERTY(serialize, save_game, name="End Size Range")
-        core::math::vec2 end_size_range;
+        LIGHTEN_PROPERTY(serialize, save_game, name = "End Size Range")
+        glm::vec2 end_size_range;
 
         /**
          * @brief This is the range in which the particle mass will be randomized
@@ -105,22 +105,22 @@ namespace engine::components
          * @warning this parameter is not used!
          * @todo Implement drag force fields
          */
-        LIGHTEN_PROPERTY(serialize, save_game, name="Mass Range")
-        core::math::vec2 mass_range;
+        LIGHTEN_PROPERTY(serialize, save_game, name = "Mass Range")
+        glm::vec2 mass_range;
         /**
          * @brief Thickness of the particle.
          *
          * Thickness is used to calculate the alpha of the particle if there's something behind it
          */
-        LIGHTEN_PROPERTY(serialize, save_game, name="Thickness Range")
-        core::math::vec2 thickness_range;
+        LIGHTEN_PROPERTY(serialize, save_game, name = "Thickness Range")
+        glm::vec2 thickness_range;
 
         /**
          * @brief This is the emission rate of the particle emitter per second
          *
          * The emission rate is a float with the following format: (x) = (particles_per_second)
          */
-        LIGHTEN_PROPERTY(serialize, save_game, name="Emission Rate")
+        LIGHTEN_PROPERTY(serialize, save_game, name = "Emission Rate")
         float emit_rate;
 
         /**
@@ -130,8 +130,8 @@ namespace engine::components
          *
          * The particle rotation is a vector with the following format: (x, y) = (min_rotation, max_rotation)
          */
-        LIGHTEN_PROPERTY(serialize, save_game, name="Rotation Range")
-        core::math::vec2 rotation_range;
+        LIGHTEN_PROPERTY(serialize, save_game, name = "Rotation Range")
+        glm::vec2 rotation_range;
 
         /**
          * @brief This is the range in which the particle rotation speed will be randomized
@@ -143,8 +143,8 @@ namespace engine::components
          * @note There's no reason to set the rotation speed to value outside of the range [\f$-2\pi\f$, \f$2\pi\f$]
          *
          */
-        LIGHTEN_PROPERTY(serialize, save_game, name="Rotation Speed Range")
-        core::math::vec2 rotation_speed_range;
+        LIGHTEN_PROPERTY(serialize, save_game, name = "Rotation Speed Range")
+        glm::vec2 rotation_speed_range;
         /**
          * @brief This is the acceleration vector of the particles
          *
@@ -155,15 +155,15 @@ namespace engine::components
          * @todo Remove this and apply force fields instead
          *
          */
-        LIGHTEN_PROPERTY(serialize, save_game, name="Particle Acceleration")
-        core::math::vec3 particle_acceleration;
+        LIGHTEN_PROPERTY(serialize, save_game, name = "Particle Acceleration")
+        glm::vec3 particle_acceleration;
 
         /// @brief Maximum amount of particles that can be alive at the same time for this particle emitter
-        LIGHTEN_PROPERTY(serialize, save_game, name="Maximum Amount of Particles")
+        LIGHTEN_PROPERTY(serialize, save_game, name = "Maximum Amount of Particles")
         uint32_t maximum_amount_of_particles;
 
         /// @brief If true, the particle emitter will stop spawning/clearing and updating particles
-        LIGHTEN_PROPERTY(serialize, save_game, name="Freeze")
+        LIGHTEN_PROPERTY(serialize, save_game, name = "Freeze")
         bool freeze = false;
 
     private:
@@ -173,17 +173,17 @@ namespace engine::components
         struct Particle
         {
             /// @brief Position of the particle in the world space
-            core::math::vec3 position;
+            glm::vec3 position;
             /// @brief Velocity of the particle in the world space
-            core::math::vec3 velocity;
+            glm::vec3 velocity;
             /**
              * @brief Acceleration of the particle in the world space
              *
              * @todo Remove this and apply force fields instead
              */
-            core::math::vec3 acceleration;
+            glm::vec3 acceleration;
             /// @brief Color of the particle
-            core::math::vec4 color;
+            glm::vec4 color;
             /// @brief Begin size of the particle
             float begin_size;
             /// @brief End size of the particle

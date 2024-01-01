@@ -29,21 +29,21 @@ namespace object_editor
         return ss.str();
     }
 
-    template <size_t size_x, size_t size_y, typename matrix_type, glm::qualifier Q>
+    template <glm::length_t size_x, glm::length_t size_y, typename matrix_type, glm::qualifier Q>
     inline std::string FormatMatrixToString(glm::mat<size_x, size_y, matrix_type, Q> mat, uint32_t precision = 3)
     {
         std::stringstream ss;
-        size_t max = 0;
-        for (size_t i = 0; i < size_x * size_y; i++)
+        glm::length_t max = 0;
+        for (glm::length_t i = 0; i < size_x * size_y; i++)
         {
             std::stringstream ss2;
-            ss2 << std::setprecision(precision) << reinterpret_cast<const matrix_type*>(&mat)[i];
-            max = std::max(max, ss2.str().size());
+            ss2 << std::setprecision(precision) << reinterpret_cast<const matrix_type *>(&mat)[i];
+            max = std::max(max, glm::length_t(ss2.str().size()));
         }
         uint32_t size = (uint32_t)max;
-        for (size_t column = 0; column < size_x; column++)
+        for (glm::length_t column = 0; column < size_x; column++)
         {
-            for (size_t row = 0; row < size_y; row++)
+            for (glm::length_t row = 0; row < size_y; row++)
             {
                 ss << std::left << std::setw(size) << std::setprecision(precision) << mat[column][row];
                 ss << " ";
@@ -60,7 +60,7 @@ namespace object_editor
     ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::ROTATE);
     ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
     bool useSnap(false);
-    vec4 snap;
+    glm::vec4 snap;
 
     void UpdateInstances()
     {
@@ -95,9 +95,9 @@ namespace object_editor
 
     void EditTransform([[maybe_unused]] CameraController const &camera, Transform &transform)
     {
-        mat4 &matrix = transform.model;
+        glm::mat4 &matrix = transform.model;
         float matrixTranslation[3], matrixRotation[3], matrixScale[3];
-        ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float*>(&matrix), matrixTranslation, matrixRotation, matrixScale);
+        ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float *>(&matrix), matrixTranslation, matrixRotation, matrixScale);
         if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_SpanAvailWidth))
         {
             if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
@@ -112,7 +112,7 @@ namespace object_editor
             changed |= ImGui::InputFloat3("Tr", matrixTranslation, "%.3f", 3);
             changed |= ImGui::InputFloat3("Rt", matrixRotation, "%.3f", 3);
             changed |= ImGui::InputFloat3("Sc", matrixScale, "%.3f", 3);
-            ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, reinterpret_cast<float*>(&matrix));
+            ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, reinterpret_cast<float *>(&matrix));
             if (mCurrentGizmoOperation != ImGuizmo::SCALE)
             {
                 if (ImGui::RadioButton("Local", mCurrentGizmoMode == ImGuizmo::LOCAL))
@@ -143,14 +143,14 @@ namespace object_editor
             if (ImGui::Button("Reset"))
             {
                 changed = true;
-                matrix = mat4{ 1.0f };
-                ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float*>(&matrix), matrixTranslation, matrixRotation, matrixScale);
+                matrix = glm::mat4{1.0f};
+                ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float *>(&matrix), matrixTranslation, matrixRotation, matrixScale);
             }
             if (ImGui::Button("Reset scale"))
             {
                 changed = true;
                 matrixScale[0] = matrixScale[1] = matrixScale[2] = 1;
-                ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float*>(&matrix), matrixTranslation, matrixRotation, matrixScale);
+                ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float *>(&matrix), matrixTranslation, matrixRotation, matrixScale);
             }
             ImGui::SameLine();
             if (ImGui::Button("Reset rotation"))
@@ -167,9 +167,9 @@ namespace object_editor
             }
             if (changed)
             {
-                ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float*>(&matrix), matrixTranslation, matrixRotation, matrixScale);
-                transform.position = vec3{ matrixTranslation[0], matrixTranslation[1], matrixTranslation[2] };
-                transform.scale = vec3{ matrixScale[0], matrixScale[1], matrixScale[2] };
+                ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float *>(&matrix), matrixTranslation, matrixRotation, matrixScale);
+                transform.position = glm::vec3{matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]};
+                transform.scale = glm::vec3{matrixScale[0], matrixScale[1], matrixScale[2]};
                 transform.rotation = glm::quat_cast(glm::mat3(scale(matrix, 1.0f / transform.scale)));
                 transform.UpdateMatrices();
                 UpdateInstances();
@@ -177,24 +177,24 @@ namespace object_editor
         }
     }
 
-    void RenderGizmo(CameraController const &camera, Transform &transform, ivec2 const &window_pos, ivec2 const &window_size, Box const &bounding_box)
+    void RenderGizmo(CameraController const &camera, Transform &transform, glm::ivec2 const &window_pos, glm::ivec2 const &window_size, Box const &bounding_box)
     {
-        mat4 &matrix = transform.model;
+        glm::mat4 &matrix = transform.model;
         float matrixTranslation[3], matrixRotation[3], matrixScale[3];
-        ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float*>(&matrix), matrixTranslation, matrixRotation, matrixScale);
+        ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float *>(&matrix), matrixTranslation, matrixRotation, matrixScale);
         ImGuizmo::SetRect((float)window_pos.x, (float)window_pos.y, (float)window_size.x, (float)window_size.y);
-        static float boundsSnap[] = { 0.1f, 0.1f, 0.1f };
-        if (ImGuizmo::Manipulate(reinterpret_cast<const float*>(&camera.camera().view),
-                                 reinterpret_cast<const float*>(&camera.camera().projection),
+        static float boundsSnap[] = {0.1f, 0.1f, 0.1f};
+        if (ImGuizmo::Manipulate(reinterpret_cast<const float *>(&camera.camera().view),
+                                 reinterpret_cast<const float *>(&camera.camera().projection),
                                  mCurrentGizmoOperation,
                                  mCurrentGizmoMode,
-                                 reinterpret_cast<float*>(&matrix),
+                                 reinterpret_cast<float *>(&matrix),
                                  nullptr,
-                                 useSnap ? &snap.x : nullptr, reinterpret_cast<const float*>(&bounding_box), boundsSnap))
+                                 useSnap ? &snap.x : nullptr, reinterpret_cast<const float *>(&bounding_box), boundsSnap))
         {
-            ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float*>(&matrix), matrixTranslation, matrixRotation, matrixScale);
-            transform.position = vec3{ matrixTranslation[0], matrixTranslation[1], matrixTranslation[2] };
-            transform.scale = vec3{ matrixScale[0], matrixScale[1], matrixScale[2] };
+            ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float *>(&matrix), matrixTranslation, matrixRotation, matrixScale);
+            transform.position = glm::vec3{matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]};
+            transform.scale = glm::vec3{matrixScale[0], matrixScale[1], matrixScale[2]};
             transform.rotation = glm::quat_cast(glm::mat3(scale(matrix, 1.0f / transform.scale)));
             transform.UpdateMatrices();
             UpdateInstances();
@@ -221,7 +221,7 @@ namespace object_editor
             ImGui::EndDisabled();
         }
     }
-    void OnRender(ivec2 const &window_pos, ivec2 const &window_size)
+    void OnRender(glm::ivec2 const &window_pos, glm::ivec2 const &window_size)
     {
         if (selected_entity != entt::null && selected_scene == Engine::scene() && InputLayer::instance()->key_state(engine::core::Key::KEY_CONTROL))
         {
@@ -308,17 +308,17 @@ namespace object_editor
             ImGui::BeginDisabled(!metallic_map_texture_enabled);
             ImGui::InputScalar("Metallic map texture ID", ImGuiDataType_U64, &metallic_map_texture_id, nullptr, nullptr, "%llu");
             ImGui::EndDisabled();
-            
+
             ImGui::Checkbox("##sheen_map_enabled", &metallic_map_texture_enabled);
             ImGui::SameLine();
             ImGui::BeginDisabled(!metallic_map_texture_enabled);
             ImGui::InputScalar("Sheen map texture ID", ImGuiDataType_U64, &sheen_map_texture_id, nullptr, nullptr, "%llu");
             ImGui::EndDisabled();
 
-            ImGui::ColorEdit3("Albedo color", reinterpret_cast<float*>(&material->albedo_color));
+            ImGui::ColorEdit3("Albedo color", reinterpret_cast<float *>(&material->albedo_color));
             ImGui::SliderFloat("Metalness", &material->metalness_value, 0.001f, 1.0f);
             ImGui::SliderFloat("Roughness", &material->roughness_value, 0.001f, 1.0f);
-            ImGui::ColorEdit3("Sheen color", reinterpret_cast<float*>(&material->sheen_color));
+            ImGui::ColorEdit3("Sheen color", reinterpret_cast<float *>(&material->sheen_color));
             ImGui::SliderFloat("Sheen Roughness", &material->sheen_roughness, 0.001f, 1.0f);
             auto width = ::ImGui::GetContentRegionMax().x - 200;
             ImGui::PushItemWidth(width / 2);
@@ -421,7 +421,7 @@ namespace object_editor
     {
         if (ImGui::CollapsingHeader("Point light", ImGuiTreeNodeFlags_SpanAvailWidth))
         {
-            ImGui::ColorEdit3("Color", reinterpret_cast<float*>(&point_light->color));
+            ImGui::ColorEdit3("Color", reinterpret_cast<float *>(&point_light->color));
             ImGui::SliderFloat("Power", &point_light->power, 0, 1e6f, "%.3f", ImGuiSliderFlags_Logarithmic);
         }
     }
@@ -429,7 +429,7 @@ namespace object_editor
     {
         if (ImGui::CollapsingHeader("Spot light", ImGuiTreeNodeFlags_SpanAvailWidth))
         {
-            ImGui::ColorEdit3("Color", reinterpret_cast<float*>(&spot_light->color));
+            ImGui::ColorEdit3("Color", reinterpret_cast<float *>(&spot_light->color));
             ImGui::SliderFloat("Power", &spot_light->power, 0, 1e6f, "%.3f", ImGuiSliderFlags_Logarithmic);
             ImGui::SliderAngle("Inner cutoff", &spot_light->inner_cutoff, 0, 180, "%.3f degrees", ImGuiSliderFlags_AlwaysClamp);
             ImGui::SliderAngle("Outer cutoff", &spot_light->outer_cutoff, 0, 180, "%.3f degrees", ImGuiSliderFlags_AlwaysClamp);
@@ -443,7 +443,7 @@ namespace object_editor
     {
         if (ImGui::CollapsingHeader("Directional light", ImGuiTreeNodeFlags_SpanAvailWidth))
         {
-            ImGui::ColorEdit3("Color", reinterpret_cast<float*>(&directional_light->color));
+            ImGui::ColorEdit3("Color", reinterpret_cast<float *>(&directional_light->color));
             ImGui::SliderFloat("Power", &directional_light->power, 0, 1e6f, "%.3f", ImGuiSliderFlags_Logarithmic);
             ImGui::InputFloat("Solid angle", &directional_light->solid_angle);
         }
@@ -551,12 +551,30 @@ namespace object_editor
                 ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.25f);
                 ImGui::SliderFloat("##max-spawn-distance", &emitter->position_radius.y, -100, 100, "%.2f", ImGuiSliderFlags_AlwaysClamp);
 
-                if (emitter->position_yaw_pitch_range.x > emitter->position_yaw_pitch_range.z) { emitter->position_yaw_pitch_range.x = emitter->position_yaw_pitch_range.z; }
-                if (emitter->position_yaw_pitch_range.z < emitter->position_yaw_pitch_range.x) { emitter->position_yaw_pitch_range.z = emitter->position_yaw_pitch_range.x; }
-                if (emitter->position_yaw_pitch_range.y > emitter->position_yaw_pitch_range.w) { emitter->position_yaw_pitch_range.y = emitter->position_yaw_pitch_range.w; }
-                if (emitter->position_yaw_pitch_range.w < emitter->position_yaw_pitch_range.y) { emitter->position_yaw_pitch_range.w = emitter->position_yaw_pitch_range.y; }
-                if (emitter->position_radius.x > emitter->position_radius.y) { emitter->position_radius.x = emitter->position_radius.y; }
-                if (emitter->position_radius.y < emitter->position_radius.x) { emitter->position_radius.y = emitter->position_radius.x; }
+                if (emitter->position_yaw_pitch_range.x > emitter->position_yaw_pitch_range.z)
+                {
+                    emitter->position_yaw_pitch_range.x = emitter->position_yaw_pitch_range.z;
+                }
+                if (emitter->position_yaw_pitch_range.z < emitter->position_yaw_pitch_range.x)
+                {
+                    emitter->position_yaw_pitch_range.z = emitter->position_yaw_pitch_range.x;
+                }
+                if (emitter->position_yaw_pitch_range.y > emitter->position_yaw_pitch_range.w)
+                {
+                    emitter->position_yaw_pitch_range.y = emitter->position_yaw_pitch_range.w;
+                }
+                if (emitter->position_yaw_pitch_range.w < emitter->position_yaw_pitch_range.y)
+                {
+                    emitter->position_yaw_pitch_range.w = emitter->position_yaw_pitch_range.y;
+                }
+                if (emitter->position_radius.x > emitter->position_radius.y)
+                {
+                    emitter->position_radius.x = emitter->position_radius.y;
+                }
+                if (emitter->position_radius.y < emitter->position_radius.x)
+                {
+                    emitter->position_radius.y = emitter->position_radius.x;
+                }
                 ImGui::NewLine();
                 ImGui::Text("Velocity: ");
 
@@ -596,12 +614,30 @@ namespace object_editor
                 ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.25f);
                 ImGui::SliderFloat("##max-velocity-distance", &emitter->velocity_radius.y, -100, 100, "%.2f", ImGuiSliderFlags_AlwaysClamp);
 
-                if (emitter->velocity_yaw_pitch_range.x > emitter->velocity_yaw_pitch_range.z) { emitter->velocity_yaw_pitch_range.x = emitter->velocity_yaw_pitch_range.z; }
-                if (emitter->velocity_yaw_pitch_range.z < emitter->velocity_yaw_pitch_range.x) { emitter->velocity_yaw_pitch_range.z = emitter->velocity_yaw_pitch_range.x; }
-                if (emitter->velocity_yaw_pitch_range.y > emitter->velocity_yaw_pitch_range.w) { emitter->velocity_yaw_pitch_range.y = emitter->velocity_yaw_pitch_range.w; }
-                if (emitter->velocity_yaw_pitch_range.w < emitter->velocity_yaw_pitch_range.y) { emitter->velocity_yaw_pitch_range.w = emitter->velocity_yaw_pitch_range.y; }
-                if (emitter->velocity_radius.x > emitter->velocity_radius.y) { emitter->velocity_radius.x = emitter->velocity_radius.y; }
-                if (emitter->velocity_radius.y < emitter->velocity_radius.x) { emitter->velocity_radius.y = emitter->velocity_radius.x; }
+                if (emitter->velocity_yaw_pitch_range.x > emitter->velocity_yaw_pitch_range.z)
+                {
+                    emitter->velocity_yaw_pitch_range.x = emitter->velocity_yaw_pitch_range.z;
+                }
+                if (emitter->velocity_yaw_pitch_range.z < emitter->velocity_yaw_pitch_range.x)
+                {
+                    emitter->velocity_yaw_pitch_range.z = emitter->velocity_yaw_pitch_range.x;
+                }
+                if (emitter->velocity_yaw_pitch_range.y > emitter->velocity_yaw_pitch_range.w)
+                {
+                    emitter->velocity_yaw_pitch_range.y = emitter->velocity_yaw_pitch_range.w;
+                }
+                if (emitter->velocity_yaw_pitch_range.w < emitter->velocity_yaw_pitch_range.y)
+                {
+                    emitter->velocity_yaw_pitch_range.w = emitter->velocity_yaw_pitch_range.y;
+                }
+                if (emitter->velocity_radius.x > emitter->velocity_radius.y)
+                {
+                    emitter->velocity_radius.x = emitter->velocity_radius.y;
+                }
+                if (emitter->velocity_radius.y < emitter->velocity_radius.x)
+                {
+                    emitter->velocity_radius.y = emitter->velocity_radius.x;
+                }
 
                 ImGui::ColorEdit4("Base diffuse color", &emitter->base_diffuse_color.x, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_Float);
                 ImGui::SliderFloat4("Diffuse color variation", &emitter->diffuse_variation.x, -2, 2, "%.3f");
@@ -614,8 +650,14 @@ namespace object_editor
                 ImGui::SameLine();
                 ImGui::SliderFloat("##max-lifespan", &emitter->particle_lifespan_range.y, 0, 100, "%.3f");
 
-                if (emitter->particle_lifespan_range.x > emitter->particle_lifespan_range.y) { emitter->particle_lifespan_range.x = emitter->particle_lifespan_range.y; }
-                if (emitter->particle_lifespan_range.y < emitter->particle_lifespan_range.x) { emitter->particle_lifespan_range.y = emitter->particle_lifespan_range.x; }
+                if (emitter->particle_lifespan_range.x > emitter->particle_lifespan_range.y)
+                {
+                    emitter->particle_lifespan_range.x = emitter->particle_lifespan_range.y;
+                }
+                if (emitter->particle_lifespan_range.y < emitter->particle_lifespan_range.x)
+                {
+                    emitter->particle_lifespan_range.y = emitter->particle_lifespan_range.x;
+                }
 
                 ImGui::Text("Begin size range");
                 ImGui::Text("Min: ");
@@ -625,8 +667,14 @@ namespace object_editor
                 ImGui::SameLine();
                 ImGui::SliderFloat("##begin-max-size", &emitter->begin_size_range.y, 0, 100, "%.3f");
 
-                if (emitter->begin_size_range.x > emitter->begin_size_range.y) { emitter->begin_size_range.x = emitter->begin_size_range.y; }
-                if (emitter->begin_size_range.y < emitter->begin_size_range.x) { emitter->begin_size_range.y = emitter->begin_size_range.x; }
+                if (emitter->begin_size_range.x > emitter->begin_size_range.y)
+                {
+                    emitter->begin_size_range.x = emitter->begin_size_range.y;
+                }
+                if (emitter->begin_size_range.y < emitter->begin_size_range.x)
+                {
+                    emitter->begin_size_range.y = emitter->begin_size_range.x;
+                }
 
                 ImGui::Text("end size range");
                 ImGui::Text("Min: ");
@@ -636,8 +684,14 @@ namespace object_editor
                 ImGui::SameLine();
                 ImGui::SliderFloat("##end-max-size", &emitter->end_size_range.y, 0, 100, "%.3f");
 
-                if (emitter->end_size_range.x > emitter->end_size_range.y) { emitter->end_size_range.x = emitter->end_size_range.y; }
-                if (emitter->end_size_range.y < emitter->end_size_range.x) { emitter->end_size_range.y = emitter->end_size_range.x; }
+                if (emitter->end_size_range.x > emitter->end_size_range.y)
+                {
+                    emitter->end_size_range.x = emitter->end_size_range.y;
+                }
+                if (emitter->end_size_range.y < emitter->end_size_range.x)
+                {
+                    emitter->end_size_range.y = emitter->end_size_range.x;
+                }
 
                 ImGui::Text("Emit rate: ");
                 ImGui::SameLine();
@@ -652,8 +706,14 @@ namespace object_editor
                 ImGui::SameLine();
                 ImGui::SliderFloat("##max-rotation", &emitter->rotation_range.y, 0, 360, "%.3f");
 
-                if (emitter->rotation_range.x > emitter->rotation_range.y) { emitter->rotation_range.x = emitter->rotation_range.y; }
-                if (emitter->rotation_range.y < emitter->rotation_range.x) { emitter->rotation_range.y = emitter->rotation_range.x; }
+                if (emitter->rotation_range.x > emitter->rotation_range.y)
+                {
+                    emitter->rotation_range.x = emitter->rotation_range.y;
+                }
+                if (emitter->rotation_range.y < emitter->rotation_range.x)
+                {
+                    emitter->rotation_range.y = emitter->rotation_range.x;
+                }
 
                 ImGui::Text("Rotation speed ");
                 ImGui::Text("Min: ");
@@ -663,8 +723,14 @@ namespace object_editor
                 ImGui::SameLine();
                 ImGui::SliderFloat("##max-rotation-speed", &emitter->rotation_speed_range.y, 0, 360, "%.3f");
 
-                if (emitter->rotation_speed_range.x > emitter->rotation_speed_range.y) { emitter->rotation_speed_range.x = emitter->rotation_speed_range.y; }
-                if (emitter->rotation_speed_range.y < emitter->rotation_speed_range.x) { emitter->rotation_speed_range.y = emitter->rotation_speed_range.x; }
+                if (emitter->rotation_speed_range.x > emitter->rotation_speed_range.y)
+                {
+                    emitter->rotation_speed_range.x = emitter->rotation_speed_range.y;
+                }
+                if (emitter->rotation_speed_range.y < emitter->rotation_speed_range.x)
+                {
+                    emitter->rotation_speed_range.y = emitter->rotation_speed_range.x;
+                }
 
                 ImGui::Text("Thickness ");
                 ImGui::Text("Min: ");
@@ -674,8 +740,14 @@ namespace object_editor
                 ImGui::SameLine();
                 ImGui::SliderFloat("##max-thickness", &emitter->thickness_range.y, 0, 100, "%.3f");
 
-                if (emitter->thickness_range.x > emitter->thickness_range.y) { emitter->thickness_range.x = emitter->thickness_range.y; }
-                if (emitter->thickness_range.y < emitter->thickness_range.x) { emitter->thickness_range.y = emitter->thickness_range.x; }
+                if (emitter->thickness_range.x > emitter->thickness_range.y)
+                {
+                    emitter->thickness_range.x = emitter->thickness_range.y;
+                }
+                if (emitter->thickness_range.y < emitter->thickness_range.x)
+                {
+                    emitter->thickness_range.y = emitter->thickness_range.x;
+                }
 
                 // acceleration
 
@@ -765,7 +837,7 @@ namespace object_editor
                 ImGui::Text("Tag: ");
                 ImGui::SameLine();
                 ImGui::InputText("##tag", game_object.tag.data(), game_object.tag.capacity());
-                auto constexpr convert_entity_id = [] (entt::entity id) -> uint32_t
+                auto constexpr convert_entity_id = [](entt::entity id) -> uint32_t
                 {
                     return static_cast<uint32_t>(*reinterpret_cast<entt::id_type *>(&id));
                 };
@@ -819,7 +891,7 @@ namespace object_editor
                 ImGui::Text("Grass material: ");
                 ImGui::InputScalar("planes count ##planes-count", ImGuiDataType_U32, &material.planes_count);
                 ImGui::InputScalar("sections per plane ##section-count", ImGuiDataType_U32, &material.section_count);
-                ImGui::ColorEdit3("albedo color ##albedo-color", reinterpret_cast<float*>(&material.albedo_color));
+                ImGui::ColorEdit3("albedo color ##albedo-color", reinterpret_cast<float *>(&material.albedo_color));
                 ImGui::DragFloat("ambient occlusion value ##ao-value", &material.ao_value, 0.01f, 0.01f, 1.0f);
                 ImGui::DragFloat("roughness value ##roughness-value", &material.roughness_value, 0.01f, 0.01f, 1.0f);
                 ImGui::DragFloat("metalness value ##metalness-value", &material.metalness_value, 0.01f, 0.01f, 1.0f);
@@ -835,7 +907,7 @@ namespace object_editor
                 ImGui::InputScalar("z spawn range ##height", ImGuiDataType_Float, &grass_field.spawn_range.y);
                 ImGui::InputScalar("min scale ##x-scale-range", ImGuiDataType_Float, &grass_field.grass_size_range.x);
                 ImGui::InputScalar("max scale ##y-scale-range", ImGuiDataType_Float, &grass_field.grass_size_range.y);
-                ImGui::InputFloat3("initial offset", reinterpret_cast<float*>(&grass_field.initial_offset), "%.3f", 3);
+                ImGui::InputFloat3("initial offset", reinterpret_cast<float *>(&grass_field.initial_offset), "%.3f", 3);
                 ImGui::InputScalar("min distance between instances", ImGuiDataType_Float, &grass_field.min_distance);
                 ImGui::InputScalar("max attempts", ImGuiDataType_U32, &grass_field.max_attempts);
                 if (ImGui::Button("Initialize"))
@@ -908,22 +980,21 @@ namespace object_editor
     // Because we need to call custom AddInstance method
     // We shall change the behaviour of systems so that they will overwrite on_construct / on_destroy
 
-    const auto kComponentNames = std::to_array<std::string>({
-        "Camera",
-        //       "Transform",
-        //       "Opaque material",
-        //       "Emissive material",
-               "Point light",
-               "Spot light",
-               "Directional light",
-               "Particle emitter",
-               "Skybox" });
+    const auto kComponentNames = std::to_array<std::string>({"Camera",
+                                                             //       "Transform",
+                                                             //       "Opaque material",
+                                                             //       "Emissive material",
+                                                             "Point light",
+                                                             "Spot light",
+                                                             "Directional light",
+                                                             "Particle emitter",
+                                                             "Skybox"});
 
     using kComponentTypes = mal_toolkit::parameter_pack_info<
         CameraComponent,
         //      Transform,
         //      render::OpaqueMaterial,
-         //     render::EmissiveMaterial,
+        //     render::EmissiveMaterial,
         PointLight,
         SpotLight,
         DirectionalLight,
@@ -951,8 +1022,8 @@ namespace object_editor
         ImGui::SameLine();
         if (ImGui::Button("Attach"))
         {
-            mal_toolkit::constexpr_for<0, kComponentNames.size(), 1>([&] (auto i) constexpr -> bool
-                                                               {
+            mal_toolkit::constexpr_for<0, kComponentNames.size(), 1>([&](auto i) constexpr -> bool
+                                                                     {
                                                                    if (i != selected_component)
                                                                    {
                                                                        return true;
@@ -964,8 +1035,7 @@ namespace object_editor
                                                                    }
                                                                    registry.emplace<typename kComponentTypes::type_at<i>::type>(selected_entity);
                                                                    UpdateInstances();
-                                                                   return false;
-                                                               });
+                                                                   return false; });
         }
     }
     void RemoveComponent()
@@ -988,8 +1058,8 @@ namespace object_editor
         ImGui::SameLine();
         if (ImGui::Button("Remove"))
         {
-            mal_toolkit::constexpr_for<0, kComponentNames.size(), 1>([&] (auto i) constexpr  -> bool
-                                                               {
+            mal_toolkit::constexpr_for<0, kComponentNames.size(), 1>([&](auto i) constexpr -> bool
+                                                                     {
                                                                    if (i != selected_component)
                                                                    {
                                                                        return true;
@@ -1001,8 +1071,7 @@ namespace object_editor
                                                                        return false;
                                                                    }
                                                                    ImGui::OpenPopup("Entity does not have this component");
-                                                                   return false;
-                                                               });
+                                                                   return false; });
         }
     }
 
@@ -1043,8 +1112,8 @@ namespace object_editor
         auto &input = *InputLayer::instance();
         auto scene = Engine::scene();
         input.AddUpdateKeyCallback(
-            InputLayer::KeySeq{ engine::core::Key::KEY_CONTROL, engine::core::Key::KEY_LBUTTON },
-            [&] (InputLayer::KeySeq const &, uint32_t)
+            InputLayer::KeySeq{engine::core::Key::KEY_CONTROL, engine::core::Key::KEY_LBUTTON},
+            [&](InputLayer::KeySeq const &, uint32_t)
             {
                 if (ImGui::GetIO().WantCaptureMouse)
                 {
@@ -1052,7 +1121,7 @@ namespace object_editor
                 }
                 auto &input = *InputLayer::instance();
                 auto scene = Engine::scene();
-                Ray ray = scene->main_camera->PixelRaycast(vec2{ input.mouse_position() });
+                Ray ray = scene->main_camera->PixelRaycast(glm::vec2{input.mouse_position()});
                 MeshIntersection nearest;
                 nearest.reset();
                 std::optional<entt::entity> entity = render::ModelSystem::FindIntersection(scene->registry, ray, nearest);
@@ -1073,8 +1142,8 @@ namespace object_editor
             },
             false);
         input.AddUpdateKeyCallback(
-            InputLayer::KeySeq{ engine::core::Key::KEY_R },
-            [&] (InputLayer::KeySeq const &, uint32_t count)
+            InputLayer::KeySeq{engine::core::Key::KEY_R},
+            [&](InputLayer::KeySeq const &, uint32_t count)
             {
                 if (count == std::numeric_limits<uint32_t>::max())
                 {
@@ -1084,8 +1153,8 @@ namespace object_editor
             },
             false);
         input.AddUpdateKeyCallback(
-            InputLayer::KeySeq{ engine::core::Key::KEY_T },
-            [&] (InputLayer::KeySeq const &, uint32_t count)
+            InputLayer::KeySeq{engine::core::Key::KEY_T},
+            [&](InputLayer::KeySeq const &, uint32_t count)
             {
                 if (count == std::numeric_limits<uint32_t>::max())
                 {
@@ -1095,8 +1164,8 @@ namespace object_editor
             },
             false);
         input.AddUpdateKeyCallback(
-            InputLayer::KeySeq{ engine::core::Key::KEY_Y },
-            [&] (InputLayer::KeySeq const &, uint32_t count)
+            InputLayer::KeySeq{engine::core::Key::KEY_Y},
+            [&](InputLayer::KeySeq const &, uint32_t count)
             {
                 if (count == std::numeric_limits<uint32_t>::max())
                 {
@@ -1107,8 +1176,8 @@ namespace object_editor
             false);
 
         input.AddUpdateKeyCallback(
-            InputLayer::KeySeq{ engine::core::Key::KEY_C },
-            [&] (InputLayer::KeySeq const &, uint32_t count)
+            InputLayer::KeySeq{engine::core::Key::KEY_C},
+            [&](InputLayer::KeySeq const &, uint32_t count)
             {
                 if (count == std::numeric_limits<uint32_t>::max())
                 {

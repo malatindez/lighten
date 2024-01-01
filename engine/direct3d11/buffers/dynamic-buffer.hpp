@@ -10,6 +10,7 @@ namespace engine::direct3d
     public:
         using BufferBase<T>::buffer;
         using BufferBase<T>::description;
+
     public:
         /// @brief Construct a new Dynamic Buffer object
         /// @param desc The description of the buffer

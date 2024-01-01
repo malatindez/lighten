@@ -12,7 +12,7 @@ void DrawPathSelector(std::vector<std::filesystem::path> &paths)
 {
     ImGui::BeginChild("ScrollingRegion", ImVec2(0, ImGui::GetTextLineHeightWithSpacing() * std::max(3u, std::min(14u, (uint32_t)paths.size()))), false, ImGuiWindowFlags_HorizontalScrollbar);
 
-    for (const auto& path : paths)
+    for (const auto &path : paths)
     {
         ImGui::Text(mal_toolkit::wstring_to_string(path.wstring()).c_str());
     }
@@ -36,7 +36,7 @@ void DrawPathSelector(std::vector<std::filesystem::path> &paths)
 
         if (GetOpenFileNameW(&ofn))
         {
-            WCHAR* p = ofn.lpstrFile;
+            WCHAR *p = ofn.lpstrFile;
             std::wstring dir = p;
             p += dir.size() + 1;
 
@@ -51,7 +51,7 @@ void DrawPathSelector(std::vector<std::filesystem::path> &paths)
                 } while (*p);
             }
             else
-            { 
+            {
                 std::filesystem::path path = std::filesystem::path(dir);
                 paths.push_back(path);
             }
@@ -60,7 +60,7 @@ void DrawPathSelector(std::vector<std::filesystem::path> &paths)
     ImGui::SameLine();
     if (ImGui::Button("Select Folder..."))
     {
-        IFileDialog* pfd;
+        IFileDialog *pfd;
 
         if (SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pfd))))
         {
@@ -72,7 +72,7 @@ void DrawPathSelector(std::vector<std::filesystem::path> &paths)
 
             if (SUCCEEDED(pfd->Show(NULL)))
             {
-                IShellItem* psi;
+                IShellItem *psi;
                 if (SUCCEEDED(pfd->GetResult(&psi)))
                 {
                     PWSTR pszPath;
@@ -91,10 +91,11 @@ void DrawPathSelector(std::vector<std::filesystem::path> &paths)
 
 namespace scene_viewer
 {
-    
+
     void ImportModelGUI()
     {
-        auto load = [](std::filesystem::path const &path) {
+        auto load = [](std::filesystem::path const &path)
+        {
             try
             {
                 if (engine::core::ModelLoader::Load(path) != std::nullopt)
@@ -102,7 +103,7 @@ namespace scene_viewer
                     spdlog::info("Successfully loaded {}", path.string());
                 }
             }
-            catch (std::exception& e)
+            catch (std::exception &e)
             {
                 spdlog::error(e.what());
             }
@@ -115,11 +116,11 @@ namespace scene_viewer
         ImGui::SameLine();
         if (ImGui::Button("Import"))
         {
-            for (const auto& input_path : paths)
+            for (const auto &input_path : paths)
             {
                 if (std::filesystem::is_directory(input_path))
                 {
-                    for (const auto& file_path : std::filesystem::recursive_directory_iterator(input_path))
+                    for (const auto &file_path : std::filesystem::recursive_directory_iterator(input_path))
                     {
                         if (!std::filesystem::is_directory(file_path))
                         {
@@ -144,22 +145,22 @@ namespace scene_viewer
 
     entt::entity AddModelToWorld(uint64_t model_id)
     {
-        auto& registry = Engine::scene()->registry;
-        auto& ors = Engine::scene()->renderer->opaque_render_system();
+        auto &registry = Engine::scene()->registry;
+        auto &ors = Engine::scene()->renderer->opaque_render_system();
         auto entity = registry.create();
-        auto& game_object = registry.emplace<GameObject>(entity);
-        auto& transform = registry.emplace<Transform>(entity);
+        auto &game_object = registry.emplace<GameObject>(entity);
+        auto &transform = registry.emplace<Transform>(entity);
         transform.reset();
         transform.UpdateMatrices();
-        auto& model_obj = render::ModelSystem::GetModel(model_id);
+        auto &model_obj = render::ModelSystem::GetModel(model_id);
         game_object.name = model_obj.name;
 
         ors.AddInstance(model_id, registry, entity);
         Engine::scene()->renderer->opaque_render_system().ScheduleInstanceUpdate();
         Engine::scene()->renderer->light_render_system().ScheduleShadowMapUpdate();
-        if (math::pow(length(model_obj.bounding_box.size()), 1.0f / 3.0f) > cbrtf(100.0f))
+        if (glm::pow(length(model_obj.bounding_box.size()), 1.0f / 3.0f) > cbrtf(100.0f))
         {
-            transform.scale = vec3{ 1.0f / cbrtf(100.0f) };
+            transform.scale = glm::vec3{1.0f / cbrtf(100.0f)};
         }
         for (auto &mesh : model_obj.meshes)
         {
@@ -176,7 +177,7 @@ namespace scene_viewer
         ImGui::BeginChild("Models", ImVec2(0, 300), true);
         for (auto const &[hash, model_info] : ModelLoader::loaded_models())
         {
-            auto& [path, model_id, model_name] = model_info;
+            auto &[path, model_id, model_name] = model_info;
             ImGui::PushID(static_cast<int>(model_id));
             if (ImGui::Selectable(model_name.size() > 0 ? model_name.c_str() : path.filename().string().c_str(), selected_mesh == model_id))
             {
@@ -185,31 +186,34 @@ namespace scene_viewer
             ImGui::PopID();
         }
         ImGui::EndChild();
-        if(ImGui::Button("Unload"))
+        if (ImGui::Button("Unload"))
         {
             try
             {
                 if (auto opt_model_id = ModelLoader::get_hash_from_model_id(selected_mesh);
                     opt_model_id.has_value())
                 {
-                    auto const& model_id = opt_model_id.value();
-//                    auto& model = render::ModelSystem::GetModel(model_id);
+                    auto const &model_id = opt_model_id.value();
+                    //                    auto& model = render::ModelSystem::GetModel(model_id);
                     render::ModelSystem::UnloadModel(model_id);
-                    
+
                     if (ModelLoader::loaded_models().size() > 1)
                     {
                         selected_mesh = ModelLoader::loaded_models().cbegin()->second.model_id;
                     }
-                    else {
+                    else
+                    {
                         selected_mesh = std::numeric_limits<uint64_t>::max();
                     }
                 }
             }
-            catch (...) {}
+            catch (...)
+            {
+            }
         }
         if (ImGui::Button("Select target mesh"))
         {
-            if(auto hash = ModelLoader::get_hash_from_model_id(selected_mesh);
+            if (auto hash = ModelLoader::get_hash_from_model_id(selected_mesh);
                 hash != std::nullopt)
             {
                 AddModelToWorld(ModelLoader::loaded_models().at(hash.value()).model_id);
@@ -218,7 +222,6 @@ namespace scene_viewer
         ImGui::SameLine();
         ImGui::End();
     }
-
 
     void DrawGuiEntity(entt::registry &registry, entt::entity entity, std::vector<entt::entity> &drawn, bool subnode = false)
     {
@@ -271,11 +274,11 @@ namespace scene_viewer
         // draw entity tree
         ImGui::BeginChild("##entity_tree", ImVec2(0, ImGui::GetWindowHeight() * 0.8f), true);
         std::vector<entt::entity> drawn;
-        registry.each([&drawn, &registry] (auto entity) {
+        registry.each([&drawn, &registry](auto entity)
+                      {
             if (std::find(drawn.begin(), drawn.end(), entity) != drawn.end())
                 return;
-            DrawGuiEntity(registry, entity, drawn);
-                      });
+            DrawGuiEntity(registry, entity, drawn); });
         ImGui::EndChild();
         if (ImGui::Button("Add Entity"))
         {

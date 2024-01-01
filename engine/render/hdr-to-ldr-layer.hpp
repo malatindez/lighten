@@ -6,16 +6,16 @@ namespace engine::render
 {
     class HDRtoLDRLayer
         : public PostProcessingLayer,
-        public PostProcessingLayer::HandleProcess
+          public PostProcessingLayer::HandleProcess
     {
     public:
         struct Buffer
         {
             float exposure = -1.0f;
             float gamma = 1.0f;
-            core::math::vec2 padding;
+            glm::vec2 padding;
         };
-        HDRtoLDRLayer(direct3d::SwapchainRenderTarget &window_render_target) : PostProcessingLayer(0), window_render_target_{ window_render_target }
+        HDRtoLDRLayer(direct3d::SwapchainRenderTarget &window_render_target) : PostProcessingLayer(0), window_render_target_{window_render_target}
         {
             auto path = std::filesystem::current_path();
             auto vs = core::ShaderManager::instance()->CompileVertexShader(path / vs_shader_path);

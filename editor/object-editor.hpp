@@ -14,5 +14,5 @@ namespace object_editor
 
     void OnGuiRender();
 
-    void OnRender(engine::core::math::ivec2 const &window_pos, engine::core::math::ivec2 const &window_size);
+    void OnRender(glm::ivec2 const &window_pos, glm::ivec2 const &window_size);
 }

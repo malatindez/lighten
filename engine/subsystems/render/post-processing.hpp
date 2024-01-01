@@ -9,9 +9,9 @@ namespace engine::render
         explicit PostProcessingLayer(int64_t weight) : kWeight(weight) {}
         virtual ~PostProcessingLayer() = default;
         PostProcessingLayer(PostProcessingLayer const &) = delete;
-        PostProcessingLayer &operator= (PostProcessingLayer const &) = delete;
+        PostProcessingLayer &operator=(PostProcessingLayer const &) = delete;
         PostProcessingLayer(PostProcessingLayer &&) = delete;
-        PostProcessingLayer &operator= (PostProcessingLayer &&) = delete;
+        PostProcessingLayer &operator=(PostProcessingLayer &&) = delete;
 
         class HandleFrameBegin
         {
@@ -66,14 +66,14 @@ namespace engine::render
 
     class PostProcessing
         : public PostProcessingLayer,
-        public core::Layer::HandleEvent,
-        public core::Layer::HandleUpdate,
-        public core::Layer::HandleRender,
-        public core::Layer::HandleGuiRender,
-        public core::Layer::HandleTick,
-        public PostProcessingLayer::HandleFrameBegin,
-        public PostProcessingLayer::HandleFrameEnd,
-        public PostProcessingLayer::HandleProcess
+          public core::Layer::HandleEvent,
+          public core::Layer::HandleUpdate,
+          public core::Layer::HandleRender,
+          public core::Layer::HandleGuiRender,
+          public core::Layer::HandleTick,
+          public PostProcessingLayer::HandleFrameBegin,
+          public PostProcessingLayer::HandleFrameEnd,
+          public PostProcessingLayer::HandleProcess
     {
     public:
         PostProcessing() : PostProcessingLayer(0) {}

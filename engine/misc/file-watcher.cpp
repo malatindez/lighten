@@ -44,7 +44,7 @@ namespace engine::misc
         }
         if (!paths.empty()) [[unlikely]]
         {
-            core::events::FilesChangedEvent fce{ std::move(paths) };
+            core::events::FilesChangedEvent fce{std::move(paths)};
             event_callback_(fce);
         }
     }

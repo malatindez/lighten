@@ -11,6 +11,7 @@ namespace engine::direct3d
         using BufferBase<T>::buffer;
         using BufferBase<T>::description;
         using BufferBase<T>::size;
+
     public:
         /// @brief Construct a new Immutable Buffer object
         /// @param desc The description of the buffer

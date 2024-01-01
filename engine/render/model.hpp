@@ -75,12 +75,12 @@ namespace engine::render
         BlendMode blend_mode;
 
         float bump_scaling;
-        core::math::vec3 diffuse_color;
-        core::math::vec3 specular_color;
-        core::math::vec3 ambient_color;
-        core::math::vec3 emissive_color;
-        core::math::vec3 transparent_color;
-        core::math::vec3 reflective_color;
+        glm::vec3 diffuse_color;
+        glm::vec3 specular_color;
+        glm::vec3 ambient_color;
+        glm::vec3 emissive_color;
+        glm::vec3 transparent_color;
+        glm::vec3 reflective_color;
         bool enable_wireframe = false;
         bool twosided = false;
         float opacity;
@@ -95,20 +95,20 @@ namespace engine::render
         bool use_emissive_map;
         bool use_ambient_occlusion_map;
 
-        core::math::vec3 base_color;
+        glm::vec3 base_color;
         float metalness;
         float roughness;
         float anisotropy;
         float specular;
         float glossiness;
-        core::math::vec3 sheen_color;
+        glm::vec3 sheen_color;
         float sheen_roughness;
         float clearcoat;
         float clearcoat_roughness;
         float transmission;
         float volume_thickness;
         float volume_attenuation_distance;
-        core::math::vec3 volume_attenuation_color;
+        glm::vec3 volume_attenuation_color;
         float emissive_intensity;
 
         std::vector<ID3D11ShaderResourceView *> none_textures;
@@ -135,25 +135,25 @@ namespace engine::render
 
         // TODO load these properties from assimp
         // Holds bytecode of shaders if available
-    /*
-        std::string vertex_shader = "";
-        std::string pixel_shader = "";
-        std::string geometry_shader = "";
-        std::string tesselation_shader = "";
-        std::string primitive_shader = "";
-        std::string compute_shader = "";
-    */
+        /*
+            std::string vertex_shader = "";
+            std::string pixel_shader = "";
+            std::string geometry_shader = "";
+            std::string tesselation_shader = "";
+            std::string primitive_shader = "";
+            std::string compute_shader = "";
+        */
     };
     struct Vertex
     {
-        core::math::vec3 position;
-        core::math::vec2 tex_coord;
-        core::math::vec3 normal;
-        core::math::vec3 tangent;
-        core::math::vec3 bitangent;
+        glm::vec3 position;
+        glm::vec2 tex_coord;
+        glm::vec3 normal;
+        glm::vec3 tangent;
+        glm::vec3 bitangent;
         static constexpr Vertex empty()
         {
-            return Vertex{ core::math::vec3{0.0f}, core::math::vec2{0.0f}, core::math::vec3{0.0f}, core::math::vec3{0.0f}, core::math::vec3{0.0f} };
+            return Vertex{glm::vec3{0.0f}, glm::vec2{0.0f}, glm::vec3{0.0f}, glm::vec3{0.0f}, glm::vec3{0.0f}};
         }
     };
     struct Mesh
@@ -173,20 +173,20 @@ namespace engine::render
     struct ModelMesh
     {
         ModelMesh() = default;
-        ModelMesh(uint32_t loaded_material_id, core::math::mat4 mesh_to_model, MeshRange &&mesh_range, Mesh &&mesh)
+        ModelMesh(uint32_t loaded_material_id, glm::mat4 mesh_to_model, MeshRange &&mesh_range, Mesh &&mesh)
             : loaded_material_id(loaded_material_id),
-            mesh_to_model(mesh_to_model),
-            inv_mesh_to_model(core::math::inverse(mesh_to_model)),
-            mesh_range(std::move(mesh_range)),
-            mesh(std::move(mesh)) {}
+              mesh_to_model(mesh_to_model),
+              inv_mesh_to_model(glm::inverse(mesh_to_model)),
+              mesh_range(std::move(mesh_range)),
+              mesh(std::move(mesh)) {}
         ModelMesh(ModelMesh &&) = default;
         ModelMesh &operator=(ModelMesh &&) = default;
         ModelMesh(ModelMesh const &) = delete;
         ModelMesh &operator=(ModelMesh const &) = delete;
 
         uint32_t loaded_material_id = std::numeric_limits<uint32_t>::max();
-        core::math::mat4 mesh_to_model;
-        core::math::mat4 inv_mesh_to_model;
+        glm::mat4 mesh_to_model;
+        glm::mat4 inv_mesh_to_model;
         MeshRange mesh_range;
         Mesh mesh;
         core::TriangleOctree triangle_octree;

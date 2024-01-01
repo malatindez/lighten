@@ -14,8 +14,8 @@ namespace engine::core
         m_mesh = &mesh;
         m_children = nullptr;
 
-        const math::vec3 eps{ 1e-5f, 1e-5f, 1e-5f };
-        m_box = m_initialBox = math::Box{ model_mesh.mesh_range.bounding_box.min - eps, model_mesh.mesh_range.bounding_box.max + eps };
+        const glm::vec3 eps{1e-5f, 1e-5f, 1e-5f};
+        m_box = m_initialBox = math::Box{model_mesh.mesh_range.bounding_box.min - eps, model_mesh.mesh_range.bounding_box.max + eps};
 
         for (size_t i = 0; i < mesh.indices.size() - 2;)
         {
@@ -23,7 +23,7 @@ namespace engine::core
             auto const &V2 = mesh.vertices[mesh.indices[i++]].position;
             auto const &V3 = mesh.vertices[mesh.indices[i++]].position;
 
-            math::vec3 center = (V1 + V2 + V3) / 3.f;
+            glm::vec3 center = (V1 + V2 + V3) / 3.f;
 
             bool inserted = addTriangle((uint32_t)(i / 3 - 1), V1, V2, V3, center);
             if (!inserted)
@@ -33,7 +33,7 @@ namespace engine::core
         }
     }
 
-    void TriangleOctree::initialize(render::Mesh const &mesh, const math::Box &parentBox, const math::vec3 &parentCenter, int octetIndex)
+    void TriangleOctree::initialize(render::Mesh const &mesh, const math::Box &parentBox, const glm::vec3 &parentCenter, int octetIndex)
     {
         m_mesh = &mesh;
         m_children = nullptr;
@@ -72,19 +72,25 @@ namespace engine::core
         }
 
         m_box = m_initialBox;
-        math::vec3 elongation = (MAX_STRETCHING_RATIO - 1.f) * m_box.size();
+        glm::vec3 elongation = (MAX_STRETCHING_RATIO - 1.f) * m_box.size();
 
-        if (octetIndex % 2 == 0) m_box.max[0] += elongation[0];
-        else m_box.min[0] -= elongation[0];
+        if (octetIndex % 2 == 0)
+            m_box.max[0] += elongation[0];
+        else
+            m_box.min[0] -= elongation[0];
 
-        if (octetIndex % 4 < 2) m_box.max[1] += elongation[1];
-        else m_box.min[1] -= elongation[1];
+        if (octetIndex % 4 < 2)
+            m_box.max[1] += elongation[1];
+        else
+            m_box.min[1] -= elongation[1];
 
-        if (octetIndex < 4) m_box.max[2] += elongation[2];
-        else m_box.min[2] -= elongation[2];
+        if (octetIndex < 4)
+            m_box.max[2] += elongation[2];
+        else
+            m_box.min[2] -= elongation[2];
     }
 
-    bool TriangleOctree::addTriangle(uint32_t triangleIndex, const math::vec3 &V1, const math::vec3 &V2, const math::vec3 &V3, const math::vec3 &center, uint32_t depth)
+    bool TriangleOctree::addTriangle(uint32_t triangleIndex, const glm::vec3 &V1, const glm::vec3 &V2, const glm::vec3 &V3, const glm::vec3 &center, uint32_t depth)
     {
         if (depth > maximum_depth)
         {
@@ -108,7 +114,7 @@ namespace engine::core
             }
             else
             {
-                math::vec3 C = (m_initialBox.min + m_initialBox.max) / 2.f;
+                glm::vec3 C = (m_initialBox.min + m_initialBox.max) / 2.f;
 
                 m_children.reset(new std::array<TriangleOctree, 8>());
                 for (int i = 0; i < 8; ++i)
@@ -124,7 +130,7 @@ namespace engine::core
                     auto const &P2 = m_mesh->vertices[m_mesh->indices[index * 3 + 1]].position;
                     auto const &P3 = m_mesh->vertices[m_mesh->indices[index * 3 + 2]].position;
 
-                    math::vec3 P = (P1 + P2 + P3) / 3.f;
+                    glm::vec3 P = (P1 + P2 + P3) / 3.f;
 
                     int i = 0;
                     for (; i < 8; ++i)
@@ -186,7 +192,8 @@ namespace engine::core
             }
         }
 
-        if (!m_children) return found;
+        if (!m_children)
+            return found;
 
         struct OctantIntersection
         {
@@ -218,7 +225,8 @@ namespace engine::core
             }
         }
         std::sort(boxIntersections.begin(), boxIntersections.end(),
-                  [] (const OctantIntersection &A, const OctantIntersection &B) -> bool { return A.t < B.t; });
+                  [](const OctantIntersection &A, const OctantIntersection &B) -> bool
+                  { return A.t < B.t; });
 
         for (int i = 0; i < 8; ++i)
         {

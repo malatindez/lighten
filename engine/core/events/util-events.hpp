@@ -8,7 +8,7 @@ namespace engine::core::events
     {
     public:
         explicit FilesChangedEvent(std::vector<std::filesystem::path> &&files)
-            : Event(EventType::FilesChanged, EventCategoryUtils), files_{ std::move(files) } {}
+            : Event(EventType::FilesChanged, EventCategoryUtils), files_{std::move(files)} {}
 
         FilesChangedEvent(FilesChangedEvent &&) = default;
         FilesChangedEvent(FilesChangedEvent const &) = default;

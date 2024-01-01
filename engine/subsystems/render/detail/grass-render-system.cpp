@@ -2,7 +2,7 @@
 #include "core/engine.hpp"
 namespace engine::components
 {
-    void GrassComponent::Initialize(std::vector<core::math::vec4> const &atlas_data)
+    void GrassComponent::Initialize(std::vector<glm::vec4> const &atlas_data)
     {
         auto &random_engine = core::Engine::random_engine();
         auto positions = core::math::random::poisson_disc::Generate(random_engine, -spawn_range / 2.0f, spawn_range / 2.0f, min_distance, max_attempts);
@@ -20,15 +20,15 @@ namespace engine::components
             uint32_t atlas_id = atlas_distribution(random_engine);
             float size = size_distribution(random_engine);
 
-            auto size_normalized = size * normalize(glm::vec2{ atlas_data[atlas_id].z - atlas_data[atlas_id].x, atlas_data[atlas_id].w - atlas_data[atlas_id].y });
+            auto size_normalized = size * normalize(glm::vec2{atlas_data[atlas_id].z - atlas_data[atlas_id].x, atlas_data[atlas_id].w - atlas_data[atlas_id].y});
 
             auto grass_instance = GrassInstance{
-                .position = core::math::vec3(position.x, size_normalized.y / 2, position.y) + initial_offset,
+                .position = glm::vec3(position.x, size_normalized.y / 2, position.y) + initial_offset,
                 .size = size_normalized,
                 .rotation = rotation_distribution(random_engine),
                 .atlas_id = atlas_id};
             mal_toolkit::SortedInsert<GrassInstance>(grass_instances_, std::move(grass_instance), [](auto const &lhs, auto const &rhs) constexpr -> bool
-                                               { return lhs.atlas_id < rhs.atlas_id; });
+                                                     { return lhs.atlas_id < rhs.atlas_id; });
         }
     }
 }
@@ -216,7 +216,7 @@ namespace engine::render::_grass_detail
     void GrassRenderSystem::RenderDepthOnly([[maybe_unused]] std::vector<GrassPerDepthCubemap> const &cubemaps, [[maybe_unused]] core::Scene *scene)
     {
 #if 1
-#pragma message ("Warning: grass shadows are disabled")
+#pragma message("Warning: grass shadows are disabled")
         return;
 #else
         if (instances_update_scheduled_)
@@ -251,7 +251,7 @@ namespace engine::render::_grass_detail
                 auto &grass_component = view.get<components::GrassComponent>(entity);
                 auto &transform = scene->registry.get<components::Transform>(entity);
 
-                grass_transform_buffer_.Update(GPUTransformInfo{.rotation_matrix = transpose(transform.rotation.as_mat4()), .position = transform.position});
+                grass_transform_buffer_.Update(GPUTransformInfo{.rotation_matrix = transpose(transform.rotation.asglm::glm::_mat4()), .position = transform.position});
 
                 material.material.Bind(grass_per_material_buffer_);
                 if (material.material.opacity_texture != nullptr)
@@ -274,7 +274,7 @@ namespace engine::render::_grass_detail
     {
 
 #if 1
-#pragma message ("Warning: grass shadows are disabled")
+#pragma message("Warning: grass shadows are disabled")
         return;
 #else
         if (instances_update_scheduled_)
@@ -309,7 +309,7 @@ namespace engine::render::_grass_detail
                 auto &grass_component = view.get<components::GrassComponent>(entity);
                 auto &transform = scene->registry.get<components::Transform>(entity);
 
-                grass_transform_buffer_.Update(GPUTransformInfo{.rotation_matrix = transpose(transform.rotation.as_mat4()), .position = transform.position});
+                grass_transform_buffer_.Update(GPUTransformInfo{.rotation_matrix = transpose(transform.rotation.asglm::glm::_mat4()), .position = transform.position});
                 material.material.Bind(grass_per_material_buffer_);
                 if (material.material.opacity_texture != nullptr)
                 {
@@ -394,8 +394,8 @@ namespace engine::render::_grass_detail
                                                     return lhs < rhs.atlas_id;
                                                 });
 
-                    core::math::uvec2 from = glm::vec2{ atlas_data[current_atlas_id].x * atlas_size.x, atlas_data[current_atlas_id].y * atlas_size.y};
-                    core::math::uvec2 to = glm::vec2{ atlas_data[current_atlas_id].z * atlas_size.x, atlas_data[current_atlas_id].w * atlas_size.y};
+                    glm::uvec2 from = glm::vec2{atlas_data[current_atlas_id].x * atlas_size.x, atlas_data[current_atlas_id].y * atlas_size.y};
+                    glm::uvec2 to = glm::vec2{atlas_data[current_atlas_id].z * atlas_size.x, atlas_data[current_atlas_id].w * atlas_size.y};
                     for (auto &it = begin; it != end; ++it)
                     {
                         auto &instance = *it;

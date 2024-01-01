@@ -44,10 +44,10 @@ namespace engine::core
         constexpr bool StaticCheck()
         {
             return std::is_base_of_v<Layer::HandleEvent, T> ||
-                std::is_base_of_v<Layer::HandleUpdate, T> ||
-                std::is_base_of_v<Layer::HandleRender, T> ||
-                std::is_base_of_v<Layer::HandleGuiRender, T> ||
-                std::is_base_of_v<Layer::HandleTick, T>;
+                   std::is_base_of_v<Layer::HandleUpdate, T> ||
+                   std::is_base_of_v<Layer::HandleRender, T> ||
+                   std::is_base_of_v<Layer::HandleGuiRender, T> ||
+                   std::is_base_of_v<Layer::HandleTick, T>;
         }
     } // namespace _layer_stack_detail
     template <typename T>

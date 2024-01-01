@@ -88,7 +88,7 @@ namespace engine::render
         }
 
     private:
-        std::shared_ptr<Shader> shaders_[ShaderCount] = { nullptr };
+        std::shared_ptr<Shader> shaders_[ShaderCount] = {nullptr};
         std::shared_ptr<InputLayout> input_layout_ = nullptr;
     };
     class ComputeShaderProgram final : public ShaderProgram

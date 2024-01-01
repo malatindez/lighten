@@ -6,7 +6,7 @@ namespace engine::render
 {
     class PresentSwapchain
         : public PostProcessingLayer,
-        public PostProcessingLayer::HandleFrameEnd
+          public PostProcessingLayer::HandleFrameEnd
     {
     public:
         PresentSwapchain() : PostProcessingLayer(std::numeric_limits<int64_t>::max()) {}

@@ -20,18 +20,18 @@ namespace engine::direct3d
         /// @brief Move assignment operator of the RenderTargetBase class
         /// @param other The other RenderTargetBase object
         /// @return A reference to the RenderTargetBase object
-        RenderTargetBase &operator= (RenderTargetBase &&) = default;
+        RenderTargetBase &operator=(RenderTargetBase &&) = default;
         /// @brief Deleted copy constructor of the RenderTargetBase class
         RenderTargetBase(RenderTargetBase const &) = delete;
         /// @brief Deleted copy assignment operator of the RenderTargetBase class
-        RenderTargetBase &operator= (RenderTargetBase const &) = delete;
+        RenderTargetBase &operator=(RenderTargetBase const &) = delete;
 
         /// @brief Initialize the render target
         /// @param size The size of the render target
-        virtual void SizeResources(core::math::ivec2 const &size) = 0;
+        virtual void SizeResources(glm::ivec2 const &size) = 0;
 
         /// @brief Get the size of the render target
-        [[nodiscard]] inline core::math::ivec2 const &size() const noexcept { return size_; }
+        [[nodiscard]] inline glm::ivec2 const &size() const noexcept { return size_; }
         /// @brief Get the ptr to the const render target
         /// @return The render target
         ID3D11Texture2D const *const &render_target() const noexcept { return render_target_.ptr(); }
@@ -71,7 +71,7 @@ namespace engine::direct3d
         /// @brief The description of the render target
         D3D11_TEXTURE2D_DESC render_target_description_;
         /// @brief The size of the render target
-        core::math::ivec2 size_;
+        glm::ivec2 size_;
     };
     /// @brief The render target class
     class RenderTarget : public RenderTargetBase
@@ -91,11 +91,11 @@ namespace engine::direct3d
         /// @brief Force the resize of the render target
         /// @param size The size of the render target
         /// @note SizeResources is checking if the size is equal to the one stored in the class, this function will force the resize
-        void ForceSizeResources(core::math::ivec2 const &size);
+        void ForceSizeResources(glm::ivec2 const &size);
         /// @brief Resize the render target
         /// @param size The size of the render target
         /// @note This function will check if the size is equal to the one stored in the class and if it is it will do nothing
-        void SizeResources(core::math::ivec2 const &size) override;
+        void SizeResources(glm::ivec2 const &size) override;
     };
     /// @todo finish docs for RenderTargetMS
 
@@ -107,8 +107,8 @@ namespace engine::direct3d
         void init();
         void deinit() noexcept;
         static RenderTargetMS empty() noexcept { return RenderTargetMS(DXGI_FORMAT_UNKNOWN); }
-        void ForceSizeResources(core::math::ivec2 const &size);
-        void SizeResources(core::math::ivec2 const &size) override;
+        void ForceSizeResources(glm::ivec2 const &size);
+        void SizeResources(glm::ivec2 const &size) override;
         uint32_t sample_count = 1;
     };
     /// @todo finish docs for SwapchainRenderTarget
@@ -119,11 +119,12 @@ namespace engine::direct3d
         using RenderTargetBase::RenderTargetBase;
         virtual ~SwapchainRenderTarget() = default;
         SwapchainRenderTarget() : RenderTargetBase(DXGI_FORMAT_UNKNOWN) {}
-        void init(HWND hWnd, core::math::ivec2 const &window_size);
+        void init(HWND hWnd, glm::ivec2 const &window_size);
         void deinit() noexcept;
-        void SizeResources(core::math::ivec2 const &size) override;
+        void SizeResources(glm::ivec2 const &size) override;
         [[nodiscard]] SwapChain1 const &swapchain() const noexcept { return swapchain_; }
         [[nodiscard]] SwapChain1 &swapchain() noexcept { return swapchain_; }
+
     private:
         SwapChain1 swapchain_ = nullptr;
     };

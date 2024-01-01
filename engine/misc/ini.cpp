@@ -16,14 +16,14 @@ namespace engine::ini
         {
             throw std::invalid_argument("The input string should be trimmed!");
         }
-        std::string t{ key };
+        std::string t{key};
         dict_.try_emplace(t);
         return dict_.at(t);
     }
 
     [[nodiscard]] Entry const &Section::at(std::string_view const key) const
     {
-        return dict_.at(std::string{ key });
+        return dict_.at(std::string{key});
     }
 
     /* Always returns the string value, even of the object of integer or double type
@@ -66,7 +66,7 @@ namespace engine::ini
 
     std::string Section::Serialize() const noexcept
     {
-        static constexpr auto format = [] (std::string_view const s)
+        static constexpr auto format = [](std::string_view const s)
         {
             std::string str(s);
             std::erase(str, '\n');
@@ -83,7 +83,7 @@ namespace engine::ini
 
     Section &Ini::operator[](std::string_view const key)
     {
-        return CreateSection(std::string{ key });
+        return CreateSection(std::string{key});
     }
 
     Section &Ini::CreateSection(std::string const &key)
@@ -160,8 +160,8 @@ namespace engine::ini
         {
             return;
         }
-        std::string key{ mal_toolkit::trimview(std::string_view{line.begin(), line.begin() + pos}) };
-        std::string value{ mal_toolkit::trimview(std::string_view{line.begin() + pos + 1, line.end()}) };
+        std::string key{mal_toolkit::trimview(std::string_view{line.begin(), line.begin() + pos})};
+        std::string value{mal_toolkit::trimview(std::string_view{line.begin() + pos + 1, line.end()})};
         char *pEnd;
         int64_t ll = strtoll(value.c_str(), &pEnd, 10);
         if (value.c_str() != pEnd && *pEnd == '\0')

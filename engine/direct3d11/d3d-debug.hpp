@@ -9,7 +9,7 @@ namespace engine::direct3d
     {
         /// @brief Get the last error info as std::string
         /// @param hr The HRESULT
-        /// @return error information 
+        /// @return error information
         inline std::string GetLastErrorInfo(HRESULT hr)
         {
             DWORD last_error = ::GetLastError();
@@ -28,9 +28,9 @@ namespace engine::direct3d
         for (UINT64 i = 0; i < message_count; i++)
         {
             SIZE_T message_size = 0;
-            api().debug_info_queue->GetMessage(i, nullptr, &message_size); //get the size of the message
+            api().debug_info_queue->GetMessage(i, nullptr, &message_size); // get the size of the message
 
-            D3D11_MESSAGE *message = (D3D11_MESSAGE *)malloc(message_size); //allocate enough space
+            D3D11_MESSAGE *message = (D3D11_MESSAGE *)malloc(message_size); // allocate enough space
             if (message == nullptr || FAILED(api().debug_info_queue->GetMessage(i, message, &message_size)))
             {
                 free(message);

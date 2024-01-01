@@ -55,7 +55,8 @@ namespace engine::direct3d
         DynamicVertexBuffer(std::span<const T> span, uint32_t cpu_access_flags = D3D11_CPU_ACCESS_WRITE, uint32_t misc_flags = 0)
             : DynamicBuffer<T>(_detail::CreateBasicBufferDesc(D3D11_BIND_VERTEX_BUFFER, cpu_access_flags, misc_flags),
                                span)
-        {}
+        {
+        }
         /// @brief Construct a new Dynamic Vertex Buffer object
         /// @param ptr The pointer to the data to initialize the buffer with
         /// @param size The size of the data to initialize the buffer with, in bytes
@@ -64,7 +65,8 @@ namespace engine::direct3d
         DynamicVertexBuffer(void *ptr, uint32_t size, uint32_t cpu_access_flags = D3D11_CPU_ACCESS_WRITE, uint32_t misc_flags = 0)
             : DynamicBuffer<T>(_detail::CreateBasicBufferDesc(D3D11_BIND_VERTEX_BUFFER, cpu_access_flags, misc_flags),
                                ptr, size)
-        {}
+        {
+        }
         /// @brief Bind the buffer to the input assembler
         /// @param start_slot The start slot to bind the buffer to
         /// @param offset The offset to bind the buffer to

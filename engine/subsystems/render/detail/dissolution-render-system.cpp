@@ -120,11 +120,11 @@ namespace engine::render::_dissolution_detail
             auto gs = core::ShaderManager::instance()->CompileGeometryShader(core::ShaderCompileInput{
                 direct3d::ShaderType::GeometryShader,
                 path / dissolution_gs_depth_only_cubemap_shader_path,
-                "cubemapGS" });
+                "cubemapGS"});
             auto gs2 = core::ShaderManager::instance()->CompileGeometryShader(core::ShaderCompileInput{
                 direct3d::ShaderType::GeometryShader,
                 path / dissolution_gs_depth_only_texture_shader_path,
-                "cubemapGS" });
+                "cubemapGS"});
             auto ps = core::ShaderManager::instance()->CompilePixelShader(path / dissolution_ps_depth_only_shader_path);
             auto il = std::make_shared<InputLayout>(vs->blob(), d3d_input_desc);
             dissolution_cubemap_shader_.SetVertexShader(vs).SetGeometryShader(gs).SetPixelShader(ps).SetInputLayout(il);
@@ -363,28 +363,28 @@ namespace engine::render::_dissolution_detail
                         {
                             dissolution = registry.try_get<components::DissolutionComponent>(entity);
                         }
-                            if (dissolution != nullptr && dissolution->time_begin + dissolution->lifetime < core::Engine::TimeFromStart()) [[unlikely]]
+                        if (dissolution != nullptr && dissolution->time_begin + dissolution->lifetime < core::Engine::TimeFromStart()) [[unlikely]]
+                        {
+                            if (material_instance.material.appearing)
                             {
-                                if (material_instance.material.appearing)
-                                {
-                                    ors.AddInstance(dissolution->model_id, registry, entity);
-                                    ors.ScheduleInstanceUpdate();
-                                    registry.erase<components::DissolutionComponent>(entity);
-                                }
-                                else
-                                {
-                                    registry.destroy(entity);
-                                }
-                                dissolution = nullptr;
-                                this->ScheduleInstanceUpdate();
+                                ors.AddInstance(dissolution->model_id, registry, entity);
+                                ors.ScheduleInstanceUpdate();
+                                registry.erase<components::DissolutionComponent>(entity);
                             }
-                                if (dissolution == nullptr) [[unlikely]]
-                                {
-                                    it = material_instance.instances.erase(it);
-                                    continue;
-                                }
+                            else
+                            {
+                                registry.destroy(entity);
+                            }
+                            dissolution = nullptr;
+                            this->ScheduleInstanceUpdate();
+                        }
+                        if (dissolution == nullptr) [[unlikely]]
+                        {
+                            it = material_instance.instances.erase(it);
+                            continue;
+                        }
 
-                            ++it;
+                        ++it;
                     }
                 }
     }
@@ -417,12 +417,11 @@ namespace engine::render::_dissolution_detail
                     {
                         auto &transform = instance_group.get<components::Transform>(entity);
                         auto &dissolution = instance_group.get<components::DissolutionComponent>(entity);
-                        dst[copiedNum++] = DissolutionInstance{ .world_transform = transform.model,
-                                                                .time_begin = dissolution.time_begin,
-                                                                .lifetime = dissolution.lifetime,
-                                                                .click_point = dissolution.click_point,
-                                                                .box_half_size = abs(model_instance.model.bounding_box.max - model_instance.model.bounding_box.min) / 2.0f * transform.scale
-                        };
+                        dst[copiedNum++] = DissolutionInstance{.world_transform = transform.model,
+                                                               .time_begin = dissolution.time_begin,
+                                                               .lifetime = dissolution.lifetime,
+                                                               .click_point = dissolution.click_point,
+                                                               .box_half_size = abs(model_instance.model.bounding_box.max - model_instance.model.bounding_box.min) / 2.0f * transform.scale};
                     }
                 }
             }
@@ -432,7 +431,7 @@ namespace engine::render::_dissolution_detail
 
     ModelInstance *DissolutionRenderSystem::GetInstancePtr(uint64_t model_id)
     {
-        auto it = std::find_if(model_instances_.begin(), model_instances_.end(), [&model_id] (auto const &instance)
+        auto it = std::find_if(model_instances_.begin(), model_instances_.end(), [&model_id](auto const &instance)
                                { return instance.model_id == model_id; });
         if (it != model_instances_.end())
         {
@@ -442,25 +441,25 @@ namespace engine::render::_dissolution_detail
     }
     ModelInstance &DissolutionRenderSystem::GetInstance(uint64_t model_id)
     {
-        auto it = std::find_if(model_instances_.begin(), model_instances_.end(), [&model_id] (auto const &instance)
+        auto it = std::find_if(model_instances_.begin(), model_instances_.end(), [&model_id](auto const &instance)
                                { return instance.model_id == model_id; });
         if (it != model_instances_.end())
         {
             return *it;
         }
-        model_instances_.emplace_back(ModelInstance{ .model = ModelSystem::GetModel(model_id), .model_id = model_id });
+        model_instances_.emplace_back(ModelInstance{.model = ModelSystem::GetModel(model_id), .model_id = model_id});
         auto &instance = model_instances_.back();
         for (auto const &mesh : instance.model.meshes)
         {
             MeshInstance value;
-            MaterialInstance material_instance{ .material = DissolutionMaterial(instance.model.materials[mesh.loaded_material_id]) };
+            MaterialInstance material_instance{.material = DissolutionMaterial(instance.model.materials[mesh.loaded_material_id])};
             value.material_instances.emplace_back(std::move(material_instance));
             instance.mesh_instances.emplace_back(std::move(value));
         }
         return instance;
     }
 
-    void DissolutionRenderSystem::AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, core::math::vec3 const &click_point, float lifetime, bool appearing, bool emissive)
+    void DissolutionRenderSystem::AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, glm::vec3 const &click_point, float lifetime, bool appearing, bool emissive)
     {
         auto &instance = GetInstance(model_id);
         for (size_t mesh_index = 0; mesh_index < instance.model.meshes.size(); mesh_index++)
@@ -471,7 +470,7 @@ namespace engine::render::_dissolution_detail
             __tmp_material.appearing = appearing;
             __tmp_material.emissive = emissive;
             __tmp_material.UpdateTextureFlags();
-            MaterialInstance material_instance{ .material = std::move(__tmp_material) };
+            MaterialInstance material_instance{.material = std::move(__tmp_material)};
             bool add_new_material = true;
             for (auto &mat_instance : material_instances)
             {
@@ -489,20 +488,20 @@ namespace engine::render::_dissolution_detail
             }
         }
         registry.emplace_or_replace<components::DissolutionComponent>(entity, components::DissolutionComponent{
-                .model_id = model_id,
-                .time_begin = core::Engine::TimeFromStart(),
-                .lifetime = lifetime,
-                .click_point = click_point });
+                                                                                  .model_id = model_id,
+                                                                                  .time_begin = core::Engine::TimeFromStart(),
+                                                                                  .lifetime = lifetime,
+                                                                                  .click_point = click_point});
     }
 
-    void DissolutionRenderSystem::AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, core::math::vec3 const &click_point, float lifetime, std::vector<DissolutionMaterial> const &materials)
+    void DissolutionRenderSystem::AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, glm::vec3 const &click_point, float lifetime, std::vector<DissolutionMaterial> const &materials)
     {
         auto &instance = GetInstance(model_id);
         mal_toolkit::Assert(materials.size() == instance.mesh_instances.size());
         for (size_t mesh_index = 0; mesh_index < instance.model.meshes.size(); mesh_index++)
         {
             auto &material_instances = instance.mesh_instances[mesh_index].material_instances;
-            MaterialInstance material_instance{ .material = DissolutionMaterial(materials[mesh_index]) };
+            MaterialInstance material_instance{.material = DissolutionMaterial(materials[mesh_index])};
             bool add_new_material = true;
             for (auto &mat_instance : material_instances)
             {
@@ -521,9 +520,9 @@ namespace engine::render::_dissolution_detail
         }
 
         registry.emplace_or_replace<components::DissolutionComponent>(entity, components::DissolutionComponent{
-                .model_id = model_id,
-                .time_begin = core::Engine::TimeFromStart(),
-                .lifetime = lifetime,
-                .click_point = click_point });
+                                                                                  .model_id = model_id,
+                                                                                  .time_begin = core::Engine::TimeFromStart(),
+                                                                                  .lifetime = lifetime,
+                                                                                  .click_point = click_point});
     }
 }

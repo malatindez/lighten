@@ -26,12 +26,11 @@
 // Input: name, category, mutator
 #define LIGHTEN_PROPERTY_SETTER(...)
 
-
 /* ideas:
 // Maximum amount of categories: 64
 #define LIGHTEN_DECLARE_EVENT_CATEGORY(categoryname)
 // Declare an event which can be processed by systems.
-// Syntax: 
+// Syntax:
 // LIGHTEN_EVENT_HANDLER(EventCategory, EventName)
 // void OnEventName(EventName const &event);
 #define LIGHTEN_DECLARE_EVENT(CategoryFlags, EventName, body, data_members)

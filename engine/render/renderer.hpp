@@ -68,6 +68,7 @@ namespace engine::render
             render::PerFrame const *per_frame_ptr = nullptr;
             void OnRender(core::Scene *scene);
         };
+
     public:
         Renderer()
         {
@@ -128,21 +129,21 @@ namespace engine::render
         {
             emissive_render_system_->AddInstance(model_id, registry, entity);
         }
-        template<typename T>
+        template <typename T>
         inline void AddRenderPass(std::shared_ptr<T> const &ptr)
         {
             auto render_pass = static_pointer_cast<RenderPass>(ptr);
             mal_toolkit::SortedInsert<std::shared_ptr<RenderPass>>(render_passes_, std::move(render_pass),
-                                                             [](auto const &lhs, auto const &rhs) __lambda_force_inline -> bool
-                                                             { return lhs->kPriority < rhs->kPriority; });
+                                                                   [](auto const &lhs, auto const &rhs) __lambda_force_inline -> bool
+                                                                   { return lhs->kPriority < rhs->kPriority; });
         }
-        template<typename T>
+        template <typename T>
         inline void RemoveRenderPass(std::shared_ptr<T> const &ptr)
         {
             auto render_pass = static_pointer_cast<RenderPass>(ptr);
             mal_toolkit::SortedErase<std::shared_ptr<RenderPass>>(render_passes_, std::move(render_pass),
-                                                            [](auto const &lhs, auto const &rhs) __lambda_force_inline -> bool
-                                                            { return lhs->kPriority < rhs->kPriority; });
+                                                                  [](auto const &lhs, auto const &rhs) __lambda_force_inline -> bool
+                                                                  { return lhs->kPriority < rhs->kPriority; });
         }
         void FrameBegin(core::Scene *scene);
         void DeferredRender(core::Scene *scene, GBuffer const &buffer);

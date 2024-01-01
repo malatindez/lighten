@@ -7,7 +7,8 @@ namespace engine::render
     public:
         Shader(ShaderBlob const &blob, direct3d::ShaderType type)
             : blob_(blob), kType(type)
-        {}
+        {
+        }
 
         ShaderBlob &blob() { return blob_; }
         direct3d::ShaderType type() const { return kType; }

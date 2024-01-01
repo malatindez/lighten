@@ -2,10 +2,10 @@
 #include "../math.hpp"
 /**
  * @file triangle.hpp
- * 
+ *
  * @author malatindez (Vladyslav Ohlii)
  * @date 12/09/2023
- * 
+ *
  * @brief Defines the Triangle structure and methods for ray-triangle intersection.
  */
 namespace engine::core::math
@@ -39,7 +39,7 @@ namespace engine::core::math
             h = cross(ray.direction(), edge2);
             a = dot(edge1, h);
             if (a > -EPSILON && a < EPSILON)
-                return false;    // This ray is parallel to this triangle.
+                return false; // This ray is parallel to this triangle.
             f = 1.0f / a;
             s = ray.origin() - p0;
             u = f * dot(s, h);
@@ -71,7 +71,7 @@ namespace engine::core::math
          */
         [[nodiscard]] static bool Intersect(glm::vec3 const &p0, glm::vec3 const &p1, glm::vec3 const &p2, Intersection &nearest, Ray const &ray)
         {
-            if(Intersect(p0, p1, p2, nearest.t, ray))
+            if (Intersect(p0, p1, p2, nearest.t, ray))
             {
                 nearest.point = ray.PointAtParameter(nearest.t);
                 return true;

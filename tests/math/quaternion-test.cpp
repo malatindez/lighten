@@ -17,7 +17,7 @@ using namespace engine::core::math;
 
 static int const kNumIterations = 10000;
 
-template<typename T>
+template <typename T>
 T random_float_arr(float from = -100, float to = 100)
 {
     T return_value;
@@ -28,7 +28,7 @@ T random_float_arr(float from = -100, float to = 100)
     }
     return return_value;
 }
-template<AnyMat M, int x, int y, typename T, glm::qualifier Q>
+template <AnyMat M, int x, int y, typename T, glm::qualifier Q>
 M create_from_other(glm::mat<x, y, T, Q> const &source)
 {
     static_assert(sizeof(M) == sizeof(glm::mat<x, y, T, Q>), "Size of matrices must be equal");
@@ -42,7 +42,7 @@ M create_from_other(glm::mat<x, y, T, Q> const &source)
     }
     return return_value;
 }
-template<AnyVec V, int x, typename T, glm::qualifier Q>
+template <AnyVec V, int x, typename T, glm::qualifier Q>
 V create_from_other(glm::vec<x, T, Q> const &source)
 {
     static_assert(sizeof(V) == sizeof(glm::vec<x, T, Q>), "Size of vectors must be equal");
@@ -59,7 +59,7 @@ quat create_from_other(glm::quat const &source)
     quat return_value(source.w, source.x, source.y, source.z);
     return return_value;
 }
-template<AnyMat M, int x, int y, typename T, glm::qualifier Q>
+template <AnyMat M, int x, int y, typename T, glm::qualifier Q>
 bool operator==(M const &lhs, glm::mat<x, y, T, Q> const &rhs)
 {
     static_assert(sizeof(M) == sizeof(glm::mat<x, y, T, Q>));
@@ -75,7 +75,7 @@ bool operator==(M const &lhs, glm::mat<x, y, T, Q> const &rhs)
     }
     return true;
 }
-template<AnyVec V, int x, typename T, glm::qualifier Q>
+template <AnyVec V, int x, typename T, glm::qualifier Q>
 bool operator==(V const &lhs, glm::vec<x, T, Q> const &rhs)
 {
     static_assert(sizeof(V) == sizeof(glm::vec<x, T, Q>));
@@ -99,12 +99,12 @@ bool operator==(quat const &lhs, glm::quat const &rhs)
     }
     return true;
 }
-template<AnyMat M, size_t x, size_t y, typename T, glm::qualifier Q>
+template <AnyMat M, size_t x, size_t y, typename T, glm::qualifier Q>
 bool operator==(glm::mat<x, y, T, Q> const &lhs, M const &rhs)
 {
     return rhs == lhs;
 }
-template<AnyVec V, size_t x, typename T, glm::qualifier Q>
+template <AnyVec V, size_t x, typename T, glm::qualifier Q>
 bool operator==(glm::vec<x, T, Q> const &lhs, V const &rhs)
 {
     return rhs == lhs;

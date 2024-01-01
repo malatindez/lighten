@@ -11,7 +11,7 @@ namespace engine::render
         DomainShader(ShaderBlob const &shader_blob) : Shader(shader_blob, direct3d::ShaderType::DomainShader)
         {
             mal_toolkit::AlwaysAssert(direct3d::api().device->CreateDomainShader(blob().ptr(), blob().size(), nullptr, &ds.ptr()) >= 0,
-                                "Failed to create vertex shader");
+                                      "Failed to create vertex shader");
         }
         void Bind() override
         {
@@ -26,7 +26,7 @@ namespace engine::render
             blob() = new_blob;
             ds = nullptr;
             mal_toolkit::AlwaysAssert(direct3d::api().device->CreateDomainShader(blob().ptr(), blob().size(), nullptr, &ds.ptr()) >= 0,
-                                "Failed to recreate vertex shader");
+                                      "Failed to recreate vertex shader");
         }
 
     private:

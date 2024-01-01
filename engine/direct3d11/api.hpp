@@ -71,7 +71,12 @@ namespace engine::direct3d
         static void public_deinit() { Deinit(); }
 #endif
         /// @brief The instance function returns a reference to the instance of the Api class
-        [[nodiscard]] static inline Api &instance() { mal_toolkit::Assert(instance_ != nullptr); return *instance_; }
+        [[nodiscard]] static inline Api &instance()
+        {
+            mal_toolkit::Assert(instance_ != nullptr);
+            return *instance_;
+        }
+
     private:
         Api() = default;
         // delete move & copy semantics
@@ -79,6 +84,7 @@ namespace engine::direct3d
         Api(Api const &) = delete;
         Api &operator=(Api &&) = delete;
         Api &operator=(Api const &) = delete;
+
     private:
         friend class ::engine::core::Engine;
         /// @brief The Init function initializes the Api class

@@ -8,13 +8,13 @@ namespace engine::render
         constexpr bool StaticCheck()
         {
             return std::is_base_of_v<core::Layer::HandleEvent, T> ||
-                std::is_base_of_v<core::Layer::HandleUpdate, T> ||
-                std::is_base_of_v<core::Layer::HandleRender, T> ||
-                std::is_base_of_v<core::Layer::HandleGuiRender, T> ||
-                std::is_base_of_v<core::Layer::HandleTick, T> ||
-                std::is_base_of_v<PostProcessingLayer::HandleFrameBegin, T> ||
-                std::is_base_of_v<PostProcessingLayer::HandleFrameEnd, T> ||
-                std::is_base_of_v<PostProcessingLayer::HandleProcess, T>;
+                   std::is_base_of_v<core::Layer::HandleUpdate, T> ||
+                   std::is_base_of_v<core::Layer::HandleRender, T> ||
+                   std::is_base_of_v<core::Layer::HandleGuiRender, T> ||
+                   std::is_base_of_v<core::Layer::HandleTick, T> ||
+                   std::is_base_of_v<PostProcessingLayer::HandleFrameBegin, T> ||
+                   std::is_base_of_v<PostProcessingLayer::HandleFrameEnd, T> ||
+                   std::is_base_of_v<PostProcessingLayer::HandleProcess, T>;
         }
 
         template <typename T>
@@ -42,7 +42,8 @@ namespace engine::render
         }
     }
     template <typename T>
-    void PostProcessing::AddLayer(std::shared_ptr<T> layer) {
+    void PostProcessing::AddLayer(std::shared_ptr<T> layer)
+    {
         static_assert(_post_processing_detail::StaticCheck<T>());
         if (HasLayer(layer)) [[unlikely]]
         {
@@ -83,8 +84,10 @@ namespace engine::render
             process_.PushLayer(static_cast<PostProcessingLayer::HandleProcess *>(layer.get()), layer->kWeight);
         }
         layer->OnAttach();
-    } template <typename T>
-        void PostProcessing::RemoveLayer(std::shared_ptr<T> layer) {
+    }
+    template <typename T>
+    void PostProcessing::RemoveLayer(std::shared_ptr<T> layer)
+    {
         static_assert(_post_processing_detail::StaticCheck<T>());
         if (auto it = std::ranges::find(all_, layer);
             it != all_.end()) [[unlikely]]
@@ -129,8 +132,10 @@ namespace engine::render
             process_.PopLayer(static_cast<PostProcessingLayer::HandleProcess *>(layer.get()));
         }
         layer->OnDetach();
-    } template <typename T>
-        bool PostProcessing::HasLayer(std::shared_ptr<T> layer) {
+    }
+    template <typename T>
+    bool PostProcessing::HasLayer(std::shared_ptr<T> layer)
+    {
         static_assert(_post_processing_detail::StaticCheck<T>());
         return std::ranges::find(all_, layer) != all_.end();
     }

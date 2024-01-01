@@ -12,10 +12,6 @@ update_sources_msvc("${CMAKE_CURRENT_SOURCE_DIR}" "${ENGINE_SOURCES}")
 
 add_library(engine STATIC "${ENGINE_SOURCES}")
 target_include_directories(engine PUBLIC ${ENGINE_SOURCES_DIR})
-target_link_libraries(engine PUBLIC 
-    EnTT::EnTT 
-    spdlog::spdlog_header_only
-)
 
 target_include_directories(engine PUBLIC 
     ${DirectX_D3D11_INCLUDE_DIRS}
@@ -32,6 +28,8 @@ target_include_directories(engine PUBLIC
     ${YAML_CPP_INCLUDE_DIRS}
     ${CEREAL_INCLUDE_DIRS}
     ${GLM_INCLUDE_DIRS}
+    ${ENTT_INCLUDE_DIRS}
+    ${SPDLOG_INCLUDE_DIRS}
 )
 target_link_libraries(engine PUBLIC 
     ${DirectX_D3D11_LIBRARIES}

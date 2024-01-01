@@ -3,9 +3,9 @@
 /**
  * @file ray.hpp
  * @brief Contains the definition of the Ray class.
- * 
+ *
  * This file provides the Ray class, which represents a geometric ray in 3D space.
- * The Ray class is equipped with various methods for querying and modifying its origin 
+ * The Ray class is equipped with various methods for querying and modifying its origin
  * and direction, as well as computing a point at a parameter along the ray.
 
  */
@@ -14,10 +14,10 @@ namespace engine::core::math
     /**
      * @class Ray
      * @brief Represents a geometric ray in 3D space.
-     * 
+     *
      * The Ray class defines a ray originating from a point, extending infinitely in a given direction.
-     * It provides methods to query and set the origin and direction of the ray, as well as 
-     * retrieving information beneficial for certain algorithms like intersection tests, 
+     * It provides methods to query and set the origin and direction of the ray, as well as
+     * retrieving information beneficial for certain algorithms like intersection tests,
      * such as the inverse direction and the sign.
      */
     class Ray
@@ -31,7 +31,8 @@ namespace engine::core::math
          * @param direction Direction in which the ray extends.
          */
         Ray(glm::vec3 const &origin, glm::vec3 const &direction)
-            : origin_(origin), direction_(direction) {
+            : origin_(origin), direction_(direction)
+        {
             OnDirectionUpdate();
         }
         /// Retrieves the ray's origin (const version).
@@ -68,11 +69,11 @@ namespace engine::core::math
         void OnDirectionUpdate()
         {
             inv_direction_ = 1.0f / direction_;
-            sign_ = glm::ivec3{ inv_direction_.x < 0, inv_direction_.y < 0, inv_direction_.z < 0 };
+            sign_ = glm::ivec3{inv_direction_.x < 0, inv_direction_.y < 0, inv_direction_.z < 0};
         }
-        glm::vec3 origin_;         ///< The ray's starting point.
-        glm::vec3 direction_;      ///< The direction in which the ray extends.
-        glm::vec3 inv_direction_;  ///< The inverse of the ray's direction.
-        glm::ivec3 sign_;          ///< Sign of the inverse direction for each axis.
+        glm::vec3 origin_;        ///< The ray's starting point.
+        glm::vec3 direction_;     ///< The direction in which the ray extends.
+        glm::vec3 inv_direction_; ///< The inverse of the ray's direction.
+        glm::ivec3 sign_;         ///< Sign of the inverse direction for each axis.
     };
 }; // namespace mal_math

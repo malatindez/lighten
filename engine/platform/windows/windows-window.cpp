@@ -63,7 +63,7 @@ namespace engine::platform::windows
         if (!IsWindow(handle())) // temporary workaround
         {
             alive_ = false;
-            core::events::WindowCloseEvent wce{ handle() };
+            core::events::WindowCloseEvent wce{handle()};
             event_callback_(wce);
         }
         return;
@@ -75,66 +75,66 @@ namespace engine::platform::windows
             return true;
         if (message == WM_KEYDOWN)
         {
-            KeyPressedEvent event{ uint32_t(w_param), LOWORD(l_param) };
+            KeyPressedEvent event{uint32_t(w_param), LOWORD(l_param)};
             event_callback_(event);
         }
         else if (message == WM_KEYUP)
         {
-            KeyReleasedEvent event{ uint32_t(w_param) };
+            KeyReleasedEvent event{uint32_t(w_param)};
             event_callback_(event);
         }
         else if (message == WM_MOUSEMOVE)
         {
-            MouseMovedEvent event{ core::math::ivec2{(int16_t)(LOWORD(l_param)),(int16_t)(HIWORD(l_param))} };
+            MouseMovedEvent event{glm::ivec2{(int16_t)(LOWORD(l_param)), (int16_t)(HIWORD(l_param))}};
             event_callback_(event);
         }
         else if (message == WM_LBUTTONDOWN)
         {
-            MouseButtonPressedEvent event{ 0, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)} };
+            MouseButtonPressedEvent event{0, glm::ivec2{LOWORD(l_param), HIWORD(l_param)}};
             event_callback_(event);
         }
         else if (message == WM_LBUTTONUP)
         {
-            MouseButtonReleasedEvent event{ 0, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)} };
+            MouseButtonReleasedEvent event{0, glm::ivec2{LOWORD(l_param), HIWORD(l_param)}};
             event_callback_(event);
         }
         else if (message == WM_RBUTTONDOWN)
         {
-            MouseButtonPressedEvent event{ 1, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)} };
+            MouseButtonPressedEvent event{1, glm::ivec2{LOWORD(l_param), HIWORD(l_param)}};
             event_callback_(event);
         }
         else if (message == WM_RBUTTONUP)
         {
-            MouseButtonReleasedEvent event{ 1, core::math::ivec2{LOWORD(l_param), HIWORD(l_param)} };
+            MouseButtonReleasedEvent event{1, glm::ivec2{LOWORD(l_param), HIWORD(l_param)}};
             event_callback_(event);
         }
         else if (message == WM_MOUSEWHEEL)
         {
-            MouseScrollEvent event{ GET_WHEEL_DELTA_WPARAM(w_param), core::math::ivec2{LOWORD(l_param), HIWORD(l_param)} };
+            MouseScrollEvent event{GET_WHEEL_DELTA_WPARAM(w_param), glm::ivec2{LOWORD(l_param), HIWORD(l_param)}};
             event_callback_(event);
         }
         else if (message == WM_SIZE) // update the window size if it has changed
         {
             if (l_param != 0)
             {
-                WindowResizeEvent event{ LOWORD(l_param), HIWORD(l_param) };
-                size_ = core::math::ivec2{ LOWORD(l_param), HIWORD(l_param) };
+                WindowResizeEvent event{LOWORD(l_param), HIWORD(l_param)};
+                size_ = glm::ivec2{LOWORD(l_param), HIWORD(l_param)};
                 event_callback_(event);
             }
         }
         else if (message == WM_EXITSIZEMOVE || message == WM_PAINT)
         {
-            WindowResizeEvent event{ size_.x, size_.y };
+            WindowResizeEvent event{size_.x, size_.y};
             event_callback_(event);
         }
         else if (message == WM_WINDOWPOSCHANGED) // update window position if it has changed
         {
             auto window_pos = reinterpret_cast<LPWINDOWPOS>(l_param);
-            position_ = core::math::ivec2{ window_pos->x, window_pos->y };
+            position_ = glm::ivec2{window_pos->x, window_pos->y};
         }
         else if (message == WM_DESTROY)
         {
-            WindowCloseEvent event{ handle_ };
+            WindowCloseEvent event{handle_};
             event_callback_(event);
         }
         return DefWindowProcW(handle, message, w_param, l_param);

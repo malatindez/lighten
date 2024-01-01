@@ -20,22 +20,28 @@ namespace engine::render
     }
     void OpaqueMaterial::BindTextures() const
     {
-        if (albedo_map != nullptr) {
+        if (albedo_map != nullptr)
+        {
             direct3d::api().devcon4->PSSetShaderResources(0, 1, &albedo_map);
         }
-        if (normal_map != nullptr) {
+        if (normal_map != nullptr)
+        {
             direct3d::api().devcon4->PSSetShaderResources(1, 1, &normal_map);
         }
-        if (metalness_map != nullptr) {
+        if (metalness_map != nullptr)
+        {
             direct3d::api().devcon4->PSSetShaderResources(2, 1, &metalness_map);
         }
-        if (roughness_map != nullptr) {
+        if (roughness_map != nullptr)
+        {
             direct3d::api().devcon4->PSSetShaderResources(3, 1, &roughness_map);
         }
-        if (opacity_map != nullptr) {
+        if (opacity_map != nullptr)
+        {
             direct3d::api().devcon4->PSSetShaderResources(4, 1, &opacity_map);
         }
-        if (sheen_map != nullptr) {
+        if (sheen_map != nullptr)
+        {
             direct3d::api().devcon4->PSSetShaderResources(15, 1, &sheen_map);
         }
     }
@@ -77,7 +83,7 @@ namespace engine::render
         {
             opacity_map = material.opacity_textures.front();
         }
-        if(material.sheen_textures.size() > 0)
+        if (material.sheen_textures.size() > 0)
         {
             sheen_map = material.sheen_textures.front();
         }
@@ -97,16 +103,16 @@ namespace engine::render::_opaque_detail
         auto path = std::filesystem::current_path();
 
         std::vector<D3D11_INPUT_ELEMENT_DESC> d3d_input_desc{
-             {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             {"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D11_INPUT_PER_VERTEX_DATA, 0},
-             { "ROWX",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA,  1},
-             { "ROWY",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "ROWZ",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "ROWW",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-             { "ENTITY_ID", 0, DXGI_FORMAT_R32_UINT, 1, 64, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+            {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+            {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0},
+            {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0},
+            {"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D11_INPUT_PER_VERTEX_DATA, 0},
+            {"ROWX", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ROWY", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ROWZ", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ROWW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ENTITY_ID", 0, DXGI_FORMAT_R32_UINT, 1, 64, D3D11_INPUT_PER_INSTANCE_DATA, 1},
         };
 
         {
@@ -117,18 +123,14 @@ namespace engine::render::_opaque_detail
         }
         {
             auto vs = core::ShaderManager::instance()->CompileVertexShader(path / opaque_vs_depth_only_shader_path);
-            auto gs = core::ShaderManager::instance()->CompileGeometryShader(core::ShaderCompileInput
-                                                                             {
-                                                                                 direct3d::ShaderType::GeometryShader,
-                                                                                 path / opaque_gs_depth_only_cubemap_shader_path,
-                                                                                 "cubemapGS"
-                                                                             });
-            auto gs2 = core::ShaderManager::instance()->CompileGeometryShader(core::ShaderCompileInput
-                                                                              {
-                                                                                  direct3d::ShaderType::GeometryShader,
-                                                                                  path / opaque_gs_depth_only_texture_shader_path,
-                                                                                  "cubemapGS"
-                                                                              });
+            auto gs = core::ShaderManager::instance()->CompileGeometryShader(core::ShaderCompileInput{
+                direct3d::ShaderType::GeometryShader,
+                path / opaque_gs_depth_only_cubemap_shader_path,
+                "cubemapGS"});
+            auto gs2 = core::ShaderManager::instance()->CompileGeometryShader(core::ShaderCompileInput{
+                direct3d::ShaderType::GeometryShader,
+                path / opaque_gs_depth_only_texture_shader_path,
+                "cubemapGS"});
             auto ps = core::ShaderManager::instance()->CompilePixelShader(path / opaque_ps_depth_only_shader_path);
             auto il = std::make_shared<InputLayout>(vs->blob(), d3d_input_desc);
             opaque_cubemap_shader_.SetVertexShader(vs).SetGeometryShader(gs).SetPixelShader(ps).SetInputLayout(il);
@@ -263,7 +265,7 @@ namespace engine::render::_opaque_detail
         instance_buffer_.Bind(1);
         uint32_t renderedInstances = 0;
 
-        for (const auto & [model_instance_id, model_instance] : model_instances_)
+        for (const auto &[model_instance_id, model_instance] : model_instances_)
         {
             model_instance.model.vertices.Bind(0);
             model_instance.model.indices.Bind();
@@ -324,11 +326,9 @@ namespace engine::render::_opaque_detail
                     auto &instances = perMaterial.instances;
                     for (auto entity : instances)
                     {
-                        dst[copiedNum++] = OpaqueInstance
-                        {
+                        dst[copiedNum++] = OpaqueInstance{
                             .world_transform = instance_group.get<components::Transform>(entity).model,
-                            .entity_id = static_cast<uint32_t>(entity)
-                        };
+                            .entity_id = static_cast<uint32_t>(entity)};
                     }
                 }
             }
@@ -338,7 +338,7 @@ namespace engine::render::_opaque_detail
 
     ModelInstance *OpaqueRenderSystem::GetInstancePtr(uint64_t model_id)
     {
-        auto it = std::find_if(model_instances_.begin(), model_instances_.end(), [&model_id] (auto const &instance)
+        auto it = std::find_if(model_instances_.begin(), model_instances_.end(), [&model_id](auto const &instance)
                                { return instance.second.model_id == model_id; });
         if (it != model_instances_.end())
         {
@@ -348,18 +348,18 @@ namespace engine::render::_opaque_detail
     }
     size_t OpaqueRenderSystem::GetInstanceId(uint64_t model_id)
     {
-        auto it = std::find_if(model_instances_.begin(), model_instances_.end(), [&model_id] (auto const &instance)
+        auto it = std::find_if(model_instances_.begin(), model_instances_.end(), [&model_id](auto const &instance)
                                { return instance.second.model_id == model_id; });
         if (it != model_instances_.end())
         {
             return it->first;
         }
-        model_instances_.insert({ model_instance_offset_++, ModelInstance{.model = ModelSystem::GetModel(model_id), .model_id = model_id } });
+        model_instances_.insert({model_instance_offset_++, ModelInstance{.model = ModelSystem::GetModel(model_id), .model_id = model_id}});
         auto &instance = model_instances_.at(model_instance_offset_ - 1);
         for (auto const &mesh : instance.model.meshes)
         {
             MeshInstance value;
-            MaterialInstance material_instance{ .material = OpaqueMaterial(instance.model.materials[mesh.loaded_material_id]) };
+            MaterialInstance material_instance{.material = OpaqueMaterial(instance.model.materials[mesh.loaded_material_id])};
             value.material_instances.emplace_back(std::move(material_instance));
             instance.mesh_instances.emplace_back(std::move(value));
         }
@@ -375,7 +375,7 @@ namespace engine::render::_opaque_detail
         {
             auto const &mesh = model_instance.model.meshes[mesh_index];
             auto &material_instances = model_instance.mesh_instances[mesh_index].material_instances;
-            MaterialInstance material_instance{ .material = OpaqueMaterial(model_instance.model.materials[mesh.loaded_material_id]) };
+            MaterialInstance material_instance{.material = OpaqueMaterial(model_instance.model.materials[mesh.loaded_material_id])};
             bool add_new_material = true;
             for (auto it = material_instances.begin(); it != material_instances.end(); ++it)
             {
@@ -409,7 +409,7 @@ namespace engine::render::_opaque_detail
         for (size_t mesh_index = 0; mesh_index < model_instance.model.meshes.size(); mesh_index++)
         {
             auto &material_instances = model_instance.mesh_instances[mesh_index].material_instances;
-            MaterialInstance material_instance{ .material = OpaqueMaterial(materials[mesh_index]) };
+            MaterialInstance material_instance{.material = OpaqueMaterial(materials[mesh_index])};
             bool add_new_material = true;
             for (auto it = material_instances.begin(); it != material_instances.end(); ++it)
             {
@@ -434,18 +434,18 @@ namespace engine::render::_opaque_detail
         opaque_instance.material_instance_id = std::move(material_instance_id);
     }
 
-    void OpaqueRenderSystem::RemoveInstance(entt::registry& registry, entt::entity entity)
+    void OpaqueRenderSystem::RemoveInstance(entt::registry &registry, entt::entity entity)
     {
-        components::OpaqueComponent& oc = registry.get<components::OpaqueComponent>(entity);
-        ModelInstance& model_instance = model_instances_.at(oc.model_instance_id);
+        components::OpaqueComponent &oc = registry.get<components::OpaqueComponent>(entity);
+        ModelInstance &model_instance = model_instances_.at(oc.model_instance_id);
         uint32_t i = 0;
         for (auto material_instance_id : oc.material_instance_id)
         {
             std::erase(model_instance.mesh_instances[i++].material_instances[material_instance_id].instances, entity);
         }
-        for (auto& mesh_instance : model_instance.mesh_instances)
+        for (auto &mesh_instance : model_instance.mesh_instances)
         {
-            for (auto& material_instance : mesh_instance.material_instances)
+            for (auto &material_instance : mesh_instance.material_instances)
             {
                 if (material_instance.instances.size())
                 {

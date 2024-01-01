@@ -13,11 +13,12 @@ namespace engine::core
         using FilepathHash = size_t;
         struct ModelInfo
         {
-            ModelInfo(std::filesystem::path const &path, ModelId model_id, std::string_view model_name) 
-            : path{path}, 
-              model_id{model_id}, 
-              model_name{model_name}
-            {}
+            ModelInfo(std::filesystem::path const &path, ModelId model_id, std::string_view model_name)
+                : path{path},
+                  model_id{model_id},
+                  model_name{model_name}
+            {
+            }
             const std::filesystem::path path;
             const ModelId model_id;
             const std::string model_name;
@@ -25,8 +26,9 @@ namespace engine::core
         // Returns id of the model stored in ModelSystem
         static std::optional<ModelId> Load(std::filesystem::path const &path);
 
-        [[nodiscard]] static std::unordered_map<FilepathHash, ModelInfo> const &loaded_models() { return instance_->loaded_models_;}
-        [[nodiscard]] static std::optional<FilepathHash> get_hash_from_model_id(ModelId model_id) {
+        [[nodiscard]] static std::unordered_map<FilepathHash, ModelInfo> const &loaded_models() { return instance_->loaded_models_; }
+        [[nodiscard]] static std::optional<FilepathHash> get_hash_from_model_id(ModelId model_id)
+        {
             auto it = instance_->models_inverse_.find(model_id);
             if (it != instance_->models_inverse_.end())
             {
@@ -34,6 +36,7 @@ namespace engine::core
             }
             return std::nullopt;
         }
+
     private:
         friend class ::engine::core::Engine;
 

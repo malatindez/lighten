@@ -3,7 +3,7 @@
 namespace engine
 {
     render::GraphicsShaderProgram SkyboxManager::skybox_shader_;
-    std::unique_ptr<direct3d::DynamicUniformBuffer<core::math::mat4x3>> SkyboxManager::skybox_buffer_;
+    std::unique_ptr<direct3d::DynamicUniformBuffer<glm::mat4x3>> SkyboxManager::skybox_buffer_;
 
     entt::entity SkyboxManager::LoadSkybox(entt::registry &registry, std::filesystem::path const &path)
     {
@@ -11,7 +11,7 @@ namespace engine
         registry.emplace<components::GameObject>(rv).name = "Skybox";
         TextureId texture_id = std::numeric_limits<TextureId>::max();
         texture_id = core::TextureManager::LoadCubemap(path);
-        registry.emplace<components::SkyboxComponent>(rv, components::SkyboxComponent{ .texture_id = texture_id });
+        registry.emplace<components::SkyboxComponent>(rv, components::SkyboxComponent{.texture_id = texture_id});
         return rv;
     }
     entt::entity SkyboxManager::LoadSkybox(entt::registry &registry, std::array<std::filesystem::path, 6> const &paths)
@@ -19,26 +19,26 @@ namespace engine
         entt::entity rv = registry.create();
         TextureId texture_id = std::numeric_limits<TextureId>::max();
         texture_id = core::TextureManager::LoadCubemap(paths);
-        registry.emplace<components::SkyboxComponent>(rv, components::SkyboxComponent{ .texture_id = texture_id });
+        registry.emplace<components::SkyboxComponent>(rv, components::SkyboxComponent{.texture_id = texture_id});
         return rv;
     }
     void SkyboxManager::RenderSkybox(components::SkyboxComponent const &skybox, render::PerFrame const &per_frame)
     {
         direct3d::api().devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-        core::math::mat4 modified_inv_view_projection = per_frame.inv_view;
+        glm::mat4 modified_inv_view_projection = per_frame.inv_view;
         modified_inv_view_projection[3][0] = modified_inv_view_projection[3][1] = modified_inv_view_projection[3][2] = 0;
         modified_inv_view_projection = modified_inv_view_projection * per_frame.inv_projection;
-        core::math::vec4 bl4 = modified_inv_view_projection * core::math::vec4(-1, -1, 1, 1);
-        core::math::vec4 br4 = modified_inv_view_projection * core::math::vec4(1, -1, 1, 1);
-        core::math::vec4 tl4 = modified_inv_view_projection * core::math::vec4(-1, 1, 1, 1);
-        core::math::vec4 right4 = br4 - bl4;
-        core::math::vec4 up4 = tl4 - bl4;
-        core::math::mat4x3 modified_inv_view_projection_4x3;
-        modified_inv_view_projection_4x3[0] = core::math::vec3{ bl4.x, right4.x, up4.x };
-        modified_inv_view_projection_4x3[1] = core::math::vec3{ bl4.y, right4.y, up4.y };
-        modified_inv_view_projection_4x3[2] = core::math::vec3{ bl4.z, right4.z, up4.z };
-        modified_inv_view_projection_4x3[3] = core::math::vec3{ bl4.w, right4.w, up4.w };
+        glm::vec4 bl4 = modified_inv_view_projection * glm::vec4(-1, -1, 1, 1);
+        glm::vec4 br4 = modified_inv_view_projection * glm::vec4(1, -1, 1, 1);
+        glm::vec4 tl4 = modified_inv_view_projection * glm::vec4(-1, 1, 1, 1);
+        glm::vec4 right4 = br4 - bl4;
+        glm::vec4 up4 = tl4 - bl4;
+        glm::mat4x3 modified_inv_view_projection_4x3;
+        modified_inv_view_projection_4x3[0] = glm::vec3{bl4.x, right4.x, up4.x};
+        modified_inv_view_projection_4x3[1] = glm::vec3{bl4.y, right4.y, up4.y};
+        modified_inv_view_projection_4x3[2] = glm::vec3{bl4.z, right4.z, up4.z};
+        modified_inv_view_projection_4x3[3] = glm::vec3{bl4.w, right4.w, up4.w};
         skybox_buffer_->Update(modified_inv_view_projection_4x3);
         skybox_buffer_->Bind(direct3d::ShaderType::VertexShader, 2);
         skybox_shader_.Bind();
@@ -65,7 +65,7 @@ namespace engine
         auto ps = core::ShaderManager::instance()->CompilePixelShader(path / skybox_ps_shader_path);
 
         skybox_shader_.SetVertexShader(vs).SetPixelShader(ps);
-        skybox_buffer_ = std::make_unique<direct3d::DynamicUniformBuffer<core::math::mat4x3>>();
+        skybox_buffer_ = std::make_unique<direct3d::DynamicUniformBuffer<glm::mat4x3>>();
     }
     void SkyboxManager::Deinit()
     {

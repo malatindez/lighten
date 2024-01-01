@@ -3,11 +3,11 @@
 #include "default-buffer.hpp"
 #include "mal-toolkit/mal-toolkit.hpp"
 #if !defined(_ENGINE_UNIFORM_BUFFERS_CHECK_IF_TYPE_IS_CORRECT)
-#   if defined(_DEBUG) || defined(DEBUG)
-#       define _ENGINE_UNIFORM_BUFFERS_CHECK_IF_TYPE_IS_CORRECT 1
-#   else
-#       define _ENGINE_UNIFORM_BUFFERS_CHECK_IF_TYPE_IS_CORRECT 0
-#   endif
+#if defined(_DEBUG) || defined(DEBUG)
+#define _ENGINE_UNIFORM_BUFFERS_CHECK_IF_TYPE_IS_CORRECT 1
+#else
+#define _ENGINE_UNIFORM_BUFFERS_CHECK_IF_TYPE_IS_CORRECT 0
+#endif
 #endif
 namespace engine::direct3d
 {
@@ -57,7 +57,8 @@ namespace engine::direct3d
         /// @note The buffer size must be a multiple of 16 bytes
         /// @return true if the buffer size is correct
         template <typename ToCheck, std::size_t RealSize = sizeof(ToCheck)>
-        constexpr bool check_buffer_size() {
+        constexpr bool check_buffer_size()
+        {
             static_assert(RealSize <= 16384, "Uniform buffer size must be less than 16384 bytes");
 #if _ENGINE_UNIFORM_BUFFERS_CHECK_IF_TYPE_IS_CORRECT
             static_assert(RealSize % 16 == 0, "Uniform buffer size must be a multiple of 16 bytes. The structure provided is not a multiple of 16 bytes.");
@@ -75,7 +76,7 @@ namespace engine::direct3d
         static constexpr size_t kSize = _uniform_buffer_detail::RoundBufferSizeTo16Boundary(sizeof(T));
         static_assert(_uniform_buffer_detail::check_buffer_size<T>());
 
-        /// @brief Construct a new Defaul Uniform Buffer object 
+        /// @brief Construct a new Defaul Uniform Buffer object
         /// @param cpu_access_flags The CPU access flags, default is 0 (no CPU access). See D3D11_CPU_ACCESS_FLAG for more information.
         /// @param misc_flags The misc flags, default is 0. See D3D11_RESOURCE_MISC_FLAG for more information.
         DefaultUniformBuffer(uint32_t cpu_access_flags = 0, uint32_t misc_flags = 0)
@@ -123,7 +124,7 @@ namespace engine::direct3d
             : DynamicBuffer<T>(_detail::CreateBasicBufferDesc(D3D11_BIND_CONSTANT_BUFFER, cpu_access_flags, misc_flags, kSize)) {}
 
         /// @brief Update uniform buffer data
-        /// @param data The data to initialize the buffer with 
+        /// @param data The data to initialize the buffer with
         /// @param data_size The size of the data, in bytes
         void Update(void const *data, uint32_t data_size)
         {

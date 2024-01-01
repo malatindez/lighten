@@ -22,16 +22,18 @@ namespace engine
         static entt::entity LoadSkybox(entt::registry &registry, std::filesystem::path const &path);
         static entt::entity LoadSkybox(entt::registry &registry, std::array<std::filesystem::path, 6> const &paths);
         static void RenderSkybox(components::SkyboxComponent const &skybox, render::PerFrame const &per_frame);
+
     private:
         friend class core::Engine;
         static void Init();
         static void Deinit();
+
     private:
         static auto constexpr skybox_vs_shader_path = "assets/shaders/skybox/skybox-vs.hlsl";
         static auto constexpr skybox_ps_shader_path = "assets/shaders/skybox/skybox-ps.hlsl";
 
         static render::GraphicsShaderProgram skybox_shader_;
-        static std::unique_ptr<direct3d::DynamicUniformBuffer<core::math::mat4x3>> skybox_buffer_;
+        static std::unique_ptr<direct3d::DynamicUniformBuffer<glm::mat4x3>> skybox_buffer_;
         static direct3d::DepthStencilState skybox_depth_state;
     };
 }

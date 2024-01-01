@@ -7,7 +7,7 @@ namespace engine::direct3d
     ID3D11DepthStencilView *const null_dsv = nullptr;
     /// @brief null depth stencil state pointer
     ID3D11ShaderResourceView *const null_srv = nullptr;
-    /// @brief Shader type enum 
+    /// @brief Shader type enum
     enum class ShaderType : uint8_t
     {
         /// @brief Vertex shader
@@ -25,7 +25,7 @@ namespace engine::direct3d
         /// @brief No shader
         None = 6
     };
-    
+
     using SwapChain1 = d3d_resource_wrapper<IDXGISwapChain1>;
     using RenderTargetView1 = d3d_resource_wrapper<ID3D11RenderTargetView1>;
     using RenderTargetView = d3d_resource_wrapper<ID3D11RenderTargetView>;

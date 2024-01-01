@@ -72,7 +72,7 @@ namespace engine::render::_decal_detail
                     auto &decal = *it;
                     DecalInstance &instance = *(decal_instances++);
                     instance.world_transform = transform_component.model * decal.mesh_transform * decal.model_to_decal;
-                    instance.inv_world_transform = core::math::inverse(instance.world_transform);
+                    instance.inv_world_transform = glm::inverse(instance.world_transform);
                     instance.base_color = decal.base_color;
                     instance.roughness = decal.roughness;
                     instance.metalness = decal.metalness;
@@ -96,12 +96,12 @@ namespace engine::render::_decal_detail
         if (instance_buffer_size_ == 0)
             return;
         std::vector<ID3D11RenderTargetView *> rtvs = {
-             buffer.albedo->render_target_view(),
-             buffer.normals->render_target_view(),
-             buffer.roughness_metalness_transmittance_ao->render_target_view(),
-             buffer.sheen->render_target_view(),
-             buffer.emission->render_target_view(),
-             nullptr };
+            buffer.albedo->render_target_view(),
+            buffer.normals->render_target_view(),
+            buffer.roughness_metalness_transmittance_ao->render_target_view(),
+            buffer.sheen->render_target_view(),
+            buffer.emission->render_target_view(),
+            nullptr};
         direct3d::api().devcon4->OMSetRenderTargets(5, rtvs.data(), dsv);
 
         direct3d::api().devcon4->PSSetShaderResources(1, 1, &normals_srv);

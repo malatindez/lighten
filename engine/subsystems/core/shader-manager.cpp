@@ -66,28 +66,28 @@ namespace engine::core
                         {
                             continue;
                         }
-                            if (dependent_shaders_map_.find(std::filesystem::hash_value(path)) == dependent_shaders_map_.end()) [[unlikely]]
-                            {
-                                dependent_shaders_map_[std::filesystem::hash_value(path)] = std::unordered_set<std::shared_ptr<render::Shader>>{};
-                            }
-                                try
-                            {
-                                std::ifstream o(path);
-                                o.close();
-                            }
-                            catch (std::exception const &e)
-                            {
-                                spdlog::error("Failed to open file @ " + path.string() + " with error: " + e.what());
-                                continue;
-                            }
-                            // I'm not sure why, but the threads will throw sometimes(pretty rarely)
-                            // I will disable it for now, but I will try to fix this later
-                            //                            threads.emplace_back(recompile_task, shader);
+                        if (dependent_shaders_map_.find(std::filesystem::hash_value(path)) == dependent_shaders_map_.end()) [[unlikely]]
+                        {
+                            dependent_shaders_map_[std::filesystem::hash_value(path)] = std::unordered_set<std::shared_ptr<render::Shader>>{};
+                        }
+                        try
+                        {
+                            std::ifstream o(path);
+                            o.close();
+                        }
+                        catch (std::exception const &e)
+                        {
+                            spdlog::error("Failed to open file @ " + path.string() + " with error: " + e.what());
+                            continue;
+                        }
+                        // I'm not sure why, but the threads will throw sometimes(pretty rarely)
+                        // I will disable it for now, but I will try to fix this later
+                        //                            threads.emplace_back(recompile_task, shader);
 
-                            // TODO(malatindez):
-                            // fix multithreading
+                        // TODO(malatindez):
+                        // fix multithreading
 
-                            recompile_task(shader);
+                        recompile_task(shader);
                     }
                     // jthreads will automatically be joined as the vector goes out of scope
                 }

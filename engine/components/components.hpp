@@ -16,7 +16,7 @@
  * @brief The components namespace contains all the components that can be used in the engine
  * @todo Every component should inherit from Component class
  * @todo Every component should have static \code{.cpp} constexpr std::string_view name;\endcode member that is used to identify the component by name
- * 
+ *
  * If the component doesn't have a name, \code{.cpp}static_assert(false, "Component {class name} must have a name declared");\endcode will be generated automatically
  * in generated file to make sure that the component has a name
  *
@@ -64,7 +64,7 @@
   * If you want to generate serialization/deserialization for the component you should add `static constexpr bool kGenerateSerialization = true;` member to the component
   *
   * Private members and members that do not have serialization specification will be ignored.
-  * 
+  *
   * If you want to create custom serializer you should create a specialization of the `engine::components::Serialize::Serializer`
   * The script will try to find it, but if it won't you can include it in the component header
   * This is the example of a serializer:
@@ -99,11 +99,11 @@ namespace engine::components::Serialize
   * This script should create the special configuration file located at `engine\components\generated\components-editor.json`.
   *
   * This file will contain the list of rules how to render each component.
-  * 
+  *
   * @warning If the member variable cannot be rendered/cast to the `ImGuiEditor<T>{}` specialization it will be written as an "unknown type" in the `.json` file
   * @note The user will be able to edit the `.json` file and add the rules for the `ImGuiEditor<T>{}` specializations
   * @note The user will be able to add the `ImGuiEditor<T>{}` specializations for the types that are not supported by default
-  * 
+  *
   * Example of `.json` configuration file:
   \code{.json}
 {

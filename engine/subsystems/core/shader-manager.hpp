@@ -63,9 +63,10 @@ namespace engine::core
         static void Deinit() { instance_ = nullptr; }
 
     private:
-        ShaderManager() : watcher_{ [this] (events::Event &e) __lambda_force_inline
-                                   { OnEvent(e); } }
-        {}
+        ShaderManager() : watcher_{[this](events::Event &e) __lambda_force_inline
+                                   { OnEvent(e); }}
+        {
+        }
 
         // delete move & copy semantics
         ShaderManager(ShaderManager &&) = delete;

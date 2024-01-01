@@ -20,17 +20,17 @@ namespace engine::render::misc
         void Init();
         void Shutdown();
         void Run(uint32_t max_size, direct3d::UnorderedAccessView sort_buffer_uav, direct3d::Buffer item_count_buffer);
-    private:
 
+    private:
         bool SortInitial(uint32_t max_size);
         bool SortIncremental(uint32_t presorted, uint32_t max_size);
 #ifdef _DEBUG
         void DebugCheck(uint32_t size, ID3D11UnorderedAccessView *pUAV);
 #endif
 
-        direct3d::DynamicUniformBuffer<core::math::ivec4> pcb_dispatch_info_;
+        direct3d::DynamicUniformBuffer<glm::ivec4> pcb_dispatch_info_;
 
-        direct3d::DefaultBuffer<core::math::uvec4> indirect_sort_args_buffer_;
+        direct3d::DefaultBuffer<glm::uvec4> indirect_sort_args_buffer_;
         direct3d::UnorderedAccessView indirect_sort_args_uav_;
         // InitSortArgsCS.hlsl
         // m_pCSInitArgs

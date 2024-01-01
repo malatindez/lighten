@@ -5,7 +5,7 @@
 namespace engine::direct3d
 {
     RenderTargetBase::RenderTargetBase(DXGI_FORMAT format) noexcept : format_(format),
-        size_(0, 0)
+                                                                      size_(0, 0)
     {
     }
 
@@ -29,14 +29,14 @@ namespace engine::direct3d
         }
         initialized = true;
     }
-    void RenderTargetMS::ForceSizeResources(core::math::ivec2 const &size)
+    void RenderTargetMS::ForceSizeResources(glm::ivec2 const &size)
     {
         if (size.x < 0 || size.y < 0)
         {
             throw std::out_of_range("Invalid width/height");
         }
 
-        size_ = core::math::ivec2{ 0 };
+        size_ = glm::ivec2{0};
         render_target_description_.Format = format_;
         render_target_description_.Width = static_cast<UINT>(size.x);
         render_target_description_.Height = static_cast<UINT>(size.y);
@@ -51,8 +51,7 @@ namespace engine::direct3d
         Assert(api().device->CreateTexture2D(
             &render_target_description_,
             nullptr,
-            &render_target_.reset()
-        ));
+            &render_target_.reset()));
 
         D3D11_RENDER_TARGET_VIEW_DESC render_target_view_desc;
         render_target_view_desc.Format = render_target_description_.Format;
@@ -62,8 +61,7 @@ namespace engine::direct3d
         Assert(api().device->CreateRenderTargetView(
             render_target_.ptr(),
             &render_target_view_desc,
-            &render_target_view_.reset()
-        ));
+            &render_target_view_.reset()));
 
         // Create SRV.
         D3D11_SHADER_RESOURCE_VIEW_DESC shader_resource_view_desc;
@@ -75,13 +73,12 @@ namespace engine::direct3d
         Assert(api().device->CreateShaderResourceView(
             render_target_.ptr(),
             &shader_resource_view_desc,
-            &shader_resource_view_.reset()
-        ));
+            &shader_resource_view_.reset()));
 
         size_ = size;
     }
 
-    void RenderTargetMS::SizeResources(core::math::ivec2 const &size)
+    void RenderTargetMS::SizeResources(glm::ivec2 const &size)
     {
         if (size == size_)
             return;
@@ -93,7 +90,7 @@ namespace engine::direct3d
         render_target_view_.reset();
         shader_resource_view_.reset();
         render_target_.reset();
-        size_ = core::math::ivec2{ 0 };
+        size_ = glm::ivec2{0};
         initialized = false;
     }
 
@@ -117,14 +114,14 @@ namespace engine::direct3d
         }
         initialized = true;
     }
-    void RenderTarget::ForceSizeResources(core::math::ivec2 const &size)
+    void RenderTarget::ForceSizeResources(glm::ivec2 const &size)
     {
         if (size.x < 0 || size.y < 0)
         {
             throw std::out_of_range("Invalid width/height");
         }
 
-        size_ = core::math::ivec2{ 0 };
+        size_ = glm::ivec2{0};
         render_target_description_.Format = format_;
         render_target_description_.Width = static_cast<UINT>(size.x);
         render_target_description_.Height = static_cast<UINT>(size.y);
@@ -139,8 +136,7 @@ namespace engine::direct3d
         Assert(api().device->CreateTexture2D(
             &render_target_description_,
             nullptr,
-            &render_target_.reset()
-        ));
+            &render_target_.reset()));
 
         D3D11_RENDER_TARGET_VIEW_DESC render_target_view_desc;
         render_target_view_desc.Format = render_target_description_.Format;
@@ -150,8 +146,7 @@ namespace engine::direct3d
         Assert(api().device->CreateRenderTargetView(
             render_target_.ptr(),
             &render_target_view_desc,
-            &render_target_view_.reset()
-        ));
+            &render_target_view_.reset()));
 
         // Create SRV.
         D3D11_SHADER_RESOURCE_VIEW_DESC shader_resource_view_desc;
@@ -163,13 +158,12 @@ namespace engine::direct3d
         Assert(api().device->CreateShaderResourceView(
             render_target_.ptr(),
             &shader_resource_view_desc,
-            &shader_resource_view_.reset()
-        ));
+            &shader_resource_view_.reset()));
 
         size_ = size;
     }
 
-    void RenderTarget::SizeResources(core::math::ivec2 const &size)
+    void RenderTarget::SizeResources(glm::ivec2 const &size)
     {
         if (size == size_)
             return;
@@ -181,11 +175,11 @@ namespace engine::direct3d
         render_target_view_.reset();
         shader_resource_view_.reset();
         render_target_.reset();
-        size_ = core::math::ivec2{ 0 };
+        size_ = glm::ivec2{0};
         initialized = false;
     }
 
-    void SwapchainRenderTarget::init(HWND hWnd, core::math::ivec2 const &window_size)
+    void SwapchainRenderTarget::init(HWND hWnd, glm::ivec2 const &window_size)
     {
         if (swapchain_.valid())
         {
@@ -210,8 +204,8 @@ namespace engine::direct3d
         SetLastError(0);
         AlwaysAssert(api().factory5->CreateSwapChainForHwnd(api().device, hWnd, &desc, nullptr, nullptr, &swapchain),
                      "Failed to create the swapchain");
-        swapchain_ = SwapChain1{ swapchain };
-        SizeResources(core::math::ivec2{ 0 });
+        swapchain_ = SwapChain1{swapchain};
+        SizeResources(glm::ivec2{0});
         initialized = true;
     }
     void SwapchainRenderTarget::deinit() noexcept
@@ -222,7 +216,7 @@ namespace engine::direct3d
         swapchain_.reset();
         initialized = false;
     }
-    void SwapchainRenderTarget::SizeResources(core::math::ivec2 const &size)
+    void SwapchainRenderTarget::SizeResources(glm::ivec2 const &size)
     {
         if (!swapchain_.valid() || size == size_)
         {

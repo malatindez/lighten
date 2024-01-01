@@ -8,13 +8,13 @@ namespace engine::core
                                            std::vector<std::filesystem::path> const &dependent_files)
     {
         mal_toolkit::Assert(mal_toolkit::for_each_true(
-            dependent_files.cbegin(),
-            dependent_files.cend(),
-            [](auto const &it) __lambda_force_inline -> bool
-            {
-                return it->is_absolute();
-            }),
-            "Paths provided should be absolute");
+                                dependent_files.cbegin(),
+                                dependent_files.cend(),
+                                [](auto const &it) __lambda_force_inline -> bool
+                                {
+                                    return it->is_absolute();
+                                }),
+                            "Paths provided should be absolute");
 
         for (auto &path : dependent_files)
         {
@@ -39,5 +39,5 @@ namespace engine::core
         return rv;
     }
     template <typename T>
-    std::shared_ptr<T> ShaderManager::CompileFromPath(std::filesystem::path const &path) { return CompileShader<T>(ShaderCompileInput{ .type = T::kType, .source_file = path }); }
+    std::shared_ptr<T> ShaderManager::CompileFromPath(std::filesystem::path const &path) { return CompileShader<T>(ShaderCompileInput{.type = T::kType, .source_file = path}); }
 }

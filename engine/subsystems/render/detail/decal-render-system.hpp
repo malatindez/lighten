@@ -19,9 +19,9 @@ namespace engine::components
     {
         struct Decal
         {
-            core::math::mat4 mesh_transform;
-            core::math::mat4 model_to_decal;
-            core::math::vec3 base_color;
+            glm::mat4 mesh_transform;
+            glm::mat4 model_to_decal;
+            glm::vec3 base_color;
             // rotation of 2d texture in radians
             float texture_angle;
             float roughness;
@@ -38,9 +38,9 @@ namespace engine::render::_decal_detail
 {
     struct DecalInstance
     {
-        core::math::mat4 world_transform;
-        core::math::mat4 inv_world_transform;
-        core::math::vec3 base_color;
+        glm::mat4 world_transform;
+        glm::mat4 inv_world_transform;
+        glm::vec3 base_color;
         float roughness;
         float metalness;
         float transmittance;
@@ -68,6 +68,7 @@ namespace engine::render::_decal_detail
         }
 
         ID3D11ShaderResourceView *normal_opacity_map;
+
     private:
         bool is_instance_update_scheduled_ = false;
         void UpdateInstances(entt::registry &registry);

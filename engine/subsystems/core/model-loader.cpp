@@ -7,66 +7,65 @@
 #include "texture-manager.hpp"
 #include "../render/model-system.hpp"
 
-
 namespace engine::core
 {
     using namespace render;
     namespace
     {
-        ModelMesh SetupMesh(std::vector<Vertex>&& vertices, std::vector<uint32_t>&& indices, uint32_t material_id, aiMatrix4x4 const& transformation, MeshRange&& mesh_range)
+        ModelMesh SetupMesh(std::vector<Vertex> &&vertices, std::vector<uint32_t> &&indices, uint32_t material_id, aiMatrix4x4 const &transformation, MeshRange &&mesh_range)
         {
-            auto temp = math::mat4(transformation.a1, transformation.a2, transformation.a3, transformation.a4,
-                transformation.b1, transformation.b2, transformation.b3, transformation.b4,
-                transformation.c1, transformation.c2, transformation.c3, transformation.c4,
-                transformation.d1, transformation.b2, transformation.d3, transformation.d4);
-            return ModelMesh(material_id, temp, std::move(mesh_range), Mesh{ .vertices = std::move(vertices), .indices = std::move(indices) });
+            auto temp = glm::mat4(transformation.a1, transformation.a2, transformation.a3, transformation.a4,
+                                  transformation.b1, transformation.b2, transformation.b3, transformation.b4,
+                                  transformation.c1, transformation.c2, transformation.c3, transformation.c4,
+                                  transformation.d1, transformation.b2, transformation.d3, transformation.d4);
+            return ModelMesh(material_id, temp, std::move(mesh_range), Mesh{.vertices = std::move(vertices), .indices = std::move(indices)});
         }
 
-        void processMesh(std::vector<Vertex>& vertices_dest,
-            std::vector<uint32_t>& indices_dest,
-            std::vector<ModelMesh>& meshes,
-            aiMesh* mesh,
-            aiMatrix4x4 const& transformation)
+        void processMesh(std::vector<Vertex> &vertices_dest,
+                         std::vector<uint32_t> &indices_dest,
+                         std::vector<ModelMesh> &meshes,
+                         aiMesh *mesh,
+                         aiMatrix4x4 const &transformation)
         {
             std::vector<Vertex> vertices;
             std::vector<uint32_t> indices;
             for (uint32_t i = 0; i < mesh->mNumVertices; i++)
             {
-                math::vec3 position = math::vec3{ 0 };
-                math::vec2 tex_coord = math::vec2{ 0 };
-                math::vec3 normal = math::vec3{ 0 };
-                math::vec3 tangent = math::vec3{ 0 };
-                math::vec3 bitangent = math::vec3{ 0 };
+                glm::vec3 position = glm::vec3{0};
+                glm::vec2 tex_coord = glm::vec2{0};
+                glm::vec3 normal = glm::vec3{0};
+                glm::vec3 tangent = glm::vec3{0};
+                glm::vec3 bitangent = glm::vec3{0};
                 if (mesh->mVertices != nullptr)
                 {
-                    position = math::vec3{ mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
+                    position = glm::vec3{mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z};
                 }
                 if (mesh->mTextureCoords[0] != nullptr)
                 {
-                    tex_coord = math::vec2{ mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
+                    tex_coord = glm::vec2{mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y};
                 }
                 if (mesh->mNormals != nullptr)
                 {
-                    normal = math::vec3{ mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
+                    normal = glm::vec3{mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z};
                 }
                 if (mesh->mTangents != nullptr)
                 {
-                    tangent = math::vec3{ mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
+                    tangent = glm::vec3{mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z};
                 }
                 if (mesh->mBitangents != nullptr)
                 {
-                    bitangent = math::vec3{ mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z };
+                    bitangent = glm::vec3{mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z};
                 }
                 vertices.emplace_back(Vertex{
                     .position = position,
                     .tex_coord = tex_coord,
                     .normal = normal,
                     .tangent = tangent,
-                    .bitangent = bitangent });
+                    .bitangent = bitangent});
             }
             for (uint32_t i = 0; i < mesh->mNumFaces; i++)
             {
-                aiFace const& face = mesh->mFaces[i];
+                aiFace const &face = mesh->mFaces[i];
                 for (uint32_t j = 0; j < face.mNumIndices; j++)
                 {
                     indices.push_back(face.mIndices[j]);
@@ -74,29 +73,24 @@ namespace engine::core
             }
             vertices_dest.insert(vertices_dest.end(), vertices.begin(), vertices.end());
             indices_dest.insert(indices_dest.end(), indices.begin(), indices.end());
-            ModelMesh mesh__ = SetupMesh(std::move(vertices), std::move(indices), mesh->mMaterialIndex, transformation, MeshRange{
-                // we are gonna fill offsets later
-                .vertex_offset = std::numeric_limits<uint32_t>::max(),
-                .index_offset = std::numeric_limits<uint32_t>::max(),
-                .vertex_count = mesh->mNumVertices,
-                .index_count = mesh->mNumFaces * 3,
-                .bounding_box = math::Box {
-                    .min = math::vec3{mesh->mAABB.mMin.x, mesh->mAABB.mMin.y, mesh->mAABB.mMin.z},
-                    .max = math::vec3{mesh->mAABB.mMax.x, mesh->mAABB.mMax.y, mesh->mAABB.mMax.z}
-                } }
-            );
+            ModelMesh mesh__ = SetupMesh(std::move(vertices), std::move(indices), mesh->mMaterialIndex, transformation, MeshRange{// we are gonna fill offsets later
+                                                                                                                                  .vertex_offset = std::numeric_limits<uint32_t>::max(),
+                                                                                                                                  .index_offset = std::numeric_limits<uint32_t>::max(),
+                                                                                                                                  .vertex_count = mesh->mNumVertices,
+                                                                                                                                  .index_count = mesh->mNumFaces * 3,
+                                                                                                                                  .bounding_box = math::Box{.min = glm::vec3{mesh->mAABB.mMin.x, mesh->mAABB.mMin.y, mesh->mAABB.mMin.z}, .max = glm::vec3{mesh->mAABB.mMax.x, mesh->mAABB.mMax.y, mesh->mAABB.mMax.z}}});
             meshes.push_back(std::move(mesh__));
         }
 
-        void processNode(std::vector<Vertex>& vertices,
-            std::vector<uint32_t>& indices,
-            std::vector<ModelMesh>& meshes,
-            aiNode* node,
-            aiScene const* scene)
+        void processNode(std::vector<Vertex> &vertices,
+                         std::vector<uint32_t> &indices,
+                         std::vector<ModelMesh> &meshes,
+                         aiNode *node,
+                         aiScene const *scene)
         {
             for (uint32_t i = 0; i < node->mNumMeshes; i++)
             {
-                aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+                aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
                 processMesh(vertices, indices, meshes, mesh, node->mTransformation);
             }
 
@@ -110,24 +104,34 @@ namespace engine::core
         {
             switch (shading_mode)
             {
-            case aiShadingMode_Flat: return Material::ShadingMode::Flat;
-            case aiShadingMode_Gouraud: return Material::ShadingMode::Gouraud;
-            case aiShadingMode_Phong: return Material::ShadingMode::Phong;
-            case aiShadingMode_Blinn: return Material::ShadingMode::Blinn;
-            case aiShadingMode_Toon: return Material::ShadingMode::Toon;
-            case aiShadingMode_OrenNayar: return Material::ShadingMode::OrenNayar;
-            case aiShadingMode_Minnaert: return Material::ShadingMode::Minnaert;
-            case aiShadingMode_CookTorrance: return Material::ShadingMode::CookTorrance;
-            case aiShadingMode_Fresnel: return Material::ShadingMode::Fresnel;
-            case aiShadingMode_PBR_BRDF: return Material::ShadingMode::PBR_BRDF;
-            default: return Material::ShadingMode::None;
+            case aiShadingMode_Flat:
+                return Material::ShadingMode::Flat;
+            case aiShadingMode_Gouraud:
+                return Material::ShadingMode::Gouraud;
+            case aiShadingMode_Phong:
+                return Material::ShadingMode::Phong;
+            case aiShadingMode_Blinn:
+                return Material::ShadingMode::Blinn;
+            case aiShadingMode_Toon:
+                return Material::ShadingMode::Toon;
+            case aiShadingMode_OrenNayar:
+                return Material::ShadingMode::OrenNayar;
+            case aiShadingMode_Minnaert:
+                return Material::ShadingMode::Minnaert;
+            case aiShadingMode_CookTorrance:
+                return Material::ShadingMode::CookTorrance;
+            case aiShadingMode_Fresnel:
+                return Material::ShadingMode::Fresnel;
+            case aiShadingMode_PBR_BRDF:
+                return Material::ShadingMode::PBR_BRDF;
+            default:
+                return Material::ShadingMode::None;
             }
         }
-        void ProcessMaterials(std::vector<Material>& materials, aiScene const* scene_ptr, std::filesystem::path const& model_folder);
+        void ProcessMaterials(std::vector<Material> &materials, aiScene const *scene_ptr, std::filesystem::path const &model_folder);
     } // namespace
 
-    
-    std::optional<ModelId> ModelLoader::Load(std::filesystem::path const& input_path)
+    std::optional<ModelId> ModelLoader::Load(std::filesystem::path const &input_path)
     {
         std::filesystem::path path = input_path;
         if (!path.is_absolute())
@@ -141,25 +145,25 @@ namespace engine::core
         }
 
         Assimp::Importer importer;
-        aiScene const* scene_ptr = importer.ReadFile(path.string().c_str(),
-            aiProcess_Triangulate |
-            aiProcess_MakeLeftHanded |
-            aiProcess_FlipUVs |
-            aiProcess_FlipWindingOrder |
-            aiProcess_JoinIdenticalVertices |
-            (uint32_t)aiProcess_GenBoundingBoxes |
-            aiProcess_CalcTangentSpace |
-            aiProcess_OptimizeGraph |
-            aiProcess_OptimizeMeshes |
-            aiProcess_ImproveCacheLocality |
-            aiProcess_RemoveRedundantMaterials |
-            aiProcess_FindDegenerates |
-            aiProcess_FindInvalidData |
-            aiProcess_GenSmoothNormals |
-            aiProcess_SplitLargeMeshes |
-            aiProcess_SortByPType |
-            aiProcess_FindInstances |
-            aiProcess_ValidateDataStructure);
+        aiScene const *scene_ptr = importer.ReadFile(path.string().c_str(),
+                                                     aiProcess_Triangulate |
+                                                         aiProcess_MakeLeftHanded |
+                                                         aiProcess_FlipUVs |
+                                                         aiProcess_FlipWindingOrder |
+                                                         aiProcess_JoinIdenticalVertices |
+                                                         (uint32_t)aiProcess_GenBoundingBoxes |
+                                                         aiProcess_CalcTangentSpace |
+                                                         aiProcess_OptimizeGraph |
+                                                         aiProcess_OptimizeMeshes |
+                                                         aiProcess_ImproveCacheLocality |
+                                                         aiProcess_RemoveRedundantMaterials |
+                                                         aiProcess_FindDegenerates |
+                                                         aiProcess_FindInvalidData |
+                                                         aiProcess_GenSmoothNormals |
+                                                         aiProcess_SplitLargeMeshes |
+                                                         aiProcess_SortByPType |
+                                                         aiProcess_FindInstances |
+                                                         aiProcess_ValidateDataStructure);
         if (scene_ptr == nullptr)
         {
             spdlog::warn("Failed to load model @ " + path.string());
@@ -176,14 +180,14 @@ namespace engine::core
         processNode(vertices, indices, meshes, scene_ptr->mRootNode, scene_ptr);
         uint32_t index_offset = 0;
         uint32_t vertex_offset = 0;
-        math::vec3 min{ std::numeric_limits<float>::max() };
-        math::vec3 max{ std::numeric_limits<float>::min() };
+        glm::vec3 min{std::numeric_limits<float>::max()};
+        glm::vec3 max{std::numeric_limits<float>::min()};
 
-        for (auto& mesh : meshes)
+        for (auto &mesh : meshes)
         {
-            auto& mesh_range = mesh.mesh_range;
-            glm::vec3 mesh_min = (math::vec4(mesh_range.bounding_box.min, 1) * mesh.mesh_to_model);
-            glm::vec3 mesh_max = (math::vec4(mesh_range.bounding_box.max, 1) * mesh.mesh_to_model);
+            auto &mesh_range = mesh.mesh_range;
+            glm::vec3 mesh_min = (glm::vec4(mesh_range.bounding_box.min, 1) * mesh.mesh_to_model);
+            glm::vec3 mesh_max = (glm::vec4(mesh_range.bounding_box.max, 1) * mesh.mesh_to_model);
             min = glm::min(min, mesh_min);
             min = glm::min(min, mesh_max);
             max = glm::max(max, mesh_min);
@@ -194,28 +198,28 @@ namespace engine::core
             index_offset += mesh_range.index_count;
             vertex_offset += mesh_range.vertex_count;
         }
-        for (auto& mesh : meshes)
+        for (auto &mesh : meshes)
         {
             mesh.triangle_octree.initialize(mesh);
         }
 
         ModelId rv = render::ModelSystem::instance().AddModel(Model{
-                .name = scene_ptr->mName.C_Str(),
-                .bounding_box = math::Box{.min = min, .max = max},
-                .meshes = std::move(meshes),
-                .materials = std::move(materials),
-                .vertices = direct3d::ImmutableVertexBuffer<Vertex>(vertices),
-                .indices = direct3d::ImmutableIndexBuffer<uint32_t>(indices) });
+            .name = scene_ptr->mName.C_Str(),
+            .bounding_box = math::Box{.min = min, .max = max},
+            .meshes = std::move(meshes),
+            .materials = std::move(materials),
+            .vertices = direct3d::ImmutableVertexBuffer<Vertex>(vertices),
+            .indices = direct3d::ImmutableIndexBuffer<uint32_t>(indices)});
         auto hash = std::filesystem::hash_value(path);
         instance_->models_.emplace(std::pair<FilepathHash, ModelId>{hash, rv});
         instance_->models_inverse_.emplace(std::pair<ModelId, FilepathHash>{rv, hash});
-        instance_->loaded_models_.emplace(std::pair< FilepathHash, ModelInfo>{hash, ModelInfo{ path, rv, std::string_view{scene_ptr->mName.C_Str()} }});
+        instance_->loaded_models_.emplace(std::pair<FilepathHash, ModelInfo>{hash, ModelInfo{path, rv, std::string_view{scene_ptr->mName.C_Str()}}});
         return rv;
     }
 
     namespace
     {
-        void ProcessMaterials(std::vector<Material>& materials, aiScene const* scene_ptr, std::filesystem::path const& model_folder)
+        void ProcessMaterials(std::vector<Material> &materials, aiScene const *scene_ptr, std::filesystem::path const &model_folder)
         {
             aiString str;
             ai_real value;
@@ -224,87 +228,198 @@ namespace engine::core
 
             for (size_t material_index = 0; material_index < scene_ptr->mNumMaterials; material_index++)
             {
-                aiMaterial* material = scene_ptr->mMaterials[material_index];
+                aiMaterial *material = scene_ptr->mMaterials[material_index];
                 Material result;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_NAME, str)) { str = aiString("n/a"); }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_NAME, str))
+                {
+                    str = aiString("n/a");
+                }
                 result.name = str.C_Str();
 
 #pragma region Load properties
-                if (AI_SUCCESS != material->Get(AI_MATKEY_SHADING_MODEL, integer)) { integer = aiShadingMode_Blinn; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_SHADING_MODEL, integer))
+                {
+                    integer = aiShadingMode_Blinn;
+                }
                 result.shading_mode = ShadingModeFromAssimp(integer);
-                if (AI_SUCCESS != material->Get(AI_MATKEY_BLEND_FUNC, integer)) { integer = 0; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_BLEND_FUNC, integer))
+                {
+                    integer = 0;
+                }
                 result.blend_mode = integer == aiBlendMode_Default ? Material::BlendMode::Default : Material::BlendMode::Add;
 
-                if (AI_SUCCESS != material->Get(AI_MATKEY_BUMPSCALING, value)) { value = 1.0f; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_BUMPSCALING, value))
+                {
+                    value = 1.0f;
+                }
                 result.bump_scaling = value;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_COLOR_DIFFUSE, color)) { color = aiColor3D(0.0f, 0.0f, 0.0f); }
-                result.diffuse_color = core::math::vec3{ color.r, color.g, color.b };
-                if (AI_SUCCESS != material->Get(AI_MATKEY_COLOR_SPECULAR, color)) { color = aiColor3D(0.0f, 0.0f, 0.0f); }
-                result.specular_color = core::math::vec3{ color.r, color.g, color.b };
-                if (AI_SUCCESS != material->Get(AI_MATKEY_COLOR_AMBIENT, color)) { color = aiColor3D(0.0f, 0.0f, 0.0f); }
-                result.ambient_color = core::math::vec3{ color.r, color.g, color.b };
-                if (AI_SUCCESS != material->Get(AI_MATKEY_COLOR_EMISSIVE, color)) { color = aiColor3D(0.0f, 0.0f, 0.0f); }
-                result.emissive_color = core::math::vec3{ color.r, color.g, color.b };
-                if (AI_SUCCESS != material->Get(AI_MATKEY_COLOR_TRANSPARENT, color)) { color = aiColor3D(0.0f, 0.0f, 0.0f); }
-                result.transparent_color = core::math::vec3{ color.r, color.g, color.b };
-                if (AI_SUCCESS != material->Get(AI_MATKEY_COLOR_REFLECTIVE, color)) { color = aiColor3D(0.0f, 0.0f, 0.0f); }
-                result.reflective_color = core::math::vec3{ color.r, color.g, color.b };
-                if (AI_SUCCESS != material->Get(AI_MATKEY_SHININESS, value)) { value = 0.0f; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_COLOR_DIFFUSE, color))
+                {
+                    color = aiColor3D(0.0f, 0.0f, 0.0f);
+                }
+                result.diffuse_color = glm::vec3{color.r, color.g, color.b};
+                if (AI_SUCCESS != material->Get(AI_MATKEY_COLOR_SPECULAR, color))
+                {
+                    color = aiColor3D(0.0f, 0.0f, 0.0f);
+                }
+                result.specular_color = glm::vec3{color.r, color.g, color.b};
+                if (AI_SUCCESS != material->Get(AI_MATKEY_COLOR_AMBIENT, color))
+                {
+                    color = aiColor3D(0.0f, 0.0f, 0.0f);
+                }
+                result.ambient_color = glm::vec3{color.r, color.g, color.b};
+                if (AI_SUCCESS != material->Get(AI_MATKEY_COLOR_EMISSIVE, color))
+                {
+                    color = aiColor3D(0.0f, 0.0f, 0.0f);
+                }
+                result.emissive_color = glm::vec3{color.r, color.g, color.b};
+                if (AI_SUCCESS != material->Get(AI_MATKEY_COLOR_TRANSPARENT, color))
+                {
+                    color = aiColor3D(0.0f, 0.0f, 0.0f);
+                }
+                result.transparent_color = glm::vec3{color.r, color.g, color.b};
+                if (AI_SUCCESS != material->Get(AI_MATKEY_COLOR_REFLECTIVE, color))
+                {
+                    color = aiColor3D(0.0f, 0.0f, 0.0f);
+                }
+                result.reflective_color = glm::vec3{color.r, color.g, color.b};
+                if (AI_SUCCESS != material->Get(AI_MATKEY_SHININESS, value))
+                {
+                    value = 0.0f;
+                }
                 result.shininess = value;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_SHININESS_STRENGTH, value)) { value = 1.0f; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_SHININESS_STRENGTH, value))
+                {
+                    value = 1.0f;
+                }
                 result.shininess_strength = value;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_OPACITY, value)) { value = 1.0f; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_OPACITY, value))
+                {
+                    value = 1.0f;
+                }
                 result.opacity = value;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_REFRACTI, value)) { value = 1.0f; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_REFRACTI, value))
+                {
+                    value = 1.0f;
+                }
                 result.refraction = value;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_REFLECTIVITY, value)) { value = 0.0f; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_REFLECTIVITY, value))
+                {
+                    value = 0.0f;
+                }
                 result.reflectivity = value;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_ENABLE_WIREFRAME, integer)) { integer = 0; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_ENABLE_WIREFRAME, integer))
+                {
+                    integer = 0;
+                }
                 result.enable_wireframe = integer != 0;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_TWOSIDED, integer)) { integer = 0; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_TWOSIDED, integer))
+                {
+                    integer = 0;
+                }
                 result.twosided = integer != 0;
 
                 // load use_color_map
-                if (AI_SUCCESS != material->Get(AI_MATKEY_USE_COLOR_MAP, integer)) { integer = 0; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_USE_COLOR_MAP, integer))
+                {
+                    integer = 0;
+                }
                 result.use_color_map = integer != 0;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_USE_METALLIC_MAP, integer)) { integer = 0; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_USE_METALLIC_MAP, integer))
+                {
+                    integer = 0;
+                }
                 result.use_metallic_map = integer != 0;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_USE_ROUGHNESS_MAP, integer)) { integer = 0; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_USE_ROUGHNESS_MAP, integer))
+                {
+                    integer = 0;
+                }
                 result.use_normal_map = integer != 0;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_USE_EMISSIVE_MAP, integer)) { integer = 0; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_USE_EMISSIVE_MAP, integer))
+                {
+                    integer = 0;
+                }
                 result.use_emissive_map = integer != 0;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_USE_AO_MAP, integer)) { integer = 0; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_USE_AO_MAP, integer))
+                {
+                    integer = 0;
+                }
                 result.use_ambient_occlusion_map = integer != 0;
 
-                if (AI_SUCCESS != material->Get(AI_MATKEY_BASE_COLOR, color)) { color = aiColor3D(0.0f, 0.0f, 0.0f); }
-                result.base_color = core::math::vec3{ color.r, color.g, color.b };
-                if (AI_SUCCESS != material->Get(AI_MATKEY_METALLIC_FACTOR, value)) { value = 0.0f; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_BASE_COLOR, color))
+                {
+                    color = aiColor3D(0.0f, 0.0f, 0.0f);
+                }
+                result.base_color = glm::vec3{color.r, color.g, color.b};
+                if (AI_SUCCESS != material->Get(AI_MATKEY_METALLIC_FACTOR, value))
+                {
+                    value = 0.0f;
+                }
                 result.metalness = value;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_ROUGHNESS_FACTOR, value)) { value = 0.0f; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_ROUGHNESS_FACTOR, value))
+                {
+                    value = 0.0f;
+                }
                 result.roughness = value;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_ANISOTROPY_FACTOR, value)) { value = 0.0f; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_ANISOTROPY_FACTOR, value))
+                {
+                    value = 0.0f;
+                }
                 result.anisotropy = value;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_SPECULAR_FACTOR, value)) { value = 0.0f; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_SPECULAR_FACTOR, value))
+                {
+                    value = 0.0f;
+                }
                 result.specular = value;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_GLOSSINESS_FACTOR, value)) { value = 0.0f; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_GLOSSINESS_FACTOR, value))
+                {
+                    value = 0.0f;
+                }
                 result.glossiness = value;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_SHEEN_COLOR_FACTOR, color)) { color = aiColor3D(0.0f, 0.0f, 0.0f); }
-                result.sheen_color = core::math::vec3{ color.r, color.g, color.b };
-                if (AI_SUCCESS != material->Get(AI_MATKEY_SHEEN_ROUGHNESS_FACTOR, value)) { value = 0.0f; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_SHEEN_COLOR_FACTOR, color))
+                {
+                    color = aiColor3D(0.0f, 0.0f, 0.0f);
+                }
+                result.sheen_color = glm::vec3{color.r, color.g, color.b};
+                if (AI_SUCCESS != material->Get(AI_MATKEY_SHEEN_ROUGHNESS_FACTOR, value))
+                {
+                    value = 0.0f;
+                }
                 result.sheen_roughness = value;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_CLEARCOAT_FACTOR, value)) { value = 0.0f; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_CLEARCOAT_FACTOR, value))
+                {
+                    value = 0.0f;
+                }
                 result.clearcoat = value;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_CLEARCOAT_ROUGHNESS_FACTOR, value)) { value = 0.0f; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_CLEARCOAT_ROUGHNESS_FACTOR, value))
+                {
+                    value = 0.0f;
+                }
                 result.clearcoat_roughness = value;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_TRANSMISSION_FACTOR, value)) { value = 0.0f; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_TRANSMISSION_FACTOR, value))
+                {
+                    value = 0.0f;
+                }
                 result.transmission = value;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_VOLUME_THICKNESS_FACTOR, value)) { value = 0.0f; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_VOLUME_THICKNESS_FACTOR, value))
+                {
+                    value = 0.0f;
+                }
                 result.volume_thickness = value;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_VOLUME_ATTENUATION_DISTANCE, value)) { value = 0.0f; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_VOLUME_ATTENUATION_DISTANCE, value))
+                {
+                    value = 0.0f;
+                }
                 result.volume_attenuation_distance = value;
-                if (AI_SUCCESS != material->Get(AI_MATKEY_VOLUME_ATTENUATION_COLOR, color)) { color = aiColor3D(0.0f, 0.0f, 0.0f); }
-                result.volume_attenuation_color = core::math::vec3{ color.r, color.g, color.b };
-                if (AI_SUCCESS != material->Get(AI_MATKEY_EMISSIVE_INTENSITY, value)) { value = 0.0f; }
+                if (AI_SUCCESS != material->Get(AI_MATKEY_VOLUME_ATTENUATION_COLOR, color))
+                {
+                    color = aiColor3D(0.0f, 0.0f, 0.0f);
+                }
+                result.volume_attenuation_color = glm::vec3{color.r, color.g, color.b};
+                if (AI_SUCCESS != material->Get(AI_MATKEY_EMISSIVE_INTENSITY, value))
+                {
+                    value = 0.0f;
+                }
                 result.emissive_intensity = value;
 
 #pragma endregion
@@ -462,8 +577,8 @@ namespace engine::core
                 float cos_phi = cos(phi);
                 float u = x;
                 float v = y;
-                return_value.vertices[i * precision + j].position = core::math::vec3{ sin_phi * cos_theta, cos_phi, sin_phi * sin_theta };
-                return_value.vertices[i * precision + j].tex_coord = core::math::vec2{ u, v };
+                return_value.vertices[i * precision + j].position = glm::vec3{sin_phi * cos_theta, cos_phi, sin_phi * sin_theta};
+                return_value.vertices[i * precision + j].tex_coord = glm::vec2{u, v};
             }
         }
         for (uint32_t i = 0; i < precision - 1; i++)

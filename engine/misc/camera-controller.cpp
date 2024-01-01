@@ -6,7 +6,7 @@ namespace engine
     using namespace math;
 
     CameraController::CameraController(entt::registry *registry, entt::entity entity,
-                                       ivec2 const &window_size)
+                                       glm::ivec2 const &window_size)
         : registry_(registry), camera_(entity), window_size_(window_size)
     {
         Init();
@@ -19,20 +19,20 @@ namespace engine
     void CameraController::UpdateProjectionMatrix()
     {
         auto &cam = camera();
-        SetProjectionMatrix(perspectiveLH_ZO(
+        SetProjectionMatrix(glm::perspectiveLH_ZO(
             cam.fovy_,
             float(window_size_.x) / float(window_size_.y),
             cam.z_near_, cam.z_far_));
         update_matrices_ = true;
     }
 
-    void CameraController::SetProjectionMatrix(mat4 const &proj)
+    void CameraController::SetProjectionMatrix(glm::mat4 const &proj)
     {
         auto &cam = camera();
         cam.projection = proj;
         cam.inv_projection = inverse(proj);
     }
-    void CameraController::SetWorldOffset(vec3 const &offset)
+    void CameraController::SetWorldOffset(glm::vec3 const &offset)
     {
         auto &transform_ = transform();
         transform_.position = offset; // overwrites
@@ -40,7 +40,7 @@ namespace engine
         update_matrices_ = true;
     }
 
-    void CameraController::AddWorldOffset(vec3 const &offset)
+    void CameraController::AddWorldOffset(glm::vec3 const &offset)
     {
         auto &transform_ = transform();
         transform_.position += offset;
@@ -48,7 +48,7 @@ namespace engine
         update_matrices_ = true;
     }
 
-    void CameraController::AddRelativeOffset(vec3 const &offset)
+    void CameraController::AddRelativeOffset(glm::vec3 const &offset)
     {
         UpdateBasis();
         auto &transform_ = transform();
@@ -64,10 +64,10 @@ namespace engine
         auto &transform_ = transform();
         if (roll_enabled_)
         {
-            transform_.rotation = quat(vec3{ 0.f, 0.f, roll });
+            transform_.rotation = glm::quat(glm::vec3{0.f, 0.f, roll});
         }
-        transform_.rotation *= quat(vec3{ pitch, 0.f, 0.f });
-        transform_.rotation *= quat(vec3{ 0.f, yaw, 0.f });
+        transform_.rotation *= glm::quat(glm::vec3{pitch, 0.f, 0.f});
+        transform_.rotation *= glm::quat(glm::vec3{0.f, yaw, 0.f});
         transform_.rotation = normalize(transform_.rotation);
     }
 
@@ -78,10 +78,10 @@ namespace engine
         auto &transform_ = transform();
         if (roll_enabled_)
         {
-            transform_.rotation *= quat(vec3{ 0.f, 0.f, roll });
+            transform_.rotation *= glm::quat(glm::vec3{0.f, 0.f, roll});
         }
-        transform_.rotation *= quat(vec3{ pitch, 0.f, 0.f });
-        transform_.rotation *= quat(vec3{ 0.f, yaw, 0.f });
+        transform_.rotation *= glm::quat(glm::vec3{pitch, 0.f, 0.f});
+        transform_.rotation *= glm::quat(glm::vec3{0.f, yaw, 0.f});
         transform_.rotation = normalize(transform_.rotation);
     }
 
@@ -92,14 +92,14 @@ namespace engine
         auto &transform_ = transform();
         if (roll_enabled_)
         {
-            transform_.rotation *= quat(roll * forward());
-            transform_.rotation *= quat(pitch * right());
-            transform_.rotation *= quat(yaw * up());
+            transform_.rotation *= glm::quat(roll * forward());
+            transform_.rotation *= glm::quat(pitch * right());
+            transform_.rotation *= glm::quat(yaw * up());
         }
         else
         {
-            transform_.rotation *= quat(pitch * right());
-            transform_.rotation *= quat(vec3{0.0f, yaw, 0.0f});
+            transform_.rotation *= glm::quat(pitch * right());
+            transform_.rotation *= glm::quat(glm::vec3{0.0f, yaw, 0.0f});
         }
         transform_.rotation = normalize(transform_.rotation);
     }
@@ -144,16 +144,16 @@ namespace engine
     }
     namespace
     {
-        const vec3 kUp{ 0, 1, 0 };
-        const vec3 kDown{ 0, -1, 0 };
-        const vec3 kLeft{ -1, 0, 0 };
-        const vec3 kRight{ 1, 0, 0 };
-        const vec3 kForward{ 0, 0, 1 };
-        const vec3 kBackwards{ 0, 0, -1 };
+        const glm::vec3 kUp{0, 1, 0};
+        const glm::vec3 kDown{0, -1, 0};
+        const glm::vec3 kLeft{-1, 0, 0};
+        const glm::vec3 kRight{1, 0, 0};
+        const glm::vec3 kForward{0, 0, 1};
+        const glm::vec3 kBackwards{0, 0, -1};
     }
-    void CameraController::OnTick(float delta_time, core::math::ivec2 const &pixel_mouse_delta)
+    void CameraController::OnTick(float delta_time, glm::ivec2 const &pixel_mouse_delta)
     {
-        vec3 offset{ 0 };
+        glm::vec3 offset{0};
         // process movement
         if (flags_ & MoveForward)
         {
@@ -206,7 +206,7 @@ namespace engine
                 offset += kUp;
             }
         }
-        vec2 t{ pixel_mouse_delta };
+        glm::vec2 t{pixel_mouse_delta};
         t = -t / glm::vec2(window_size_);
         t *= sensivity_ * camera().fovy_;
         yaw = t.x;

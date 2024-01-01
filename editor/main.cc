@@ -22,7 +22,7 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
         auto input_layer = InputLayer::instance();
         app.PushLayer(shader_manager);
 
-        std::shared_ptr<windows::Window> window = std::make_shared<windows::Window>(core::Window::Props{ "D3D Test", { 1280, 720 }, {100, 100} });
+        std::shared_ptr<windows::Window> window = std::make_shared<windows::Window>(core::Window::Props{"D3D Test", {1280, 720}, {100, 100}});
         window->SetEventCallback(Engine::event_function());
         app.PushLayer(window);
 

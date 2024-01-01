@@ -12,6 +12,7 @@ namespace engine::core
         void SetScene(std::shared_ptr<Scene> const &scene) { scene_ = scene; }
         [[nodiscard]] inline std::shared_ptr<Scene> const &scene() const noexcept { return scene_; }
         [[nodiscard]] inline std::shared_ptr<Scene> &scene() noexcept { return scene_; }
+
     protected:
         void InitImGuiLayer(std::shared_ptr<core::Window> window)
         {

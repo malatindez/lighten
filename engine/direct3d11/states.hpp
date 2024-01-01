@@ -407,7 +407,12 @@ namespace engine::direct3d
 
         /// @brief instance of the states class
         /// @details This is a singleton class, so this is the only instance of the class
-        [[nodiscard]] static inline States &instance() { mal_toolkit::Assert(instance_ != nullptr, "States not initialized"); return *instance_; }
+        [[nodiscard]] static inline States &instance()
+        {
+            mal_toolkit::Assert(instance_ != nullptr, "States not initialized");
+            return *instance_;
+        }
+
     private:
         friend class Api;
         States();

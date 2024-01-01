@@ -15,16 +15,16 @@ namespace engine::render
             bool rv = false;
             for (auto const &mesh : model.meshes)
             {
-                mat4 mat = transform.model * mesh.mesh_to_model;
-                mat4 inv_mat = mesh.inv_mesh_to_model * transform.inv_model;
+                glm::mat4 mat = transform.model * mesh.mesh_to_model;
+                glm::mat4 inv_mat = mesh.inv_mesh_to_model * transform.inv_model;
                 Ray mesh_local = ray;
-                mesh_local.origin() = (inv_mat * vec4{ mesh_local.origin(), 1 });
-                mesh_local.SetDirection((inv_mat * vec4{ mesh_local.direction(), 0 }));
+                mesh_local.origin() = (inv_mat * glm::vec4{mesh_local.origin(), 1});
+                mesh_local.SetDirection((inv_mat * glm::vec4{mesh_local.direction(), 0}));
                 bool t = mesh.triangle_octree.intersect(mesh_local, nearest);
                 if (t)
                 {
-                    nearest.point = (mat * vec4{ nearest.point, 1 });
-                    nearest.normal = (mat * vec4{ nearest.normal, 0 });
+                    nearest.point = (mat * glm::vec4{nearest.point, 1});
+                    nearest.normal = (mat * glm::vec4{nearest.normal, 0});
                     rv = t;
                 }
             }
@@ -39,7 +39,7 @@ namespace engine::render
         auto group2 = registry.group<components::EmissiveComponent>(entt::get<components::Transform>);
         auto group3 = registry.group<components::DissolutionComponent>(entt::get<components::Transform>);
         std::optional<entt::entity> rv = std::nullopt;
-        auto const &func = [&rv, &ray, &nearest] (auto const entity, auto const &model_instance, auto const &transform) -> void
+        auto const &func = [&rv, &ray, &nearest](auto const entity, auto const &model_instance, auto const &transform) -> void
         {
             auto const &model = GetModel(model_instance.model_id);
             if (CheckForIntersection(model, transform, ray, nearest))
@@ -95,23 +95,21 @@ namespace engine::render
         mesh.vertices.resize(VERT_PER_SIZE * SIDES);
         Vertex *vertex = mesh.vertices.data();
         int sideMasks[6][3] =
-        {
-            { 2, 1, 0 },
-            { 0, 1, 2 },
-            { 2, 1, 0 },
-            { 0, 1, 2 },
-            { 0, 2, 1 },
-            { 0, 2, 1 }
-        };
+            {
+                {2, 1, 0},
+                {0, 1, 2},
+                {2, 1, 0},
+                {0, 1, 2},
+                {0, 2, 1},
+                {0, 2, 1}};
         float sideSigns[6][3] =
-        {
-            { +1, +1, +1 },
-            { -1, +1, +1 },
-            { -1, +1, -1 },
-            { +1, +1, -1 },
-            { +1, -1, -1 },
-            { +1, +1, +1 }
-        };
+            {
+                {+1, +1, +1},
+                {-1, +1, +1},
+                {-1, +1, -1},
+                {+1, +1, -1},
+                {+1, -1, -1},
+                {+1, +1, +1}};
 
         for (uint32_t side = 0; side < SIDES; ++side)
         {
@@ -124,30 +122,29 @@ namespace engine::render
                     float bottom = (row + 0) / float(GRID_SIZE) * 2.f - 1.f;
                     float top = (row + 1) / float(GRID_SIZE) * 2.f - 1.f;
 
-                    vec3 quad[4] =
-                    {
-                        { left, bottom, 1.f },
-                        { right, bottom, 1.f },
-                        { left, top, 1.f },
-                        { right, top, 1.f }
-                    };
+                    glm::vec3 quad[4] =
+                        {
+                            {left, bottom, 1.f},
+                            {right, bottom, 1.f},
+                            {left, top, 1.f},
+                            {right, top, 1.f}};
 
                     vertex[0] = vertex[1] = vertex[2] = vertex[3] = Vertex::empty();
 
-                    auto setPos = [sideMasks, sideSigns] (int side, Vertex &dst, const vec3 &position)
+                    auto setPos = [sideMasks, sideSigns](int side, Vertex &dst, const glm::vec3 &position)
                     {
                         dst.position[sideMasks[side][0]] = position.x * sideSigns[side][0];
                         dst.position[sideMasks[side][1]] = position.y * sideSigns[side][1];
                         dst.position[sideMasks[side][2]] = position.z * sideSigns[side][2];
                         dst.position = normalize(dst.position);
                     };
-                    auto setTexCoord = [] ([[maybe_unused]] Vertex &dst)
+                    auto setTexCoord = []([[maybe_unused]] Vertex &dst)
                     {
                         // todo
-                        // dst.tex_coord.u = ((-dst.position.z / core::math::abs(dst.position.x)) + 1) / 2;
-                        // dst.tex_coord.v = ((-dst.position.y / core::math::abs(dst.position.x)) + 1) / 2;
+                        // dst.tex_coord.u = ((-dst.position.z / glm::abs(dst.position.x)) + 1) / 2;
+                        // dst.tex_coord.v = ((-dst.position.y / glm::abs(dst.position.x)) + 1) / 2;
                     };
-                    auto calculateTangents = [] ([[maybe_unused]] Vertex &dst)
+                    auto calculateTangents = []([[maybe_unused]] Vertex &dst)
                     {
                         // todo
                         // vec3 tangent = cross(dst.normal, vec3{ 0, 1, 0 });
@@ -167,8 +164,8 @@ namespace engine::render
                     setTexCoord(vertex[1]);
                     setTexCoord(vertex[2]);
                     {
-                        vec3 AB = vertex[1].position - vertex[0].position;
-                        vec3 AC = vertex[2].position - vertex[0].position;
+                        glm::vec3 AB = vertex[1].position - vertex[0].position;
+                        glm::vec3 AC = vertex[2].position - vertex[0].position;
                         vertex[0].normal = vertex[1].normal = vertex[2].normal = normalize(cross(AC, AB));
                         vertex[0].normal = vertex[0].position;
                         vertex[1].normal = vertex[1].position;
@@ -187,8 +184,8 @@ namespace engine::render
                     setTexCoord(vertex[2]);
 
                     {
-                        vec3 AB = vertex[1].position - vertex[0].position;
-                        vec3 AC = vertex[2].position - vertex[0].position;
+                        glm::vec3 AB = vertex[1].position - vertex[0].position;
+                        glm::vec3 AC = vertex[2].position - vertex[0].position;
                         vertex[0].normal = vertex[1].normal = vertex[2].normal = normalize(cross(AC, AB));
                         vertex[0].normal = vertex[0].position;
                         vertex[1].normal = vertex[1].position;
@@ -211,11 +208,8 @@ namespace engine::render
             box.max = max(box.max, mesh.vertices[i].position);
         }
 
-        ModelMesh model_mesh(0, mat4{ 1.0f },
-                             MeshRange{ .vertex_offset = 0, .index_offset = 0,
-                             .vertex_count = (uint32_t)mesh.vertices.size(),
-                             .index_count = (uint32_t)mesh.indices.size(),
-                             .bounding_box = box },
+        ModelMesh model_mesh(0, glm::mat4{1.0f},
+                             MeshRange{.vertex_offset = 0, .index_offset = 0, .vertex_count = (uint32_t)mesh.vertices.size(), .index_count = (uint32_t)mesh.indices.size(), .bounding_box = box},
                              std::move(mesh));
         Model model{
             .name = name,
@@ -223,8 +217,7 @@ namespace engine::render
             .meshes = {},
             .materials = {render::Material{}},
             .vertices = direct3d::ImmutableVertexBuffer<Vertex>{model_mesh.mesh.vertices},
-            .indices = direct3d::ImmutableIndexBuffer<uint32_t>{model_mesh.mesh.indices}
-        };
+            .indices = direct3d::ImmutableIndexBuffer<uint32_t>{model_mesh.mesh.indices}};
         model.meshes.push_back(std::move(model_mesh));
         model.meshes[0].triangle_octree.initialize(model.meshes[0]);
 
@@ -252,23 +245,21 @@ namespace engine::render
         mesh.vertices.resize(VERT_PER_SIZE * SIDES);
         Vertex *vertex = mesh.vertices.data();
         int sideMasks[6][3] =
-        {
-            { 2, 1, 0 },
-            { 0, 1, 2 },
-            { 2, 1, 0 },
-            { 0, 1, 2 },
-            { 0, 2, 1 },
-            { 0, 2, 1 }
-        };
+            {
+                {2, 1, 0},
+                {0, 1, 2},
+                {2, 1, 0},
+                {0, 1, 2},
+                {0, 2, 1},
+                {0, 2, 1}};
         float sideSigns[6][3] =
-        {
-            { +1, +1, +1 },
-            { -1, +1, +1 },
-            { -1, +1, -1 },
-            { +1, +1, -1 },
-            { +1, -1, -1 },
-            { +1, +1, +1 }
-        };
+            {
+                {+1, +1, +1},
+                {-1, +1, +1},
+                {-1, +1, -1},
+                {+1, +1, -1},
+                {+1, -1, -1},
+                {+1, +1, +1}};
 
         for (uint32_t side = 0; side < SIDES; ++side)
         {
@@ -281,30 +272,29 @@ namespace engine::render
                     float bottom = (row + 0) / float(GRID_SIZE) * 2.f - 1.f;
                     float top = (row + 1) / float(GRID_SIZE) * 2.f - 1.f;
 
-                    vec3 quad[4] =
-                    {
-                        { left, bottom, 1.f },
-                        { right, bottom, 1.f },
-                        { left, top, 1.f },
-                        { right, top, 1.f }
-                    };
+                    glm::vec3 quad[4] =
+                        {
+                            {left, bottom, 1.f},
+                            {right, bottom, 1.f},
+                            {left, top, 1.f},
+                            {right, top, 1.f}};
 
                     vertex[0] = vertex[1] = vertex[2] = vertex[3] = Vertex::empty();
 
-                    auto setPos = [sideMasks, sideSigns] (int side, Vertex &dst, const vec3 &position)
+                    auto setPos = [sideMasks, sideSigns](int side, Vertex &dst, const glm::vec3 &position)
                     {
                         dst.position[sideMasks[side][0]] = position.x * sideSigns[side][0];
                         dst.position[sideMasks[side][1]] = position.y * sideSigns[side][1];
                         dst.position[sideMasks[side][2]] = position.z * sideSigns[side][2];
                         dst.position = normalize(dst.position);
                     };
-                    auto setTexCoord = [] ([[maybe_unused]] Vertex &dst)
+                    auto setTexCoord = []([[maybe_unused]] Vertex &dst)
                     {
                         // todo
-                        // dst.tex_coord.u = ((-dst.position.z / core::math::abs(dst.position.x)) + 1) / 2;
-                        // dst.tex_coord.v = ((-dst.position.y / core::math::abs(dst.position.x)) + 1) / 2;
+                        // dst.tex_coord.u = ((-dst.position.z / glm::abs(dst.position.x)) + 1) / 2;
+                        // dst.tex_coord.v = ((-dst.position.y / glm::abs(dst.position.x)) + 1) / 2;
                     };
-                    auto calculateTangents = [] ([[maybe_unused]] Vertex &dst)
+                    auto calculateTangents = []([[maybe_unused]] Vertex &dst)
                     {
                         // todo
                         // vec3 tangent = cross(dst.normal, vec3{ 0, 1, 0 });
@@ -324,8 +314,8 @@ namespace engine::render
                     setTexCoord(vertex[1]);
                     setTexCoord(vertex[2]);
                     {
-                        vec3 AB = vertex[1].position - vertex[0].position;
-                        vec3 AC = vertex[2].position - vertex[0].position;
+                        glm::vec3 AB = vertex[1].position - vertex[0].position;
+                        glm::vec3 AC = vertex[2].position - vertex[0].position;
                         vertex[0].normal = vertex[1].normal = vertex[2].normal = normalize(cross(AC, AB));
                         vertex[0].normal = vertex[0].position;
                         vertex[1].normal = vertex[1].position;
@@ -344,8 +334,8 @@ namespace engine::render
                     setTexCoord(vertex[2]);
 
                     {
-                        vec3 AB = vertex[1].position - vertex[0].position;
-                        vec3 AC = vertex[2].position - vertex[0].position;
+                        glm::vec3 AB = vertex[1].position - vertex[0].position;
+                        glm::vec3 AC = vertex[2].position - vertex[0].position;
                         vertex[0].normal = vertex[1].normal = vertex[2].normal = normalize(cross(AC, AB));
                         vertex[0].normal = vertex[0].position;
                         vertex[1].normal = vertex[1].position;
@@ -367,14 +357,11 @@ namespace engine::render
             box.min = min(box.min, mesh.vertices[i].position);
             box.max = max(box.max, mesh.vertices[i].position);
         }
-        box.min = core::math::vec3{ -1 };
-        box.max = core::math::vec3{ +1 };
+        box.min = glm::vec3{-1};
+        box.max = glm::vec3{+1};
 
-        ModelMesh model_mesh(0, mat4 {1.0f },
-                             MeshRange{ .vertex_offset = 0, .index_offset = 0,
-                             .vertex_count = (uint32_t)mesh.vertices.size(),
-                             .index_count = (uint32_t)mesh.indices.size(),
-                             .bounding_box = box },
+        ModelMesh model_mesh(0, glm::mat4{1.0f},
+                             MeshRange{.vertex_offset = 0, .index_offset = 0, .vertex_count = (uint32_t)mesh.vertices.size(), .index_count = (uint32_t)mesh.indices.size(), .bounding_box = box},
                              std::move(mesh));
         Model model{
             .name = name,
@@ -382,15 +369,14 @@ namespace engine::render
             .meshes = {},
             .materials = {render::Material{}},
             .vertices = direct3d::ImmutableVertexBuffer<Vertex>{model_mesh.mesh.vertices},
-            .indices = direct3d::ImmutableIndexBuffer<uint32_t>{model_mesh.mesh.indices}
-        };
+            .indices = direct3d::ImmutableIndexBuffer<uint32_t>{model_mesh.mesh.indices}};
         model.meshes.push_back(std::move(model_mesh));
         model.meshes[0].triangle_octree.initialize(model.meshes[0]);
 
         model_id = instance().AddModel(std::move(model));
         ::engine::core::ModelLoader::instance_->models_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
         ::engine::core::ModelLoader::instance_->models_inverse_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
-        ::engine::core::ModelLoader::instance_->loaded_models_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ::engine::core::ModelLoader::ModelInfo>{model_id, ::engine::core::ModelLoader::ModelInfo{ "", model_id, "UnitSphereLowPoly" }});
+        ::engine::core::ModelLoader::instance_->loaded_models_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ::engine::core::ModelLoader::ModelInfo>{model_id, ::engine::core::ModelLoader::ModelInfo{"", model_id, "UnitSphereLowPoly"}});
         return model_id;
     }
     ModelId ModelSystem::GetUnitCube()
@@ -401,134 +387,134 @@ namespace engine::render
             return model_id;
         }
         std::string name = "UNIT_CUBE_FLAT";
-        Box box = Box{ glm::vec3{-0.5f}, glm::vec3{0.5f} };
+        Box box = Box{glm::vec3{-0.5f}, glm::vec3{0.5f}};
         Mesh mesh;
         mesh.vertices.resize(24);
         Vertex *vertex = mesh.vertices.data();
-        vertex[0].position = { -0.5f, -0.5f, -0.5f };
-        vertex[0].tex_coord = { 0, 1 };
-        vertex[0].normal = { 0,0,-1 };
-        vertex[0].tangent = { 1,0,0 };
-        vertex[0].bitangent = { 0,-1,0 };
-        vertex[1].position = { 0.5f, -0.5f, -0.5f };
-        vertex[1].tex_coord = { 1, 1 };
-        vertex[1].normal = { 0,0,-1 };
-        vertex[1].tangent = { 1,0,0 };
-        vertex[1].bitangent = { 0,-1,0 };
-        vertex[2].position = { -0.5f, 0.5f, -0.5f };
-        vertex[2].tex_coord = { 0, 0 };
-        vertex[2].normal = { 0,0,-1 };
-        vertex[2].tangent = { 1,0,0 };
-        vertex[2].bitangent = { 0,-1,0 };
-        vertex[3].position = { 0.5f, 0.5f, -0.5f };
-        vertex[3].tex_coord = { 1, 0 };
-        vertex[3].normal = { 0,0,-1 };
-        vertex[3].tangent = { 1,0,0 };
-        vertex[3].bitangent = { 0,-1,0 };
-        vertex[4].position = { -0.5f, -0.5f, 0.5f };
-        vertex[4].tex_coord = { 0, 1 };
-        vertex[4].normal = { 0,0,1 };
-        vertex[4].tangent = { -1,0,0 };
-        vertex[4].bitangent = { 0,-1,0 };
-        vertex[5].position = { 0.5f, -0.5f, 0.5f };
-        vertex[5].tex_coord = { 1, 1 };
-        vertex[5].normal = { 0,0,1 };
-        vertex[5].tangent = { -1,0,0 };
-        vertex[5].bitangent = { 0,-1,0 };
-        vertex[6].position = { -0.5f, 0.5f, 0.5f };
-        vertex[6].tex_coord = { 0, 0 };
-        vertex[6].normal = { 0,0,1 };
-        vertex[6].tangent = { -1,0,0 };
-        vertex[6].bitangent = { 0,-1,0 };
-        vertex[7].position = { 0.5f, 0.5f, 0.5f };
-        vertex[7].tex_coord = { 1, 0 };
-        vertex[7].normal = { 0,0,1 };
-        vertex[7].tangent = { -1,0,0 };
-        vertex[7].bitangent = { 0,-1,0 };
-        vertex[8].position = { -0.5f, -0.5f, -0.5f };
-        vertex[8].tex_coord = { 0, 1 };
-        vertex[8].normal = { -1,0,0 };
-        vertex[8].tangent = { 0,0,-1 };
-        vertex[8].bitangent = { 0,-1,0 };
-        vertex[9].position = { -0.5f, 0.5f, -0.5f };
-        vertex[9].tex_coord = { 1, 1 };
-        vertex[9].normal = { -1,0,0 };
-        vertex[9].tangent = { 0,0,-1 };
-        vertex[9].bitangent = { 0,-1,0 };
-        vertex[10].position = { -0.5f, -0.5f, 0.5f };
-        vertex[10].tex_coord = { 0, 0 };
-        vertex[10].normal = { -1,0,0 };
-        vertex[10].tangent = { 0,0,-1 };
-        vertex[10].bitangent = { 0,-1,0 };
-        vertex[11].position = { -0.5f, 0.5f, 0.5f };
-        vertex[11].tex_coord = { 1, 0 };
-        vertex[11].normal = { -1,0,0 };
-        vertex[11].tangent = { 0,0,-1 };
-        vertex[11].bitangent = { 0,-1,0 };
-        vertex[12].position = { 0.5f, -0.5f, -0.5f };
-        vertex[12].tex_coord = { 0, 1 };
-        vertex[12].normal = { 1,0,0 };
-        vertex[12].tangent = { 0,0,1 };
-        vertex[12].bitangent = { 0,-1,0 };
-        vertex[13].position = { 0.5f, 0.5f, -0.5f };
-        vertex[13].tex_coord = { 1, 1 };
-        vertex[13].normal = { 1,0,0 };
-        vertex[13].tangent = { 0,0,1 };
-        vertex[13].bitangent = { 0,-1,0 };
-        vertex[14].position = { 0.5f, -0.5f, 0.5f };
-        vertex[14].tex_coord = { 0, 0 };
-        vertex[14].normal = { 1,0,0 };
-        vertex[14].tangent = { 0,0,1 };
-        vertex[14].bitangent = { 0,-1,0 };
-        vertex[15].position = { 0.5f, 0.5f, 0.5f };
-        vertex[15].tex_coord = { 1, 0 };
-        vertex[15].normal = { 1,0,0 };
-        vertex[15].tangent = { 0,0,1 };
-        vertex[15].bitangent = { 0,-1,0 };
-        vertex[16].position = { -0.5f, -0.5f, -0.5f };
-        vertex[16].tex_coord = { 0, 1 };
-        vertex[16].normal = { 0,-1,0 };
-        vertex[16].tangent = { 1,0,0 };
-        vertex[16].bitangent = { 0,0,-1 };
-        vertex[17].position = { 0.5f, -0.5f, -0.5f };
-        vertex[17].tex_coord = { 1, 1 };
-        vertex[17].normal = { 0,-1,0 };
-        vertex[17].tangent = { 1,0,0 };
-        vertex[17].bitangent = { 0,0,-1 };
-        vertex[18].position = { -0.5f, -0.5f, 0.5f };
-        vertex[18].tex_coord = { 0, 0 };
-        vertex[18].normal = { 0,-1,0 };
-        vertex[18].tangent = { 1,0,0 };
-        vertex[18].bitangent = { 0,0,-1 };
-        vertex[19].position = { 0.5f, -0.5f, 0.5f };
-        vertex[19].tex_coord = { 1, 0 };
-        vertex[19].normal = { 0,-1,0 };
-        vertex[19].tangent = { 1,0,0 };
-        vertex[19].bitangent = { 0,0,-1 };
-        vertex[20].position = { -0.5f, 0.5f, -0.5f };
-        vertex[20].tex_coord = { 0, 1 };
-        vertex[20].normal = { 0,1,0 };
-        vertex[20].tangent = { 1,0,0 };
-        vertex[20].bitangent = { 0,0,1 };
-        vertex[21].position = { 0.5f, 0.5f, -0.5f };
-        vertex[21].tex_coord = { 1, 1 };
-        vertex[21].normal = { 0,1,0 };
-        vertex[21].tangent = { 1,0,0 };
-        vertex[21].bitangent = { 0,0,1 };
-        vertex[22].position = { -0.5f, 0.5f, 0.5f };
-        vertex[22].tex_coord = { 0, 0 };
-        vertex[22].normal = { 0,1,0 };
-        vertex[22].tangent = { 1,0,0 };
-        vertex[22].bitangent = { 0,0,1 };
-        vertex[23].position = { 0.5f, 0.5f, 0.5f };
-        vertex[23].tex_coord = { 1, 0 };
-        vertex[23].normal = { 0,1,0 };
-        vertex[23].tangent = { 1,0,0 };
-        vertex[23].bitangent = { 0,0,1 };
-        mesh.indices = { 2,1,0, 2,3,1, 4,5,6, 5,7,6, 10,9,8, 10,11,9, 12,13,14, 13,15,14, 16,17,18, 17,19,18, 22,21,20, 22,23,21 };
+        vertex[0].position = {-0.5f, -0.5f, -0.5f};
+        vertex[0].tex_coord = {0, 1};
+        vertex[0].normal = {0, 0, -1};
+        vertex[0].tangent = {1, 0, 0};
+        vertex[0].bitangent = {0, -1, 0};
+        vertex[1].position = {0.5f, -0.5f, -0.5f};
+        vertex[1].tex_coord = {1, 1};
+        vertex[1].normal = {0, 0, -1};
+        vertex[1].tangent = {1, 0, 0};
+        vertex[1].bitangent = {0, -1, 0};
+        vertex[2].position = {-0.5f, 0.5f, -0.5f};
+        vertex[2].tex_coord = {0, 0};
+        vertex[2].normal = {0, 0, -1};
+        vertex[2].tangent = {1, 0, 0};
+        vertex[2].bitangent = {0, -1, 0};
+        vertex[3].position = {0.5f, 0.5f, -0.5f};
+        vertex[3].tex_coord = {1, 0};
+        vertex[3].normal = {0, 0, -1};
+        vertex[3].tangent = {1, 0, 0};
+        vertex[3].bitangent = {0, -1, 0};
+        vertex[4].position = {-0.5f, -0.5f, 0.5f};
+        vertex[4].tex_coord = {0, 1};
+        vertex[4].normal = {0, 0, 1};
+        vertex[4].tangent = {-1, 0, 0};
+        vertex[4].bitangent = {0, -1, 0};
+        vertex[5].position = {0.5f, -0.5f, 0.5f};
+        vertex[5].tex_coord = {1, 1};
+        vertex[5].normal = {0, 0, 1};
+        vertex[5].tangent = {-1, 0, 0};
+        vertex[5].bitangent = {0, -1, 0};
+        vertex[6].position = {-0.5f, 0.5f, 0.5f};
+        vertex[6].tex_coord = {0, 0};
+        vertex[6].normal = {0, 0, 1};
+        vertex[6].tangent = {-1, 0, 0};
+        vertex[6].bitangent = {0, -1, 0};
+        vertex[7].position = {0.5f, 0.5f, 0.5f};
+        vertex[7].tex_coord = {1, 0};
+        vertex[7].normal = {0, 0, 1};
+        vertex[7].tangent = {-1, 0, 0};
+        vertex[7].bitangent = {0, -1, 0};
+        vertex[8].position = {-0.5f, -0.5f, -0.5f};
+        vertex[8].tex_coord = {0, 1};
+        vertex[8].normal = {-1, 0, 0};
+        vertex[8].tangent = {0, 0, -1};
+        vertex[8].bitangent = {0, -1, 0};
+        vertex[9].position = {-0.5f, 0.5f, -0.5f};
+        vertex[9].tex_coord = {1, 1};
+        vertex[9].normal = {-1, 0, 0};
+        vertex[9].tangent = {0, 0, -1};
+        vertex[9].bitangent = {0, -1, 0};
+        vertex[10].position = {-0.5f, -0.5f, 0.5f};
+        vertex[10].tex_coord = {0, 0};
+        vertex[10].normal = {-1, 0, 0};
+        vertex[10].tangent = {0, 0, -1};
+        vertex[10].bitangent = {0, -1, 0};
+        vertex[11].position = {-0.5f, 0.5f, 0.5f};
+        vertex[11].tex_coord = {1, 0};
+        vertex[11].normal = {-1, 0, 0};
+        vertex[11].tangent = {0, 0, -1};
+        vertex[11].bitangent = {0, -1, 0};
+        vertex[12].position = {0.5f, -0.5f, -0.5f};
+        vertex[12].tex_coord = {0, 1};
+        vertex[12].normal = {1, 0, 0};
+        vertex[12].tangent = {0, 0, 1};
+        vertex[12].bitangent = {0, -1, 0};
+        vertex[13].position = {0.5f, 0.5f, -0.5f};
+        vertex[13].tex_coord = {1, 1};
+        vertex[13].normal = {1, 0, 0};
+        vertex[13].tangent = {0, 0, 1};
+        vertex[13].bitangent = {0, -1, 0};
+        vertex[14].position = {0.5f, -0.5f, 0.5f};
+        vertex[14].tex_coord = {0, 0};
+        vertex[14].normal = {1, 0, 0};
+        vertex[14].tangent = {0, 0, 1};
+        vertex[14].bitangent = {0, -1, 0};
+        vertex[15].position = {0.5f, 0.5f, 0.5f};
+        vertex[15].tex_coord = {1, 0};
+        vertex[15].normal = {1, 0, 0};
+        vertex[15].tangent = {0, 0, 1};
+        vertex[15].bitangent = {0, -1, 0};
+        vertex[16].position = {-0.5f, -0.5f, -0.5f};
+        vertex[16].tex_coord = {0, 1};
+        vertex[16].normal = {0, -1, 0};
+        vertex[16].tangent = {1, 0, 0};
+        vertex[16].bitangent = {0, 0, -1};
+        vertex[17].position = {0.5f, -0.5f, -0.5f};
+        vertex[17].tex_coord = {1, 1};
+        vertex[17].normal = {0, -1, 0};
+        vertex[17].tangent = {1, 0, 0};
+        vertex[17].bitangent = {0, 0, -1};
+        vertex[18].position = {-0.5f, -0.5f, 0.5f};
+        vertex[18].tex_coord = {0, 0};
+        vertex[18].normal = {0, -1, 0};
+        vertex[18].tangent = {1, 0, 0};
+        vertex[18].bitangent = {0, 0, -1};
+        vertex[19].position = {0.5f, -0.5f, 0.5f};
+        vertex[19].tex_coord = {1, 0};
+        vertex[19].normal = {0, -1, 0};
+        vertex[19].tangent = {1, 0, 0};
+        vertex[19].bitangent = {0, 0, -1};
+        vertex[20].position = {-0.5f, 0.5f, -0.5f};
+        vertex[20].tex_coord = {0, 1};
+        vertex[20].normal = {0, 1, 0};
+        vertex[20].tangent = {1, 0, 0};
+        vertex[20].bitangent = {0, 0, 1};
+        vertex[21].position = {0.5f, 0.5f, -0.5f};
+        vertex[21].tex_coord = {1, 1};
+        vertex[21].normal = {0, 1, 0};
+        vertex[21].tangent = {1, 0, 0};
+        vertex[21].bitangent = {0, 0, 1};
+        vertex[22].position = {-0.5f, 0.5f, 0.5f};
+        vertex[22].tex_coord = {0, 0};
+        vertex[22].normal = {0, 1, 0};
+        vertex[22].tangent = {1, 0, 0};
+        vertex[22].bitangent = {0, 0, 1};
+        vertex[23].position = {0.5f, 0.5f, 0.5f};
+        vertex[23].tex_coord = {1, 0};
+        vertex[23].normal = {0, 1, 0};
+        vertex[23].tangent = {1, 0, 0};
+        vertex[23].bitangent = {0, 0, 1};
+        mesh.indices = {2, 1, 0, 2, 3, 1, 4, 5, 6, 5, 7, 6, 10, 9, 8, 10, 11, 9, 12, 13, 14, 13, 15, 14, 16, 17, 18, 17, 19, 18, 22, 21, 20, 22, 23, 21};
 
-        ModelMesh model_mesh(0, mat4 {1.0f},
-                             MeshRange{ .vertex_offset = 0, .index_offset = 0, .vertex_count = (uint32_t)mesh.vertices.size(), .index_count = (uint32_t)mesh.indices.size(), .bounding_box = box },
+        ModelMesh model_mesh(0, glm::mat4{1.0f},
+                             MeshRange{.vertex_offset = 0, .index_offset = 0, .vertex_count = (uint32_t)mesh.vertices.size(), .index_count = (uint32_t)mesh.indices.size(), .bounding_box = box},
                              std::move(mesh));
         Model model{
             .name = name,
@@ -536,15 +522,14 @@ namespace engine::render
             .meshes = {},
             .materials = {render::Material{}},
             .vertices = direct3d::ImmutableVertexBuffer<Vertex>{model_mesh.mesh.vertices},
-            .indices = direct3d::ImmutableIndexBuffer<uint32_t>{model_mesh.mesh.indices}
-        };
+            .indices = direct3d::ImmutableIndexBuffer<uint32_t>{model_mesh.mesh.indices}};
         model.meshes.push_back(std::move(model_mesh));
         model.meshes[0].triangle_octree.initialize(model.meshes[0]);
 
         model_id = instance().AddModel(std::move(model));
         ::engine::core::ModelLoader::instance_->models_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
         ::engine::core::ModelLoader::instance_->models_inverse_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
-        ::engine::core::ModelLoader::instance_->loaded_models_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ::engine::core::ModelLoader::ModelInfo>{model_id, ::engine::core::ModelLoader::ModelInfo{ "", model_id, "UnitCube" }});
+        ::engine::core::ModelLoader::instance_->loaded_models_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ::engine::core::ModelLoader::ModelInfo>{model_id, ::engine::core::ModelLoader::ModelInfo{"", model_id, "UnitCube"}});
         return model_id;
     }
 } // namespace engine::render

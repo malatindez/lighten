@@ -91,6 +91,7 @@ set(IMGUIZMO_LIBRARIES imguizmo)
 
 # entt
 add_subdirectory(${ENTT_DIR})
+set(ENTT_INCLUDE_DIRS "${ENTT_DIR}/src")
 set(ENTT_LIBRARIES EnTT::EnTT)
 
 # google test
@@ -115,7 +116,7 @@ set_target_properties(benchmark PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUT
 
 # spdlog
 add_subdirectory("${SPDLOG_DIR}" EXCLUDE_FROM_ALL)
-
+set(SPDLOG_INCLUDE_DIRS "${SPDLOG_DIR}/include")
 
 # DDS texture loader
 add_library(dds_texture_loader11 STATIC "${DDS_TEXTURE_LOADER_DIR}/DDSTextureLoader11.cpp")

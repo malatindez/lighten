@@ -7,46 +7,41 @@ namespace engine::render::_emissive_particle_detail
 {
     namespace
     {
-        static constexpr D3D11_BUFFER_DESC particle_buffer_desc
-        {
-             .ByteWidth = sizeof(GPUParticle) * kMaximumAmountOfParticles,
-                .Usage = D3D11_USAGE_DEFAULT,
-                .BindFlags = D3D11_BIND_UNORDERED_ACCESS,
-                .CPUAccessFlags = 0,
-                .MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED,
-                .StructureByteStride = sizeof(GPUParticle)
-        };
-        static constexpr D3D11_BUFFER_DESC particle_range_desc
-        {
+        static constexpr D3D11_BUFFER_DESC particle_buffer_desc{
+            .ByteWidth = sizeof(GPUParticle) * kMaximumAmountOfParticles,
+            .Usage = D3D11_USAGE_DEFAULT,
+            .BindFlags = D3D11_BIND_UNORDERED_ACCESS,
+            .CPUAccessFlags = 0,
+            .MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED,
+            .StructureByteStride = sizeof(GPUParticle)};
+        static constexpr D3D11_BUFFER_DESC particle_range_desc{
             .ByteWidth = sizeof(uint32_t) * 3,
-                                .Usage = D3D11_USAGE_DEFAULT,
-                                .BindFlags = D3D11_BIND_UNORDERED_ACCESS,
-                                .CPUAccessFlags = 0,
-                                .MiscFlags = 0,
-                                .StructureByteStride = sizeof(uint32_t) };
-        static constexpr D3D11_BUFFER_DESC particle_indirect_args_structured_desc
-        {
-                                            .ByteWidth = sizeof(D3D11_DRAW_INSTANCED_INDIRECT_ARGS),
-                                            .Usage = D3D11_USAGE_DEFAULT,
-                                            .BindFlags = D3D11_BIND_UNORDERED_ACCESS,
-                                            .CPUAccessFlags = 0,
-                                            .MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED,
-                                            .StructureByteStride = sizeof(D3D11_DRAW_INSTANCED_INDIRECT_ARGS) };
-        static constexpr D3D11_BUFFER_DESC particle_indirect_args_copy_desc
-        {
-                                            .ByteWidth = sizeof(D3D11_DRAW_INSTANCED_INDIRECT_ARGS),
-                                            .Usage = D3D11_USAGE_DEFAULT,
-                                            .BindFlags = D3D11_BIND_UNORDERED_ACCESS,
-                                            .CPUAccessFlags = 0,
-                                            .MiscFlags = D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS,
-                                            .StructureByteStride = sizeof(D3D11_DRAW_INSTANCED_INDIRECT_ARGS) };
+            .Usage = D3D11_USAGE_DEFAULT,
+            .BindFlags = D3D11_BIND_UNORDERED_ACCESS,
+            .CPUAccessFlags = 0,
+            .MiscFlags = 0,
+            .StructureByteStride = sizeof(uint32_t)};
+        static constexpr D3D11_BUFFER_DESC particle_indirect_args_structured_desc{
+            .ByteWidth = sizeof(D3D11_DRAW_INSTANCED_INDIRECT_ARGS),
+            .Usage = D3D11_USAGE_DEFAULT,
+            .BindFlags = D3D11_BIND_UNORDERED_ACCESS,
+            .CPUAccessFlags = 0,
+            .MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED,
+            .StructureByteStride = sizeof(D3D11_DRAW_INSTANCED_INDIRECT_ARGS)};
+        static constexpr D3D11_BUFFER_DESC particle_indirect_args_copy_desc{
+            .ByteWidth = sizeof(D3D11_DRAW_INSTANCED_INDIRECT_ARGS),
+            .Usage = D3D11_USAGE_DEFAULT,
+            .BindFlags = D3D11_BIND_UNORDERED_ACCESS,
+            .CPUAccessFlags = 0,
+            .MiscFlags = D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS,
+            .StructureByteStride = sizeof(D3D11_DRAW_INSTANCED_INDIRECT_ARGS)};
     }
 
     EmissiveParticleRenderSystem::EmissiveParticleRenderSystem() : RenderPass(0x30000),
-        particle_buffer_{ D3D11_BUFFER_DESC(particle_buffer_desc) },
-        particle_range_{ D3D11_BUFFER_DESC(particle_range_desc) },
-        particle_indirect_args_{ D3D11_BUFFER_DESC(particle_indirect_args_structured_desc) },
-        particle_indirect_args_copy_{ D3D11_BUFFER_DESC(particle_indirect_args_copy_desc) }
+                                                                   particle_buffer_{D3D11_BUFFER_DESC(particle_buffer_desc)},
+                                                                   particle_range_{D3D11_BUFFER_DESC(particle_range_desc)},
+                                                                   particle_indirect_args_{D3D11_BUFFER_DESC(particle_indirect_args_structured_desc)},
+                                                                   particle_indirect_args_copy_{D3D11_BUFFER_DESC(particle_indirect_args_copy_desc)}
     {
         D3D11_UNORDERED_ACCESS_VIEW_DESC uav_desc;
         ZeroMemory(&uav_desc, sizeof(uav_desc));
@@ -103,16 +98,16 @@ namespace engine::render::_emissive_particle_detail
         noise_texture_ = core::TextureManager::GetTextureView(path / "assets/dissolution_perlin_noise.dds");
     }
 
-    void EmissiveParticleRenderSystem::OnRender([[maybe_unused]] ID3D11ShaderResourceView * depth_srv, [[maybe_unused]] ID3D11ShaderResourceView * normals_srv)
+    void EmissiveParticleRenderSystem::OnRender([[maybe_unused]] ID3D11ShaderResourceView *depth_srv, [[maybe_unused]] ID3D11ShaderResourceView *normals_srv)
     {
-        
-        //update_particles(depth_srv, normals_srv);
-        //render_particles(depth_srv);
+
+        // update_particles(depth_srv, normals_srv);
+        // render_particles(depth_srv);
     }
 
-    void EmissiveParticleRenderSystem::update_particles(ID3D11ShaderResourceView * depth_srv, ID3D11ShaderResourceView * normals_srv)
+    void EmissiveParticleRenderSystem::update_particles(ID3D11ShaderResourceView *depth_srv, ID3D11ShaderResourceView *normals_srv)
     {
-        per_frame_buffer_.Update(PerFrame{ .maximum_amount_of_particles = kMaximumAmountOfParticles });
+        per_frame_buffer_.Update(PerFrame{.maximum_amount_of_particles = kMaximumAmountOfParticles});
         per_frame_buffer_.Bind(direct3d::ShaderType::ComputeShader, 2);
 
         direct3d::api().devcon4->CSSetShaderResources(0, 1, &depth_srv);
@@ -121,7 +116,7 @@ namespace engine::render::_emissive_particle_detail
         std::vector<ID3D11UnorderedAccessView *> uavs = {
             particle_buffer_uav_.ptr(),
             particle_range_uav_.ptr(),
-            particle_indirect_args_uav_.ptr() };
+            particle_indirect_args_uav_.ptr()};
 
         direct3d::api().devcon4->CSSetUnorderedAccessViews(1, static_cast<uint32_t>(uavs.size()), uavs.data(), nullptr);
 
@@ -145,7 +140,7 @@ namespace engine::render::_emissive_particle_detail
         std::vector<ID3D11UnorderedAccessView *> uavs = {
             particle_buffer_uav_.ptr(),
             particle_range_uav_.ptr(),
-            particle_indirect_args_uav_.ptr() };
+            particle_indirect_args_uav_.ptr()};
 
         direct3d::api().devcon4->OMSetRenderTargetsAndUnorderedAccessViews(D3D11_KEEP_RENDER_TARGETS_AND_DEPTH_STENCIL,
                                                                            nullptr,
@@ -188,16 +183,15 @@ namespace engine::render::_emissive_particle_detail
             .time_begin = dissolution_component.time_begin,
             .object_lifetime = dissolution_component.lifetime,
             .velocity_range = {0.25f, 1.5f}, // TODO: make this the system parameter that we can change from UI
-            .size_range = {0.001f, 0.005f},     // TODO: make this the system parameter that we can change from UI
+            .size_range = {0.001f, 0.005f},  // TODO: make this the system parameter that we can change from UI
             .particle_lifetime = 22.5f,      // TODO: make this the system parameter that we can change from UI
             .flags = 0,
             .click_point = dissolution_component.click_point,
             .time_since_last_emission = time_since_last_emission,
-            .box_half_size = core::math::abs(model.bounding_box.min - model.bounding_box.max) / 2.0f * transform.scale,
-            .padding1 = 0.0f
-        };
+            .box_half_size = glm::abs(model.bounding_box.min - model.bounding_box.max) / 2.0f * transform.scale,
+            .padding1 = 0.0f};
 
-        per_frame_buffer_.Update(PerFrame{ .maximum_amount_of_particles = kMaximumAmountOfParticles });
+        per_frame_buffer_.Update(PerFrame{.maximum_amount_of_particles = kMaximumAmountOfParticles});
 
         per_frame_buffer_.Bind(direct3d::ShaderType::VertexShader, 2);
         per_mesh_buffer_.Bind(direct3d::ShaderType::VertexShader, 3);
@@ -205,7 +199,7 @@ namespace engine::render::_emissive_particle_detail
         std::vector<ID3D11UnorderedAccessView *> uavs = {
             particle_buffer_uav_.ptr(),
             particle_range_uav_.ptr(),
-            particle_indirect_args_uav_.ptr() };
+            particle_indirect_args_uav_.ptr()};
 
         direct3d::api().devcon4->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff);
@@ -308,7 +302,7 @@ namespace engine::render::_emissive_particle_detail
 #endif
     }
 
-    core::math::uvec3 EmissiveParticleRenderSystem::GetParticleRangeData()
+    glm::uvec3 EmissiveParticleRenderSystem::GetParticleRangeData()
     {
         D3D11_BUFFER_DESC particle_range_cpu_desc = particle_range_desc;
         particle_range_cpu_desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
@@ -322,7 +316,7 @@ namespace engine::render::_emissive_particle_detail
         uint32_t dead_count = ptr[2];
         buffer.Unmap();
 
-        return core::math::uvec3{ begin, particle_count, dead_count };
+        return glm::uvec3{begin, particle_count, dead_count};
     }
     D3D11_DRAW_INSTANCED_INDIRECT_ARGS EmissiveParticleRenderSystem::GetParticleIndirectArgsData()
     {
@@ -349,7 +343,8 @@ namespace engine::render::_emissive_particle_detail
         GPUParticle *ptr = static_cast<GPUParticle *>(particle_range.pData);
         std::vector<GPUParticle> rv;
         rv.reserve(kMaximumAmountOfParticles);
-        std::transform(ptr, ptr + kMaximumAmountOfParticles, std::back_inserter(rv), [] (GPUParticle &particle) { return particle; });
+        std::transform(ptr, ptr + kMaximumAmountOfParticles, std::back_inserter(rv), [](GPUParticle &particle)
+                       { return particle; });
         buffer.Unmap();
         return rv;
     }

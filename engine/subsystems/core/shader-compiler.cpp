@@ -10,7 +10,8 @@ namespace engine::core
         {
         public:
             CShaderInclude(char const *shader_dir) : shader_dir_(shader_dir)
-            {}
+            {
+            }
 
             HRESULT __stdcall Open(
                 D3D_INCLUDE_TYPE include_type,
@@ -134,7 +135,7 @@ namespace engine::core
                 defines[i].Name = input.macros[i].name.c_str();
                 defines[i].Definition = input.macros[i].definition.c_str();
             }
-            defines.push_back({ NULL, NULL });
+            defines.push_back({NULL, NULL});
 
             direct3d::Blob bytecode_blob = nullptr;
             direct3d::Blob error_blob = nullptr;

@@ -8,7 +8,8 @@ namespace engine::core
         constexpr uint32_t MipmapLevels(uint32_t width, uint32_t height)
         {
             uint32_t levels = 1;
-            while ((width | height) >> levels) ++levels;
+            while ((width | height) >> levels)
+                ++levels;
             return levels;
         }
 
@@ -84,7 +85,8 @@ namespace engine::core
                 direct3d::AlwaysAssert(direct3d::api().device->CreateShaderResourceView(texture, &srv_desc, &shader_resource_view.ptr()),
                                        "Failed to create shader resource view");
 
-                if (mipmaps) direct3d::api().devcon->GenerateMips(shader_resource_view);
+                if (mipmaps)
+                    direct3d::api().devcon->GenerateMips(shader_resource_view);
             }
             else
             {
@@ -135,11 +137,20 @@ namespace engine::core
         desc.MipLevels = generate_mipmaps ? MipmapLevels((uint32_t)width, (uint32_t)height) : 1;
         switch (channels)
         {
-        case 1: desc.Format = DXGI_FORMAT_R8_UNORM; break;
-        case 2: desc.Format = DXGI_FORMAT_R8G8_UNORM; break;
-        case 3: desc.Format = DXGI_FORMAT_B8G8R8X8_UNORM_SRGB; break;
-        case 4: desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; break;
-        default: mal_toolkit::AlwaysAssert(false, "Invalid number of channels");
+        case 1:
+            desc.Format = DXGI_FORMAT_R8_UNORM;
+            break;
+        case 2:
+            desc.Format = DXGI_FORMAT_R8G8_UNORM;
+            break;
+        case 3:
+            desc.Format = DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
+            break;
+        case 4:
+            desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            break;
+        default:
+            mal_toolkit::AlwaysAssert(false, "Invalid number of channels");
         }
         direct3d::Texture2D texture;
         D3D11_SUBRESOURCE_DATA srd;
@@ -167,7 +178,8 @@ namespace engine::core
         srv_desc.Texture2D.MostDetailedMip = 0;
         direct3d::ShaderResourceView shader_resource_view;
         direct3d::AlwaysAssert(direct3d::api().device->CreateShaderResourceView(texture, &srv_desc, &shader_resource_view.reset()), "Failed to create shader resource view");
-        if (generate_mipmaps) direct3d::api().devcon->GenerateMips(shader_resource_view);
+        if (generate_mipmaps)
+            direct3d::api().devcon->GenerateMips(shader_resource_view);
         instance_->textures_.emplace(std::make_pair(instance_->current_id_, shader_resource_view));
         return instance_->current_id_++;
     }
@@ -188,7 +200,8 @@ namespace engine::core
         }
         auto shader_resource_view = LoadTextureFromPath(path, generate_mipmaps);
         std::filesystem::path relative_path = path.lexically_relative(std::filesystem::current_path());
-        if (relative_path.empty()) relative_path = path;
+        if (relative_path.empty())
+            relative_path = path;
         instance_->texture_paths_.emplace(std::make_pair(instance_->current_id_, relative_path));
         instance_->textures_.emplace(std::make_pair(instance_->current_id_, shader_resource_view));
         instance_->texture_hashes_.emplace(std::make_pair(std::filesystem::hash_value(path), instance_->current_id_));
@@ -223,7 +236,8 @@ namespace engine::core
 
         instance_->textures_.emplace(std::make_pair(instance_->current_id_, shader_resource_view));
         std::filesystem::path relative_path = path.lexically_relative(std::filesystem::current_path());
-        if (relative_path.empty()) relative_path = path;
+        if (relative_path.empty())
+            relative_path = path;
         instance_->texture_paths_.emplace(std::make_pair(instance_->current_id_, relative_path));
         instance_->texture_hashes_.emplace(std::make_pair(std::filesystem::hash_value(path), instance_->current_id_));
         return instance_->current_id_++;
@@ -283,7 +297,8 @@ namespace engine::core
         direct3d::AlwaysAssert(direct3d::api().device->CreateShaderResourceView(texture, &srv_desc, &shader_resource_view.ptr()),
                                "Failed to create shader resource view");
 
-        if (generate_mipmaps) direct3d::api().devcon->GenerateMips(shader_resource_view);
+        if (generate_mipmaps)
+            direct3d::api().devcon->GenerateMips(shader_resource_view);
         instance_->textures_.emplace(std::make_pair(instance_->current_id_, shader_resource_view));
         return instance_->current_id_++;
     }

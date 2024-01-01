@@ -34,11 +34,11 @@ namespace engine::core
 {
     class LayerStack
         : public Layer,
-        public Layer::HandleEvent,
-        public Layer::HandleUpdate,
-        public Layer::HandleRender,
-        public Layer::HandleGuiRender,
-        public Layer::HandleTick
+          public Layer::HandleEvent,
+          public Layer::HandleUpdate,
+          public Layer::HandleRender,
+          public Layer::HandleGuiRender,
+          public Layer::HandleTick
     {
     public:
         using Layer::Layer;

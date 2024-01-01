@@ -13,7 +13,7 @@ namespace engine::render
         class GrassRenderSystem;
         struct GrassPerMaterial
         {
-            core::math::vec3 albedo_color;
+            glm::vec3 albedo_color;
             float ao_value;
 
             float bump_value;
@@ -22,22 +22,22 @@ namespace engine::render
             float gloss_value;
 
             float roughness_value;
-            core::math::vec3 specular_value;
+            glm::vec3 specular_value;
 
             float metalness_value;
-            core::math::vec3 translucency_value;
+            glm::vec3 translucency_value;
 
             float opacity_value;
             uint32_t plane_count;
             uint32_t section_count;
             uint32_t enabled_texture_flags;
 
-            core::math::vec3 wind_vector;
+            glm::vec3 wind_vector;
             float wind_amplitude;
             float wind_wavenumber;
             float wind_frequency;
 
-            core::math::uvec2 atlas_texture_size;
+            glm::uvec2 atlas_texture_size;
         };
     } // namespace _grass_detail
 
@@ -55,7 +55,7 @@ namespace engine::render
         ID3D11ShaderResourceView *specular_texture = nullptr;
         ID3D11ShaderResourceView *translucency_texture = nullptr;
         ID3D11ShaderResourceView *metalness_texture = nullptr;
-        core::math::vec3 albedo_color;
+        glm::vec3 albedo_color;
         float ao_value = 0.0f;
         float bump_value = 0.0f;
         float cavity_value = 0.0f;
@@ -63,20 +63,20 @@ namespace engine::render
         float gloss_value = 0.0f;
         float opacity_value = 0.0f;
         float roughness_value = 0.0f;
-        core::math::vec3 specular_value{ 0.0f };
-        core::math::vec3 translucency_value{ 0.0f };
+        glm::vec3 specular_value{0.0f};
+        glm::vec3 translucency_value{0.0f};
         float metalness_value = 0.0f;
         bool reverse_normal_y = false;
 
-        core::math::vec3 wind_vector = core::math::vec3{ 0,0,0 };
+        glm::vec3 wind_vector = glm::vec3{0, 0, 0};
         float wind_amplitude = 0.0f;
         float wind_wavenumber = 0.0f;
         float wind_frequency = 0.0f;
 
         uint32_t texture_flags = 0;
         // from, to texture coordinates
-        std::vector<core::math::vec4> atlas_data{};
-        core::math::uvec2 atlas_size;
+        std::vector<glm::vec4> atlas_data{};
+        glm::uvec2 atlas_size;
 
         uint32_t planes_count = 2;
         uint32_t section_count = 3;
@@ -141,19 +141,19 @@ namespace engine::components
     {
         struct GrassInstance
         {
-            core::math::vec3 position;
-            core::math::vec2 size;
+            glm::vec3 position;
+            glm::vec2 size;
             float rotation;
             uint32_t atlas_id;
         };
 
         size_t material_id = std::numeric_limits<size_t>::max();
-        core::math::vec2 spawn_range = { 2.0f, 2.0f }; // from center
-        core::math::vec2 grass_size_range = { 0.1f, 0.5f };
-        core::math::vec3 initial_offset{ 0.0f };
+        glm::vec2 spawn_range = {2.0f, 2.0f}; // from center
+        glm::vec2 grass_size_range = {0.1f, 0.5f};
+        glm::vec3 initial_offset{0.0f};
         float min_distance;
         uint32_t max_attempts;
-        void Initialize(std::vector<core::math::vec4> const &atlas_data);
+        void Initialize(std::vector<glm::vec4> const &atlas_data);
 
     private:
         friend class engine::render::_grass_detail::GrassRenderSystem;
@@ -174,8 +174,8 @@ namespace engine::render::_grass_detail
     constexpr auto grass_ps_depth_only_shader_path = "assets/shaders/grass/grass-depth-only-ps.hlsl";
     struct GPUGrassInstance
     {
-        core::math::vec3 position;
-        core::math::vec2 size;
+        glm::vec3 position;
+        glm::vec2 size;
         float rotation;
         uint16_t from_uv_x;
         uint16_t from_uv_y;
@@ -202,7 +202,8 @@ namespace engine::render::_grass_detail
         void Update([[maybe_unused]] core::Scene *scene) {}
         void ScheduleInstanceUpdate();
 
-        GrassMaterial &GetMaterial(size_t material_id) {
+        GrassMaterial &GetMaterial(size_t material_id)
+        {
             return materials_[material_id].material;
         }
 
@@ -214,11 +215,12 @@ namespace engine::render::_grass_detail
          * @return grass material id
          */
         size_t AddMaterial(GrassMaterial &&material);
+
     private:
         struct GPUTransformInfo
         {
-            core::math::mat4 rotation_matrix;
-            core::math::vec3 position;
+            glm::mat4 rotation_matrix;
+            glm::vec3 position;
             float padding;
         };
         void OnInstancesUpdate(core::Scene *scene);

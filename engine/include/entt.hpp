@@ -3,9 +3,13 @@
 #include <cstdint>
 #ifdef _DEBUG
 #include "mal-toolkit/mal-toolkit.hpp"
-#define ENTT_ASSERT(x, s) \
-        if (!std::is_constant_evaluated()) { mal_toolkit::Assert(x, s); } \
-        else assert(x)
+#define ENTT_ASSERT(x, s)                  \
+        if (!std::is_constant_evaluated()) \
+        {                                  \
+                mal_toolkit::Assert(x, s); \
+        }                                  \
+        else                               \
+                assert(x)
 #else
 #define ENTT_ASSERT(...)
 #define ENTT_DISABLE_ASSERT

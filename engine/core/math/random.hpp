@@ -4,7 +4,7 @@
 /**
  * @file random.hpp
  * @brief Provides functionality for random number generation and manipulation in vector spaces.
- * 
+ *
  * This file contains utility functions for generating random vectors in 2D, 3D, and 4D spaces.
  * It also provides Poisson Disk sampling for generating a random, yet evenly distributed set of points.
  */
@@ -36,12 +36,12 @@ namespace engine::core::math::random
          * @param to End vector.
          * @return A random vector between `from` and `to`.
          */
-        template<uint32_t size, typename Type, glm::qualifier Q>
-        inline vec<size, Type, Q> RandomVector(std::mt19937 &gen, vec<size, Type, Q> const &from, vec<size, Type, Q> const &to) noexcept
+        template <glm::length_t size, typename Type, glm::qualifier Q>
+        inline glm::vec<size, Type, Q> RandomVector(std::mt19937 &gen, glm::vec<size, Type, Q> const &from, glm::vec<size, Type, Q> const &to) noexcept
         {
             std::uniform_real_distribution<float> dis(0.0f, 1.0f);
-            vec<size, Type, Q> p;
-            for (uint32_t i = 0; i < size; i++)
+            glm::vec<size, Type, Q> p;
+            for (glm::length_t i = 0; i < size; i++)
                 p[i] = static_cast<Type>(from[i] + dis(gen) * (to[i] - from[i]));
             return p;
         }
@@ -65,7 +65,7 @@ namespace engine::core::math::random
      */
     inline glm::vec4 RandomDirection4(std::mt19937 &gen) noexcept { return _detail::UnitRandom<glm::vec4>(gen); }
 
-    template<typename U>
+    template <typename U>
     U RandomVector(std::mt19937 &gen, U const &from, U const &to) noexcept { return _detail::RandomVector(gen, from, to); }
 
     namespace poisson_disc
@@ -82,13 +82,13 @@ namespace engine::core::math::random
              * @param max_attempts Maximum number of attempts before giving up on finding a new point.
              * @return A vector containing the generated points.
              */
-            template<typename U>
+            template <typename U>
             inline std::vector<U> PoissonDisc(std::mt19937 &gen, U const &from, U const &to, float min_distance, size_t max_attempts = 30) noexcept
             {
                 std::vector<U> result;
                 std::uniform_real_distribution<float> dist(0.0f, 1.0f);
                 std::vector<U> active;
-                result.push_back(random::_detail::RandomVector(gen, from, to));
+                result.push_back(::engine::core::math::random::_detail::RandomVector(gen, from, to));
                 active.push_back(result.back());
                 while (!active.empty())
                 {
@@ -98,7 +98,7 @@ namespace engine::core::math::random
                     bool found = false;
                     for (size_t i = 0; i < max_attempts; ++i)
                     {
-                        U new_point = point + random::_detail::RandomVector(gen, U{ -min_distance }, U{ min_distance });
+                        U new_point = point + ::engine::core::math::random::_detail::RandomVector(gen, U{-min_distance}, U{min_distance});
                         if (new_point.x < from.x || new_point.x > to.x || new_point.y < from.y || new_point.y > to.y)
                             continue;
                         bool ok = true;

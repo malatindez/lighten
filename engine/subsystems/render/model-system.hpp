@@ -29,11 +29,16 @@ namespace engine::render
         static std::optional<entt::entity> FindIntersection(entt::registry &registry,
                                                             core::math::Ray const &ray,
                                                             core::math::Intersection &nearest);
+
     public:
-        [[nodiscard]] static ModelSystem &instance() noexcept { mal_toolkit::Assert(instance_ != nullptr); return *instance_; }
+        [[nodiscard]] static ModelSystem &instance() noexcept
+        {
+            mal_toolkit::Assert(instance_ != nullptr);
+            return *instance_;
+        }
         [[nodiscard]] static Model &GetModel(ModelId model_id) { return instance().models_.find(model_id)->second; }
 
-        [[nodiscard]] static ModelId AddModel(Model&& model);
+        [[nodiscard]] static ModelId AddModel(Model &&model);
         static void UnloadModel(ModelId model_id);
 
         static ModelId GetUnitSphereFlat();
@@ -41,7 +46,6 @@ namespace engine::render
         static ModelId GetUnitCube();
 
     private:
-
         friend class ::engine::core::Engine;
         friend class ::engine::core::ModelLoader;
 
@@ -68,4 +72,4 @@ namespace engine::render
         std::unordered_map<ModelId, Model> models_;
         ModelId current_index = 0;
     };
-} // namespace engine::render   
+} // namespace engine::render

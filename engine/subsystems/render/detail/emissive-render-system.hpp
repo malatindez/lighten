@@ -19,7 +19,7 @@ namespace engine::components
     struct EmissiveComponent
     {
         uint64_t model_id;
-        core::math::vec3 emissive_color;
+        glm::vec3 emissive_color;
         float power;
     };
 } // namespace engine::components
@@ -27,12 +27,12 @@ namespace engine::render::_emissive_detail
 {
     struct EmissiveShaderBuffer
     {
-        core::math::mat4 mesh_to_model;
+        glm::mat4 mesh_to_model;
     };
     struct EmissiveInstance
     {
-        core::math::mat4 world_transform;
-        core::math::vec3 emissive_color;
+        glm::mat4 world_transform;
+        glm::vec3 emissive_color;
     };
     struct MeshInstance
     {

@@ -17,11 +17,11 @@ namespace engine::render::_emissive_detail
             {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0},
             {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0},
             {"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D11_INPUT_PER_VERTEX_DATA, 0},
-            {"ROWX", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0 * sizeof(core::math::vec4), D3D11_INPUT_PER_INSTANCE_DATA, 1},
-            {"ROWY", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1 * sizeof(core::math::vec4), D3D11_INPUT_PER_INSTANCE_DATA, 1},
-            {"ROWZ", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 2 * sizeof(core::math::vec4), D3D11_INPUT_PER_INSTANCE_DATA, 1},
-            {"ROWW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 3 * sizeof(core::math::vec4), D3D11_INPUT_PER_INSTANCE_DATA, 1},
-            {"EMISSION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 4 * sizeof(core::math::vec4), D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ROWX", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0 * sizeof(glm::vec4), D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ROWY", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1 * sizeof(glm::vec4), D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ROWZ", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 2 * sizeof(glm::vec4), D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ROWW", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 3 * sizeof(glm::vec4), D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"EMISSION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 4 * sizeof(glm::vec4), D3D11_INPUT_PER_INSTANCE_DATA, 1},
         };
         auto vs = core::ShaderManager::instance()->CompileVertexShader(path / emissive_vs_shader_path);
         auto ps = core::ShaderManager::instance()->CompilePixelShader(path / emissive_ps_shader_path);
@@ -100,7 +100,7 @@ namespace engine::render::_emissive_detail
                     auto &emissive_component = instance_group.get<components::EmissiveComponent>(entity);
                     *dst++ = EmissiveInstance{
                         .world_transform = instance_group.get<components::Transform>(entity).model,
-                        .emissive_color = emissive_component.emissive_color * emissive_component.power };
+                        .emissive_color = emissive_component.emissive_color * emissive_component.power};
                 }
             }
         }
@@ -115,18 +115,19 @@ namespace engine::render::_emissive_detail
             auto &mesh_instance = instance.mesh_instances[mesh_index];
             mesh_instance.instances.push_back(entity);
         }
-        registry.emplace<components::EmissiveComponent>(entity, components::EmissiveComponent{ .model_id = model_id });
+        registry.emplace<components::EmissiveComponent>(entity, components::EmissiveComponent{.model_id = model_id});
     }
     ModelInstance &EmissiveRenderSystem::GetInstance(uint64_t model_id)
     {
-        auto it = std::find_if(model_instances_.begin(), model_instances_.end(), [&model_id] (auto const &instance) { return instance.model_id == model_id; });
+        auto it = std::find_if(model_instances_.begin(), model_instances_.end(), [&model_id](auto const &instance)
+                               { return instance.model_id == model_id; });
         if (it != model_instances_.end())
         {
             return *it;
         }
-        model_instances_.emplace_back(ModelInstance{ .model = ModelSystem::GetModel(model_id), .model_id = model_id });
+        model_instances_.emplace_back(ModelInstance{.model = ModelSystem::GetModel(model_id), .model_id = model_id});
         auto &instance = model_instances_.at(model_instances_.size() - 1);
-        for ([[maybe_unused]] auto const &_: instance.model.meshes)
+        for ([[maybe_unused]] auto const &_ : instance.model.meshes)
         {
             MeshInstance value;
             instance.mesh_instances.emplace_back(std::move(value));

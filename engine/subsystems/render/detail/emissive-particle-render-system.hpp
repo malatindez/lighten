@@ -24,32 +24,32 @@ namespace engine::render
 
         struct GPUParticle
         {
-            core::math::vec3 position;
+            glm::vec3 position;
             float spawn_time;
-            core::math::vec3 velocity;
+            glm::vec3 velocity;
             float lifetime;
-            core::math::vec3 color;
+            glm::vec3 color;
             float size;
         };
 
         struct PerFrame
         {
             uint32_t maximum_amount_of_particles;
-            core::math::vec3 padding0;
+            glm::vec3 padding0;
         };
 
         struct PerMesh
         {
-            core::math::mat4 world_transform;
+            glm::mat4 world_transform;
             float time_begin;
             float object_lifetime;
-            core::math::vec2 velocity_range;
-            core::math::vec2 size_range;
+            glm::vec2 velocity_range;
+            glm::vec2 size_range;
             float particle_lifetime;
             uint32_t flags;
-            core::math::vec3 click_point;
+            glm::vec3 click_point;
             float time_since_last_emission;
-            core::math::vec3 box_half_size;
+            glm::vec3 box_half_size;
             float padding1;
         };
     } // namespace _emissive_particle_detail
@@ -64,7 +64,7 @@ namespace engine::render
         class EmissiveParticleRenderSystem final : public RenderPass
         {
         public:
-            void OnRender(ID3D11ShaderResourceView * depth_srv,  ID3D11ShaderResourceView * normals_srv);
+            void OnRender(ID3D11ShaderResourceView *depth_srv, ID3D11ShaderResourceView *normals_srv);
 
             void Update(core::Scene *scene);
 
@@ -81,10 +81,10 @@ namespace engine::render
             EmissiveParticleRenderSystem &operator=(EmissiveParticleRenderSystem &&) = delete;
 
         private:
-            void update_particles(ID3D11ShaderResourceView * depth_srv, ID3D11ShaderResourceView * ormals_srv);
-            void render_particles(ID3D11ShaderResourceView * depth_srv);
+            void update_particles(ID3D11ShaderResourceView *depth_srv, ID3D11ShaderResourceView *ormals_srv);
+            void render_particles(ID3D11ShaderResourceView *depth_srv);
 
-            core::math::uvec3 GetParticleRangeData();
+            glm::uvec3 GetParticleRangeData();
             D3D11_DRAW_INSTANCED_INDIRECT_ARGS GetParticleIndirectArgsData();
             std::vector<GPUParticle> GetParticleData();
             GraphicsShaderProgram particle_render_shader_;

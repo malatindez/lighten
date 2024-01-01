@@ -29,15 +29,15 @@ namespace engine::render
 
         // Used only to discard pixels with opacity < 0.5
         ID3D11ShaderResourceView *opacity_map = nullptr;
-        core::math::vec3 albedo_color{ 0.0f };
+        glm::vec3 albedo_color{0.0f};
         float metalness_value = 0.0f;
         float roughness_value = 0.0f;
-        core::math::vec3 sheen_color{ 0.0f };
+        glm::vec3 sheen_color{0.0f};
         float sheen_roughness = 0.0f;
         uint32_t texture_flags;
         bool reverse_normal_y = false;
         bool twosided = true;
-        core::math::vec2 uv_multiplier{ 1 };
+        glm::vec2 uv_multiplier{1};
         void UpdateTextureFlags();
         OpaqueMaterial() { reset(); }
         void BindTextures() const;
@@ -50,19 +50,20 @@ namespace engine::render
             metalness_map = nullptr;
             roughness_map = nullptr;
             opacity_map = nullptr;
-            albedo_color = core::math::vec3{ 0.0f };
+            albedo_color = glm::vec3{0.0f};
             metalness_value = 0.01f;
             roughness_value = 0.01f;
-            sheen_color = core::math::vec3{0.0f};
+            sheen_color = glm::vec3{0.0f};
             sheen_roughness = 0.00f;
             texture_flags = 0;
             reverse_normal_y = false;
             twosided = true;
-            uv_multiplier = core::math::vec2{ 1 };
+            uv_multiplier = glm::vec2{1};
         }
     };
 }
-namespace std {
+namespace std
+{
     template <>
     struct hash<engine::render::OpaqueMaterial>
     {
@@ -90,6 +91,7 @@ namespace engine::components
     public:
         OpaqueComponent(size_t model_id) : model_id(model_id) {}
         size_t model_id;
+
     private:
         friend class ::engine::render::_opaque_detail::OpaqueRenderSystem;
         size_t model_instance_id;
@@ -100,7 +102,7 @@ namespace engine::render::_opaque_detail
 {
     struct OpaqueInstance
     {
-        core::math::mat4 world_transform;
+        glm::mat4 world_transform;
         uint32_t entity_id;
     };
     struct MaterialInstance
@@ -121,25 +123,25 @@ namespace engine::render::_opaque_detail
     };
     struct OpaquePerMaterial
     {
-        core::math::vec3 albedo_color;
+        glm::vec3 albedo_color;
         float metalness;
         float roughness;
-        core::math::vec3 sheen_color;
+        glm::vec3 sheen_color;
         float sheen;
         uint32_t enabled_texture_flags;
-        core::math::vec2 uv_multiplier;
+        glm::vec2 uv_multiplier;
     };
     struct OpaquePerDepthCubemap
     {
-        std::array<core::math::mat4, 6> g_view_projection;
+        std::array<glm::mat4, 6> g_view_projection;
         uint32_t g_slice_offset;
-        core::math::vec3 padding0;
+        glm::vec3 padding0;
     };
     struct OpaquePerDepthTexture
     {
-        core::math::mat4 g_view_projection;
+        glm::mat4 g_view_projection;
         uint32_t g_slice_offset;
-        core::math::vec3 padding0;
+        glm::vec3 padding0;
     };
     struct OpaqueInstanceInfo
     {
@@ -183,8 +185,8 @@ namespace engine::render::_opaque_detail
         void RenderDepthOnly(std::vector<OpaquePerDepthTexture> const &textures, core::Scene *scene);
 
         /** @brief Returns instance information
-        * @warning pointers to materials aren't guaranteed to point to the correct location after UpdateInstances was called
-        */
+         * @warning pointers to materials aren't guaranteed to point to the correct location after UpdateInstances was called
+         */
         OpaqueInstanceInfo GetInstanceInfo(entt::registry &registry, entt::entity entity)
         {
             OpaqueInstanceInfo rv;
@@ -201,16 +203,17 @@ namespace engine::render::_opaque_detail
         }
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity);
         void AddInstance(uint64_t model_id, entt::registry &registry, entt::entity entity, std::vector<OpaqueMaterial> const &materials);
-        void RemoveInstance(entt::registry& registry, entt::entity entity);
+        void RemoveInstance(entt::registry &registry, entt::entity entity);
 
         void Update([[maybe_unused]] core::Scene *scene) {}
         void ScheduleInstanceUpdate()
         {
             is_instance_update_scheduled_ = true;
         }
+
     private:
         size_t GetInstanceId(uint64_t model_id);
-        
+
         void UpdateInstances(entt::registry &registry);
 
         // TODO:
@@ -229,7 +232,7 @@ namespace engine::render::_opaque_detail
 
         GraphicsShaderProgram opaque_shader_;
         direct3d::DynamicUniformBuffer<OpaquePerMaterial> opaque_per_material_buffer_;
-        direct3d::DynamicUniformBuffer<core::math::mat4> mesh_to_model_buffer_;
+        direct3d::DynamicUniformBuffer<glm::mat4> mesh_to_model_buffer_;
         direct3d::DynamicVertexBuffer<OpaqueInstance> instance_buffer_;
     };
 } // namespace engine::render::_opaque_detail

@@ -7,10 +7,10 @@ namespace engine::render
     {
         hdr_render_target_.SizeResources(g_buffer.albedo->size());
 
-        const core::math::vec4 empty_vec(0, 0, 0, 0);
+        const glm::vec4 empty_vec(0, 0, 0, 0);
 
         direct3d::api().devcon4->OMSetRenderTargets(0, nullptr, nullptr);
-        direct3d::api().devcon4->ClearRenderTargetView(hdr_render_target_.render_target_view(), reinterpret_cast<const float*>(&empty_vec));
+        direct3d::api().devcon4->ClearRenderTargetView(hdr_render_target_.render_target_view(), reinterpret_cast<const float *>(&empty_vec));
         direct3d::api().devcon4->RSSetState(direct3d::states().cull_none.ptr());
 
         std::vector<PointLightInstance> point_lights;
@@ -25,12 +25,12 @@ namespace engine::render
             const float exposure = 1.0f;
             auto &lrs = scene->renderer->light_render_system();
             auto &registry = scene->registry;
-            constexpr auto inv_exposure = [] (float intensity, float exposure) -> float
+            constexpr auto inv_exposure = [](float intensity, float exposure) -> float
             {
                 return intensity * (78.0f / (0.65f * 100.0f)) * std::pow(2.0f, exposure);
             };
 
-            constexpr auto calculate_length_for_solid_angle = [] (float radius, float x) -> float
+            constexpr auto calculate_length_for_solid_angle = [](float radius, float x) -> float
             {
                 return 2.0f * float(std::numbers::pi) * radius / std::sqrtf(4.0f * float(std::numbers::pi) * x - x * x);
             };
@@ -39,53 +39,48 @@ namespace engine::render
             {
                 auto &light = registry.get<components::PointLight>(entity);
                 auto &transform = registry.get<components::Transform>(entity);
-                auto instance_matrix = core::math::mat4{ 1.0f };
-                instance_matrix = core::math::translate(instance_matrix, transform.position);
+                auto instance_matrix = glm::mat4{1.0f};
+                instance_matrix = glm::translate(instance_matrix, transform.position);
                 float radius = length(transform.scale) / sqrtf(3.1f);
                 float max_intensity = std::max(std::max(light.color.x, light.color.y), light.color.z) * light.power;
 
                 float instance_scale = calculate_length_for_solid_angle(radius, 0.5f) / 10 * inv_exposure(max_intensity, exposure);
                 instance_scale = std::clamp(instance_scale, 0.01f, 1e4f);
-                instance_matrix = core::math::scale(instance_matrix, core::math::vec3(instance_scale));
+                instance_matrix = glm::scale(instance_matrix, glm::vec3(instance_scale));
                 point_lights.emplace_back(
-                    PointLightInstance
-                    {
+                    PointLightInstance{
                         .transform_matrix = instance_matrix,
                         .color = light.color * light.power,
                         .radius = radius,
                         .position = transform.position,
-                        .shadow_map_index = lrs.get_point_light_index(entity)
-                    }
-                );
+                        .shadow_map_index = lrs.get_point_light_index(entity)});
             }
             for (auto const &entity : lrs.spot_light_entities())
             {
                 auto &light = registry.get<components::SpotLight>(entity);
                 auto &transform = registry.get<components::Transform>(entity);
 
-                auto instance_matrix = core::math::mat4{ 1.0f };
-                instance_matrix = core::math::translate(instance_matrix, transform.position);
+                auto instance_matrix = glm::mat4{1.0f};
+                instance_matrix = glm::translate(instance_matrix, transform.position);
                 float radius = length(transform.scale) / sqrtf(3.1f);
                 float max_intensity = std::max(std::max(light.color.x, light.color.y), light.color.z) * light.power;
 
                 float solid_angle = calculate_length_for_solid_angle(radius, 0.01f);
                 float instance_scale = inv_exposure(max_intensity, exposure) * solid_angle / max_intensity;
 
-                instance_matrix = core::math::scale(instance_matrix, core::math::vec3(instance_scale));
+                instance_matrix = glm::scale(instance_matrix, glm::vec3(instance_scale));
 
                 spot_lights.emplace_back(
-                    SpotLightInstance
-                    {
+                    SpotLightInstance{
                         .transform_matrix = instance_matrix,
                         .color = light.color * light.power,
                         .radius = radius,
-                        .direction = transform.rotation * core::math::vec3(0, 1, 0),
+                        .direction = transform.rotation * glm::vec3(0, 1, 0),
                         .inner_cutoff = light.inner_cutoff,
                         .position = transform.position,
                         .outer_cutoff = light.outer_cutoff,
                         .shadow_map_index = lrs.get_spot_light_index(entity),
-                    }
-                );
+                    });
             }
         }
         if (point_lights.size() > 0)

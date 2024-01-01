@@ -9,9 +9,9 @@ namespace engine::core
         explicit Layer(std::string_view name = "Layer") : debug_name_(name) {}
         virtual ~Layer() = default;
         Layer(Layer const &) = delete;
-        Layer &operator= (Layer const &) = delete;
+        Layer &operator=(Layer const &) = delete;
         Layer(Layer &&) = delete;
-        Layer &operator= (Layer &&) = delete;
+        Layer &operator=(Layer &&) = delete;
 
         virtual void OnAttach() {}
         virtual void OnDetach() {}

@@ -31,10 +31,10 @@ namespace engine::render
 
         struct GPUParticle
         {
-            core::math::vec3 position;
-            core::math::vec3 velocity;
-            core::math::vec3 acceleration; // e.g. gravity
-            core::math::vec4 color;
+            glm::vec3 position;
+            glm::vec3 velocity;
+            glm::vec3 acceleration; // e.g. gravity
+            glm::vec4 color;
             float begin_size;
             float end_size;
             float rotation;
@@ -63,7 +63,7 @@ namespace engine::render
         class ParticleRenderSystem final : public RenderPass
         {
         public:
-            void OnRender(core::Scene *scene, ID3D11ShaderResourceView * depth_srv);
+            void OnRender(core::Scene *scene, ID3D11ShaderResourceView *depth_srv);
             void Tick(core::Scene *scene, float delta_time);
             ParticleRenderSystem();
             ~ParticleRenderSystem() = default;
@@ -78,7 +78,8 @@ namespace engine::render
             ID3D11ShaderResourceView *emva2 = nullptr;
             ID3D11ShaderResourceView *rlt = nullptr;
 
-            core::math::uvec2 atlas_size = { 1, 1 };
+            glm::uvec2 atlas_size = {1, 1};
+
         private:
             GraphicsShaderProgram particle_shader_;
             direct3d::DynamicUniformBuffer<ParticlePerFrame> particle_per_frame_buffer_;

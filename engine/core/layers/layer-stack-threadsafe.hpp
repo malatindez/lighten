@@ -6,7 +6,7 @@ namespace engine::core
     {
     public:
         using LayerStack::LayerStack;
-        virtual ~LayerStackThreadsafe() { std::unique_lock guard{ mutex }; }
+        virtual ~LayerStackThreadsafe() { std::unique_lock guard{mutex}; }
         template <typename T>
         void PushLayer(std::shared_ptr<T> layer);
         template <typename T>

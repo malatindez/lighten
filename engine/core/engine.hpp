@@ -9,15 +9,15 @@
 namespace engine::core
 {
     // TODO: move to config file
-    const core::math::ivec2 kWindowPosition{ 0 };
-    const core::math::ivec2 kWindowResolution{ 640, 360 };
+    const glm::ivec2 kWindowPosition{0};
+    const glm::ivec2 kWindowResolution{640, 360};
 
     const float kUpdateLimit = 1e9f;
     const float kFpsLimit = 150.0f;
     const float kTickrate = 150.0f;
 
-    const core::math::vec3 kSphereCoords{ 0, 0, -1 };
-    const float kSphereRadius{ 0.5f };
+    const glm::vec3 kSphereCoords{0, 0, -1};
+    const float kSphereRadius{0.5f};
 
     /**
      * @brief Represents the core of the engine
@@ -160,19 +160,20 @@ namespace engine::core
         [[nodiscard]] static inline float maximum_update_rate() { return application_->update_rate_; }
 
 #ifdef _DEBUG
-        mal_toolkit::Measurer<std::chrono::high_resolution_clock> update_measurer{ "Engine::Update()", false };
-        mal_toolkit::Measurer<std::chrono::high_resolution_clock> render_measurer{ "Engine::Render()", false };
-        mal_toolkit::Measurer<std::chrono::high_resolution_clock> tick_measurer{ "Engine::Tick()", false };
+        mal_toolkit::Measurer<std::chrono::high_resolution_clock> update_measurer{"Engine::Update()", false};
+        mal_toolkit::Measurer<std::chrono::high_resolution_clock> render_measurer{"Engine::Render()", false};
+        mal_toolkit::Measurer<std::chrono::high_resolution_clock> tick_measurer{"Engine::Tick()", false};
 #endif
-
 
         [[nodiscard]] static uint64_t random_seed()
         {
-            try {
+            try
+            {
                 std::random_device rd;
                 return rd();
             }
-            catch ([[maybe_unused]] const std::exception& e) {
+            catch ([[maybe_unused]] const std::exception &e)
+            {
                 return std::chrono::system_clock::now().time_since_epoch().count();
             }
         }

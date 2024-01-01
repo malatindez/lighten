@@ -7,8 +7,8 @@ namespace engine::direct3d
 {
     DeferredHDRRenderPipeline::DeferredHDRRenderPipeline(std::shared_ptr<core::Window> window, std::shared_ptr<SwapchainRenderTarget> const &output_target)
         : core::RenderPipeline(),
-        hdr_target_{ DXGI_FORMAT_R16G16B16A16_FLOAT },
-        output_target_{ output_target }
+          hdr_target_{DXGI_FORMAT_R16G16B16A16_FLOAT},
+          output_target_{output_target}
     {
         viewport_.MinDepth = 0.0f;
         viewport_.MaxDepth = 1.0f;
@@ -30,7 +30,7 @@ namespace engine::direct3d
         gbuffer_.emission = std::make_shared<direct3d::RenderTarget>(DXGI_FORMAT_R16G16B16A16_FLOAT);
         gbuffer_.entity_id = std::make_shared<direct3d::RenderTarget>(DXGI_FORMAT_R32_UINT);
     }
-    void DeferredHDRRenderPipeline::WindowSizeChanged(core::math::ivec2 const &size)
+    void DeferredHDRRenderPipeline::WindowSizeChanged(glm::ivec2 const &size)
     {
         hdr_target_.SizeResources(size);
         output_target_->SizeResources(size);
@@ -93,14 +93,13 @@ namespace engine::direct3d
         scene_->FrameBegin();
 
         api().devcon4->RSSetViewports(1, &viewport_);
-        std::vector <ID3D11RenderTargetView *> gbuffer_target_views = {
-                                     gbuffer_.albedo->render_target_view(),
-                                     gbuffer_.normals->render_target_view(),
-                                     gbuffer_.roughness_metalness_transmittance_ao->render_target_view(),
-                                     gbuffer_.sheen->render_target_view(),
-                                     gbuffer_.emission->render_target_view(),
-                                     gbuffer_.entity_id->render_target_view()
-        };
+        std::vector<ID3D11RenderTargetView *> gbuffer_target_views = {
+            gbuffer_.albedo->render_target_view(),
+            gbuffer_.normals->render_target_view(),
+            gbuffer_.roughness_metalness_transmittance_ao->render_target_view(),
+            gbuffer_.sheen->render_target_view(),
+            gbuffer_.emission->render_target_view(),
+            gbuffer_.entity_id->render_target_view()};
         api().devcon4->OMSetRenderTargets(5, gbuffer_target_views.data(), depth_stencil_.depth_stencil_view());
         direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth_write_stencil_replace, 1);
         scene_->DeferredRender(gbuffer_);
@@ -150,14 +149,14 @@ namespace engine::direct3d
 
     void DeferredHDRRenderPipeline::FrameBegin()
     {
-        const core::math::vec4 empty_vec{ 0.0f, 0.0f, 0.0f, 1.0f };
-        api().devcon4->ClearRenderTargetView(hdr_target_.render_target_view(), reinterpret_cast<const float*>(&empty_vec));
-        api().devcon4->ClearRenderTargetView(gbuffer_.normals->render_target_view(), reinterpret_cast<const float*>(&empty_vec));
-        api().devcon4->ClearRenderTargetView(gbuffer_.albedo->render_target_view(), reinterpret_cast<const float*>(&empty_vec));
-        api().devcon4->ClearRenderTargetView(gbuffer_.roughness_metalness_transmittance_ao->render_target_view(), reinterpret_cast<const float*>(&empty_vec));
-        api().devcon4->ClearRenderTargetView(gbuffer_.sheen->render_target_view(), reinterpret_cast<const float*>(&empty_vec));
-        api().devcon4->ClearRenderTargetView(gbuffer_.emission->render_target_view(), reinterpret_cast<const float*>(&empty_vec));
-        api().devcon4->ClearRenderTargetView(gbuffer_.entity_id->render_target_view(), reinterpret_cast<const float*>(&empty_vec));
+        const glm::vec4 empty_vec{0.0f, 0.0f, 0.0f, 1.0f};
+        api().devcon4->ClearRenderTargetView(hdr_target_.render_target_view(), reinterpret_cast<const float *>(&empty_vec));
+        api().devcon4->ClearRenderTargetView(gbuffer_.normals->render_target_view(), reinterpret_cast<const float *>(&empty_vec));
+        api().devcon4->ClearRenderTargetView(gbuffer_.albedo->render_target_view(), reinterpret_cast<const float *>(&empty_vec));
+        api().devcon4->ClearRenderTargetView(gbuffer_.roughness_metalness_transmittance_ao->render_target_view(), reinterpret_cast<const float *>(&empty_vec));
+        api().devcon4->ClearRenderTargetView(gbuffer_.sheen->render_target_view(), reinterpret_cast<const float *>(&empty_vec));
+        api().devcon4->ClearRenderTargetView(gbuffer_.emission->render_target_view(), reinterpret_cast<const float *>(&empty_vec));
+        api().devcon4->ClearRenderTargetView(gbuffer_.entity_id->render_target_view(), reinterpret_cast<const float *>(&empty_vec));
         api().devcon4->ClearDepthStencilView(depth_stencil_.depth_stencil_view(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0);
 
         auto const &camera = scene_->main_camera->camera();
@@ -167,8 +166,8 @@ namespace engine::direct3d
         per_frame_.inv_view = camera.inv_view;
         per_frame_.inv_projection = camera.inv_projection;
         per_frame_.inv_view_projection = camera.inv_view_projection;
-        per_frame_.screen_resolution = core::math::vec2{ viewport_.Width, viewport_.Height };
-        per_frame_.mouse_position = core::math::vec2{ core::InputLayer::instance()->mouse_position() };
+        per_frame_.screen_resolution = glm::vec2{viewport_.Width, viewport_.Height};
+        per_frame_.mouse_position = glm::vec2{core::InputLayer::instance()->mouse_position()};
         per_frame_.time_now = core::Engine::TimeFromStart();
         per_frame_.time_since_last_frame = timer.elapsed();
         timer.reset();

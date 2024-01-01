@@ -6,16 +6,16 @@
 using namespace engine::core::math;
 namespace
 {
-    float Randomize(std::mt19937 &engine, vec2 range)
+    float Randomize(std::mt19937 &engine, glm::vec2 range)
     {
         std::uniform_real_distribution<float> distribution(range.x, range.y);
         return distribution(engine);
     }
 
-    vec3 CreateDirectionVector(std::mt19937 &engine,
-                               quat transform_rotation,
-                               vec4 yaw_pitch_range,
-                               vec2 radius_range)
+    glm::vec3 CreateDirectionVector(std::mt19937 &engine,
+                                    glm::quat transform_rotation,
+                                    glm::vec4 yaw_pitch_range,
+                                    glm::vec2 radius_range)
     {
         std::uniform_real_distribution<float> yaw_distribution(yaw_pitch_range.x, yaw_pitch_range.z);
         std::uniform_real_distribution<float> pitch_distribution(yaw_pitch_range.y, yaw_pitch_range.w);
@@ -25,11 +25,10 @@ namespace
         float pitch = pitch_distribution(engine);
         float radius = radius_distribution(engine);
 
-        vec3 direction = radius * vec3(
-            std::cos(yaw) * std::cos(pitch),
-            std::sin(yaw) * std::cos(pitch),
-            std::sin(pitch)
-        );
+        glm::vec3 direction = radius * glm::vec3(
+                                           std::cos(yaw) * std::cos(pitch),
+                                           std::sin(yaw) * std::cos(pitch),
+                                           std::sin(pitch));
 
         return direction * transform_rotation;
     }
@@ -41,17 +40,16 @@ namespace engine::render::_particle_detail
         random_engine_.seed(static_cast<uint32_t>(engine::core::Engine::random_seed()));
         auto path = std::filesystem::current_path();
         std::vector<D3D11_INPUT_ELEMENT_DESC> d3d_input_desc{
-            { "POSITION",        0, DXGI_FORMAT_R32G32B32_FLOAT,     1, 0,                            D3D11_INPUT_PER_INSTANCE_DATA, 1},
-            { "VELOCITY",        0, DXGI_FORMAT_R32G32B32_FLOAT,     1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-            { "ACCELERATION",    0, DXGI_FORMAT_R32G32B32_FLOAT,     1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-            { "COLOR",           0, DXGI_FORMAT_R32G32B32A32_FLOAT,  1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-            { "BEGIN_SIZE",      0, DXGI_FORMAT_R32_FLOAT,           1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-            { "END_SIZE",        0, DXGI_FORMAT_R32_FLOAT,           1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-            { "ROTATION",        0, DXGI_FORMAT_R32_FLOAT,           1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-            { "ROTATION_SPEED",  0, DXGI_FORMAT_R32_FLOAT,           1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-            { "LIFESPAN",        0, DXGI_FORMAT_R32_FLOAT,           1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-            { "THICKNESS",       0, DXGI_FORMAT_R32_FLOAT,           1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1}
-        };
+            {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"VELOCITY", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ACCELERATION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"BEGIN_SIZE", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"END_SIZE", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ROTATION", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"ROTATION_SPEED", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"LIFESPAN", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+            {"THICKNESS", 0, DXGI_FORMAT_R32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1}};
 
         auto vs = core::ShaderManager::instance()->CompileVertexShader(path / particle_vs_shader_path);
         auto ps = core::ShaderManager::instance()->CompilePixelShader(path / particle_ps_shader_path);
@@ -76,17 +74,16 @@ namespace engine::render::_particle_detail
 
             for (auto &particle : emitter.particles)
             {
-                particles.push_back({
-                    particle.position,
-                    emitter.freeze ? vec3(0.0f) : particle.velocity,
-                    emitter.freeze ? vec3(0.0f) : particle.acceleration,
-                    particle.color,
-                    particle.begin_size,
-                    particle.end_size,
-                    particle.rotation,
-                    emitter.freeze ? 0.0f : particle.rotation_speed,
-                    1.0f - (particle.life_end - render_start_timestamp) / (particle.life_end - particle.life_begin),
-                    particle.thickness });
+                particles.push_back({particle.position,
+                                     emitter.freeze ? glm::vec3(0.0f) : particle.velocity,
+                                     emitter.freeze ? glm::vec3(0.0f) : particle.acceleration,
+                                     particle.color,
+                                     particle.begin_size,
+                                     particle.end_size,
+                                     particle.rotation,
+                                     emitter.freeze ? 0.0f : particle.rotation_speed,
+                                     1.0f - (particle.life_end - render_start_timestamp) / (particle.life_end - particle.life_begin),
+                                     particle.thickness});
             }
         }
         if (particles.size() == 0)
@@ -95,9 +92,8 @@ namespace engine::render::_particle_detail
         }
         auto &camera_transform = scene->main_camera->transform();
 
-        std::sort(particles.begin(), particles.end(), [&camera_transform] (const GPUParticle &a, const GPUParticle &b) noexcept -> bool {
-            return length(a.position - camera_transform.position) > length(b.position - camera_transform.position);
-                  });
+        std::sort(particles.begin(), particles.end(), [&camera_transform](const GPUParticle &a, const GPUParticle &b) noexcept -> bool
+                  { return length(a.position - camera_transform.position) > length(b.position - camera_transform.position); });
 
         particle_buffer_.Init(std::span<GPUParticle>(particles));
         ParticlePerFrame per_frame;
@@ -114,8 +110,8 @@ namespace engine::render::_particle_detail
         particle_per_frame_buffer_.Bind(direct3d::ShaderType::PixelShader, 2);
 
         direct3d::api().devcon4->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        core::math::vec4 blend_factor{ 0.0f };
-        direct3d::api().devcon4->OMSetBlendState(direct3d::states().additive_blend_state_alpha.ptr(), reinterpret_cast<float*>(&blend_factor), 0xffffffff);
+        glm::vec4 blend_factor{0.0f};
+        direct3d::api().devcon4->OMSetBlendState(direct3d::states().additive_blend_state_alpha.ptr(), reinterpret_cast<float *>(&blend_factor), 0xffffffff);
         direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().no_depth_write.ptr(), 0);
 
         particle_buffer_.Bind(1);
@@ -208,10 +204,10 @@ namespace engine::render::_particle_detail
                 emitter.particles.emplace_back();
                 auto &particle = emitter.particles.back();
                 particle.position = transform.position +
-                    CreateDirectionVector(random_engine_,
-                                          transform.rotation,
-                                          emitter.position_yaw_pitch_range,
-                                          emitter.position_radius);
+                                    CreateDirectionVector(random_engine_,
+                                                          transform.rotation,
+                                                          emitter.position_yaw_pitch_range,
+                                                          emitter.position_radius);
                 particle.velocity = CreateDirectionVector(random_engine_,
                                                           transform.rotation,
                                                           emitter.velocity_yaw_pitch_range,
@@ -220,7 +216,7 @@ namespace engine::render::_particle_detail
                 particle.acceleration = emitter.particle_acceleration;
 
                 particle.color = emitter.base_diffuse_color +
-                    random::RandomVector(random_engine_, vec4(-1), vec4(1)) * emitter.diffuse_variation;
+                                 random::RandomVector(random_engine_, glm::vec4(-1), glm::vec4(1)) * emitter.diffuse_variation;
                 particle.begin_size = Randomize(random_engine_, emitter.begin_size_range);
                 particle.end_size = Randomize(random_engine_, emitter.end_size_range);
                 particle.life_begin = time_now;

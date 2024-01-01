@@ -53,9 +53,9 @@ namespace engine::core
         math::Box m_initialBox = math::Box::empty();
         std::unique_ptr<std::array<TriangleOctree, 8>> m_children;
 
-        void initialize(render::Mesh const &mesh, const math::Box &parentBox, const math::vec3 &parentCenter, int octetIndex);
+        void initialize(render::Mesh const &mesh, const math::Box &parentBox, const glm::vec3 &parentCenter, int octetIndex);
 
-        bool addTriangle(uint32_t triangleIndex, const math::vec3 &V1, const math::vec3 &V2, const math::vec3 &V3, const math::vec3 &center, uint32_t depth = 0);
+        bool addTriangle(uint32_t triangleIndex, const glm::vec3 &V1, const glm::vec3 &V2, const glm::vec3 &V3, const glm::vec3 &center, uint32_t depth = 0);
 
         bool intersectInternal(const math::Ray &ray, MeshIntersection &nearest) const;
         static constexpr uint32_t maximum_depth = 128;

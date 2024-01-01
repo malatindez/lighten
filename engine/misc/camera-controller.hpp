@@ -19,16 +19,16 @@ namespace engine
             Accelerate = 1 << 8
         };
 
-        CameraController(entt::registry *registry, entt::entity camera, core::math::ivec2 const &window_size);
+        CameraController(entt::registry *registry, entt::entity camera, glm::ivec2 const &window_size);
 
         void Init();
         void UpdateProjectionMatrix();
 
-        void SetProjectionMatrix(core::math::mat4 const &proj);
+        void SetProjectionMatrix(glm::mat4 const &proj);
 
-        void SetWorldOffset(core::math::vec3 const &offset);
-        void AddWorldOffset(core::math::vec3 const &offset);
-        void AddRelativeOffset(core::math::vec3 const &offset);
+        void SetWorldOffset(glm::vec3 const &offset);
+        void AddWorldOffset(glm::vec3 const &offset);
+        void AddRelativeOffset(glm::vec3 const &offset);
 
         void SetWorldAngles(float roll, float pitch, float yaw);
         void AddWorldAngles(float roll, float pitch, float yaw);
@@ -40,14 +40,14 @@ namespace engine
 
         // ndc in range from -1 to 1
         // returns a projected ray from camera
-        [[nodiscard]] inline core::math::Ray Raycast(core::math::vec2 const &ndc) const noexcept
+        [[nodiscard]] inline core::math::Ray Raycast(glm::vec2 const &ndc) const noexcept
         {
             auto const &cam = camera();
-            core::math::vec4 direction = cam.inv_view_projection * core::math::vec4(ndc.x, ndc.y, 1, 1);
-            return core::math::Ray(cam.position(), core::math::normalize(glm::vec3{ direction } / direction.w - cam.position()));
+            glm::vec4 direction = cam.inv_view_projection * glm::vec4(ndc.x, ndc.y, 1, 1);
+            return core::math::Ray(cam.position(), glm::normalize(glm::vec3{direction} / direction.w - cam.position()));
         }
 
-        [[nodiscard]] inline core::math::Ray PixelRaycast(core::math::vec2 ndc) const noexcept
+        [[nodiscard]] inline core::math::Ray PixelRaycast(glm::vec2 ndc) const noexcept
         {
             ndc /= window_size();
             ndc = ndc * 2.0f - 1.0f;
@@ -60,13 +60,13 @@ namespace engine
         [[nodiscard]] inline components::CameraComponent &camera() noexcept { return registry_->get<components::CameraComponent>(camera_); }
         [[nodiscard]] inline components::Transform &transform() noexcept { return registry_->get<components::Transform>(camera_); }
 
-        [[nodiscard]] constexpr core::math::ivec2 const &window_size() const noexcept { return window_size_; }
-        [[nodiscard]] inline core::math::vec3 const &position() const noexcept { return transform().position; }
-        [[nodiscard]] inline core::math::quat const &rotation() const noexcept { return transform().rotation; }
+        [[nodiscard]] constexpr glm::ivec2 const &window_size() const noexcept { return window_size_; }
+        [[nodiscard]] inline glm::vec3 const &position() const noexcept { return transform().position; }
+        [[nodiscard]] inline glm::quat const &rotation() const noexcept { return transform().rotation; }
 
-        [[nodiscard]] inline core::math::vec3 right() const noexcept { return camera().inv_view[0]; }
-        [[nodiscard]] inline core::math::vec3 up() const noexcept { return camera().inv_view[1]; }
-        [[nodiscard]] inline core::math::vec3 forward() const noexcept { return camera().inv_view[2]; }
+        [[nodiscard]] inline glm::vec3 right() const noexcept { return camera().inv_view[0]; }
+        [[nodiscard]] inline glm::vec3 up() const noexcept { return camera().inv_view[1]; }
+        [[nodiscard]] inline glm::vec3 forward() const noexcept { return camera().inv_view[2]; }
 
         [[nodiscard]] inline float fovy() const noexcept { return camera().fovy_; }
         [[nodiscard]] inline float z_near() const noexcept { return camera().z_near_; }
@@ -90,19 +90,19 @@ namespace engine
             camera_ = new_camera;
             Init();
         }
-        void OnTick(float delta_time, core::math::ivec2 const &pixel_mouse_delta);
+        void OnTick(float delta_time, glm::ivec2 const &pixel_mouse_delta);
 
     private:
         uint32_t flags_ = None;
         float sensivity_ = 8.0f;
         float move_speed_ = 2.0f;
         float accelerated_speed_ = 10.0f;
-        float roll_speed_ = engine::core::math::radians(60.0f);
+        float roll_speed_ = glm::radians(60.0f);
 
     public:
         entt::registry *registry_;
         entt::entity camera_;
-        core::math::ivec2 const &window_size_;
+        glm::ivec2 const &window_size_;
 
         bool update_matrices_ = true;
         bool update_basis_ = true;

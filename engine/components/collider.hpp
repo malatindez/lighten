@@ -3,7 +3,7 @@
 #include "../core/reflection-macro.hpp"
 #include "../include/library-pch.hpp"
 namespace engine::components
-{    
+{
     /**
      * @brief Collider component
      *
@@ -11,19 +11,18 @@ namespace engine::components
      * @todo Implement colliders
      *
      */
-    LIGHTEN_COMPONENT(name="Collider", category="Physics")
+    LIGHTEN_COMPONENT(name = "Collider", category = "Physics")
     struct BoxCollider
     {
         /// half extents of the box collider
-        LIGHTEN_PROPERTY(serialize, save_game, name="Half Extents")
-        core::math::vec3 half_extents;
+        LIGHTEN_PROPERTY(serialize, save_game, name = "Half Extents")
+        glm::vec3 half_extents;
 
-        private: 
+    private:
         // aligning to 4 bytes
         float padding;
     };
-    
-    
+
     /**
      * @brief Collider component
      *
@@ -31,11 +30,11 @@ namespace engine::components
      * @todo Implement colliders
      *
      */
-    LIGHTEN_COMPONENT(name="Collider", category="Physics")
+    LIGHTEN_COMPONENT(name = "Collider", category = "Physics")
     struct SphereCollider
     {
         /// radius of the sphere collider
-        LIGHTEN_PROPERTY(serialize, save_game, name="Radius")
+        LIGHTEN_PROPERTY(serialize, save_game, name = "Radius")
         float radius;
     };
 } // namespace engine::components

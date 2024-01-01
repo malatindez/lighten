@@ -16,7 +16,8 @@ namespace engine::core
         Config::Init();
 
         application_ = std::unique_ptr<Engine>(new Engine{});
-        debug::RedirectOutputDebugString([&](std::string_view view) __lambda_force_inline{ application_->logger_->info(view); });
+        debug::RedirectOutputDebugString([&](std::string_view view) __lambda_force_inline
+                                         { application_->logger_->info(view); });
         if (config()["Logger"]["console_enabled"].as_boolean())
         {
             AllocConsole();
@@ -124,7 +125,7 @@ namespace engine::core
         }
 #endif
     }
-    Engine::Engine() 
+    Engine::Engine()
     {
         random_engine_ = std::make_unique<std::mt19937>(static_cast<uint32_t>(random_seed()));
         event_function_ = std::bind_front([this](Event &e) __lambda_force_inline
@@ -154,7 +155,7 @@ namespace engine::core
                 char buffer[25];
                 log.read(buffer, 24);
                 buffer[24] = '\0';
-                
+
                 std::string date(buffer + 1);
                 std::ranges::replace(date, ' ', '_');
                 std::ranges::replace(date, ':', '-');

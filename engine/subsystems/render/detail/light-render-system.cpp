@@ -23,11 +23,11 @@ namespace engine::render::_light_detail
         {
             directional_light_entities.push_back(entity);
         }
-        std::ranges::sort(point_light_entities, [] (entt::entity const &lhs, entt::entity const &rhs)
+        std::ranges::sort(point_light_entities, [](entt::entity const &lhs, entt::entity const &rhs)
                           { return static_cast<uint32_t>(lhs) < static_cast<uint32_t>(rhs); });
-        std::ranges::sort(spot_light_entities, [] (entt::entity const &lhs, entt::entity const &rhs)
+        std::ranges::sort(spot_light_entities, [](entt::entity const &lhs, entt::entity const &rhs)
                           { return static_cast<uint32_t>(lhs) < static_cast<uint32_t>(rhs); });
-        std::ranges::sort(directional_light_entities, [] (entt::entity const &lhs, entt::entity const &rhs)
+        std::ranges::sort(directional_light_entities, [](entt::entity const &lhs, entt::entity const &rhs)
                           { return static_cast<uint32_t>(lhs) < static_cast<uint32_t>(rhs); });
 
         point_light_entities_temp_ = std::move(point_light_entities);
@@ -37,25 +37,25 @@ namespace engine::render::_light_detail
         ScheduleShadowMapUpdate();
     }
 
-    mat4 CreateViewProjection(vec3 const &position, vec3 const &forward, vec3 const &up, float degrees = radians(90.0f))
+    glm::mat4 CreateViewProjection(glm::vec3 const &position, glm::vec3 const &forward, glm::vec3 const &up, float degrees = glm::radians(90.0f))
     {
         static float kShadowRange = 100.0f;
-        mat4 rv{ 1 };
-        vec3 right = -normalize(cross(forward, up));
-        rv[0] = vec4{ right, 0 };
-        rv[1] = vec4{ up, 0 };
-        rv[2] = vec4{ forward, 0 };
-        rv[3] = vec4{ position, 1 };
-        return perspectiveLH_ZO(degrees, 1.0f, kShadowRange, 0.01f) * invert_orthonormal(rv);
+        glm::mat4 rv{1};
+        glm::vec3 right = -normalize(cross(forward, up));
+        rv[0] = glm::vec4{right, 0};
+        rv[1] = glm::vec4{up, 0};
+        rv[2] = glm::vec4{forward, 0};
+        rv[3] = glm::vec4{position, 1};
+        return glm::perspectiveLH_ZO(degrees, 1.0f, kShadowRange, 0.01f) * invert_orthonormal(rv);
     }
 
-    mat4 CreateOrthoViewProjection(vec3 const &position, vec3 const &direction, float resolution)
+    glm::mat4 CreateOrthoViewProjection(glm::vec3 const &position, glm::vec3 const &direction, float resolution)
     {
-        vec3 up = vec3(0.0f, 1.0f, 0.0f);
-        vec3 right = normalize(cross(direction, up));
+        glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+        glm::vec3 right = normalize(cross(direction, up));
         up = normalize(cross(right, direction));
-        mat4 view = lookAtLH(position, position + direction, up);
-        mat4 projection = orthoLH_ZO(-resolution, resolution, -resolution, resolution, 10000.0f, 0.0f);
+        glm::mat4 view = lookAtLH(position, position + direction, up);
+        glm::mat4 projection = glm::orthoLH_ZO(-resolution, resolution, -resolution, resolution, 10000.0f, 0.0f);
         return projection * view;
     }
 
@@ -75,12 +75,12 @@ namespace engine::render::_light_detail
             auto &g_view_projection = cubemap.g_view_projection;
             cubemap.g_slice_offset = i;
             i += 6;
-            g_view_projection[0] = CreateViewProjection(transform.position, vec3(1, 0, 0), vec3(0, 1, 0));
-            g_view_projection[1] = CreateViewProjection(transform.position, vec3(-1, 0, 0), vec3(0, 1, 0));
-            g_view_projection[2] = CreateViewProjection(transform.position, vec3(0, 1, 0), vec3(0, 0, -1));
-            g_view_projection[3] = CreateViewProjection(transform.position, vec3(0, -1, 0), vec3(0, 0, 1));
-            g_view_projection[4] = CreateViewProjection(transform.position, vec3(0, 0, 1), vec3(0, 1, 0));
-            g_view_projection[5] = CreateViewProjection(transform.position, vec3(0, 0, -1), vec3(0, 1, 0));
+            g_view_projection[0] = CreateViewProjection(transform.position, glm::vec3(1, 0, 0), glm::vec3(0, 1, 0));
+            g_view_projection[1] = CreateViewProjection(transform.position, glm::vec3(-1, 0, 0), glm::vec3(0, 1, 0));
+            g_view_projection[2] = CreateViewProjection(transform.position, glm::vec3(0, 1, 0), glm::vec3(0, 0, -1));
+            g_view_projection[3] = CreateViewProjection(transform.position, glm::vec3(0, -1, 0), glm::vec3(0, 0, 1));
+            g_view_projection[4] = CreateViewProjection(transform.position, glm::vec3(0, 0, 1), glm::vec3(0, 1, 0));
+            g_view_projection[5] = CreateViewProjection(transform.position, glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
             opaque_per_cubemap_.push_back(std::move(cubemap));
             point_light_shadow_matrices_[entity] = g_view_projection;
         }
@@ -106,8 +106,8 @@ namespace engine::render::_light_detail
                 continue;
             auto const &transform = registry.get<components::Transform>(entity);
             _opaque_detail::OpaquePerDepthTexture texture;
-            vec3 forward = normalize(transform.rotation * core::math::vec3{ 0, 0, -1 });
-            vec3 up = normalize(transform.rotation * core::math::vec3{ 0, 1, 0 });
+            glm::vec3 forward = normalize(transform.rotation * glm::vec3{0, 0, -1});
+            glm::vec3 up = normalize(transform.rotation * glm::vec3{0, 1, 0});
             texture.g_view_projection = CreateViewProjection(transform.position, forward, up, spot_light.outer_cutoff);
             texture.g_slice_offset = i++;
             opaque_per_texture_.push_back(std::move(texture));
@@ -135,8 +135,8 @@ namespace engine::render::_light_detail
                 continue;
             auto const &transform = registry.get<components::Transform>(entity);
             _opaque_detail::OpaquePerDepthTexture texture;
-            vec3 forward = normalize(transform.rotation * core::math::vec3{ 0, 1, 0 });
-            vec3 camera_position = core::Engine::scene()->main_camera->position() - forward * 30.0f;
+            glm::vec3 forward = normalize(transform.rotation * glm::vec3{0, 1, 0});
+            glm::vec3 camera_position = core::Engine::scene()->main_camera->position() - forward * 30.0f;
             texture.g_view_projection = CreateOrthoViewProjection(camera_position, forward, 20.0f);
             texture.g_slice_offset = i++;
             opaque_per_texture_.push_back(std::move(texture));
@@ -180,7 +180,7 @@ namespace engine::render::_light_detail
             uint32_t directional_shadow_lights = 0;
             // for some reason returns 1 less than it should
             // TODO (look into it):
-            //std::accumulate(point_light_entities_.begin(), point_light_entities_.end(), 0u,
+            // std::accumulate(point_light_entities_.begin(), point_light_entities_.end(), 0u,
             //                                         [&registry] (uint32_t value, entt::entity const &entity)
             //                                        {
             //                                           return value + registry.get<components::PointLight>(entity).casts_shadows ? 1u : 0u;
@@ -281,7 +281,7 @@ namespace engine::render::_light_detail
                     auto &opaque_spot_light = per_frame.spot_lights[per_frame.num_spot_lights];
                     opaque_spot_light.color = registry_spot_light.color * registry_spot_light.power;
                     opaque_spot_light.position = registry_transform.position;
-                    opaque_spot_light.direction = registry_transform.rotation * core::math::vec3(0, 0, 1);
+                    opaque_spot_light.direction = registry_transform.rotation * glm::vec3(0, 0, 1);
                     opaque_spot_light.radius = length(registry_transform.scale) / sqrt(3.1f);
                     opaque_spot_light.inner_cutoff = registry_spot_light.inner_cutoff;
                     opaque_spot_light.outer_cutoff = registry_spot_light.outer_cutoff;
@@ -300,7 +300,7 @@ namespace engine::render::_light_detail
                     auto &opaque_spot_light = per_frame.shadow_spot_lights[per_frame.shadow_num_spot_lights];
                     opaque_spot_light.color = registry_spot_light.color * registry_spot_light.power;
                     opaque_spot_light.position = registry_transform.position;
-                    opaque_spot_light.direction = registry_transform.rotation * core::math::vec3(0, 0, 1);
+                    opaque_spot_light.direction = registry_transform.rotation * glm::vec3(0, 0, 1);
                     opaque_spot_light.radius = length(registry_transform.scale) / sqrt(3.1f);
                     opaque_spot_light.inner_cutoff = registry_spot_light.inner_cutoff;
                     opaque_spot_light.outer_cutoff = registry_spot_light.outer_cutoff;
@@ -321,7 +321,7 @@ namespace engine::render::_light_detail
                 {
                     auto &opaque_directional_light = per_frame.directional_lights[per_frame.num_directional_lights];
                     opaque_directional_light.color = registry_directional_light.color * registry_directional_light.power;
-                    opaque_directional_light.direction = core::math::normalize(registry_transform.rotation * core::math::vec3{ 0, 1, 0 });
+                    opaque_directional_light.direction = glm::normalize(registry_transform.rotation * glm::vec3{0, 1, 0});
                     opaque_directional_light.solid_angle = registry_directional_light.solid_angle;
                     if (++per_frame.num_directional_lights >= LightsPerFrame::kMaxDirectionalLights)
                     {
@@ -337,7 +337,7 @@ namespace engine::render::_light_detail
                     }
                     auto &opaque_directional_light = per_frame.shadow_directional_lights[per_frame.shadow_num_directional_lights];
                     opaque_directional_light.color = registry_directional_light.color * registry_directional_light.power;
-                    opaque_directional_light.direction = core::math::normalize(registry_transform.rotation * core::math::vec3{ 0, 1, 0 });
+                    opaque_directional_light.direction = glm::normalize(registry_transform.rotation * glm::vec3{0, 1, 0});
                     opaque_directional_light.solid_angle = registry_directional_light.solid_angle;
                     opaque_directional_light.view_projection = directional_light_matrices.at(entity);
                     directional_light_shadow_map_indices_[entity] = per_frame.shadow_num_directional_lights;

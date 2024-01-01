@@ -24,19 +24,19 @@ namespace engine::render::misc
                 });
             sort_step_compute_shader_.SetComputeShader(sort_step);
 
-            const std::vector<core::ShaderMacro> sort_size_shader_macro{ core::ShaderMacro{"SORT_SIZE", "512"} };
+            const std::vector<core::ShaderMacro> sort_size_shader_macro{core::ShaderMacro{"SORT_SIZE", "512"}};
             auto inner = core::ShaderManager::instance()->CompileComputeShader(
-                { direct3d::ShaderType::ComputeShader,
+                {direct3d::ShaderType::ComputeShader,
                  path / kBitonicSortInnerComputeShaderPath,
                  "BitonicInnerSort",
-                 sort_size_shader_macro });
+                 sort_size_shader_macro});
             inner_compute_shader_.SetComputeShader(inner);
 
             auto outer = core::ShaderManager::instance()->CompileComputeShader(
-                { direct3d::ShaderType::ComputeShader,
+                {direct3d::ShaderType::ComputeShader,
                  path / kBitonicSortLDSComputeShaderPath,
                  "BitonicSortLDS",
-                 sort_size_shader_macro });
+                 sort_size_shader_macro});
 
             lds_compute_shader_.SetComputeShader(outer);
 
@@ -78,10 +78,10 @@ namespace engine::render::misc
         direct3d::UnorderedAccessView prevUAV;
         direct3d::api().devcon4->CSGetUnorderedAccessViews(0, 1, &prevUAV.ptr());
 
-        ID3D11Buffer *prevCBs[] = { nullptr, nullptr };
+        ID3D11Buffer *prevCBs[] = {nullptr, nullptr};
         direct3d::api().devcon4->CSGetConstantBuffers(0, ARRAYSIZE(prevCBs), prevCBs);
 
-        ID3D11Buffer *cbs[] = { item_count_buffer, pcb_dispatch_info_.buffer() };
+        ID3D11Buffer *cbs[] = {item_count_buffer, pcb_dispatch_info_.buffer()};
         direct3d::api().devcon4->CSSetConstantBuffers(0, ARRAYSIZE(cbs), cbs);
 
         direct3d::api().devcon4->CSSetUnorderedAccessViews(0, 1, &indirect_sort_args_uav_.ptr(), nullptr);
@@ -166,11 +166,11 @@ namespace engine::render::misc
 
         unsigned int nMergeSize = presorted * 2;
         for (unsigned int nMergeSubSize = nMergeSize >> 1; nMergeSubSize > 256; nMergeSubSize = nMergeSubSize >> 1)
-            //	for( int nMergeSubSize=nMergeSize>>1; nMergeSubSize>0; nMergeSubSize=nMergeSubSize>>1 )
+        //	for( int nMergeSubSize=nMergeSize>>1; nMergeSubSize>0; nMergeSubSize=nMergeSubSize>>1 )
         {
             D3D11_MAPPED_SUBRESOURCE mapped_resource;
             direct3d::api().devcon4->Map(pcb_dispatch_info_.buffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_resource);
-            core::math::ivec4 *sc = (core::math::ivec4 *)mapped_resource.pData;
+            glm::ivec4 *sc = (glm::ivec4 *)mapped_resource.pData;
             sc->x = nMergeSubSize;
             if (nMergeSubSize == nMergeSize >> 1)
             {
@@ -213,7 +213,7 @@ namespace engine::render::misc
         direct3d::api().device->CreateBuffer(&bDesc, NULL, &readBackBuffer);
 
         // Download the data
-        D3D11_MAPPED_SUBRESOURCE MappedResource = { nullptr, 0, 0 };
+        D3D11_MAPPED_SUBRESOURCE MappedResource = {nullptr, 0, 0};
         direct3d::api().devcon->CopyResource(readBackBuffer, srcResource);
         direct3d::api().devcon->Map(readBackBuffer, 0, D3D11_MAP_READ, 0, &MappedResource);
 

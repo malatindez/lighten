@@ -42,13 +42,19 @@ show_direct3d_debug_output = false
     class Config final : public ini::Ini
     {
     public:
-        [[nodiscard]] static inline Config &instance() noexcept { mal_toolkit::Assert(instance_ != nullptr, "Config is not initialized!"); return *instance_; }
+        [[nodiscard]] static inline Config &instance() noexcept
+        {
+            mal_toolkit::Assert(instance_ != nullptr, "Config is not initialized!");
+            return *instance_;
+        }
+
     private:
         Config(Config &&) = delete;
         Config(Config const &) = delete;
         Config &operator=(Config &&) = delete;
         Config &operator=(Config const &) = delete;
         using ini::Ini::Ini;
+
     private:
         friend class Engine;
         /**
@@ -97,7 +103,11 @@ show_direct3d_debug_output = false
          * @note This method is called automatically when the engine is deinitialized
          *
          */
-        static void Deinit() { Save(); instance_.reset(); }
+        static void Deinit()
+        {
+            Save();
+            instance_.reset();
+        }
         static std::unique_ptr<Config> instance_;
     };
     [[nodiscard]] inline Config &config() noexcept { return Config::instance(); }

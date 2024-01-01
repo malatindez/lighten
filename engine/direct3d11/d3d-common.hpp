@@ -47,7 +47,7 @@ namespace engine::direct3d
             return ptr_;
         }
         /// @brief Assign operator, resets and releases underlying data and assigns the provided pointer
-        /// @note This method will not release the provided pointer, it takes control of it. 
+        /// @note This method will not release the provided pointer, it takes control of it.
         /// @note It won't `AddRef()` it.
         constexpr d3d_resource_wrapper<T> &operator=(T *ptr)
         {
@@ -113,12 +113,12 @@ namespace engine::direct3d
         /// @brief The invoke operator
         /// @details This is proxy to the pointer's member functions
         /// @tparam ...Types
-        /// @param ...args 
-        /// @return 
+        /// @param ...args
+        /// @return
         template <class... Types>
         constexpr auto operator()(Types &&...args) const
             noexcept(noexcept(std::invoke(*ptr_, static_cast<Types &&>(args)...)))
-            -> decltype(std::invoke(*ptr_, static_cast<Types &&>(args)...))
+                -> decltype(std::invoke(*ptr_, static_cast<Types &&>(args)...))
         {
             return std::invoke(*ptr_, static_cast<Types &&>(args)...);
         }
@@ -140,7 +140,7 @@ namespace engine::direct3d
         /// @brief arrow operator to the underlying T *
         /// @return T *
         constexpr T *operator->() noexcept { return d3d_resource_wrapper<T>::ptr(); }
-        /// @brief converts readonly wrapper to default wrapper  
+        /// @brief converts readonly wrapper to default wrapper
         constexpr operator d3d_resource_wrapper<T>() { return d3d_resource_wrapper<T>() = *this; }
         /// @brief converts readonly wrapper to default wrapper
         /// @return d3d_resource_wrapper<T>
@@ -152,6 +152,7 @@ namespace engine::direct3d
 
         using d3d_resource_wrapper<T>::valid;
         using d3d_resource_wrapper<T>::operator();
+
     protected:
         using d3d_resource_wrapper<T>::operator=;
         using d3d_resource_wrapper<T>::d3d_resource_wrapper;

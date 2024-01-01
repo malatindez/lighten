@@ -12,7 +12,7 @@
 using namespace engine::core::math;
 
 static int const kNumIterations = 100;
-template<typename T>
+template <typename T>
 T random_float_arr(float from = -100, float to = 100)
 {
     T return_value;
@@ -23,7 +23,7 @@ T random_float_arr(float from = -100, float to = 100)
     }
     return return_value;
 }
-template<AnyMat M, int x, int y, typename T, glm::qualifier Q>
+template <AnyMat M, int x, int y, typename T, glm::qualifier Q>
 M create_from_other(glm::mat<x, y, T, Q> const &source)
 {
     static_assert(sizeof(M) == sizeof(glm::mat<x, y, T, Q>), "Size of matrices must be equal");
@@ -37,7 +37,7 @@ M create_from_other(glm::mat<x, y, T, Q> const &source)
     }
     return return_value;
 }
-template<AnyVec V, int x, typename T, glm::qualifier Q>
+template <AnyVec V, int x, typename T, glm::qualifier Q>
 V create_from_other(glm::vec<x, T, Q> const &source)
 {
     static_assert(sizeof(V) == sizeof(glm::vec<x, T, Q>), "Size of vectors must be equal");
@@ -48,7 +48,7 @@ V create_from_other(glm::vec<x, T, Q> const &source)
     }
     return return_value;
 }
-template<AnyMat M, int x, int y, typename T, glm::qualifier Q>
+template <AnyMat M, int x, int y, typename T, glm::qualifier Q>
 bool operator==(M const &lhs, glm::mat<x, y, T, Q> const &rhs)
 {
     static_assert(sizeof(M) == sizeof(glm::mat<x, y, T, Q>));
@@ -64,7 +64,7 @@ bool operator==(M const &lhs, glm::mat<x, y, T, Q> const &rhs)
     }
     return true;
 }
-template<AnyVec V, int x, typename T, glm::qualifier Q>
+template <AnyVec V, int x, typename T, glm::qualifier Q>
 bool operator==(V const &lhs, glm::vec<x, T, Q> const &rhs)
 {
     static_assert(sizeof(V) == sizeof(glm::vec<x, T, Q>));
@@ -77,18 +77,18 @@ bool operator==(V const &lhs, glm::vec<x, T, Q> const &rhs)
     }
     return true;
 }
-template<AnyMat M, size_t x, size_t y, typename T, glm::qualifier Q>
+template <AnyMat M, size_t x, size_t y, typename T, glm::qualifier Q>
 bool operator==(glm::mat<x, y, T, Q> const &lhs, M const &rhs)
 {
     return rhs == lhs;
 }
-template<AnyVec V, size_t x, typename T, glm::qualifier Q>
+template <AnyVec V, size_t x, typename T, glm::qualifier Q>
 bool operator==(glm::vec<x, T, Q> const &lhs, V const &rhs)
 {
     return rhs == lhs;
 }
 
-template<AnyMat M, size_t x, size_t y, typename T, glm::qualifier Q>
+template <AnyMat M, size_t x, size_t y, typename T, glm::qualifier Q>
 void BasicArithmeticTestSquaredMatricesMultiplication(M const &mat_1,
                                                       M const &mat_2,
                                                       M const &mat_3,
@@ -122,7 +122,7 @@ void BasicArithmeticTestSquaredMatricesMultiplication(M const &mat_1,
     ASSERT_TRUE(mat_3 * (mat_2 - mat_1) == glm_mat_3 * (glm_mat_2 - glm_mat_1));
     ASSERT_TRUE((mat_3 - mat_2) * mat_1 == (glm_mat_3 - glm_mat_2) * glm_mat_1);
 }
-template<typename A, typename B, typename C, typename D, typename E, typename F>
+template <typename A, typename B, typename C, typename D, typename E, typename F>
 void BasicArithmeticTestNonSquaredMatricesMultiplication(A const &mat_1,
                                                          B const &mat_2,
                                                          C const &mat_3,
@@ -134,7 +134,7 @@ void BasicArithmeticTestNonSquaredMatricesMultiplication(A const &mat_1,
     ASSERT_TRUE(mat_3 * mat_2 == glm_mat_3 * glm_mat_2);
     ASSERT_TRUE((mat_3 * mat_2) * mat_1 == (glm_mat_3 * glm_mat_2) * glm_mat_1);
 }
-template<typename A, typename B, typename C, typename D, typename E, typename F>
+template <typename A, typename B, typename C, typename D, typename E, typename F>
 void BasicArithmeticTestMatricesVectorsMultiplication(A const &mat_1,
                                                       B const &mat_2,
                                                       C const &mat_3,
@@ -146,7 +146,7 @@ void BasicArithmeticTestMatricesVectorsMultiplication(A const &mat_1,
     ASSERT_TRUE(mat_1 * mat_2 * mat_3 == glm_mat_1 * glm_mat_2 * glm_mat_3);
     ASSERT_TRUE((mat_1 * mat_2) * mat_3 == (glm_mat_1 * glm_mat_2) * glm_mat_3);
 }
-template<AnyMat M, size_t x, size_t y, typename T, glm::qualifier Q>
+template <AnyMat M, size_t x, size_t y, typename T, glm::qualifier Q>
 void BasicArithmeticTest(M const &mat_1,
                          M const &mat_2,
                          M const &mat_3,

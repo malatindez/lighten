@@ -4,15 +4,15 @@
 #include <stdexcept>
 /**
  * @file plane.hpp
- * 
+ *
  * @author malatindez (Vladyslav Ohlii)
  * @date 12/09/2023
- * 
+ *
  * @brief Provides the definition of the Plane structure and its associated operations.
- * 
- * The Plane structure represents a mathematical plane in 3D space. It provides functionality 
+ *
+ * The Plane structure represents a mathematical plane in 3D space. It provides functionality
  * to intersect the plane with a ray and to update the plane's definition based on two vectors.
- * 
+ *
  * @see intersection.hpp
  * @see ray.hpp
  */
@@ -22,7 +22,7 @@ namespace engine::core::math
     /**
      * @struct Plane
      * @brief Represents a plane in 3D space defined by its normal and two vectors.
-     * 
+     *
      * This structure provides functionalities such as checking for intersections
      * with rays and updating the plane based on new vector inputs.
      */
@@ -30,7 +30,7 @@ namespace engine::core::math
     {
         /**
          * @brief Checks for the intersection of the plane with a given ray.
-         * 
+         *
          * @param i Intersection data to update if an intersection occurs.
          * @param ray The ray to check for intersection with the plane.
          * @return True if the ray intersects the plane, false otherwise.
@@ -55,7 +55,7 @@ namespace engine::core::math
         }
         /**
          * @brief Updates the plane's vectors and normal based on two new vectors.
-         * 
+         *
          * @param first The first vector to define the plane.
          * @param second The second vector to define the plane.
          * @throws std::invalid_argument if the provided vectors are collinear.

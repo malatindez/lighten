@@ -15,7 +15,8 @@ namespace engine::direct3d
         ImmutableIndexBuffer(std::span<const T> span, uint32_t cpu_access_flags = 0, uint32_t misc_flags = 0)
             : ImmutableBuffer<T>(_detail::CreateBasicBufferDesc(D3D11_BIND_INDEX_BUFFER, cpu_access_flags, misc_flags),
                                  span)
-        {}
+        {
+        }
         /// @brief Construct a new Immutable Index Buffer object
         /// @param ptr The pointer to the data to initialize the buffer with
         /// @param size The size of the data to initialize the buffer with, in bytes
@@ -24,7 +25,8 @@ namespace engine::direct3d
         ImmutableIndexBuffer(void *ptr, uint32_t size, uint32_t cpu_access_flags = 0, uint32_t misc_flags = 0)
             : ImmutableBuffer<T>(_detail::CreateBasicBufferDesc(D3D11_BIND_INDEX_BUFFER, cpu_access_flags, misc_flags),
                                  ptr, size)
-        {}
+        {
+        }
         /// @brief Bind the buffer to the input assembler
         /// @param format The format of the indices, default is DXGI_FORMAT_R32_UINT
         /// @param offset The offset of the indices, default is 0
@@ -52,7 +54,8 @@ namespace engine::direct3d
         DynamicIndexBuffer(std::span<const T> span, uint32_t cpu_access_flags = D3D11_CPU_ACCESS_WRITE, uint32_t misc_flags = 0)
             : DynamicBuffer<T>(_detail::CreateBasicBufferDesc(D3D11_BIND_INDEX_BUFFER, cpu_access_flags, misc_flags),
                                span)
-        {}
+        {
+        }
         /// @brief Construct a new Dynamic Index Buffer object
         /// @param ptr The pointer to the data to initialize the buffer with
         /// @param size The size of the data to initialize the buffer with, in bytes
@@ -61,7 +64,8 @@ namespace engine::direct3d
         DynamicIndexBuffer(void *ptr, uint32_t size, uint32_t cpu_access_flags = D3D11_CPU_ACCESS_WRITE, uint32_t misc_flags = 0)
             : DynamicBuffer<T>(_detail::CreateBasicBufferDesc(D3D11_BIND_INDEX_BUFFER, cpu_access_flags, misc_flags),
                                ptr, size)
-        {}
+        {
+        }
         /// @brief Bind the buffer to the input assembler
         /// @param format The format of the indices, default is DXGI_FORMAT_R32_UINT
         /// @param offset The offset of the indices, default is 0

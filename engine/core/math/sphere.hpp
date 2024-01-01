@@ -2,10 +2,10 @@
 #include "ray.hpp"
 /**
  * @file sphere.hpp
- * 
+ *
  * @author malatindez (Vladyslav Ohlii)
  * @date 12/09/2023
- * 
+ *
  * @brief Defines the Sphere structure and its associated functionality.
  */
 namespace engine::core::math
@@ -70,8 +70,8 @@ namespace engine::core::math
             i.normal = i.normal * (length(ray.origin()) < 1 ? -1.0f : 1.0f);
             return true;
         }
-        
-        glm::vec3 position{ 0 }; ///< Position of the sphere's center in 3D space.
-        float radius{ 1 };  ///< Radius of the sphere.
+
+        glm::vec3 position{0}; ///< Position of the sphere's center in 3D space.
+        float radius{1};       ///< Radius of the sphere.
     };
 }

@@ -18,8 +18,8 @@ namespace engine::direct3d
         DeferredHDRRenderPipeline &operator=(DeferredHDRRenderPipeline const &) = delete;
         DeferredHDRRenderPipeline &operator=(DeferredHDRRenderPipeline &&) = delete;
 
-        [[nodiscard]] inline core::math::vec4 &sky_color() noexcept { return sky_color_; }
-        [[nodiscard]] inline core::math::vec4 const &sky_color() const noexcept { return sky_color_; }
+        [[nodiscard]] inline glm::vec4 &sky_color() noexcept { return sky_color_; }
+        [[nodiscard]] inline glm::vec4 const &sky_color() const noexcept { return sky_color_; }
         [[nodiscard]] inline render::PerFrame const &per_frame() const noexcept { return per_frame_; }
         [[nodiscard]] inline render::PerFrame &per_frame() noexcept { return per_frame_; }
         [[nodiscard]] inline std::shared_ptr<render::HDRtoLDRLayer> hdr_to_ldr_layer() const noexcept { return hdr_to_ldr_layer_; }
@@ -30,14 +30,14 @@ namespace engine::direct3d
         void OnUpdate() override;
         void OnTick(float) override;
         void OnEvent(core::events::Event &) override;
-        void WindowSizeChanged(core::math::ivec2 const &size);
+        void WindowSizeChanged(glm::ivec2 const &size);
 
     public:
         void FrameBegin() override;
         void FrameEnd() override;
         void PostProcess();
         mal_toolkit::HighResolutionTimer timer;
-        core::math::vec4 sky_color_{ core::math::vec3{0.25f}, 0.0f };
+        glm::vec4 sky_color_{glm::vec3{0.25f}, 0.0f};
         render::PerFrame per_frame_;
         DynamicUniformBuffer<engine::render::PerFrame> per_frame_buffer_{};
         DepthStencil depth_stencil_;

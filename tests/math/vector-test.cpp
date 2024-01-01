@@ -8,7 +8,6 @@
 #include <glm/gtx/compatibility.hpp>
 #include <glm/gtx/norm.hpp>
 
-
 using namespace engine::core::math;
 
 template <size_t size, typename T>
@@ -20,8 +19,8 @@ void vec_test_basic_arithmetic_same_types()
         arr[i] = utils::Random<T>(1);
     }
     std::array<T, size> invalid_array = arr;
-    vec<size, T> vec1{ invalid_array };
-    vec<size, T> vec2{ std::move(invalid_array) };
+    vec<size, T> vec1{invalid_array};
+    vec<size, T> vec2{std::move(invalid_array)};
 
     for (int i = 0; i < arr.size(); ++i)
     {
@@ -35,35 +34,35 @@ void vec_test_basic_arithmetic_same_types()
         vec1[i] = utils::Random<T>(1);
     }
 
-    vec<size, T> add{ vec1 + vec2 };
-    vec<size, T> sub{ vec1 - vec2 };
-    vec<size, T> mul{ vec1 * vec2 };
-    vec<size, T> div{ vec1 / vec2 };
+    vec<size, T> add{vec1 + vec2};
+    vec<size, T> sub{vec1 - vec2};
+    vec<size, T> mul{vec1 * vec2};
+    vec<size, T> div{vec1 / vec2};
     vec<size, T> mod;
     if constexpr (std::is_integral_v<T>)
     {
-        mod = vec<size, T>{ vec1 % vec2 };
+        mod = vec<size, T>{vec1 % vec2};
     }
 
     for (int i = 0; i < arr.size(); ++i)
     {
         ASSERT_TRUE(static_cast<T>(vec1[i] + vec2[i]) == add[i]) << vec1 << std::endl
-            << vec2 << std::endl
-            << add << " " << i << " " << static_cast<T>(vec1[i] + vec2[i]) << std::endl;
+                                                                 << vec2 << std::endl
+                                                                 << add << " " << i << " " << static_cast<T>(vec1[i] + vec2[i]) << std::endl;
         ASSERT_TRUE(static_cast<T>(vec1[i] - vec2[i]) == sub[i]) << vec1 << std::endl
-            << vec2 << std::endl
-            << sub << " " << i << " " << static_cast<T>(vec1[i] - vec2[i]) << std::endl;
+                                                                 << vec2 << std::endl
+                                                                 << sub << " " << i << " " << static_cast<T>(vec1[i] - vec2[i]) << std::endl;
         ASSERT_TRUE(static_cast<T>(vec1[i] * vec2[i]) == mul[i]) << vec1 << std::endl
-            << vec2 << std::endl
-            << mul << " " << i << " " << static_cast<T>(vec1[i] * vec2[i]) << std::endl;
+                                                                 << vec2 << std::endl
+                                                                 << mul << " " << i << " " << static_cast<T>(vec1[i] * vec2[i]) << std::endl;
         ASSERT_TRUE(static_cast<T>(vec1[i] / vec2[i]) == div[i]) << vec1 << std::endl
-            << vec2 << std::endl
-            << div << " " << i << " " << static_cast<T>(vec1[i] / vec2[i]) << std::endl;
+                                                                 << vec2 << std::endl
+                                                                 << div << " " << i << " " << static_cast<T>(vec1[i] / vec2[i]) << std::endl;
         if constexpr (std::is_integral_v<T>)
         {
             ASSERT_TRUE((vec1[i] % vec2[i]) == mod[i]) << vec1 << std::endl
-                << vec2 << std::endl
-                << mod << " " << i << " " << static_cast<T>(vec1[i] % vec2[i]) << std::endl;
+                                                       << vec2 << std::endl
+                                                       << mod << " " << i << " " << static_cast<T>(vec1[i] % vec2[i]) << std::endl;
         }
     }
 
@@ -81,22 +80,22 @@ void vec_test_basic_arithmetic_same_types()
     for (int i = 0; i < arr.size(); ++i)
     {
         ASSERT_TRUE(static_cast<T>(vec1[i] + random_number) == add[i]) << vec1 << std::endl
-            << vec2 << std::endl
-            << add << " " << i << " " << static_cast<T>(vec1[i] + random_number) << std::endl;
+                                                                       << vec2 << std::endl
+                                                                       << add << " " << i << " " << static_cast<T>(vec1[i] + random_number) << std::endl;
         ASSERT_TRUE(static_cast<T>(vec1[i] - random_number) == sub[i]) << vec1 << std::endl
-            << vec2 << std::endl
-            << sub << " " << i << " " << static_cast<T>(vec1[i] - random_number) << std::endl;
+                                                                       << vec2 << std::endl
+                                                                       << sub << " " << i << " " << static_cast<T>(vec1[i] - random_number) << std::endl;
         ASSERT_TRUE(static_cast<T>(vec1[i] * random_number) == mul[i]) << vec1 << std::endl
-            << vec2 << std::endl
-            << mul << " " << i << " " << static_cast<T>(vec1[i] * random_number) << std::endl;
+                                                                       << vec2 << std::endl
+                                                                       << mul << " " << i << " " << static_cast<T>(vec1[i] * random_number) << std::endl;
         ASSERT_TRUE(static_cast<T>(vec1[i] / random_number) == div[i]) << vec1 << std::endl
-            << vec2 << std::endl
-            << div << " " << i << " " << static_cast<T>(vec1[i] / random_number) << std::endl;
+                                                                       << vec2 << std::endl
+                                                                       << div << " " << i << " " << static_cast<T>(vec1[i] / random_number) << std::endl;
         if constexpr (std::is_integral_v<T>)
         {
             ASSERT_TRUE((vec1[i] % random_number) == mod[i]) << vec1 << std::endl
-                << vec2 << std::endl
-                << mod << " " << i << " " << static_cast<T>(vec1[i] % random_number) << std::endl;
+                                                             << vec2 << std::endl
+                                                             << mod << " " << i << " " << static_cast<T>(vec1[i] % random_number) << std::endl;
         }
     }
 }
@@ -148,8 +147,8 @@ void vec_test_basic_arithmetic_different_types()
     {
         vec2[i] = utils::Random<U>(1);
     }
-    vec<size, U> _test1{ vec1 };
-    vec<size, T> _test2{ vec2 };
+    vec<size, U> _test1{vec1};
+    vec<size, T> _test2{vec2};
 
     for (int i = 0; i < size; ++i)
     {
@@ -157,35 +156,35 @@ void vec_test_basic_arithmetic_different_types()
         ASSERT_TRUE(_test2[i] == static_cast<T>(vec2[i]));
     }
 
-    vec<size, T> add{ vec1 + vec2 };
-    vec<size, T> sub{ vec1 - vec2 };
-    vec<size, T> mul{ vec1 * vec2 };
-    vec<size, T> div{ vec1 / vec2 };
+    vec<size, T> add{vec1 + vec2};
+    vec<size, T> sub{vec1 - vec2};
+    vec<size, T> mul{vec1 * vec2};
+    vec<size, T> div{vec1 / vec2};
     vec<size, T> mod;
     if constexpr (std::is_integral_v<T> && std::is_integral_v<U>)
     {
-        mod = vec<size, T>{ vec1 % vec2 };
+        mod = vec<size, T>{vec1 % vec2};
     }
 
     for (int i = 0; i < size; ++i)
     {
         ASSERT_TRUE(static_cast<T>(vec1[i] + vec2[i]) == add[i]) << vec1 << std::endl
-            << vec2 << std::endl
-            << add << " " << i << " " << static_cast<T>(vec1[i] + static_cast<T>(vec2[i])) << std::endl;
+                                                                 << vec2 << std::endl
+                                                                 << add << " " << i << " " << static_cast<T>(vec1[i] + static_cast<T>(vec2[i])) << std::endl;
         ASSERT_TRUE(static_cast<T>(vec1[i] - vec2[i]) == sub[i]) << vec1 << std::endl
-            << vec2 << std::endl
-            << sub << " " << i << " " << static_cast<T>(vec1[i] - static_cast<T>(vec2[i])) << std::endl;
+                                                                 << vec2 << std::endl
+                                                                 << sub << " " << i << " " << static_cast<T>(vec1[i] - static_cast<T>(vec2[i])) << std::endl;
         ASSERT_TRUE(static_cast<T>(vec1[i] * vec2[i]) == mul[i]) << vec1 << std::endl
-            << vec2 << std::endl
-            << mul << " " << i << " " << static_cast<T>(vec1[i] * static_cast<T>(vec2[i])) << std::endl;
+                                                                 << vec2 << std::endl
+                                                                 << mul << " " << i << " " << static_cast<T>(vec1[i] * static_cast<T>(vec2[i])) << std::endl;
         ASSERT_TRUE(static_cast<T>(vec1[i] / vec2[i]) == div[i]) << vec1 << std::endl
-            << vec2 << std::endl
-            << div << " " << i << " " << static_cast<T>(vec1[i] / static_cast<T>(vec2[i])) << std::endl;
+                                                                 << vec2 << std::endl
+                                                                 << div << " " << i << " " << static_cast<T>(vec1[i] / static_cast<T>(vec2[i])) << std::endl;
         if constexpr (std::is_integral_v<T> && std::is_integral_v<U>)
         {
             ASSERT_TRUE(static_cast<T>(vec1[i] % vec2[i]) == mod[i]) << vec1 << std::endl
-                << vec2 << std::endl
-                << mod << " " << i << " " << static_cast<T>(vec1[i] % static_cast<T>(vec2[i])) << std::endl;
+                                                                     << vec2 << std::endl
+                                                                     << mod << " " << i << " " << static_cast<T>(vec1[i] % static_cast<T>(vec2[i])) << std::endl;
         }
     }
 
@@ -203,22 +202,22 @@ void vec_test_basic_arithmetic_different_types()
     for (int i = 0; i < size; ++i)
     {
         ASSERT_TRUE(static_cast<T>(vec1[i] + random_number) == add[i]) << vec1 << std::endl
-            << vec2 << std::endl
-            << add << " " << i << " " << static_cast<T>(vec1[i] + static_cast<T>(random_number)) << std::endl;
+                                                                       << vec2 << std::endl
+                                                                       << add << " " << i << " " << static_cast<T>(vec1[i] + static_cast<T>(random_number)) << std::endl;
         ASSERT_TRUE(static_cast<T>(vec1[i] - random_number) == sub[i]) << vec1 << std::endl
-            << vec2 << std::endl
-            << sub << " " << i << " " << static_cast<T>(vec1[i] - static_cast<T>(random_number)) << std::endl;
+                                                                       << vec2 << std::endl
+                                                                       << sub << " " << i << " " << static_cast<T>(vec1[i] - static_cast<T>(random_number)) << std::endl;
         ASSERT_TRUE(static_cast<T>(vec1[i] * random_number) == mul[i]) << vec1 << std::endl
-            << vec2 << std::endl
-            << mul << " " << i << " " << static_cast<T>(vec1[i] * static_cast<T>(random_number)) << std::endl;
+                                                                       << vec2 << std::endl
+                                                                       << mul << " " << i << " " << static_cast<T>(vec1[i] * static_cast<T>(random_number)) << std::endl;
         ASSERT_TRUE(static_cast<T>(vec1[i] / random_number) == div[i]) << vec1 << std::endl
-            << vec2 << std::endl
-            << div << " " << i << " " << static_cast<T>(vec1[i] / static_cast<T>(random_number)) << std::endl;
+                                                                       << vec2 << std::endl
+                                                                       << div << " " << i << " " << static_cast<T>(vec1[i] / static_cast<T>(random_number)) << std::endl;
         if constexpr (std::is_integral_v<T> && std::is_integral_v<U>)
         {
             ASSERT_TRUE((vec1[i] % random_number) == mod[i]) << vec1 << std::endl
-                << vec2 << std::endl
-                << mod << " " << i << " " << static_cast<T>(vec1[i] % static_cast<T>(random_number)) << std::endl;
+                                                             << vec2 << std::endl
+                                                             << mod << " " << i << " " << static_cast<T>(vec1[i] % static_cast<T>(random_number)) << std::endl;
         }
     }
 }
@@ -263,7 +262,7 @@ TEST(TEST_VECTORS_ARITHMETIC, RandomTestDifferentTypes)
     }
 }
 
-template<AnyVec V, int x, typename T, glm::qualifier Q>
+template <AnyVec V, int x, typename T, glm::qualifier Q>
 bool operator==(V const &lhs, glm::vec<x, T, Q> const &rhs)
 {
     static_assert(sizeof(V) == sizeof(glm::vec<x, T, Q>));
@@ -276,7 +275,7 @@ bool operator==(V const &lhs, glm::vec<x, T, Q> const &rhs)
     }
     return true;
 }
-template<AnyVec V, int x, typename T, glm::qualifier Q>
+template <AnyVec V, int x, typename T, glm::qualifier Q>
 bool operator==(glm::vec<x, T, Q> const &lhs, V const &rhs)
 {
     return rhs == lhs;
