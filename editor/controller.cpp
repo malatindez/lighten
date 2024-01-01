@@ -107,7 +107,7 @@ void Controller::OnGuiRender()
     if ((uint32_t)(sample_count) != current_sample_count) { hdr_render_pipeline_->SetSampleCount(sample_count); }
 #endif
 #if 0
-    static uivec2 poisson_disk_size = { 0.5f, 0.5f };
+    static uvec2 poisson_disk_size = { 0.5f, 0.5f };
     ImGui::InputScalar("Poisson disk size x", ImGuiDataType_U32, &poisson_disk_size.x);
     ImGui::InputScalar("Poisson disk size y", ImGuiDataType_U32, &poisson_disk_size.y);
     static uint32_t k, r;
@@ -191,7 +191,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     Engine::SetScene(first_scene);
     Engine::scene()->main_camera->SetWorldOffset(vec3{ 0.0f, 0.0f, 0.0f });
     Engine::scene()->main_camera->SetWorldAngles(0.0f, 0.0f, 0.0f);
-    Engine::scene()->main_camera->SetProjectionMatrix(perspective(45.0f, static_cast<float>(window_size.x) / static_cast<float>(window_size.y), 0.001f, 100.0f));
+    Engine::scene()->main_camera->SetProjectionMatrix(perspectiveLH_ZO(45.0f, static_cast<float>(window_size.x) / static_cast<float>(window_size.y), 0.001f, 100.0f));
 
     int amount = 12;
     for (int i = 0; i < amount; i++)
@@ -226,8 +226,8 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                                  0,
                                  std::cos(float(i) / amount * 2 * (float)std::numbers::pi) } *
                                  (float(amount) / std::sqrtf((float)amount));
-        transform.rotation = QuaternionFromEuler(0.0f, 0.0f, radians(180.0f));
-        transform.rotation *= QuaternionFromRotationMatrix(look_at(transform.position, vec3{ 0, 0, 0 }, vec3{ 0, 1, 0 }).as_rmat<3, 3>());
+        transform.rotation = glm::quat(glm::vec3(0.0f, 0.0f, radians(180.0f)));
+        transform.rotation *= glm::quat_cast(glm::lookAtLH(transform.position, vec3{ 0, 0, 0 }, vec3{ 0, 1, 0 }));
         transform.UpdateMatrices();
     }
     render::OpaqueMaterial cobblestone_material;
@@ -380,7 +380,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         auto &transform = registry.emplace<Transform>(wall);
         transform.position = vec3{ -5, 4.5f, 0 };
         transform.scale = vec3{ 10, 0.1, 10 };
-        transform.rotation = QuaternionFromEuler(0.0f, 0.0f, radians(90.0f));
+        transform.rotation = glm::quat(glm::vec3(0.0f, 0.0f, radians(90.0f)));
         transform.UpdateMatrices();
         ors.AddInstance(model_id, registry, wall, { stone_material });
     }
@@ -489,7 +489,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         lights_game_object.children.push_back(entity);
         transform.scale = vec3{ 0.15f };
         transform.position = vec3{ 0, 10, 0 };
-        transform.rotation = QuaternionFromEuler(vec3{ radians(-120.0f), radians(-30.0f), radians(-60.0f) });
+        transform.rotation = glm::quat(vec3{ radians(-120.0f), radians(-30.0f), radians(-60.0f) });
         transform.UpdateMatrices();
         auto &directional_light = registry.emplace<DirectionalLight>(entity);
         directional_light.color = vec3{ 0.988, 0.933, 0.455 };
@@ -514,7 +514,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
 
         transform.scale = vec3{ 0.15f };
         transform.position = vec3{ 0, 3, 0 };
-        transform.rotation = QuaternionFromEuler(vec3{ radians(-120.0f), radians(-30.0f), radians(-60.0f) });
+        transform.rotation = glm::quat(vec3{ radians(-120.0f), radians(-30.0f), radians(-60.0f) });
         transform.UpdateMatrices();
         auto &spot_light = registry.emplace<SpotLight>(entity);
         spot_light.color = vec3{ 0.988, 0.933, 0.455 };
@@ -544,13 +544,13 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         auto &transform = registry.emplace<Transform>(entity);
         transform.scale = vec3{ 0.15f };
         transform.position = vec3{ -3.5, 2, -8 };
-        transform.rotation = QuaternionFromEuler(vec3{ 0, 0, radians(-90.0f) });
+        transform.rotation = glm::quat(vec3{ 0, 0, radians(-90.0f) });
         transform.UpdateMatrices();
 
         auto &particle_emitter = registry.emplace<ParticleEmitter>(entity);
-        particle_emitter.position_yaw_pitch_range = vec4{ vec2{-numbers::pi}, vec2{numbers::pi} } / 16;
+        particle_emitter.position_yaw_pitch_range = vec4{ vec2{-std::numbers::pi}, vec2{std::numbers::pi_v<float>} } / 16.0f;
         particle_emitter.position_radius = vec2{ 0.25, 0.5f };
-        particle_emitter.velocity_yaw_pitch_range = vec4{ vec2{-numbers::pi}, vec2{numbers::pi} } / 32;
+        particle_emitter.velocity_yaw_pitch_range = vec4{ vec2{-std::numbers::pi}, vec2{std::numbers::pi_v<float>} } / 32.0f;
         particle_emitter.velocity_radius = vec2{ 0.15f, 0.4f };
         particle_emitter.base_diffuse_color = vec4{ 1.288, 1.133, 1.055, 1.0f };
         particle_emitter.diffuse_variation = vec4{ 0.2f, 0.2f, 0.2f, 0.0f };
@@ -560,8 +560,8 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         particle_emitter.end_size_range = vec2{ 0.0f, 0.3f };
         particle_emitter.mass_range = vec2{ 0.1f, 0.5f };
         particle_emitter.emit_rate = 10;
-        particle_emitter.rotation_range = vec2{ 0.0f, 2 * numbers::pi };
-        particle_emitter.rotation_speed_range = vec2{ 0.0f, 0.1 * numbers::pi };
+        particle_emitter.rotation_range = vec2{ 0.0f, 2 * std::numbers::pi };
+        particle_emitter.rotation_speed_range = vec2{ 0.0f, 0.1 * std::numbers::pi };
         particle_emitter.particle_acceleration = vec3{ 0.0f };
         particle_emitter.maximum_amount_of_particles = 200;
         ors.AddInstance(model_id, registry, entity, { white_porcelain });
@@ -575,13 +575,13 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         auto &transform = registry.emplace<Transform>(entity);
         transform.scale = vec3{ 0.15f };
         transform.position = vec3{ 4, 2, -8 };
-        transform.rotation = QuaternionFromEuler(vec3{ 0, 0, radians(-90.0f) });
+        transform.rotation = glm::quat(vec3{ 0, 0, radians(-90.0f) });
         transform.UpdateMatrices();
 
         auto &particle_emitter = registry.emplace<ParticleEmitter>(entity);
-        particle_emitter.position_yaw_pitch_range = vec4{ -numbers::pi / 4, -numbers::pi / 4, numbers::pi / 4, numbers::pi / 4 };
+        particle_emitter.position_yaw_pitch_range = vec4{ -std::numbers::pi / 4, -std::numbers::pi / 4, std::numbers::pi / 4, std::numbers::pi / 4 };
         particle_emitter.position_radius = vec2{ 0.25, 0.5f };
-        particle_emitter.velocity_yaw_pitch_range = vec4{ -numbers::pi / 8, -numbers::pi / 8, numbers::pi / 8, numbers::pi / 8 };
+        particle_emitter.velocity_yaw_pitch_range = vec4{ -std::numbers::pi / 8, -std::numbers::pi / 8, std::numbers::pi / 8, std::numbers::pi / 8 };
         particle_emitter.velocity_radius = vec2{ 5.0f, 10.0f };
         particle_emitter.base_diffuse_color = vec4{ 1.988, 1.933, 1.455, 1.0f };
         particle_emitter.diffuse_variation = vec4{ 0.8f, 0.5f, 0.5f, 0.0f };
@@ -591,8 +591,8 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         particle_emitter.end_size_range = vec2{ 4.0f, 10.0f };
         particle_emitter.mass_range = vec2{ 0.1f, 0.5f };
         particle_emitter.emit_rate = 3;
-        particle_emitter.rotation_range = vec2{ 0.0f, 2 * numbers::pi };
-        particle_emitter.rotation_speed_range = vec2{ 0.0f, 0.1 * numbers::pi };
+        particle_emitter.rotation_range = vec2{ 0.0f, 2 * std::numbers::pi };
+        particle_emitter.rotation_speed_range = vec2{ 0.0f, 0.1 * std::numbers::pi };
         particle_emitter.particle_acceleration = vec3{ 0.0f };
         particle_emitter.maximum_amount_of_particles = 300;
         ors.AddInstance(model_id, registry, entity, { white_porcelain });
@@ -646,7 +646,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             vec4{76, 2746, 2217, 4065} / texture_size,
             vec4{2651, 3005, 3774, 4033} / texture_size,
         };
-        grass_material.atlas_size = uivec2(texture_size.xy);
+        grass_material.atlas_size = uvec2(texture_size.x, texture_size.y);
         grass_material.atlas_data = atlas_data;
         grass_material.planes_count = 2;
         grass_material.section_count = 4;
@@ -734,11 +734,11 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             DecalComponent::Decal decal{};
             decal.mesh_transform = model_instance->model.meshes[mesh_id].mesh_to_model;
             mat4 inv_mat = model_instance->model.meshes[mesh_id].inv_mesh_to_model * transform.inv_model;
-            vec3 relative_position = (inv_mat * vec4(nearest.point, 1.0f)).xyz;
+            vec3 relative_position = (inv_mat * vec4(nearest.point, 1.0f));
 
-            float texture_angle = std::uniform_real_distribution(0.0f, 2.0f * numbers::pi_v<float>)(core::Engine::random_engine());
+            float texture_angle = std::uniform_real_distribution(0.0f, 2.0f * std::numbers::pi_v<float>)(core::Engine::random_engine());
 
-            decal.base_color = random::RandomVector3(core::Engine::random_engine(), 0.25f, 1.0f);
+            decal.base_color = random::RandomVector(core::Engine::random_engine(), glm::vec3{ 0.25f }, glm::vec3{ 1.0f });
             decal.roughness = 1.0f;
             decal.metalness = 0.01f;
             decal.transmittance = 0.0f;
@@ -753,12 +753,13 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                 std::sin(texture_angle), std::cos(texture_angle), 0.0f,
                 0.0f, 0.0f, 1.0f };
 
-            rotation_matrix = inv_mat.as_rmat<3, 3>() * inverse(rtranspose(rotation_matrix));
-            mat4 rotation_matrix_4x4 = mat4::identity();
-            rotation_matrix_4x4.as_rmat<3, 3>() = rotation_matrix;
+            rotation_matrix = glm::mat3x3(inv_mat) * glm::inverse(glm::transpose(rotation_matrix));
+            mat4 rotation_matrix_4x4 = mat4{ 1.0f };
+            for(int i = 0; i < 3; i++) for (int j = 0; j < 3; j++)
+                rotation_matrix_4x4[i][j] = rotation_matrix[i][j];
 
             // this rotation should be relative to the model space, so we had to multiply it by the inverse of the model matrix
-            decal.model_to_decal = mat4::identity();
+            decal.model_to_decal = mat4{ 1.0f };
             decal.model_to_decal = translate(decal.model_to_decal, relative_position);
             decal.model_to_decal = decal.model_to_decal * rotation_matrix_4x4;
             decal.model_to_decal = scale(decal.model_to_decal, vec3{ 0.1f });
@@ -794,8 +795,8 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                                        Engine::scene()->main_camera->right(),
                                        -Engine::scene()->main_camera->up(),
                                        -Engine::scene()->main_camera->forward() };
-                                   rotation_matrix = inverse(rtranspose(rotation_matrix));
-                                   transform.rotation = QuaternionFromRotationMatrix(rotation_matrix);
+                                   rotation_matrix = inverse(transpose(rotation_matrix));
+                                   transform.rotation = glm::quat_cast(rotation_matrix);
                                    transform.UpdateMatrices();
                                    uint64_t model_id = ModelLoader::Load("assets\\models\\Knight\\Knight.fbx").value();
                                    drs.AddInstance(model_id, registry, knight, vec3{ 0.0f }, std::uniform_real_distribution<float>(3.0f, 15.0f)(Engine::random_engine()));
@@ -894,8 +895,8 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                                        Engine::scene()->main_camera->right(),
                                        -Engine::scene()->main_camera->up(),
                                        -Engine::scene()->main_camera->forward() };
-                                   rotation_matrix = inverse(rtranspose(rotation_matrix));
-                                   transform.rotation = QuaternionFromRotationMatrix(rotation_matrix);
+                                   rotation_matrix = inverse(transpose(rotation_matrix));
+                                   transform.rotation = glm::quat_cast(rotation_matrix);
                                    transform.scale = vec3{ 0.05, 0.05, 0.1f };
                                    transform.UpdateMatrices();
                                    uint64_t model_id = render::ModelSystem::GetUnitCube();

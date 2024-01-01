@@ -193,7 +193,7 @@ namespace engine::render::_emissive_particle_detail
             .flags = 0,
             .click_point = dissolution_component.click_point,
             .time_since_last_emission = time_since_last_emission,
-            .box_half_size = core::math::abs(model.bounding_box.min - model.bounding_box.max) / 2 * transform.scale,
+            .box_half_size = core::math::abs(model.bounding_box.min - model.bounding_box.max) / 2.0f * transform.scale,
             .padding1 = 0.0f
         };
 
@@ -308,7 +308,7 @@ namespace engine::render::_emissive_particle_detail
 #endif
     }
 
-    core::math::uivec3 EmissiveParticleRenderSystem::GetParticleRangeData()
+    core::math::uvec3 EmissiveParticleRenderSystem::GetParticleRangeData()
     {
         D3D11_BUFFER_DESC particle_range_cpu_desc = particle_range_desc;
         particle_range_cpu_desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
@@ -322,7 +322,7 @@ namespace engine::render::_emissive_particle_detail
         uint32_t dead_count = ptr[2];
         buffer.Unmap();
 
-        return core::math::uivec3{ begin, particle_count, dead_count };
+        return core::math::uvec3{ begin, particle_count, dead_count };
     }
     D3D11_DRAW_INSTANCED_INDIRECT_ARGS EmissiveParticleRenderSystem::GetParticleIndirectArgsData()
     {

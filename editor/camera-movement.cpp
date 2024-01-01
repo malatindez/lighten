@@ -57,7 +57,7 @@ namespace camera_movement
                     lb_saved_mouse_position = core::math::ivec2{ -1 };
                     return;
                 }
-                if (lb_saved_mouse_position == core::math::vec2{ -1 })
+                if (lb_saved_mouse_position == core::math::ivec2{ -1 })
                 {
                     lb_saved_mouse_position = mouse_position();
                 }
@@ -82,7 +82,7 @@ namespace camera_movement
                     }
                     return;
                 }
-                if (rb_saved_mouse_position == core::math::vec2{ -1 })
+                if (rb_saved_mouse_position == core::math::ivec2{ -1 })
                 {
                     auto &input = *InputLayer::instance();
                     auto scene = Engine::scene();

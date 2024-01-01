@@ -11,7 +11,6 @@ file(GLOB_RECURSE ENGINE_SOURCES ${ENGINE_SOURCES_DIR}/*.*)
 update_sources_msvc("${CMAKE_CURRENT_SOURCE_DIR}" "${ENGINE_SOURCES}")
 
 add_library(engine STATIC "${ENGINE_SOURCES}")
-target_include_directories(engine PUBLIC ${MATH_INCLUDE_DIRS})
 target_include_directories(engine PUBLIC ${ENGINE_SOURCES_DIR})
 target_link_libraries(engine PUBLIC 
     EnTT::EnTT 
@@ -32,6 +31,7 @@ target_include_directories(engine PUBLIC
     ${JSON_INCLUDE_DIRS}
     ${YAML_CPP_INCLUDE_DIRS}
     ${CEREAL_INCLUDE_DIRS}
+    ${GLM_INCLUDE_DIRS}
 )
 target_link_libraries(engine PUBLIC 
     ${DirectX_D3D11_LIBRARIES}

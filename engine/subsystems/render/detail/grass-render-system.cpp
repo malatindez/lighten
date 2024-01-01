@@ -5,7 +5,7 @@ namespace engine::components
     void GrassComponent::Initialize(std::vector<core::math::vec4> const &atlas_data)
     {
         auto &random_engine = core::Engine::random_engine();
-        auto positions = core::math::random::poisson_disc::Generate(random_engine, -spawn_range / 2, spawn_range / 2, min_distance, max_attempts);
+        auto positions = core::math::random::poisson_disc::Generate(random_engine, -spawn_range / 2.0f, spawn_range / 2.0f, min_distance, max_attempts);
         grass_instances_.clear();
         grass_instances_.reserve(positions.size());
         if (atlas_data.size() == 0)
@@ -13,14 +13,14 @@ namespace engine::components
             throw std::invalid_argument("grass atlas data is empty");
         }
         std::uniform_real_distribution<float> size_distribution(grass_size_range.x, grass_size_range.y);
-        std::uniform_real_distribution<float> rotation_distribution(0.0f, 2.0f * core::math::numbers::pi_v<float>);
+        std::uniform_real_distribution<float> rotation_distribution(0.0f, 2.0f * std::numbers::pi_v<float>);
         std::uniform_int_distribution<uint32_t> atlas_distribution(0, static_cast<uint32_t>(atlas_data.size() - 1));
         for (auto const &position : positions)
         {
             uint32_t atlas_id = atlas_distribution(random_engine);
             float size = size_distribution(random_engine);
 
-            auto size_normalized = size * normalize(atlas_data[atlas_id].zw - atlas_data[atlas_id].xy);
+            auto size_normalized = size * normalize(glm::vec2{ atlas_data[atlas_id].z - atlas_data[atlas_id].x, atlas_data[atlas_id].w - atlas_data[atlas_id].y });
 
             auto grass_instance = GrassInstance{
                 .position = core::math::vec3(position.x, size_normalized.y / 2, position.y) + initial_offset,
@@ -198,7 +198,7 @@ namespace engine::render::_grass_detail
                 auto &grass_component = view.get<components::GrassComponent>(entity);
                 auto &transform = scene->registry.get<components::Transform>(entity);
 
-                grass_transform_buffer_.Update(GPUTransformInfo{.rotation_matrix = transpose(transform.rotation.as_mat4()), .position = transform.position});
+                grass_transform_buffer_.Update(GPUTransformInfo{.rotation_matrix = transpose(glm::mat4_cast(transform.rotation)), .position = transform.position});
                 material.material.Bind(grass_per_material_buffer_);
                 material.material.BindTextures();
                 uint32_t instances_to_render = static_cast<uint32_t>(grass_component.grass_instances_.size());
@@ -394,8 +394,8 @@ namespace engine::render::_grass_detail
                                                     return lhs < rhs.atlas_id;
                                                 });
 
-                    core::math::uivec2 from = atlas_size * atlas_data[current_atlas_id].xy;
-                    core::math::uivec2 to = atlas_size * atlas_data[current_atlas_id].zw;
+                    core::math::uvec2 from = glm::vec2{ atlas_data[current_atlas_id].x * atlas_size.x, atlas_data[current_atlas_id].y * atlas_size.y};
+                    core::math::uvec2 to = glm::vec2{ atlas_data[current_atlas_id].z * atlas_size.x, atlas_data[current_atlas_id].w * atlas_size.y};
                     for (auto &it = begin; it != end; ++it)
                     {
                         auto &instance = *it;

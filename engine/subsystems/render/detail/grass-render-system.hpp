@@ -37,7 +37,7 @@ namespace engine::render
             float wind_wavenumber;
             float wind_frequency;
 
-            core::math::uivec2 atlas_texture_size;
+            core::math::uvec2 atlas_texture_size;
         };
     } // namespace _grass_detail
 
@@ -63,8 +63,8 @@ namespace engine::render
         float gloss_value = 0.0f;
         float opacity_value = 0.0f;
         float roughness_value = 0.0f;
-        core::math::vec3 specular_value = 0.0f;
-        core::math::vec3 translucency_value = 0.0f;
+        core::math::vec3 specular_value{ 0.0f };
+        core::math::vec3 translucency_value{ 0.0f };
         float metalness_value = 0.0f;
         bool reverse_normal_y = false;
 
@@ -76,7 +76,7 @@ namespace engine::render
         uint32_t texture_flags = 0;
         // from, to texture coordinates
         std::vector<core::math::vec4> atlas_data{};
-        core::math::uivec2 atlas_size;
+        core::math::uvec2 atlas_size;
 
         uint32_t planes_count = 2;
         uint32_t section_count = 3;
@@ -150,7 +150,7 @@ namespace engine::components
         size_t material_id = std::numeric_limits<size_t>::max();
         core::math::vec2 spawn_range = { 2.0f, 2.0f }; // from center
         core::math::vec2 grass_size_range = { 0.1f, 0.5f };
-        core::math::vec3 initial_offset = { 0.0f };
+        core::math::vec3 initial_offset{ 0.0f };
         float min_distance;
         uint32_t max_attempts;
         void Initialize(std::vector<core::math::vec4> const &atlas_data);

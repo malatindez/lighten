@@ -1,6 +1,5 @@
 #pragma once
 #include "include/library-pch.hpp"
-#include "misc/math-serialization.hpp"
 #include "transform.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)

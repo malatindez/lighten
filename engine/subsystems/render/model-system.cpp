@@ -18,13 +18,13 @@ namespace engine::render
                 mat4 mat = transform.model * mesh.mesh_to_model;
                 mat4 inv_mat = mesh.inv_mesh_to_model * transform.inv_model;
                 Ray mesh_local = ray;
-                mesh_local.origin() = (inv_mat * vec4{ mesh_local.origin(), 1 }).xyz;
-                mesh_local.SetDirection((inv_mat * vec4{ mesh_local.direction(), 0 }).xyz);
+                mesh_local.origin() = (inv_mat * vec4{ mesh_local.origin(), 1 });
+                mesh_local.SetDirection((inv_mat * vec4{ mesh_local.direction(), 0 }));
                 bool t = mesh.triangle_octree.intersect(mesh_local, nearest);
                 if (t)
                 {
-                    nearest.point = (mat * vec4{ nearest.point, 1 }).xyz;
-                    nearest.normal = (mat * vec4{ nearest.normal, 0 }).xyz;
+                    nearest.point = (mat * vec4{ nearest.point, 1 });
+                    nearest.normal = (mat * vec4{ nearest.normal, 0 });
                     rv = t;
                 }
             }
@@ -207,11 +207,11 @@ namespace engine::render
             mesh.indices.push_back(i + 2);
             mesh.indices.push_back(i + 1);
             mesh.indices.push_back(i);
-            rmin(box.min, mesh.vertices[i].position);
-            rmax(box.max, mesh.vertices[i].position);
+            box.min = min(box.min, mesh.vertices[i].position);
+            box.max = max(box.max, mesh.vertices[i].position);
         }
 
-        ModelMesh model_mesh(0, mat4::identity(),
+        ModelMesh model_mesh(0, mat4{ 1.0f },
                              MeshRange{ .vertex_offset = 0, .index_offset = 0,
                              .vertex_count = (uint32_t)mesh.vertices.size(),
                              .index_count = (uint32_t)mesh.indices.size(),
@@ -364,13 +364,13 @@ namespace engine::render
             mesh.indices.push_back(i + 2);
             mesh.indices.push_back(i + 1);
             mesh.indices.push_back(i);
-            rmin(box.min, mesh.vertices[i].position);
-            rmax(box.max, mesh.vertices[i].position);
+            box.min = min(box.min, mesh.vertices[i].position);
+            box.max = max(box.max, mesh.vertices[i].position);
         }
         box.min = core::math::vec3{ -1 };
         box.max = core::math::vec3{ +1 };
 
-        ModelMesh model_mesh(0, mat4::identity(),
+        ModelMesh model_mesh(0, mat4 {1.0f },
                              MeshRange{ .vertex_offset = 0, .index_offset = 0,
                              .vertex_count = (uint32_t)mesh.vertices.size(),
                              .index_count = (uint32_t)mesh.indices.size(),
@@ -401,7 +401,7 @@ namespace engine::render
             return model_id;
         }
         std::string name = "UNIT_CUBE_FLAT";
-        Box box = Box{ {-0.5f}, {0.5f} };
+        Box box = Box{ glm::vec3{-0.5f}, glm::vec3{0.5f} };
         Mesh mesh;
         mesh.vertices.resize(24);
         Vertex *vertex = mesh.vertices.data();
@@ -527,7 +527,7 @@ namespace engine::render
         vertex[23].bitangent = { 0,0,1 };
         mesh.indices = { 2,1,0, 2,3,1, 4,5,6, 5,7,6, 10,9,8, 10,11,9, 12,13,14, 13,15,14, 16,17,18, 17,19,18, 22,21,20, 22,23,21 };
 
-        ModelMesh model_mesh(0, mat4::identity(),
+        ModelMesh model_mesh(0, mat4 {1.0f},
                              MeshRange{ .vertex_offset = 0, .index_offset = 0, .vertex_count = (uint32_t)mesh.vertices.size(), .index_count = (uint32_t)mesh.indices.size(), .bounding_box = box },
                              std::move(mesh));
         Model model{

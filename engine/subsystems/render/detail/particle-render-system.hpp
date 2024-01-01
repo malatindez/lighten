@@ -78,7 +78,7 @@ namespace engine::render
             ID3D11ShaderResourceView *emva2 = nullptr;
             ID3D11ShaderResourceView *rlt = nullptr;
 
-            core::math::uivec2 atlas_size = { 1, 1 };
+            core::math::uvec2 atlas_size = { 1, 1 };
         private:
             GraphicsShaderProgram particle_shader_;
             direct3d::DynamicUniformBuffer<ParticlePerFrame> particle_per_frame_buffer_;

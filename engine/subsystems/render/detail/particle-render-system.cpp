@@ -95,7 +95,7 @@ namespace engine::render::_particle_detail
         }
         auto &camera_transform = scene->main_camera->transform();
 
-        std::sort(particles.begin(), particles.end(), [&camera_transform] (const GPUParticle &a, const GPUParticle &b) constexpr noexcept -> bool {
+        std::sort(particles.begin(), particles.end(), [&camera_transform] (const GPUParticle &a, const GPUParticle &b) noexcept -> bool {
             return length(a.position - camera_transform.position) > length(b.position - camera_transform.position);
                   });
 
@@ -115,7 +115,7 @@ namespace engine::render::_particle_detail
 
         direct3d::api().devcon4->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         core::math::vec4 blend_factor{ 0.0f };
-        direct3d::api().devcon4->OMSetBlendState(direct3d::states().additive_blend_state_alpha.ptr(), blend_factor.data.data(), 0xffffffff);
+        direct3d::api().devcon4->OMSetBlendState(direct3d::states().additive_blend_state_alpha.ptr(), reinterpret_cast<float*>(&blend_factor), 0xffffffff);
         direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().no_depth_write.ptr(), 0);
 
         particle_buffer_.Bind(1);
@@ -220,7 +220,7 @@ namespace engine::render::_particle_detail
                 particle.acceleration = emitter.particle_acceleration;
 
                 particle.color = emitter.base_diffuse_color +
-                    random::RandomVector4(random_engine_, vec4(-1), vec4(1)) * emitter.diffuse_variation;
+                    random::RandomVector(random_engine_, vec4(-1), vec4(1)) * emitter.diffuse_variation;
                 particle.begin_size = Randomize(random_engine_, emitter.begin_size_range);
                 particle.end_size = Randomize(random_engine_, emitter.end_size_range);
                 particle.life_begin = time_now;

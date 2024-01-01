@@ -9,8 +9,8 @@ using namespace components;
 namespace object_editor
 {
 
-    template <AnyVec Vector>
-    inline std::string FormatToString(Vector vec, uint32_t precision = 3)
+    template <typename Vector>
+    inline std::string FormatVectorToString(Vector vec, uint32_t precision = 3)
     {
         std::stringstream ss;
         size_t max = 0;
@@ -29,21 +29,21 @@ namespace object_editor
         return ss.str();
     }
 
-    template <AnyMat Matrix>
-    inline std::string FormatToString(Matrix mat, uint32_t precision = 3)
+    template <size_t size_x, size_t size_y, typename matrix_type, glm::qualifier Q>
+    inline std::string FormatMatrixToString(glm::mat<size_x, size_y, matrix_type, Q> mat, uint32_t precision = 3)
     {
         std::stringstream ss;
         size_t max = 0;
-        for (size_t i = 0; i < Matrix::size.x * Matrix::size.y; i++)
+        for (size_t i = 0; i < size_x * size_y; i++)
         {
             std::stringstream ss2;
-            ss2 << std::setprecision(precision) << mat.arr[i];
+            ss2 << std::setprecision(precision) << reinterpret_cast<const matrix_type*>(&mat)[i];
             max = std::max(max, ss2.str().size());
         }
         uint32_t size = (uint32_t)max;
-        for (size_t column = 0; column < Matrix::size.y; column++)
+        for (size_t column = 0; column < size_x; column++)
         {
-            for (size_t row = 0; row < Matrix::size.x; row++)
+            for (size_t row = 0; row < size_y; row++)
             {
                 ss << std::left << std::setw(size) << std::setprecision(precision) << mat[column][row];
                 ss << " ";
@@ -97,7 +97,7 @@ namespace object_editor
     {
         mat4 &matrix = transform.model;
         float matrixTranslation[3], matrixRotation[3], matrixScale[3];
-        ImGuizmo::DecomposeMatrixToComponents(matrix.arr.data(), matrixTranslation, matrixRotation, matrixScale);
+        ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float*>(&matrix), matrixTranslation, matrixRotation, matrixScale);
         if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_SpanAvailWidth))
         {
             if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
@@ -112,7 +112,7 @@ namespace object_editor
             changed |= ImGui::InputFloat3("Tr", matrixTranslation, "%.3f", 3);
             changed |= ImGui::InputFloat3("Rt", matrixRotation, "%.3f", 3);
             changed |= ImGui::InputFloat3("Sc", matrixScale, "%.3f", 3);
-            ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, matrix.arr.data());
+            ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, reinterpret_cast<float*>(&matrix));
             if (mCurrentGizmoOperation != ImGuizmo::SCALE)
             {
                 if (ImGui::RadioButton("Local", mCurrentGizmoMode == ImGuizmo::LOCAL))
@@ -143,14 +143,14 @@ namespace object_editor
             if (ImGui::Button("Reset"))
             {
                 changed = true;
-                matrix = mat4::identity();
-                ImGuizmo::DecomposeMatrixToComponents(matrix.arr.data(), matrixTranslation, matrixRotation, matrixScale);
+                matrix = mat4{ 1.0f };
+                ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float*>(&matrix), matrixTranslation, matrixRotation, matrixScale);
             }
             if (ImGui::Button("Reset scale"))
             {
                 changed = true;
                 matrixScale[0] = matrixScale[1] = matrixScale[2] = 1;
-                ImGuizmo::DecomposeMatrixToComponents(matrix.arr.data(), matrixTranslation, matrixRotation, matrixScale);
+                ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float*>(&matrix), matrixTranslation, matrixRotation, matrixScale);
             }
             ImGui::SameLine();
             if (ImGui::Button("Reset rotation"))
@@ -167,10 +167,10 @@ namespace object_editor
             }
             if (changed)
             {
-                ImGuizmo::DecomposeMatrixToComponents(matrix.arr.data(), matrixTranslation, matrixRotation, matrixScale);
+                ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float*>(&matrix), matrixTranslation, matrixRotation, matrixScale);
                 transform.position = vec3{ matrixTranslation[0], matrixTranslation[1], matrixTranslation[2] };
                 transform.scale = vec3{ matrixScale[0], matrixScale[1], matrixScale[2] };
-                transform.rotation = QuaternionFromRotationMatrix(scale(matrix, 1.0f / transform.scale).as_rmat<3, 3>());
+                transform.rotation = glm::quat_cast(glm::mat3(scale(matrix, 1.0f / transform.scale)));
                 transform.UpdateMatrices();
                 UpdateInstances();
             }
@@ -181,21 +181,21 @@ namespace object_editor
     {
         mat4 &matrix = transform.model;
         float matrixTranslation[3], matrixRotation[3], matrixScale[3];
-        ImGuizmo::DecomposeMatrixToComponents(matrix.arr.data(), matrixTranslation, matrixRotation, matrixScale);
+        ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float*>(&matrix), matrixTranslation, matrixRotation, matrixScale);
         ImGuizmo::SetRect((float)window_pos.x, (float)window_pos.y, (float)window_size.x, (float)window_size.y);
         static float boundsSnap[] = { 0.1f, 0.1f, 0.1f };
-        if (ImGuizmo::Manipulate(camera.camera().view.arr.data(),
-                                 camera.camera().projection.arr.data(),
+        if (ImGuizmo::Manipulate(reinterpret_cast<const float*>(&camera.camera().view),
+                                 reinterpret_cast<const float*>(&camera.camera().projection),
                                  mCurrentGizmoOperation,
                                  mCurrentGizmoMode,
-                                 matrix.arr.data(),
+                                 reinterpret_cast<float*>(&matrix),
                                  nullptr,
-                                 useSnap ? &snap.x : nullptr, Box{ .min = -bounding_box.min, .max = -bounding_box.max }.min.data.data(), boundsSnap))
+                                 useSnap ? &snap.x : nullptr, reinterpret_cast<const float*>(&bounding_box), boundsSnap))
         {
-            ImGuizmo::DecomposeMatrixToComponents(matrix.arr.data(), matrixTranslation, matrixRotation, matrixScale);
+            ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float*>(&matrix), matrixTranslation, matrixRotation, matrixScale);
             transform.position = vec3{ matrixTranslation[0], matrixTranslation[1], matrixTranslation[2] };
             transform.scale = vec3{ matrixScale[0], matrixScale[1], matrixScale[2] };
-            transform.rotation = QuaternionFromRotationMatrix(scale(matrix, 1.0f / transform.scale).as_rmat<3, 3>());
+            transform.rotation = glm::quat_cast(glm::mat3(scale(matrix, 1.0f / transform.scale)));
             transform.UpdateMatrices();
             UpdateInstances();
         }
@@ -315,10 +315,10 @@ namespace object_editor
             ImGui::InputScalar("Sheen map texture ID", ImGuiDataType_U64, &sheen_map_texture_id, nullptr, nullptr, "%llu");
             ImGui::EndDisabled();
 
-            ImGui::ColorEdit3("Albedo color", material->albedo_color.data.data());
+            ImGui::ColorEdit3("Albedo color", reinterpret_cast<float*>(&material->albedo_color));
             ImGui::SliderFloat("Metalness", &material->metalness_value, 0.001f, 1.0f);
             ImGui::SliderFloat("Roughness", &material->roughness_value, 0.001f, 1.0f);
-            ImGui::ColorEdit3("Sheen color", material->sheen_color.data.data());
+            ImGui::ColorEdit3("Sheen color", reinterpret_cast<float*>(&material->sheen_color));
             ImGui::SliderFloat("Sheen Roughness", &material->sheen_roughness, 0.001f, 1.0f);
             auto width = ::ImGui::GetContentRegionMax().x - 200;
             ImGui::PushItemWidth(width / 2);
@@ -421,7 +421,7 @@ namespace object_editor
     {
         if (ImGui::CollapsingHeader("Point light", ImGuiTreeNodeFlags_SpanAvailWidth))
         {
-            ImGui::ColorEdit3("Color", point_light->color.data.data());
+            ImGui::ColorEdit3("Color", reinterpret_cast<float*>(&point_light->color));
             ImGui::SliderFloat("Power", &point_light->power, 0, 1e6f, "%.3f", ImGuiSliderFlags_Logarithmic);
         }
     }
@@ -429,7 +429,7 @@ namespace object_editor
     {
         if (ImGui::CollapsingHeader("Spot light", ImGuiTreeNodeFlags_SpanAvailWidth))
         {
-            ImGui::ColorEdit3("Color", spot_light->color.data.data());
+            ImGui::ColorEdit3("Color", reinterpret_cast<float*>(&spot_light->color));
             ImGui::SliderFloat("Power", &spot_light->power, 0, 1e6f, "%.3f", ImGuiSliderFlags_Logarithmic);
             ImGui::SliderAngle("Inner cutoff", &spot_light->inner_cutoff, 0, 180, "%.3f degrees", ImGuiSliderFlags_AlwaysClamp);
             ImGui::SliderAngle("Outer cutoff", &spot_light->outer_cutoff, 0, 180, "%.3f degrees", ImGuiSliderFlags_AlwaysClamp);
@@ -443,7 +443,7 @@ namespace object_editor
     {
         if (ImGui::CollapsingHeader("Directional light", ImGuiTreeNodeFlags_SpanAvailWidth))
         {
-            ImGui::ColorEdit3("Color", directional_light->color.data.data());
+            ImGui::ColorEdit3("Color", reinterpret_cast<float*>(&directional_light->color));
             ImGui::SliderFloat("Power", &directional_light->power, 0, 1e6f, "%.3f", ImGuiSliderFlags_Logarithmic);
             ImGui::InputFloat("Solid angle", &directional_light->solid_angle);
         }
@@ -721,12 +721,12 @@ namespace object_editor
             }
             if (ImGui::CollapsingHeader("Camera data: "))
             {
-                std::string view = FormatToString(camera.view);
-                std::string projection = FormatToString(camera.view);
-                std::string view_projection = FormatToString(camera.view);
-                std::string inv_view = FormatToString(camera.view);
-                std::string inv_projection = FormatToString(camera.view);
-                std::string inv_view_projection = FormatToString(camera.view);
+                std::string view = FormatMatrixToString(camera.view);
+                std::string projection = FormatMatrixToString(camera.view);
+                std::string view_projection = FormatMatrixToString(camera.view);
+                std::string inv_view = FormatMatrixToString(camera.view);
+                std::string inv_projection = FormatMatrixToString(camera.view);
+                std::string inv_view_projection = FormatMatrixToString(camera.view);
                 ImGui::Text("View matrix: ");
                 ImGui::Text("%s", view.c_str());
                 ImGui::Text("Projection matrix: ");
@@ -819,7 +819,7 @@ namespace object_editor
                 ImGui::Text("Grass material: ");
                 ImGui::InputScalar("planes count ##planes-count", ImGuiDataType_U32, &material.planes_count);
                 ImGui::InputScalar("sections per plane ##section-count", ImGuiDataType_U32, &material.section_count);
-                ImGui::ColorEdit3("albedo color ##albedo-color", material.albedo_color.data.data());
+                ImGui::ColorEdit3("albedo color ##albedo-color", reinterpret_cast<float*>(&material.albedo_color));
                 ImGui::DragFloat("ambient occlusion value ##ao-value", &material.ao_value, 0.01f, 0.01f, 1.0f);
                 ImGui::DragFloat("roughness value ##roughness-value", &material.roughness_value, 0.01f, 0.01f, 1.0f);
                 ImGui::DragFloat("metalness value ##metalness-value", &material.metalness_value, 0.01f, 0.01f, 1.0f);
@@ -835,7 +835,7 @@ namespace object_editor
                 ImGui::InputScalar("z spawn range ##height", ImGuiDataType_Float, &grass_field.spawn_range.y);
                 ImGui::InputScalar("min scale ##x-scale-range", ImGuiDataType_Float, &grass_field.grass_size_range.x);
                 ImGui::InputScalar("max scale ##y-scale-range", ImGuiDataType_Float, &grass_field.grass_size_range.y);
-                ImGui::InputFloat3("initial offset", grass_field.initial_offset.data.data(), "%.3f", 3);
+                ImGui::InputFloat3("initial offset", reinterpret_cast<float*>(&grass_field.initial_offset), "%.3f", 3);
                 ImGui::InputScalar("min distance between instances", ImGuiDataType_Float, &grass_field.min_distance);
                 ImGui::InputScalar("max attempts", ImGuiDataType_U32, &grass_field.max_attempts);
                 if (ImGui::Button("Initialize"))

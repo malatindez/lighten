@@ -19,7 +19,7 @@ namespace engine
     void CameraController::UpdateProjectionMatrix()
     {
         auto &cam = camera();
-        SetProjectionMatrix(perspective(
+        SetProjectionMatrix(perspectiveLH_ZO(
             cam.fovy_,
             float(window_size_.x) / float(window_size_.y),
             cam.z_near_, cam.z_far_));
@@ -64,10 +64,10 @@ namespace engine
         auto &transform_ = transform();
         if (roll_enabled_)
         {
-            transform_.rotation = quat(roll, vec3{ 0.f, 0.f, 1.f });
+            transform_.rotation = quat(vec3{ 0.f, 0.f, roll });
         }
-        transform_.rotation *= quat(pitch, vec3{ 1.f, 0.f, 0.f });
-        transform_.rotation *= quat(yaw, vec3{ 0.f, 1.f, 0.f });
+        transform_.rotation *= quat(vec3{ pitch, 0.f, 0.f });
+        transform_.rotation *= quat(vec3{ 0.f, yaw, 0.f });
         transform_.rotation = normalize(transform_.rotation);
     }
 
@@ -78,10 +78,10 @@ namespace engine
         auto &transform_ = transform();
         if (roll_enabled_)
         {
-            transform_.rotation *= quat(roll, vec3{ 0.f, 0.f, 1.f });
+            transform_.rotation *= quat(vec3{ 0.f, 0.f, roll });
         }
-        transform_.rotation *= quat(pitch, vec3{ 1.f, 0.f, 0.f });
-        transform_.rotation *= quat(yaw, vec3{ 0.f, 1.f, 0.f });
+        transform_.rotation *= quat(vec3{ pitch, 0.f, 0.f });
+        transform_.rotation *= quat(vec3{ 0.f, yaw, 0.f });
         transform_.rotation = normalize(transform_.rotation);
     }
 
@@ -92,14 +92,14 @@ namespace engine
         auto &transform_ = transform();
         if (roll_enabled_)
         {
-            transform_.rotation *= quat(roll, as_vec(forward()));
-            transform_.rotation *= quat(pitch, as_vec(right()));
-            transform_.rotation *= quat(yaw, as_vec(up()));
+            transform_.rotation *= quat(roll * forward());
+            transform_.rotation *= quat(pitch * right());
+            transform_.rotation *= quat(yaw * up());
         }
         else
         {
-            transform_.rotation *= quat(pitch, as_vec(right()));
-            transform_.rotation *= quat(yaw, vec3{ 0, 1, 0 });
+            transform_.rotation *= quat(pitch * right());
+            transform_.rotation *= quat(vec3{0.0f, yaw, 0.0f});
         }
         transform_.rotation = normalize(transform_.rotation);
     }
@@ -113,7 +113,14 @@ namespace engine
         update_basis_ = false;
         auto &cam = camera();
         auto &transform_ = transform();
-        cam.inv_view.as_rmat<3, 3>() = transpose(transform_.rotation.as_mat3());
+        auto t = glm::transpose(glm::mat3_cast(transform_.rotation));
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                cam.inv_view[i][j] = t[i][j];
+            }
+        }
     }
 
     void CameraController::UpdateMatrices()
@@ -127,8 +134,9 @@ namespace engine
         UpdateBasis();
         auto &cam = camera();
         auto &transform_ = transform();
-
-        as_rvec<3>(cam.inv_view[3]) = transform_.position;
+        cam.inv_view[3][0] = transform_.position.x;
+        cam.inv_view[3][1] = transform_.position.y;
+        cam.inv_view[3][2] = transform_.position.z;
 
         cam.view = invert_orthonormal(cam.inv_view);
         cam.view_projection = cam.projection * cam.view;
@@ -199,7 +207,7 @@ namespace engine
             }
         }
         vec2 t{ pixel_mouse_delta };
-        t = -t / window_size_;
+        t = -t / glm::vec2(window_size_);
         t *= sensivity_ * camera().fovy_;
         yaw = t.x;
         pitch = t.y;
@@ -207,7 +215,7 @@ namespace engine
         {
             AddRelativeAngles(delta_time * roll, delta_time * pitch, delta_time * yaw);
         }
-        if (squared_length(offset) != 0)
+        if (dot(offset, offset) != 0)
         {
             AddRelativeOffset(move_speed_ * offset * delta_time * ((flags_ & Accelerate) ? accelerated_speed_ : move_speed_));
         }

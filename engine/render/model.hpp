@@ -153,7 +153,7 @@ namespace engine::render
         core::math::vec3 bitangent;
         static constexpr Vertex empty()
         {
-            return Vertex{ core::math::vec3::zero(), core::math::vec2::zero(), core::math::vec3::zero(), core::math::vec3::zero(), core::math::vec3::zero() };
+            return Vertex{ core::math::vec3{0.0f}, core::math::vec2{0.0f}, core::math::vec3{0.0f}, core::math::vec3{0.0f}, core::math::vec3{0.0f} };
         }
     };
     struct Mesh

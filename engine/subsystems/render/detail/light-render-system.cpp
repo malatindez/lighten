@@ -46,7 +46,7 @@ namespace engine::render::_light_detail
         rv[1] = vec4{ up, 0 };
         rv[2] = vec4{ forward, 0 };
         rv[3] = vec4{ position, 1 };
-        return perspective(degrees, 1.0f, kShadowRange, 0.01f) * invert_orthonormal(rv);
+        return perspectiveLH_ZO(degrees, 1.0f, kShadowRange, 0.01f) * invert_orthonormal(rv);
     }
 
     mat4 CreateOrthoViewProjection(vec3 const &position, vec3 const &direction, float resolution)
@@ -54,8 +54,8 @@ namespace engine::render::_light_detail
         vec3 up = vec3(0.0f, 1.0f, 0.0f);
         vec3 right = normalize(cross(direction, up));
         up = normalize(cross(right, direction));
-        mat4 view = look_at(position, position + direction, up);
-        mat4 projection = ortho(-resolution, resolution, -resolution, resolution, 10000.0f, 0.0f);
+        mat4 view = lookAtLH(position, position + direction, up);
+        mat4 projection = orthoLH_ZO(-resolution, resolution, -resolution, resolution, 10000.0f, 0.0f);
         return projection * view;
     }
 
@@ -136,7 +136,7 @@ namespace engine::render::_light_detail
             auto const &transform = registry.get<components::Transform>(entity);
             _opaque_detail::OpaquePerDepthTexture texture;
             vec3 forward = normalize(transform.rotation * core::math::vec3{ 0, 1, 0 });
-            vec3 camera_position = core::Engine::scene()->main_camera->position() - forward * 30;
+            vec3 camera_position = core::Engine::scene()->main_camera->position() - forward * 30.0f;
             texture.g_view_projection = CreateOrthoViewProjection(camera_position, forward, 20.0f);
             texture.g_slice_offset = i++;
             opaque_per_texture_.push_back(std::move(texture));

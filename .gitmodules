@@ -29,9 +29,6 @@
 [submodule "third_party/mal-packet-weaver"]
 	path = third_party/mal-packet-weaver
 	url = https://github.com/malatindez/mal-packet-weaver
-[submodule "third_party/math"]
-	path = third_party/math
-	url = https://github.com/malatindez/math
 [submodule "third_party/yaml"]
 	path = third_party/yaml
 	url = https://github.com/jbeder/yaml-cpp

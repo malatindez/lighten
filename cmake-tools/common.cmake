@@ -131,8 +131,8 @@ function(run_reflection_tool TARGET)
     # Run custom command with the aggregated include directories
     add_custom_command(
         TARGET "${TARGET}" PRE_BUILD
-        COMMAND python "${CMAKE_CURRENT_LIST_DIR}/../reflection/main.py"
-                        --build_dir "${INPUT_TARGET_BINARY_DIR}"
+        COMMAND python \"${CMAKE_CURRENT_LIST_DIR}/../reflection/main.py\"
+                        --build_dir \"${INPUT_TARGET_BINARY_DIR}\"
                         --include_dirs "${INPUT_TARGET_INCLUDES}"
                         --source_files "${INPUT_TARGET_SOURCES}"
         COMMENT "Running reflection tool for ${TARGET}"

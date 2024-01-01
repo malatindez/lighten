@@ -10,7 +10,7 @@ namespace engine::render
         const core::math::vec4 empty_vec(0, 0, 0, 0);
 
         direct3d::api().devcon4->OMSetRenderTargets(0, nullptr, nullptr);
-        direct3d::api().devcon4->ClearRenderTargetView(hdr_render_target_.render_target_view(), empty_vec.data.data());
+        direct3d::api().devcon4->ClearRenderTargetView(hdr_render_target_.render_target_view(), reinterpret_cast<const float*>(&empty_vec));
         direct3d::api().devcon4->RSSetState(direct3d::states().cull_none.ptr());
 
         std::vector<PointLightInstance> point_lights;
@@ -39,7 +39,7 @@ namespace engine::render
             {
                 auto &light = registry.get<components::PointLight>(entity);
                 auto &transform = registry.get<components::Transform>(entity);
-                auto instance_matrix = core::math::mat4::identity();
+                auto instance_matrix = core::math::mat4{ 1.0f };
                 instance_matrix = core::math::translate(instance_matrix, transform.position);
                 float radius = length(transform.scale) / sqrtf(3.1f);
                 float max_intensity = std::max(std::max(light.color.x, light.color.y), light.color.z) * light.power;
@@ -63,7 +63,7 @@ namespace engine::render
                 auto &light = registry.get<components::SpotLight>(entity);
                 auto &transform = registry.get<components::Transform>(entity);
 
-                auto instance_matrix = core::math::mat4::identity();
+                auto instance_matrix = core::math::mat4{ 1.0f };
                 instance_matrix = core::math::translate(instance_matrix, transform.position);
                 float radius = length(transform.scale) / sqrtf(3.1f);
                 float max_intensity = std::max(std::max(light.color.x, light.color.y), light.color.z) * light.power;

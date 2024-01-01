@@ -22,7 +22,7 @@ public:
     void OnGuiRender() override;
     void OnUpdate() override;
     uint32_t current_view_proj = std::numeric_limits<uint32_t>::max();
-    engine::core::math::mat4 view_proj = engine::core::math::mat4::identity();
+    engine::core::math::mat4 view_proj = engine::core::math::mat4{ 1.0f };
 private:
     std::shared_ptr<engine::core::Scene> first_scene;
 private:

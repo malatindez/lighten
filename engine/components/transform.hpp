@@ -1,7 +1,6 @@
 #pragma once
 #include "../core/reflection-macro.hpp"
 #include "../include/library-pch.hpp"
-#include "../misc/math-serialization.hpp"
 namespace engine::components
 {
     /**
@@ -74,7 +73,7 @@ namespace engine::components
         {
             model = core::math::mat4{ 1 };
             model = core::math::translate(model, position);
-            model = model * rotation.as_mat4();
+            model = model * glm::mat4_cast(rotation);
             model = core::math::scale(model, scale);
             inv_model = core::math::inverse(model);
         }

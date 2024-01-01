@@ -30,7 +30,7 @@ namespace engine::render::misc
 
         direct3d::DynamicUniformBuffer<core::math::ivec4> pcb_dispatch_info_;
 
-        direct3d::DefaultBuffer<core::math::uivec4> indirect_sort_args_buffer_;
+        direct3d::DefaultBuffer<core::math::uvec4> indirect_sort_args_buffer_;
         direct3d::UnorderedAccessView indirect_sort_args_uav_;
         // InitSortArgsCS.hlsl
         // m_pCSInitArgs

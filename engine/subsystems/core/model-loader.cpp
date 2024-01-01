@@ -182,12 +182,12 @@ namespace engine::core
         for (auto& mesh : meshes)
         {
             auto& mesh_range = mesh.mesh_range;
-            auto mesh_min = (math::vec4(mesh_range.bounding_box.min, 1) * mesh.mesh_to_model).xyz;
-            auto mesh_max = (math::vec4(mesh_range.bounding_box.max, 1) * mesh.mesh_to_model).xyz;
-            math::rmin(min, mesh_min);
-            math::rmin(min, mesh_max);
-            math::rmax(max, mesh_min);
-            math::rmax(max, mesh_max);
+            glm::vec3 mesh_min = (math::vec4(mesh_range.bounding_box.min, 1) * mesh.mesh_to_model);
+            glm::vec3 mesh_max = (math::vec4(mesh_range.bounding_box.max, 1) * mesh.mesh_to_model);
+            min = glm::min(min, mesh_min);
+            min = glm::min(min, mesh_max);
+            max = glm::max(max, mesh_min);
+            max = glm::max(max, mesh_max);
 
             mesh_range.index_offset = index_offset;
             mesh_range.vertex_offset = vertex_offset;
@@ -454,8 +454,8 @@ namespace engine::core
             {
                 float x = (float)i / (float)precision;
                 float y = (float)j / (float)precision;
-                float theta = x * 2.0f * core::math::numbers::pi_v<float>;
-                float phi = y * core::math::numbers::pi_v<float>;
+                float theta = x * 2.0f * std::numbers::pi_v<float>;
+                float phi = y * std::numbers::pi_v<float>;
                 float sin_theta = sin(theta);
                 float cos_theta = cos(theta);
                 float sin_phi = sin(phi);

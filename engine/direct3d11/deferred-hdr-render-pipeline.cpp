@@ -151,13 +151,13 @@ namespace engine::direct3d
     void DeferredHDRRenderPipeline::FrameBegin()
     {
         const core::math::vec4 empty_vec{ 0.0f, 0.0f, 0.0f, 1.0f };
-        api().devcon4->ClearRenderTargetView(hdr_target_.render_target_view(), empty_vec.data.data());
-        api().devcon4->ClearRenderTargetView(gbuffer_.normals->render_target_view(), empty_vec.data.data());
-        api().devcon4->ClearRenderTargetView(gbuffer_.albedo->render_target_view(), empty_vec.data.data());
-        api().devcon4->ClearRenderTargetView(gbuffer_.roughness_metalness_transmittance_ao->render_target_view(), empty_vec.data.data());
-        api().devcon4->ClearRenderTargetView(gbuffer_.sheen->render_target_view(), empty_vec.data.data());
-        api().devcon4->ClearRenderTargetView(gbuffer_.emission->render_target_view(), empty_vec.data.data());
-        api().devcon4->ClearRenderTargetView(gbuffer_.entity_id->render_target_view(), empty_vec.data.data());
+        api().devcon4->ClearRenderTargetView(hdr_target_.render_target_view(), reinterpret_cast<const float*>(&empty_vec));
+        api().devcon4->ClearRenderTargetView(gbuffer_.normals->render_target_view(), reinterpret_cast<const float*>(&empty_vec));
+        api().devcon4->ClearRenderTargetView(gbuffer_.albedo->render_target_view(), reinterpret_cast<const float*>(&empty_vec));
+        api().devcon4->ClearRenderTargetView(gbuffer_.roughness_metalness_transmittance_ao->render_target_view(), reinterpret_cast<const float*>(&empty_vec));
+        api().devcon4->ClearRenderTargetView(gbuffer_.sheen->render_target_view(), reinterpret_cast<const float*>(&empty_vec));
+        api().devcon4->ClearRenderTargetView(gbuffer_.emission->render_target_view(), reinterpret_cast<const float*>(&empty_vec));
+        api().devcon4->ClearRenderTargetView(gbuffer_.entity_id->render_target_view(), reinterpret_cast<const float*>(&empty_vec));
         api().devcon4->ClearDepthStencilView(depth_stencil_.depth_stencil_view(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0);
 
         auto const &camera = scene_->main_camera->camera();

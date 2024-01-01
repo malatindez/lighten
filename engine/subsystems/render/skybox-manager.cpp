@@ -34,7 +34,12 @@ namespace engine
         core::math::vec4 tl4 = modified_inv_view_projection * core::math::vec4(-1, 1, 1, 1);
         core::math::vec4 right4 = br4 - bl4;
         core::math::vec4 up4 = tl4 - bl4;
-        skybox_buffer_->Update(core::math::mat4x3{ bl4, right4, up4 });
+        core::math::mat4x3 modified_inv_view_projection_4x3;
+        modified_inv_view_projection_4x3[0] = core::math::vec3{ bl4.x, right4.x, up4.x };
+        modified_inv_view_projection_4x3[1] = core::math::vec3{ bl4.y, right4.y, up4.y };
+        modified_inv_view_projection_4x3[2] = core::math::vec3{ bl4.z, right4.z, up4.z };
+        modified_inv_view_projection_4x3[3] = core::math::vec3{ bl4.w, right4.w, up4.w };
+        skybox_buffer_->Update(modified_inv_view_projection_4x3);
         skybox_buffer_->Bind(direct3d::ShaderType::VertexShader, 2);
         skybox_shader_.Bind();
         auto view = core::TextureManager::GetTextureView(skybox.texture_id);

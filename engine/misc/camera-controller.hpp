@@ -44,14 +44,14 @@ namespace engine
         {
             auto const &cam = camera();
             core::math::vec4 direction = cam.inv_view_projection * core::math::vec4(ndc.x, ndc.y, 1, 1);
-            return core::math::Ray(cam.position(), core::math::normalize(direction.xyz / direction.w - cam.position()));
+            return core::math::Ray(cam.position(), core::math::normalize(glm::vec3{ direction } / direction.w - cam.position()));
         }
 
         [[nodiscard]] inline core::math::Ray PixelRaycast(core::math::vec2 ndc) const noexcept
         {
             ndc /= window_size();
             ndc = ndc * 2.0f - 1.0f;
-            ndc.v = -ndc.v;
+            ndc.y = -ndc.y;
             return Raycast(ndc);
         }
 
@@ -64,9 +64,9 @@ namespace engine
         [[nodiscard]] inline core::math::vec3 const &position() const noexcept { return transform().position; }
         [[nodiscard]] inline core::math::quat const &rotation() const noexcept { return transform().rotation; }
 
-        [[nodiscard]] inline core::math::vec3 const &right() const noexcept { return core::math::as_crvec<3>(camera().inv_view[0]); }
-        [[nodiscard]] inline core::math::vec3 const &up() const noexcept { return core::math::as_crvec<3>(camera().inv_view[1]); }
-        [[nodiscard]] inline core::math::vec3 const &forward() const noexcept { return core::math::as_crvec<3>(camera().inv_view[2]); }
+        [[nodiscard]] inline core::math::vec3 right() const noexcept { return camera().inv_view[0]; }
+        [[nodiscard]] inline core::math::vec3 up() const noexcept { return camera().inv_view[1]; }
+        [[nodiscard]] inline core::math::vec3 forward() const noexcept { return camera().inv_view[2]; }
 
         [[nodiscard]] inline float fovy() const noexcept { return camera().fovy_; }
         [[nodiscard]] inline float z_near() const noexcept { return camera().z_near_; }

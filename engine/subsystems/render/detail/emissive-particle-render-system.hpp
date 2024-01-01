@@ -84,7 +84,7 @@ namespace engine::render
             void update_particles(ID3D11ShaderResourceView * depth_srv, ID3D11ShaderResourceView * ormals_srv);
             void render_particles(ID3D11ShaderResourceView * depth_srv);
 
-            core::math::uivec3 GetParticleRangeData();
+            core::math::uvec3 GetParticleRangeData();
             D3D11_DRAW_INSTANCED_INDIRECT_ARGS GetParticleIndirectArgsData();
             std::vector<GPUParticle> GetParticleData();
             GraphicsShaderProgram particle_render_shader_;
