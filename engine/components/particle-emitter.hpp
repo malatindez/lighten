@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../core/reflection-macro.hpp"
-#include "../include/library-pch.hpp"
+#include "core/math.hpp"
 
 // forward declaration
 namespace engine::render::_particle_detail

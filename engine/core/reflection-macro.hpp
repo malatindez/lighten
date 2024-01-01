@@ -1,4 +1,5 @@
 #pragma once
+#define LIGHTEN_REFLECTION_DISCARD_FILE_FROM_UNITY_BUILD
 
 // classes
 /**

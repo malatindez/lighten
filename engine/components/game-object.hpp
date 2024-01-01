@@ -1,7 +1,9 @@
 #pragma once
 
 #include "../core/reflection-macro.hpp"
-#include "../include/library-pch.hpp"
+#include "core/math.hpp"
+#include "include/entt.hpp"
+
 namespace engine::components
 {
     /**

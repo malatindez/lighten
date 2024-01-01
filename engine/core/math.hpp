@@ -5,6 +5,24 @@
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <cereal/cereal.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/map.hpp>
+#include <cereal/archives/json.hpp>
+namespace cereal {
+    template<class Archive, glm::length_t length, typename vector_type, glm::qualifier Q>
+    void serialize(Archive& archive, glm::vec<length, vector_type, Q> & v) {
+        for(glm::length_t i = 0; i < length; i++)
+            archive(v[i]);
+    }
+    template <glm::length_t size_x, glm::length_t size_y, typename matrix_type, glm::qualifier Q>
+    void serialize(Archive &archive, glm::mat<size_x, size_y, matrix_type, Q> &m)
+    {
+        for (glm::length_t i = 0; i < size_x; i++)
+            for (glm::length_t j = 0; j < size_y; j++)
+                archive(m[i][j]);
+    }
+}
 
 namespace engine::core::math
 {

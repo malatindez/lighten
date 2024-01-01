@@ -1,6 +1,6 @@
 #pragma once
 #include "../core/reflection-macro.hpp"
-#include "../include/library-pch.hpp"
+#include "core/math.hpp"
 namespace engine::components
 {
     /**
