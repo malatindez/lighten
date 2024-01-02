@@ -1,6 +1,6 @@
 #include "triangle-octree.hpp"
 #include "render/model.hpp"
-namespace engine::core
+namespace lighten::core
 {
     const int TriangleOctree::PREFFERED_TRIANGLE_COUNT = 32;
     const float TriangleOctree::MAX_STRETCHING_RATIO = 1.05f;

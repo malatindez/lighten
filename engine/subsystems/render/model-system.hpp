@@ -6,12 +6,12 @@
 #include "core/math.hpp"
 #include "render/model.hpp"
 
-namespace engine::core
+namespace lighten::core
 {
     class Engine;
     class ModelLoader;
 }
-namespace engine::render
+namespace lighten::render
 {
     /**
      * @brief ModelSystem class, responsible for loading and rendering models.
@@ -46,8 +46,8 @@ namespace engine::render
         static ModelId GetUnitCube();
 
     private:
-        friend class ::engine::core::Engine;
-        friend class ::engine::core::ModelLoader;
+        friend class ::lighten::core::Engine;
+        friend class ::lighten::core::ModelLoader;
 
         static void Init()
         {
@@ -72,4 +72,4 @@ namespace engine::render
         std::unordered_map<ModelId, Model> models_;
         ModelId current_index = 0;
     };
-} // namespace engine::render
+} // namespace lighten::render

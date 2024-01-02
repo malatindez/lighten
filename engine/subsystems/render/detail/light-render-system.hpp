@@ -5,7 +5,7 @@
 #include "core/math.hpp"
 #include "components/components.hpp"
 #include "render/common.hpp"
-namespace engine
+namespace lighten
 {
     namespace core
     {
@@ -51,7 +51,7 @@ namespace engine
         };
     }
 }
-namespace engine::render::_light_detail
+namespace lighten::render::_light_detail
 {
     class LightRenderSystem final : public RenderPass
     {
@@ -149,4 +149,4 @@ namespace engine::render::_light_detail
         direct3d::DynamicUniformBuffer<LightsPerFrame> lights_per_frame_;
         uint32_t resolution_ = 2048;
     };
-} // namespace engine::render::_light_detail
+} // namespace lighten::render::_light_detail

@@ -1,7 +1,7 @@
 #pragma once
 #include "../api.hpp"
 #include "../d3d-debug.hpp"
-namespace engine::direct3d
+namespace lighten::direct3d
 {
     /**
      * @brief A wrapper for a D3D11 buffer.
@@ -81,4 +81,4 @@ namespace engine::direct3d
         /// @brief Underlying buffer
         Buffer buffer_;
     };
-} // namespace engine::direct3d
+} // namespace lighten::direct3d

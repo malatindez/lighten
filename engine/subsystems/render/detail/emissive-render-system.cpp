@@ -5,7 +5,7 @@
 #include "core/scene.hpp"
 #include "mal-toolkit/mal-toolkit.hpp"
 
-namespace engine::render::_emissive_detail
+namespace lighten::render::_emissive_detail
 {
     EmissiveRenderSystem::EmissiveRenderSystem() : RenderPass(0x10002)
     {

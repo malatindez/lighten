@@ -1,6 +1,6 @@
 #include "object-editor.hpp"
 
-using namespace engine;
+using namespace lighten;
 using namespace core;
 using namespace events;
 using namespace math;
@@ -53,7 +53,7 @@ namespace object_editor
         return ss.str();
     }
 
-    std::shared_ptr<engine::core::Scene> selected_scene = nullptr;
+    std::shared_ptr<lighten::core::Scene> selected_scene = nullptr;
     entt::entity selected_entity = entt::null;
     render::Mesh const *selected_mesh = nullptr;
     float selected_distance = 0.0f;
@@ -223,7 +223,7 @@ namespace object_editor
     }
     void OnRender(glm::ivec2 const &window_pos, glm::ivec2 const &window_size)
     {
-        if (selected_entity != entt::null && selected_scene == Engine::scene() && InputLayer::instance()->key_state(engine::core::Key::KEY_CONTROL))
+        if (selected_entity != entt::null && selected_scene == Engine::scene() && InputLayer::instance()->key_state(lighten::core::Key::KEY_CONTROL))
         {
             auto *transform_ptr = Engine::scene()->registry.try_get<Transform>(selected_entity);
             if (transform_ptr == nullptr)
@@ -1112,7 +1112,7 @@ namespace object_editor
         auto &input = *InputLayer::instance();
         auto scene = Engine::scene();
         input.AddUpdateKeyCallback(
-            InputLayer::KeySeq{engine::core::Key::KEY_CONTROL, engine::core::Key::KEY_LBUTTON},
+            InputLayer::KeySeq{lighten::core::Key::KEY_CONTROL, lighten::core::Key::KEY_LBUTTON},
             [&](InputLayer::KeySeq const &, uint32_t)
             {
                 if (ImGui::GetIO().WantCaptureMouse)
@@ -1142,7 +1142,7 @@ namespace object_editor
             },
             false);
         input.AddUpdateKeyCallback(
-            InputLayer::KeySeq{engine::core::Key::KEY_R},
+            InputLayer::KeySeq{lighten::core::Key::KEY_R},
             [&](InputLayer::KeySeq const &, uint32_t count)
             {
                 if (count == std::numeric_limits<uint32_t>::max())
@@ -1153,7 +1153,7 @@ namespace object_editor
             },
             false);
         input.AddUpdateKeyCallback(
-            InputLayer::KeySeq{engine::core::Key::KEY_T},
+            InputLayer::KeySeq{lighten::core::Key::KEY_T},
             [&](InputLayer::KeySeq const &, uint32_t count)
             {
                 if (count == std::numeric_limits<uint32_t>::max())
@@ -1164,7 +1164,7 @@ namespace object_editor
             },
             false);
         input.AddUpdateKeyCallback(
-            InputLayer::KeySeq{engine::core::Key::KEY_Y},
+            InputLayer::KeySeq{lighten::core::Key::KEY_Y},
             [&](InputLayer::KeySeq const &, uint32_t count)
             {
                 if (count == std::numeric_limits<uint32_t>::max())
@@ -1176,7 +1176,7 @@ namespace object_editor
             false);
 
         input.AddUpdateKeyCallback(
-            InputLayer::KeySeq{engine::core::Key::KEY_C},
+            InputLayer::KeySeq{lighten::core::Key::KEY_C},
             [&](InputLayer::KeySeq const &, uint32_t count)
             {
                 if (count == std::numeric_limits<uint32_t>::max())

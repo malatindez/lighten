@@ -27,11 +27,11 @@
 // For now, I will copy the code from opaque rendering system and will modify it to fit the new system
 // so we can complete the project as fast as possible.
 // After that, I will create the generalized class and will refactor the code
-namespace engine::core
+namespace lighten::core
 {
     class Scene;
 }
-namespace engine::render
+namespace lighten::render
 {
     class ModelSystem;
     namespace _light_detail
@@ -107,9 +107,9 @@ namespace engine::render
 namespace std
 {
     template <>
-    struct hash<engine::render::DissolutionMaterial>
+    struct hash<lighten::render::DissolutionMaterial>
     {
-        std::size_t operator()(engine::render::DissolutionMaterial const &material) const
+        std::size_t operator()(lighten::render::DissolutionMaterial const &material) const
         {
             size_t seed = 0;
             mal_toolkit::hash_combine(seed, material.albedo_map);
@@ -129,7 +129,7 @@ namespace std
         }
     };
 }
-namespace engine::components
+namespace lighten::components
 {
     struct DissolutionComponent
     {
@@ -139,7 +139,7 @@ namespace engine::components
         glm::vec3 click_point;
     };
 }
-namespace engine::render::_dissolution_detail
+namespace lighten::render::_dissolution_detail
 {
     struct DissolutionInstance
     {
@@ -242,4 +242,4 @@ namespace engine::render::_dissolution_detail
         uint32_t instance_buffer_size_;
         ID3D11ShaderResourceView *noise_texture_;
     };
-} // namespace engine::render::_dissolution_detail
+} // namespace lighten::render::_dissolution_detail

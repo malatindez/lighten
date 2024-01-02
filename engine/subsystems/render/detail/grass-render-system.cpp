@@ -1,6 +1,6 @@
 #include "grass-render-system.hpp"
 #include "core/engine.hpp"
-namespace engine::components
+namespace lighten::components
 {
     void GrassComponent::Initialize(std::vector<glm::vec4> const &atlas_data)
     {
@@ -33,7 +33,7 @@ namespace engine::components
     }
 }
 
-namespace engine::render
+namespace lighten::render
 {
     void GrassMaterial::UpdateTextureFlags()
     {
@@ -126,7 +126,7 @@ namespace engine::render
         }
     }
 }
-namespace engine::render::_grass_detail
+namespace lighten::render::_grass_detail
 {
     GrassRenderSystem::GrassRenderSystem() : RenderPass(0x20000)
     {

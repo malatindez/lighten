@@ -2,7 +2,7 @@
 #include "include/d3d.hpp"
 #include "include/library-pch.hpp"
 
-namespace engine::direct3d
+namespace lighten::direct3d
 {
     /// @brief The d3d resource wrapper class
     /// @tparam T The type of the resource
@@ -157,6 +157,6 @@ namespace engine::direct3d
         using d3d_resource_wrapper<T>::operator=;
         using d3d_resource_wrapper<T>::d3d_resource_wrapper;
     };
-} // namespace engine::direct3d
+} // namespace lighten::direct3d
 
 #include "typedefs.hpp"

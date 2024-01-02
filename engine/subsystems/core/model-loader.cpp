@@ -7,7 +7,7 @@
 #include "texture-manager.hpp"
 #include "../render/model-system.hpp"
 
-namespace engine::core
+namespace lighten::core
 {
     using namespace render;
     namespace
@@ -596,4 +596,4 @@ namespace engine::core
         return return_value;
     }
     std::shared_ptr<ModelLoader> ModelLoader::instance_ = nullptr;
-} // namespace engine::core
+} // namespace lighten::core

@@ -2,9 +2,9 @@
 #include "DDSTextureLoader11.h"
 #include "DirectXTex.h"
 #include "WICTextureLoader11.h"
-#include "include/engine-pch.hpp"
+#include "include/lighten-pch.hpp"
 
-namespace engine::core
+namespace lighten::core
 {
     class Engine;
     inline constexpr TextureId const kInvalidTextureId = std::numeric_limits<size_t>::max();
@@ -56,7 +56,7 @@ namespace engine::core
         [[nodiscard]] static inline auto const &GetTextureHashes() noexcept { return instance_->texture_hashes_; }
 
     private:
-        friend class ::engine::core::Engine;
+        friend class ::lighten::core::Engine;
 
         static void Init()
         {

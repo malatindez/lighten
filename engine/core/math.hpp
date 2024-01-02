@@ -15,7 +15,7 @@ namespace cereal {
         for(glm::length_t i = 0; i < length; i++)
             archive(v[i]);
     }
-    template <glm::length_t size_x, glm::length_t size_y, typename matrix_type, glm::qualifier Q>
+    template <class Archive, glm::length_t size_x, glm::length_t size_y, typename matrix_type, glm::qualifier Q>
     void serialize(Archive &archive, glm::mat<size_x, size_y, matrix_type, Q> &m)
     {
         for (glm::length_t i = 0; i < size_x; i++)
@@ -24,7 +24,7 @@ namespace cereal {
     }
 }
 
-namespace engine::core::math
+namespace lighten::core::math
 {
     template <typename T>
     void invert_orthonormal(glm::mat<4, 4, T> const &src, glm::mat<4, 4, T> &dst)

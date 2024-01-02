@@ -4,12 +4,12 @@
 #include "core/math.hpp"
 
 // forward declaration
-namespace engine::render::_particle_detail
+namespace lighten::render::_particle_detail
 {
     class ParticleRenderSystem;
 }
 
-namespace engine::components
+namespace lighten::components
 {
     /**
      * @brief Particle emitter component
@@ -167,7 +167,7 @@ namespace engine::components
         bool freeze = false;
 
     private:
-        friend class engine::render::_particle_detail::ParticleRenderSystem;
+        friend class lighten::render::_particle_detail::ParticleRenderSystem;
 
         /// @brief CPU particle class
         struct Particle
@@ -215,4 +215,4 @@ namespace engine::components
         /// @brief Amount of particles that were emitted in the last second
         uint32_t particles_last_second_count;
     };
-} // namespace engine::components
+} // namespace lighten::components

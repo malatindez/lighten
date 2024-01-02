@@ -1,7 +1,7 @@
 #pragma once
 #include "misc/ini.hpp"
 
-namespace engine::core
+namespace lighten::core
 {
     namespace _config_detail
     {
@@ -26,7 +26,7 @@ show_direct3d_debug_output = false
 )";
     } // namespace _config_detail
     /**
-     * @brief Config class which is used to store all the configuration data for the engine
+     * @brief Config class which is used to store all the configuration data for the lighten
      *
      * @note This class is a singleton, so you can't create an instance of it, you can only access it through the instance() method
      *
@@ -81,7 +81,7 @@ show_direct3d_debug_output = false
         /**
          * @brief Save the config to the config.ini file
          *
-         * @note This method is called automatically when the engine is deinitialized
+         * @note This method is called automatically when the lighten is deinitialized
          *
          */
         static void Save()
@@ -93,14 +93,14 @@ show_direct3d_debug_output = false
         /**
          * @brief Initialize the config
          *
-         * @note This method is called automatically when the engine is initialized
+         * @note This method is called automatically when the lighten is initialized
          *
          */
         static void Init() { Load(); }
         /**
          * @brief Deinitialize the config
          *
-         * @note This method is called automatically when the engine is deinitialized
+         * @note This method is called automatically when the lighten is deinitialized
          *
          */
         static void Deinit()

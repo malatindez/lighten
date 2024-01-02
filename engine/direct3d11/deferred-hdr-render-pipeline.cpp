@@ -3,7 +3,7 @@
 #include "subsystems/core/input-layer.hpp"
 #include "subsystems/render/skybox-manager.hpp"
 #include "core/engine.hpp"
-namespace engine::direct3d
+namespace lighten::direct3d
 {
     DeferredHDRRenderPipeline::DeferredHDRRenderPipeline(std::shared_ptr<core::Window> window, std::shared_ptr<SwapchainRenderTarget> const &output_target)
         : core::RenderPipeline(),

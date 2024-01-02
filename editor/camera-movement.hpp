@@ -4,7 +4,7 @@
 namespace camera_movement
 {
     extern bool dynamic_shadows;
-    [[nodiscard]] inline glm::ivec2 const &mouse_position() { return engine::core::InputLayer::instance()->mouse_position(); }
+    [[nodiscard]] inline glm::ivec2 const &mouse_position() { return lighten::core::InputLayer::instance()->mouse_position(); }
 
     void RegisterKeyCallbacks();
 

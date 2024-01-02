@@ -1,7 +1,7 @@
 #pragma once
 #include "direct3d11/direct3d11.hpp"
 #include "include/library-pch.hpp"
-namespace engine::render
+namespace lighten::render
 {
     struct ShaderBlob
     {

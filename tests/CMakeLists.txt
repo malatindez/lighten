@@ -20,7 +20,7 @@ if(test)
 
   target_include_directories(runUnitTests PRIVATE ${TEST_SOURCES_DIR})
   target_include_directories(runUnitTests PUBLIC ${GTEST_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS})
-  target_link_libraries(runUnitTests engine ${GTEST_LIBRARIES})
+  target_link_libraries(runUnitTests lighten ${GTEST_LIBRARIES})
 
   target_compile_options(runUnitTests PRIVATE /bigobj)
 

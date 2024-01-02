@@ -1,14 +1,14 @@
 #pragma once
 #include "misc/camera-controller.hpp"
 #include "render/renderer.hpp"
-namespace engine::core
+namespace lighten::core
 {
     class Scene
     {
     public:
         entt::registry registry;
         std::unique_ptr<render::Renderer> renderer = nullptr;
-        std::unique_ptr<engine::CameraController> main_camera = nullptr;
+        std::unique_ptr<lighten::CameraController> main_camera = nullptr;
         void FrameBegin()
         {
             mal_toolkit::Assert(renderer != nullptr, "Renderer is null");

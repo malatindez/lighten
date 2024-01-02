@@ -1,7 +1,7 @@
 #pragma once
 #include "render/shader-program.hpp"
 
-namespace engine::core
+namespace lighten::core
 {
     struct ShaderMacro
     {
@@ -48,9 +48,9 @@ namespace engine::core
 namespace std
 {
     template <>
-    struct hash<engine::core::ShaderCompileInput>
+    struct hash<lighten::core::ShaderCompileInput>
     {
-        size_t operator()(engine::core::ShaderCompileInput const &input) const
+        size_t operator()(lighten::core::ShaderCompileInput const &input) const
         {
             size_t hash = 0;
             mal_toolkit::hash_combine(hash, input.type);

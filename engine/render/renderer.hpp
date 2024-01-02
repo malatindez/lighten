@@ -11,11 +11,11 @@
 #include "subsystems/render/detail/emissive-particle-render-system.hpp"
 #include "subsystems/render/detail/particle-render-system.hpp"
 #include "subsystems/render/model-system.hpp"
-namespace engine::core
+namespace lighten::core
 {
     class Scene;
 }
-namespace engine::render
+namespace lighten::render
 {
     // TODO(malatindez):
     // Refactor the renderer code to use a render graph.

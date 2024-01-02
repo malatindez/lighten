@@ -13,7 +13,7 @@
 #include "lights.hpp"
 #include "particle-emitter.hpp"
 /**
- * @brief The components namespace contains all the components that can be used in the engine
+ * @brief The components namespace contains all the components that can be used in the lighten
  * @todo Every component should inherit from Component class
  * @todo Every component should have static \code{.cpp} constexpr std::string_view name;\endcode member that is used to identify the component by name
  *
@@ -23,27 +23,27 @@
  * About forward declaring or including the component headers.
  *
  * Header including can cause issues like this:
- * * increasing the compilation time of the engine
- * * increasing the binary size of the engine
+ * * increasing the compilation time of the lighten
+ * * increasing the binary size of the lighten
  * * causing problems with the precompiled headers
  * * causing problems with the header include order, because the components-info.hpp
- *          will be included in the engine\components\components.hpp
+ *          will be included in the lighten\components\components.hpp
  *
  * Forward declaration can cause issues like this:
- * * not being able to use the components in the engine\components\components.hpp
+ * * not being able to use the components in the lighten\components\components.hpp
  * * not being able to recognize the size of the component before including the header
- * * not being able to use the component in the engine\components\generated\components-info.hpp
+ * * not being able to use the component in the lighten\components\generated\components-info.hpp
  * * still it will be necessary to include the headers in serialization/gui files to use them
  *
  * I think we should include the headers, because it will be easier to work with the components
  *
  * If you don't want to mess up your project you should create separate file for component and/or components
- * Otherwise because they will be included in the engine\components\generated\components-info.hpp file
+ * Otherwise because they will be included in the lighten\components\generated\components-info.hpp file
  * this will lead to problems with header including mentioned above
  *
  @todo Add the python pre-build step that will gather all the components identifying them by Component parent class, and then generate the header files that will contain all the components.
  * This header file will contain `mal_toolkit::parameter_pack_info<Component, Component, ...>` as the list of types and corresponding `std::array<std::string, N>` as the list of component names
- * It will modify the `engine\components\generated\components-info.hpp` file
+ * It will modify the `lighten\components\generated\components-info.hpp` file
  *
  * To iterate through all the component types you can use the following code:
  \code{.cpp}
@@ -65,18 +65,18 @@
   *
   * Private members and members that do not have serialization specification will be ignored.
   *
-  * If you want to create custom serializer you should create a specialization of the `engine::components::Serialize::Serializer`
+  * If you want to create custom serializer you should create a specialization of the `lighten::components::Serialize::Serializer`
   * The script will try to find it, but if it won't you can include it in the component header
   * This is the example of a serializer:
   \code{.cpp}
-namespace engine::components::Serialize
+namespace lighten::components::Serialize
 {
   template<class Ty>
   struct Serializer;
 }
   \endcode
   \code{.cpp}
-namespace engine::components::Serialize
+namespace lighten::components::Serialize
 {
     template<>
     struct Serializer<ComponentName>
@@ -84,19 +84,19 @@ namespace engine::components::Serialize
         static void Serialize(const ComponentName &component, std::ostream &stream)
         {
             // serialize each of the public members of the component
-            // using the engine::components::Serialize::Serializer<T>{} specialization
+            // using the lighten::components::Serialize::Serializer<T>{} specialization
         }
         static void Deserialize(ComponentName &component, std::istream &stream)
         {
             // deserialize each of the public members of the component
-            // using the engine::components::Serialize::Serializer<T>{} specialization
+            // using the lighten::components::Serialize::Serializer<T>{} specialization
         }
 };
   \endcode
-  * It will modify the engine\components\generated\components-serialization.hpp file
+  * It will modify the lighten\components\generated\components-serialization.hpp file
 
   @todo Add a python script that will generate the ImGui component editor code
-  * This script should create the special configuration file located at `engine\components\generated\components-editor.json`.
+  * This script should create the special configuration file located at `lighten\components\generated\components-editor.json`.
   *
   * This file will contain the list of rules how to render each component.
   *
@@ -131,14 +131,14 @@ namespace engine::components::Serialize
   * `static constexpr bool kGenerateEditor = true;` member to the component
   * This is the example of a component editor:
   \code{.cpp}
-namespace engine::components::ImGuiEditor
+namespace lighten::components::ImGuiEditor
 {
   template<class Ty>
   struct ImGuiEditor;
 }
   \endcode
   \code{.cpp}
-namespace engine::components::ImGuiEditor
+namespace lighten::components::ImGuiEditor
 {
     template<>
     struct ImGuiEditor<ComponentName>
@@ -146,7 +146,7 @@ namespace engine::components::ImGuiEditor
         static void Draw(ComponentName &component)
         {
             // draw each of the public members of the component
-            // using the engine::components::ImGuiEditor::ImGuiEditor<T>{} specialization
+            // using the lighten::components::ImGuiEditor::ImGuiEditor<T>{} specialization
             // It will draw the component in the ImGui window
             // using the ImGui::InputText, ImGui::InputFloat, etc.
             // You can also use the ImGui::DragFloat, ImGui::SliderFloat, etc.
@@ -155,15 +155,15 @@ namespace engine::components::ImGuiEditor
     };
 }
   \endcode
-  * It will modify the engine\components\generated\components-editor.hpp file
+  * It will modify the lighten\components\generated\components-editor.hpp file
   @todo Add a python script that will generate the `std::hash` extension for each component
 
   * The generated code will look like this:
   \code{.cpp}
 template<>
-struct std::hash<engine::components::ComponentName>
+struct std::hash<lighten::components::ComponentName>
 {
-    std::size_t operator()(const engine::components::ComponentName &component) const noexcept
+    std::size_t operator()(const lighten::components::ComponentName &component) const noexcept
     {
         std::size_t seed = 0;
         mal_toolkit::hash_combine (member1);
@@ -179,5 +179,5 @@ struct std::hash<engine::components::ComponentName>
   *
   * If you want to generate hash class for the component you should add the `static constexpr bool kGenerateHash = true;` member to the component.
   *
-  * It will modify the engine\components\generated\components-hash.hpp file
+  * It will modify the lighten\components\generated\components-hash.hpp file
 */

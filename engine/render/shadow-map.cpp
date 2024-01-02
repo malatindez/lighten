@@ -1,5 +1,5 @@
 #include "shadow-map.hpp"
-namespace engine::render
+namespace lighten::render
 {
     void ShadowMap::Resize(uint32_t resolution, uint32_t size, bool cubemap)
     {

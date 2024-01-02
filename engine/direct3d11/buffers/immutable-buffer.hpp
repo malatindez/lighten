@@ -1,6 +1,6 @@
 #pragma once
 #include "buffer-base.hpp"
-namespace engine::direct3d
+namespace lighten::direct3d
 {
     /// @brief The immutable buffer class
     /// @tparam T The type of the buffer
@@ -31,4 +31,4 @@ namespace engine::direct3d
             BufferBase<T>::Init(std::move(desc), ptr, size);
         }
     };
-} // namespace engine::direct3d
+} // namespace lighten::direct3d

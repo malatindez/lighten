@@ -2,7 +2,7 @@
 #include "shader-compiler.hpp"
 #include "core/layers/layer.hpp"
 #include "misc/file-watcher.hpp"
-namespace engine::core
+namespace lighten::core
 {
     class Engine;
     class ShaderManager final : public Layer, public Layer::HandleEvent, public Layer::HandleUpdate
@@ -53,7 +53,7 @@ namespace engine::core
         }
 
     private:
-        friend class ::engine::core::Engine;
+        friend class ::lighten::core::Engine;
 
         static void Init()
         {

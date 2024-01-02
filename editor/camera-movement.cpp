@@ -1,5 +1,5 @@
 #include "camera-movement.hpp"
-using namespace engine;
+using namespace lighten;
 using namespace core;
 using namespace events;
 using namespace math;
@@ -11,7 +11,7 @@ namespace camera_movement
     glm::ivec2 lb_saved_mouse_position{-1};
     glm::ivec2 rb_saved_mouse_position{-1};
 
-    std::shared_ptr<engine::core::Scene> selected_scene = nullptr;
+    std::shared_ptr<lighten::core::Scene> selected_scene = nullptr;
     entt::entity selected_entity = entt::null;
     float selected_distance = 0.0f;
     glm::vec3 selected_object_offset{0.0f};
@@ -21,38 +21,38 @@ namespace camera_movement
     {
         auto input = InputLayer::instance();
         input->AddUpdateKeyCallback(
-            InputLayer::KeySeq{engine::core::Key::KEY_W},
+            InputLayer::KeySeq{lighten::core::Key::KEY_W},
             [&](InputLayer::KeySeq const &, uint32_t)
             { Engine::scene()->main_camera->flags() |= CameraController::MoveForward; });
         input->AddUpdateKeyCallback(
-            InputLayer::KeySeq{engine::core::Key::KEY_S},
+            InputLayer::KeySeq{lighten::core::Key::KEY_S},
             [&](InputLayer::KeySeq const &, uint32_t)
             { Engine::scene()->main_camera->flags() |= CameraController::MoveBackwards; });
         input->AddUpdateKeyCallback(
-            InputLayer::KeySeq{engine::core::Key::KEY_A},
+            InputLayer::KeySeq{lighten::core::Key::KEY_A},
             [&](InputLayer::KeySeq const &, uint32_t)
             { Engine::scene()->main_camera->flags() |= CameraController::MoveLeft; });
         input->AddUpdateKeyCallback(
-            InputLayer::KeySeq{engine::core::Key::KEY_D},
+            InputLayer::KeySeq{lighten::core::Key::KEY_D},
             [&](InputLayer::KeySeq const &, uint32_t)
             { Engine::scene()->main_camera->flags() |= CameraController::MoveRight; });
         input->AddUpdateKeyCallback(
-            InputLayer::KeySeq{engine::core::Key::KEY_Q},
+            InputLayer::KeySeq{lighten::core::Key::KEY_Q},
             [&](InputLayer::KeySeq const &, uint32_t)
             { Engine::scene()->main_camera->flags() |= CameraController::RotateLeft; });
         input->AddUpdateKeyCallback(
-            InputLayer::KeySeq{engine::core::Key::KEY_E},
+            InputLayer::KeySeq{lighten::core::Key::KEY_E},
             [&](InputLayer::KeySeq const &, uint32_t)
             { Engine::scene()->main_camera->flags() |= CameraController::RotateRight; });
         input->AddUpdateKeyCallback(
-            InputLayer::KeySeq{engine::core::Key::KEY_SHIFT},
+            InputLayer::KeySeq{lighten::core::Key::KEY_SHIFT},
             [&](InputLayer::KeySeq const &, uint32_t)
             { Engine::scene()->main_camera->flags() |= CameraController::Accelerate; });
         input->AddUpdateKeyCallback(
-            InputLayer::KeySeq{engine::core::Key::KEY_LBUTTON},
+            InputLayer::KeySeq{lighten::core::Key::KEY_LBUTTON},
             [&](InputLayer::KeySeq const &, uint32_t count)
             {
-                if (count == std::numeric_limits<uint32_t>::max() || InputLayer::instance()->key_state(engine::core::Key::KEY_CONTROL))
+                if (count == std::numeric_limits<uint32_t>::max() || InputLayer::instance()->key_state(lighten::core::Key::KEY_CONTROL))
                 {
                     lb_saved_mouse_position = glm::ivec2{-1};
                     return;
@@ -63,10 +63,10 @@ namespace camera_movement
                 }
             });
         input->AddTickKeyCallback(
-            InputLayer::KeySeq{engine::core::Key::KEY_RBUTTON},
+            InputLayer::KeySeq{lighten::core::Key::KEY_RBUTTON},
             [&](float, InputLayer::KeySeq const &, uint32_t count)
             {
-                if (count == std::numeric_limits<uint32_t>::max() || InputLayer::instance()->key_state(engine::core::Key::KEY_CONTROL))
+                if (count == std::numeric_limits<uint32_t>::max() || InputLayer::instance()->key_state(lighten::core::Key::KEY_CONTROL))
                 {
                     rb_saved_mouse_position = glm::ivec2{-1};
                     if (moving && Engine::scene()->registry.valid(selected_entity))
@@ -150,7 +150,7 @@ namespace camera_movement
         auto &input = *InputLayer::instance();
         auto scene = Engine::scene();
         glm::ivec2 pixel_delta{0};
-        if (lb_saved_mouse_position != glm::ivec2{-1} && input.lbutton_down() && !InputLayer::instance()->key_state(engine::core::Key::KEY_CONTROL))
+        if (lb_saved_mouse_position != glm::ivec2{-1} && input.lbutton_down() && !InputLayer::instance()->key_state(lighten::core::Key::KEY_CONTROL))
         {
             pixel_delta = input.mouse_position() - lb_saved_mouse_position;
         }

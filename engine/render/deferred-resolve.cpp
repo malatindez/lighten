@@ -1,7 +1,7 @@
 #include "deferred-resolve.hpp"
 #include "core/scene.hpp"
 
-namespace engine::render
+namespace lighten::render
 {
     direct3d::RenderTargetBase &DeferredResolve::Process(render::GBuffer &g_buffer, core::Scene *scene, ID3D11DepthStencilView *depth_target, ID3D11ShaderResourceView *depth_srv)
     {

@@ -1,7 +1,7 @@
 #pragma once
 #include "event.hpp"
 
-namespace engine::core::events
+namespace lighten::core::events
 {
     class KeyPressedEvent final : public Event
     {
@@ -34,4 +34,4 @@ namespace engine::core::events
     private:
         uint32_t const key_code_;
     };
-} // namespace engine::core::events
+} // namespace lighten::core::events

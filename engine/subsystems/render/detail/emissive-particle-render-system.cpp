@@ -3,7 +3,7 @@
 #include "../../core/shader-manager.hpp"
 #include "subsystems/core/texture-manager.hpp"
 #include "core/engine.hpp"
-namespace engine::render::_emissive_particle_detail
+namespace lighten::render::_emissive_particle_detail
 {
     namespace
     {
@@ -348,4 +348,4 @@ namespace engine::render::_emissive_particle_detail
         buffer.Unmap();
         return rv;
     }
-} // namespace engine::render::_emissive_particle_detail
+} // namespace lighten::render::_emissive_particle_detail

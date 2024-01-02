@@ -2,7 +2,7 @@
 #include "imgui-layer.hpp"
 #include "layer-stack.hpp"
 #include "../scene.hpp"
-namespace engine::core
+namespace lighten::core
 {
     class RenderPipeline : public LayerStack
     {
@@ -24,4 +24,4 @@ namespace engine::core
         std::shared_ptr<Scene> scene_ = nullptr;
         std::shared_ptr<ImGuiLayer> imgui_layer_ = nullptr;
     };
-} // namespace engine::core
+} // namespace lighten::core

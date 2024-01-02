@@ -1,12 +1,12 @@
 #pragma once
-#include "include/engine-pch.hpp"
+#include "include/lighten-pch.hpp"
 #include "layers.hpp"
 #include "misc/ini.hpp"
 #include "core/scene.hpp"
 #include "subsystems/core/core.hpp"
 #include "subsystems/render/render.hpp"
 #include "mal-toolkit/mal-toolkit.hpp"
-namespace engine::core
+namespace lighten::core
 {
     // TODO: move to config file
     const glm::ivec2 kWindowPosition{0};
@@ -20,9 +20,9 @@ namespace engine::core
     const float kSphereRadius{0.5f};
 
     /**
-     * @brief Represents the core of the engine
+     * @brief Represents the core of the lighten
      *
-     * This class is a singleton and is responsible for the main loop of the engine.
+     * This class is a singleton and is responsible for the main loop of the lighten.
      * It also holds the LayerStack and the EventFunction.
      *
      */
@@ -54,8 +54,8 @@ namespace engine::core
         /**
          * @brief Get the logger reference
          *
-         * Returns a logger that is used by the engine.
-         * This logger is used by the engine itself and all the subsystems.
+         * Returns a logger that is used by the lighten.
+         * This logger is used by the lighten itself and all the subsystems.
          * All the logs are written to the file located at the path specified in the config file.
          *
          * @return spdlog::logger&
@@ -73,9 +73,9 @@ namespace engine::core
         [[nodiscard]] static inline std::shared_ptr<Scene> scene() { return application_->scene_; }
 
         /**
-         * @brief Get the Time From Start of the engine
+         * @brief Get the Time From Start of the lighten
          *
-         * Returns the time elapsed since the engine was started.
+         * Returns the time elapsed since the lighten was started.
          *
          * @return float
          */
@@ -83,7 +83,7 @@ namespace engine::core
         [[nodiscard]] static inline float TimeFromStart() { return from_start_.elapsed(); }
 
         /**
-         * @brief Stops the engine entirely
+         * @brief Stops the lighten entirely
          */
         static void Exit();
         /**
@@ -182,28 +182,28 @@ namespace engine::core
 
     private:
         /**
-         * @brief Initializes the engine
+         * @brief Initializes the lighten
          *
-         * Should be called in the main function before the engine starts.
-         * Creates an instance_ of an engine and initializes all the subsystems.
+         * Should be called in the main function before the lighten starts.
+         * Creates an instance_ of an lighten and initializes all the subsystems.
          *
          */
         static void Init();
 
         /**
-         * @brief Deinitializes the engine
+         * @brief Deinitializes the lighten
          *
-         * Should be called in the main function after the engine returns control.
+         * Should be called in the main function after the lighten returns control.
          *
          */
         static void Deinit();
 
         /**
-         * @brief Starts the engine
+         * @brief Starts the lighten
          *
          * You should initialize and push all the subsystems after Init() but before calling this function.
-         * Should be called in the main function after the engine is initialized.
-         * Starts the engine and runs it until the engine is stopped.
+         * Should be called in the main function after the lighten is initialized.
+         * Starts the lighten and runs it until the lighten is stopped.
          *
          */
         void Run();
@@ -239,4 +239,4 @@ namespace engine::core
         float tick_duration_ = 1.0f / kTickrate;
         friend INT WINAPI::wWinMain(HINSTANCE, HINSTANCE, PWSTR, int cmd_show);
     };
-} // namespace engine::core
+} // namespace lighten::core

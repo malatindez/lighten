@@ -7,7 +7,7 @@
 #include "render/deferred-resolve.hpp"
 #include "render/present-swapchain.hpp"
 #include "render/renderer.hpp"
-namespace engine::direct3d
+namespace lighten::direct3d
 {
     class DeferredHDRRenderPipeline : public core::RenderPipeline
     {
@@ -39,7 +39,7 @@ namespace engine::direct3d
         mal_toolkit::HighResolutionTimer timer;
         glm::vec4 sky_color_{glm::vec3{0.25f}, 0.0f};
         render::PerFrame per_frame_;
-        DynamicUniformBuffer<engine::render::PerFrame> per_frame_buffer_{};
+        DynamicUniformBuffer<lighten::render::PerFrame> per_frame_buffer_{};
         DepthStencil depth_stencil_;
         direct3d::RenderTarget hdr_target_;
         std::shared_ptr<direct3d::SwapchainRenderTarget> output_target_;

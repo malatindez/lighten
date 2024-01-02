@@ -13,7 +13,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
 
-using namespace engine::core::math;
+using namespace lighten::core::math;
 
 static int const kNumIterations = 10000;
 

@@ -7,7 +7,7 @@
 #include "subsystems/core/texture-manager.hpp"
 #include "mal-toolkit/mal-toolkit.hpp"
 
-namespace engine::render
+namespace lighten::render
 {
     void DissolutionMaterial::UpdateTextureFlags()
     {
@@ -88,7 +88,7 @@ namespace engine::render
         twosided = material.twosided;
     }
 }
-namespace engine::render::_dissolution_detail
+namespace lighten::render::_dissolution_detail
 {
     DissolutionRenderSystem::DissolutionRenderSystem() : RenderPass(0x10001)
     {

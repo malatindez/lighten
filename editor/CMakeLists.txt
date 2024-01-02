@@ -22,7 +22,7 @@ update_sources_msvc("${CMAKE_CURRENT_SOURCE_DIR}" "${EDITOR_SOURCES}")
 
 add_executable(editor WIN32 ${EDITOR_SOURCES})
 target_include_directories(editor PRIVATE ${CPP_SOURCES_DIR})
-target_link_libraries(editor PUBLIC engine)
+target_link_libraries(editor PUBLIC lighten)
 
 
 set(CMAKE_CXX_FLAGS_DEBUG_INIT "${CMAKE_CXX_FLAGS_DEBUG_INIT}" "Zl")

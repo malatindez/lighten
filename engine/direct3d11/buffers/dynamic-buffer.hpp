@@ -1,6 +1,6 @@
 #pragma once
 #include "buffer-base.hpp"
-namespace engine::direct3d
+namespace lighten::direct3d
 {
     /// @brief The dynamic buffer class
     /// @tparam T The type of the buffer
@@ -38,4 +38,4 @@ namespace engine::direct3d
         }
         using BufferBase<T>::Init;
     };
-} // namespace engine::direct3d
+} // namespace lighten::direct3d

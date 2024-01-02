@@ -1,11 +1,11 @@
 #pragma once
-#include "include/engine-pch.hpp"
+#include "include/lighten-pch.hpp"
 #include "include/win.hpp"
 
 #include "core/window.hpp"
 #include "mal-toolkit/mal-toolkit.hpp"
 
-namespace engine::platform::windows
+namespace lighten::platform::windows
 {
     // Simple WINAPI window wrapper
     class Window : public core::Window
@@ -46,4 +46,4 @@ namespace engine::platform::windows
 
         HWND handle_;
     };
-}; // namespace engine::core
+}; // namespace lighten::core

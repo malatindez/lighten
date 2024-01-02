@@ -1,5 +1,5 @@
 #include "post-processing.hpp"
-namespace engine::render
+namespace lighten::render
 {
     PostProcessing::~PostProcessing()
     {

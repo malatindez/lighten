@@ -5,7 +5,7 @@
 #include "mal-toolkit/mal-toolkit.hpp"
 #include "core/scene.hpp"
 
-namespace engine::render
+namespace lighten::render
 {
     void OpaqueMaterial::UpdateTextureFlags()
     {
@@ -96,7 +96,7 @@ namespace engine::render
         twosided = material.twosided;
     }
 }
-namespace engine::render::_opaque_detail
+namespace lighten::render::_opaque_detail
 {
     OpaqueRenderSystem::OpaqueRenderSystem() : RenderPass(0x10000)
     {

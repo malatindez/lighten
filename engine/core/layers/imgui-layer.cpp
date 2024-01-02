@@ -1,6 +1,6 @@
 #include "imgui-layer.hpp"
 #include "direct3d11/direct3d11.hpp"
-namespace engine::core
+namespace lighten::core
 {
     void ImGuiLayer::OnAttach()
     {

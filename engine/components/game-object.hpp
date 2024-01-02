@@ -4,7 +4,7 @@
 #include "core/math.hpp"
 #include "include/entt.hpp"
 
-namespace engine::components
+namespace lighten::components
 {
     /**
      * @brief Component that contains the name of the object and its tag
@@ -25,4 +25,4 @@ namespace engine::components
         LIGHTEN_PROPERTY(serialize, name = "Children")
         std::vector<entt::entity> children;
     };
-} // namespace engine::components
+} // namespace lighten::components

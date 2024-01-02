@@ -7,7 +7,7 @@
 #include "shaders/pixel-shader.hpp"
 #include "shaders/vertex-shader.hpp"
 
-namespace engine::render
+namespace lighten::render
 {
     struct ShaderProgram
     {

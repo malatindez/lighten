@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "include/engine-pch.hpp"
+#include "include/lighten-pch.hpp"
 #include "utils.hpp"
 #include "misc/file-watcher.hpp"
 
-using namespace engine::core::events;
+using namespace lighten::core::events;
 
 TEST(FILE_WATCHER_TEST, BasicTest)
 {
@@ -17,8 +17,8 @@ TEST(FILE_WATCHER_TEST, BasicTest)
         fce.handled = true;
     };
     {
-        engine::misc::FileWatcher file_watcher{callback_fn};
-        std::filesystem::path path = std::filesystem::temp_directory_path() / "engine/tests/file-watcher-test/first.file";
+        lighten::misc::FileWatcher file_watcher{callback_fn};
+        std::filesystem::path path = std::filesystem::temp_directory_path() / "lighten/tests/file-watcher-test/first.file";
         std::string random_string = utils::RandomBinaryString(4096);
         utils::CreateFile(path, random_string.c_str(), random_string.size());
         file_watcher.AddPathToWatch(path);
@@ -41,11 +41,11 @@ TEST(FILE_WATCHER_TEST, RandomTest)
         last_event.emplace(fce);
         fce.handled = true;
     };
-    auto paths = utils::CreateRandomFilesRecursive(std::filesystem::temp_directory_path() / "engine/tests/file-watcher-test" / "random-test", 3, 2, 6);
+    auto paths = utils::CreateRandomFilesRecursive(std::filesystem::temp_directory_path() / "lighten/tests/file-watcher-test" / "random-test", 3, 2, 6);
     std::set<std::filesystem::path> files_changed;
 
-    engine::misc::FileWatcher file_watcher{callback_fn};
-    file_watcher.AddPathToWatch(std::filesystem::temp_directory_path() / "engine/tests/file-watcher-test" / "random-test");
+    lighten::misc::FileWatcher file_watcher{callback_fn};
+    file_watcher.AddPathToWatch(std::filesystem::temp_directory_path() / "lighten/tests/file-watcher-test" / "random-test");
     for (int i = 0; i < kTestSize; i++)
     {
         size_t amount_to_change = utils::Random<size_t>(0, paths.size());

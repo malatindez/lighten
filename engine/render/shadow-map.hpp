@@ -1,6 +1,6 @@
 #pragma once
 #include "direct3d11/direct3d11.hpp"
-namespace engine::render
+namespace lighten::render
 {
     class ShadowMap
     {

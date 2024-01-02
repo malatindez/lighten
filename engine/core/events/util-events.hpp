@@ -1,7 +1,7 @@
 #pragma once
 #include "include/library-pch.hpp"
 #include "event.hpp"
-namespace engine::core::events
+namespace lighten::core::events
 {
     // Event that is caused by misc::FileWatcher
     class FilesChangedEvent final : public Event

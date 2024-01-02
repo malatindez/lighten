@@ -3,11 +3,11 @@
 #include "render/shader-program.hpp"
 #include "components/components.hpp"
 #include "render/common.hpp"
-namespace engine::core
+namespace lighten::core
 {
     class Scene;
 }
-namespace engine::render
+namespace lighten::render
 {
     class ModelSystem;
     namespace _light_detail
@@ -65,9 +65,9 @@ namespace engine::render
 namespace std
 {
     template <>
-    struct hash<engine::render::OpaqueMaterial>
+    struct hash<lighten::render::OpaqueMaterial>
     {
-        std::size_t operator()(engine::render::OpaqueMaterial const &material) const
+        std::size_t operator()(lighten::render::OpaqueMaterial const &material) const
         {
             size_t seed = 0;
             mal_toolkit::hash_combine(seed, material.albedo_map);
@@ -84,7 +84,7 @@ namespace std
         }
     };
 }
-namespace engine::components
+namespace lighten::components
 {
     struct OpaqueComponent
     {
@@ -93,12 +93,12 @@ namespace engine::components
         size_t model_id;
 
     private:
-        friend class ::engine::render::_opaque_detail::OpaqueRenderSystem;
+        friend class ::lighten::render::_opaque_detail::OpaqueRenderSystem;
         size_t model_instance_id;
         std::vector<size_t> material_instance_id;
     };
 }
-namespace engine::render::_opaque_detail
+namespace lighten::render::_opaque_detail
 {
     struct OpaqueInstance
     {
@@ -235,4 +235,4 @@ namespace engine::render::_opaque_detail
         direct3d::DynamicUniformBuffer<glm::mat4> mesh_to_model_buffer_;
         direct3d::DynamicVertexBuffer<OpaqueInstance> instance_buffer_;
     };
-} // namespace engine::render::_opaque_detail
+} // namespace lighten::render::_opaque_detail

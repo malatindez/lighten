@@ -5,7 +5,7 @@
 #include "events/window-events.hpp"
 #include "include/library-pch.hpp"
 
-namespace engine::core
+namespace lighten::core
 {
     using EventCallbackFn = std::function<void(core::events::Event &)>;
-} // namespace engine::core
+} // namespace lighten::core

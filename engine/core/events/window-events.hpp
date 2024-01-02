@@ -2,7 +2,7 @@
 #include "core/math.hpp"
 #include "event.hpp"
 
-namespace engine::core::events
+namespace lighten::core::events
 {
     class WindowCloseEvent final : public Event
     {
@@ -25,4 +25,4 @@ namespace engine::core::events
     private:
         glm::ivec2 window_size_;
     };
-} // namespace engine::core::events
+} // namespace lighten::core::events

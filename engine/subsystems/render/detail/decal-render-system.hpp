@@ -1,11 +1,11 @@
 #pragma once
 #include "opaque-render-system.hpp"
 
-namespace engine::core
+namespace lighten::core
 {
     class Scene;
 }
-namespace engine::render
+namespace lighten::render
 {
     class ModelSystem;
     namespace _light_detail
@@ -13,7 +13,7 @@ namespace engine::render
         class LightRenderSystem;
     }
 }
-namespace engine::components
+namespace lighten::components
 {
     struct DecalComponent
     {
@@ -34,7 +34,7 @@ namespace engine::components
         std::vector<Decal> decals;
     };
 }
-namespace engine::render::_decal_detail
+namespace lighten::render::_decal_detail
 {
     struct DecalInstance
     {
@@ -82,4 +82,4 @@ namespace engine::render::_decal_detail
         direct3d::DynamicVertexBuffer<DecalInstance> instance_buffer_;
         size_t instance_buffer_size_ = 0;
     };
-} // namespace engine::render::_decal_detail
+} // namespace lighten::render::_decal_detail

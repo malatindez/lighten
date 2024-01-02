@@ -8,7 +8,7 @@
  *
  * @brief Defines the Triangle structure and methods for ray-triangle intersection.
  */
-namespace engine::core::math
+namespace lighten::core::math
 {
     /**
      * @struct Triangle

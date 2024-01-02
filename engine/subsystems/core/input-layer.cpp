@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include <imgui.h>
 // TODO EVENT SUBSCRIPTIONS
-namespace engine::core
+namespace lighten::core
 {
     std::shared_ptr<InputLayer> InputLayer::instance_ = nullptr;
     using namespace events;

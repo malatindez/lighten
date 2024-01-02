@@ -4,7 +4,7 @@
 #include "mal-toolkit/win-utils.hpp"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-namespace engine::platform::windows
+namespace lighten::platform::windows
 {
     using namespace core::events;
     Window::Window(Props const &props) : core::Window(props)
@@ -150,4 +150,4 @@ namespace engine::platform::windows
         }
         return DefWindowProcW(handle, message, w_param, l_param);
     }
-} // namespace engine::platform::windows
+} // namespace lighten::platform::windows

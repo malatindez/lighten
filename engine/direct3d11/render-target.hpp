@@ -3,7 +3,7 @@
 #include "direct3d11/d3d-common.hpp"
 #include "core/math.hpp"
 
-namespace engine::direct3d
+namespace lighten::direct3d
 {
     /// @brief The render target base class
     class RenderTargetBase

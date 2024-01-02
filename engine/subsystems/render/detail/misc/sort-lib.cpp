@@ -2,7 +2,7 @@
 
 #include "subsystems/core/shader-manager.hpp"
 
-namespace engine::render::misc
+namespace lighten::render::misc
 {
     ComputeShaderProgram SortLib::init_sort_args_compute_shader_;
     ComputeShaderProgram SortLib::sort_step_compute_shader_;

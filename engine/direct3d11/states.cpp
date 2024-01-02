@@ -61,7 +61,7 @@ namespace
         return desc;
     }
 }
-namespace engine::direct3d
+namespace lighten::direct3d
 {
     std::unique_ptr<States> States::instance_ = nullptr;
     States::States()

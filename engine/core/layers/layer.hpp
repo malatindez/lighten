@@ -1,7 +1,7 @@
 #pragma once
 #include "core/events.hpp"
 
-namespace engine::core
+namespace lighten::core
 {
     class Layer
     {
@@ -43,4 +43,4 @@ namespace engine::core
             virtual void OnTick([[maybe_unused]] float delta_time) = 0;
         };
     };
-} // namespace engine::core
+} // namespace lighten::core

@@ -1,7 +1,7 @@
 #include "model-system.hpp"
 #include "../core/model-loader.hpp"
 #include "../core/texture-manager.hpp"
-namespace engine::render
+namespace lighten::render
 {
     using namespace core::math;
     std::shared_ptr<ModelSystem> ModelSystem::instance_ = nullptr;
@@ -75,7 +75,7 @@ namespace engine::render
     void ModelSystem::UnloadModel(ModelId model_id)
     {
         instance_->models_.erase(model_id);
-        ::engine::core::ModelLoader::UnloadModel(model_id);
+        ::lighten::core::ModelLoader::UnloadModel(model_id);
     }
     ModelId ModelSystem::GetUnitSphereFlat()
     {
@@ -222,9 +222,9 @@ namespace engine::render
         model.meshes[0].triangle_octree.initialize(model.meshes[0]);
 
         model_id = instance().AddModel(std::move(model));
-        ::engine::core::ModelLoader::instance_->models_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
-        ::engine::core::ModelLoader::instance_->models_inverse_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
-        ::engine::core::ModelLoader::instance_->loaded_models_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ::engine::core::ModelLoader::ModelInfo>{model_id, ::engine::core::ModelLoader::ModelInfo{"", model_id, "UnitSphere"}});
+        ::lighten::core::ModelLoader::instance_->models_.emplace(std::pair<::lighten::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
+        ::lighten::core::ModelLoader::instance_->models_inverse_.emplace(std::pair<::lighten::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
+        ::lighten::core::ModelLoader::instance_->loaded_models_.emplace(std::pair<::lighten::core::ModelLoader::FilepathHash, ::lighten::core::ModelLoader::ModelInfo>{model_id, ::lighten::core::ModelLoader::ModelInfo{"", model_id, "UnitSphere"}});
         return model_id;
     }
     ModelId ModelSystem::GetUnitSphereLowPoly()
@@ -374,9 +374,9 @@ namespace engine::render
         model.meshes[0].triangle_octree.initialize(model.meshes[0]);
 
         model_id = instance().AddModel(std::move(model));
-        ::engine::core::ModelLoader::instance_->models_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
-        ::engine::core::ModelLoader::instance_->models_inverse_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
-        ::engine::core::ModelLoader::instance_->loaded_models_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ::engine::core::ModelLoader::ModelInfo>{model_id, ::engine::core::ModelLoader::ModelInfo{"", model_id, "UnitSphereLowPoly"}});
+        ::lighten::core::ModelLoader::instance_->models_.emplace(std::pair<::lighten::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
+        ::lighten::core::ModelLoader::instance_->models_inverse_.emplace(std::pair<::lighten::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
+        ::lighten::core::ModelLoader::instance_->loaded_models_.emplace(std::pair<::lighten::core::ModelLoader::FilepathHash, ::lighten::core::ModelLoader::ModelInfo>{model_id, ::lighten::core::ModelLoader::ModelInfo{"", model_id, "UnitSphereLowPoly"}});
         return model_id;
     }
     ModelId ModelSystem::GetUnitCube()
@@ -527,9 +527,9 @@ namespace engine::render
         model.meshes[0].triangle_octree.initialize(model.meshes[0]);
 
         model_id = instance().AddModel(std::move(model));
-        ::engine::core::ModelLoader::instance_->models_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
-        ::engine::core::ModelLoader::instance_->models_inverse_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
-        ::engine::core::ModelLoader::instance_->loaded_models_.emplace(std::pair<::engine::core::ModelLoader::FilepathHash, ::engine::core::ModelLoader::ModelInfo>{model_id, ::engine::core::ModelLoader::ModelInfo{"", model_id, "UnitCube"}});
+        ::lighten::core::ModelLoader::instance_->models_.emplace(std::pair<::lighten::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
+        ::lighten::core::ModelLoader::instance_->models_inverse_.emplace(std::pair<::lighten::core::ModelLoader::FilepathHash, ModelId>{model_id, model_id});
+        ::lighten::core::ModelLoader::instance_->loaded_models_.emplace(std::pair<::lighten::core::ModelLoader::FilepathHash, ::lighten::core::ModelLoader::ModelInfo>{model_id, ::lighten::core::ModelLoader::ModelInfo{"", model_id, "UnitCube"}});
         return model_id;
     }
-} // namespace engine::render
+} // namespace lighten::render

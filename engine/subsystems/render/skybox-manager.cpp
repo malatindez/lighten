@@ -1,6 +1,6 @@
 #include "skybox-manager.hpp"
 #include "../core/shader-manager.hpp"
-namespace engine
+namespace lighten
 {
     render::GraphicsShaderProgram SkyboxManager::skybox_shader_;
     std::unique_ptr<direct3d::DynamicUniformBuffer<glm::mat4x3>> SkyboxManager::skybox_buffer_;
@@ -72,4 +72,4 @@ namespace engine
         skybox_shader_.SetVertexShader(nullptr).SetPixelShader(nullptr).SetInputLayout(nullptr);
         skybox_buffer_.reset();
     }
-} // namespace engine
+} // namespace lighten

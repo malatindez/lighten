@@ -7,7 +7,7 @@
 #include "subsystems/core/texture-manager.hpp"
 #include "mal-toolkit/mal-toolkit.hpp"
 
-namespace engine::render::_decal_detail
+namespace lighten::render::_decal_detail
 {
     DecalRenderSystem::DecalRenderSystem() : RenderPass(0x14000)
     {

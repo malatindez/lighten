@@ -3,7 +3,7 @@
 #include "render/render.hpp"
 namespace object_editor
 {
-    extern std::shared_ptr<engine::core::Scene> selected_scene;
+    extern std::shared_ptr<lighten::core::Scene> selected_scene;
     extern entt::entity selected_entity;
     extern float selected_distance;
 

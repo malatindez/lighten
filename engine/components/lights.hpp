@@ -2,7 +2,7 @@
 
 #include "../core/reflection-macro.hpp"
 #include "core/math.hpp"
-namespace engine::components
+namespace lighten::components
 {
     /// @brief Point light component
     /// TODO: Add these features:
@@ -84,4 +84,4 @@ namespace engine::components
         LIGHTEN_PROPERTY(serialize, save_game, name = "Solid angle")
         float solid_angle;
     };
-} // namespace engine::components
+} // namespace lighten::components

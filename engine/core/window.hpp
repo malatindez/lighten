@@ -2,7 +2,7 @@
 #include "core/events.hpp"
 #include "core/layers/layer.hpp"
 #include "mal-toolkit/mal-toolkit.hpp"
-namespace engine::core
+namespace lighten::core
 {
     class Window : public Layer, public Layer::HandleUpdate
     {
@@ -32,4 +32,4 @@ namespace engine::core
         glm::ivec2 position_;
         bool alive_ = true;
     };
-} // namespace engine::core
+} // namespace lighten::core

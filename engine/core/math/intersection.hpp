@@ -40,7 +40,7 @@
 #pragma warning(push)
 #pragma warning(disable : 26495)
 
-namespace engine::core::math
+namespace lighten::core::math
 {
     /**
      * @brief Represents the data of a ray's intersection with an object.

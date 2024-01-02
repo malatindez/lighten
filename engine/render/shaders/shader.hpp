@@ -1,6 +1,6 @@
 #pragma once
 #include "shader-common.hpp"
-namespace engine::render
+namespace lighten::render
 {
     class Shader
     {

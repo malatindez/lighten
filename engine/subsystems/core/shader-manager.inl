@@ -1,6 +1,6 @@
 #pragma once
 #include "shader-manager.hpp"
-namespace engine::core
+namespace lighten::core
 {
     template <typename T>
     void ShaderManager::AddShaderForUpdate(std::shared_ptr<T> const &shader_ptr,

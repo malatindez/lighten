@@ -1,7 +1,7 @@
 #include "shader-compiler.hpp"
 #include "mal-toolkit/mal-toolkit.hpp"
 #include "mal-toolkit/win-utils.hpp"
-namespace engine::core
+namespace lighten::core
 {
     using namespace render;
     namespace

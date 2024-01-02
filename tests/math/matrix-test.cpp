@@ -9,7 +9,7 @@
 #include <glm/gtx/norm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/matrix_operation.hpp>
-using namespace engine::core::math;
+using namespace lighten::core::math;
 
 static int const kNumIterations = 100;
 template <typename T>

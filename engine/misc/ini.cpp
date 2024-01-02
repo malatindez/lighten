@@ -3,7 +3,7 @@ namespace
 {
     using namespace mal_toolkit;
 }
-namespace engine::ini
+namespace lighten::ini
 {
     template <typename T>
     T const &Section::GetValue(std::string const &key) const
@@ -177,4 +177,4 @@ namespace engine::ini
         }
         dict_.at(section)[key] = value;
     }
-} // namespace engine::ini
+} // namespace lighten::ini

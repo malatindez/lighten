@@ -9,7 +9,7 @@
 #define PARTICLE_RENDER_SYSTEM_AMOUNT_OF_EMITTER_PER_CALL 16
 #endif
 
-namespace engine::core
+namespace lighten::core
 {
     class Scene;
 }
@@ -17,7 +17,7 @@ namespace engine::core
 // full GPU interpretation
 // https://github.com/GPUOpen-LibrariesAndSDKs/GPUParticles11
 
-namespace engine::render
+namespace lighten::render
 {
     namespace _particle_detail
     {
@@ -88,4 +88,4 @@ namespace engine::render
             std::mt19937 random_engine_;
         };
     } // namespace _particle_detail
-} // namespace engine::render
+} // namespace lighten::render

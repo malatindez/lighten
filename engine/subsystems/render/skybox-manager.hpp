@@ -2,7 +2,7 @@
 #include "render/render.hpp"
 #include "components/components.hpp"
 #include "../core/texture-manager.hpp"
-namespace engine
+namespace lighten
 {
     namespace core
     {

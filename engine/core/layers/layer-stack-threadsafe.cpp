@@ -1,5 +1,5 @@
 #include "layer-stack-threadsafe.hpp"
-namespace engine::core
+namespace lighten::core
 {
     void LayerStackThreadsafe::OnUpdate()
     {

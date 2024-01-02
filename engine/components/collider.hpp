@@ -2,7 +2,7 @@
 
 #include "../core/reflection-macro.hpp"
 #include "core/math.hpp"
-namespace engine::components
+namespace lighten::components
 {
     /**
      * @brief Collider component
@@ -37,4 +37,4 @@ namespace engine::components
         LIGHTEN_PROPERTY(serialize, save_game, name = "Radius")
         float radius;
     };
-} // namespace engine::components
+} // namespace lighten::components

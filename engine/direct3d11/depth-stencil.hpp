@@ -3,7 +3,7 @@
 #include "direct3d11/d3d-debug.hpp"
 #include "core/math.hpp"
 
-namespace engine::direct3d
+namespace lighten::direct3d
 {
     /// @todo finish documentation for DepthStencil class
     class DepthStencil

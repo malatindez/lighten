@@ -1,7 +1,7 @@
 #include "engine.hpp"
 #include "include/win-debug.hpp"
 
-namespace engine::core
+namespace lighten::core
 {
     using namespace events;
     std::unique_ptr<Engine> Engine::application_;
@@ -115,12 +115,12 @@ namespace engine::core
         catch (std::exception e)
         {
             spdlog::critical(e.what());
-            spdlog::critical("Exception occurred within the engine layers. Shutting down.");
+            spdlog::critical("Exception occurred within the lighten layers. Shutting down.");
             Exit();
         }
         catch (...)
         {
-            spdlog::critical("Unknown exception occurred within the engine layers. Shutting down.");
+            spdlog::critical("Unknown exception occurred within the lighten layers. Shutting down.");
             Exit();
         }
 #endif
@@ -174,4 +174,4 @@ namespace engine::core
     Engine::~Engine()
     {
     }
-} // namespace engine::core
+} // namespace lighten::core

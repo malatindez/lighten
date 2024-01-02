@@ -2,7 +2,7 @@
 #include "components/components.hpp"
 #include "core/scene.hpp"
 #include "subsystems/render/skybox-manager.hpp"
-namespace engine::render
+namespace lighten::render
 {
     void Renderer::SkyboxRenderWrapper::OnRender(core::Scene *scene)
     {

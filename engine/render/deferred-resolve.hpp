@@ -3,11 +3,11 @@
 #include "shader-program.hpp"
 #include "../subsystems/core/shader-manager.hpp"
 #include "render/common.hpp"
-namespace engine::core
+namespace lighten::core
 {
     class Scene;
 }
-namespace engine::render
+namespace lighten::render
 {
     class DeferredResolve
     {

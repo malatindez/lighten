@@ -1,5 +1,5 @@
 #include "layer-stack.hpp"
-namespace engine::core
+namespace lighten::core
 {
     LayerStack::~LayerStack()
     {

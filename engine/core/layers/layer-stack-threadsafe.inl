@@ -1,6 +1,6 @@
 #pragma once
 #include "layer-stack-threadsafe.hpp"
-namespace engine::core
+namespace lighten::core
 {
     template <typename T>
     void LayerStackThreadsafe::PushLayer(std::shared_ptr<T> layer)

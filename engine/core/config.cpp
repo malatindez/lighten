@@ -1,5 +1,5 @@
 #include "config.hpp"
-namespace engine::core
+namespace lighten::core
 {
     std::unique_ptr<Config> Config::instance_ = nullptr;
 }

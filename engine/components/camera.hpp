@@ -2,7 +2,7 @@
 
 #include "../core/reflection-macro.hpp"
 #include "core/math.hpp"
-namespace engine::components
+namespace lighten::components
 {
     /**
      * @brief Camera component
@@ -80,4 +80,4 @@ namespace engine::components
             return glm::vec3{inv_view[3][0], inv_view[3][1], inv_view[3][2]};
         }
     };
-} // namespace engine::components
+} // namespace lighten::components

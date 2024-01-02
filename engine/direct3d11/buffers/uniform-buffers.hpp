@@ -9,7 +9,7 @@
 #define _ENGINE_UNIFORM_BUFFERS_CHECK_IF_TYPE_IS_CORRECT 0
 #endif
 #endif
-namespace engine::direct3d
+namespace lighten::direct3d
 {
     /// @brief The detail namespace for uniform buffers
     /// @details This namespace contains all the classes and functions related to uniform buffers that are not meant to be used by the user

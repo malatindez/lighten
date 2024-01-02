@@ -1,12 +1,12 @@
 #pragma once
 #include "include/library-pch.hpp"
-namespace engine::render
+namespace lighten::render
 {
     struct Mesh;
     struct ModelMesh;
 }
 
-namespace engine::core
+namespace lighten::core
 {
     struct MeshIntersection : math::Intersection
     {

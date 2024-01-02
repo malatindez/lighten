@@ -6,7 +6,7 @@
 
 #include "../math.hpp"
 
-namespace engine::core::math
+namespace lighten::core::math
 {
     /**
      * @brief A templated bounding box structure in 3D.

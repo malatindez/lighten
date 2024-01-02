@@ -1,6 +1,6 @@
 #pragma once
 #include "mal-toolkit/mal-toolkit.hpp"
-namespace engine::ini
+namespace lighten::ini
 {
     /**
      * @brief Exception thrown when the syntax of the ini file is invalid

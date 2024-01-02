@@ -1,7 +1,7 @@
 #pragma once
 #include "../core/reflection-macro.hpp"
 #include "core/math.hpp"
-namespace engine::components
+namespace lighten::components
 {
     /**
      * @brief Component that contains the name of the object and its tag
@@ -116,4 +116,4 @@ namespace engine::components
         glm::mat4 inv_world;
     };
 
-} // namespace engine::components
+} // namespace lighten::components

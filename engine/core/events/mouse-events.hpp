@@ -1,7 +1,7 @@
 #pragma once
 #include "core/math.hpp"
 #include "event.hpp"
-namespace engine::core::events
+namespace lighten::core::events
 {
     class MouseMovedEvent final : public Event
     {
@@ -113,4 +113,4 @@ namespace engine::core::events
         int16_t const delta_;
         glm::ivec2 const coordinates_;
     };
-} // namespace engine::core::events
+} // namespace lighten::core::events

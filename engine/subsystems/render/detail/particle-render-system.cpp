@@ -3,16 +3,16 @@
 #include "components/components.hpp"
 #include "core/scene.hpp"
 #include "core/engine.hpp"
-using namespace engine::core::math;
+using namespace lighten::core::math;
 namespace
 {
-    float Randomize(std::mt19937 &engine, glm::vec2 range)
+    float Randomize(std::mt19937 &lighten, glm::vec2 range)
     {
         std::uniform_real_distribution<float> distribution(range.x, range.y);
-        return distribution(engine);
+        return distribution(lighten);
     }
 
-    glm::vec3 CreateDirectionVector(std::mt19937 &engine,
+    glm::vec3 CreateDirectionVector(std::mt19937 &lighten,
                                     glm::quat transform_rotation,
                                     glm::vec4 yaw_pitch_range,
                                     glm::vec2 radius_range)
@@ -21,9 +21,9 @@ namespace
         std::uniform_real_distribution<float> pitch_distribution(yaw_pitch_range.y, yaw_pitch_range.w);
         std::uniform_real_distribution<float> radius_distribution(radius_range.x, radius_range.y);
 
-        float yaw = yaw_distribution(engine);
-        float pitch = pitch_distribution(engine);
-        float radius = radius_distribution(engine);
+        float yaw = yaw_distribution(lighten);
+        float pitch = pitch_distribution(lighten);
+        float radius = radius_distribution(lighten);
 
         glm::vec3 direction = radius * glm::vec3(
                                            std::cos(yaw) * std::cos(pitch),
@@ -33,11 +33,11 @@ namespace
         return direction * transform_rotation;
     }
 }
-namespace engine::render::_particle_detail
+namespace lighten::render::_particle_detail
 {
     ParticleRenderSystem::ParticleRenderSystem() : RenderPass(0x30000)
     {
-        random_engine_.seed(static_cast<uint32_t>(engine::core::Engine::random_seed()));
+        random_engine_.seed(static_cast<uint32_t>(lighten::core::Engine::random_seed()));
         auto path = std::filesystem::current_path();
         std::vector<D3D11_INPUT_ELEMENT_DESC> d3d_input_desc{
             {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1},
@@ -97,7 +97,7 @@ namespace engine::render::_particle_detail
 
         particle_buffer_.Init(std::span<GPUParticle>(particles));
         ParticlePerFrame per_frame;
-        using namespace engine::core::math;
+        using namespace lighten::core::math;
         // render particles
 
         per_frame.time_since_last_tick = core::Engine::TimeFromStart() - last_tick_time_;

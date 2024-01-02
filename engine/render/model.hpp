@@ -3,11 +3,11 @@
 #include "core/triangle-octree.hpp"
 #include "direct3d11/direct3d11.hpp"
 #include "include/library-pch.hpp"
-namespace engine
+namespace lighten
 {
     using ModelId = uint64_t;
 };
-namespace engine::render
+namespace lighten::render
 {
     // Global material properties loaded from assimp
     // Rendering mode will use these properties to determine how to render the model

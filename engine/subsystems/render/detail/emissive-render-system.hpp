@@ -2,11 +2,11 @@
 #include "render/model.hpp"
 #include "render/shader-program.hpp"
 #include "render/common.hpp"
-namespace engine::core
+namespace lighten::core
 {
     class Scene;
 }
-namespace engine::render
+namespace lighten::render
 {
     class ModelSystem;
     namespace _emissive_detail
@@ -14,7 +14,7 @@ namespace engine::render
         class EmissiveRenderSystem;
     }
 }
-namespace engine::components
+namespace lighten::components
 {
     struct EmissiveComponent
     {
@@ -22,8 +22,8 @@ namespace engine::components
         glm::vec3 emissive_color;
         float power;
     };
-} // namespace engine::components
-namespace engine::render::_emissive_detail
+} // namespace lighten::components
+namespace lighten::render::_emissive_detail
 {
     struct EmissiveShaderBuffer
     {
@@ -78,4 +78,4 @@ namespace engine::render::_emissive_detail
         direct3d::DynamicUniformBuffer<EmissiveShaderBuffer> emissive_shader_buffer_;
         direct3d::DynamicVertexBuffer<EmissiveInstance> instance_buffer_;
     };
-} // namespace engine::render::_emissive_detail
+} // namespace lighten::render::_emissive_detail

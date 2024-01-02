@@ -1,6 +1,6 @@
 #pragma once
 #include "post-processing.hpp"
-namespace engine::render
+namespace lighten::render
 {
     namespace _post_processing_detail
     {
@@ -139,4 +139,4 @@ namespace engine::render
         static_assert(_post_processing_detail::StaticCheck<T>());
         return std::ranges::find(all_, layer) != all_.end();
     }
-} // namespace engine::render
+} // namespace lighten::render

@@ -1,7 +1,7 @@
 #pragma once
-#include "include/engine-pch.hpp"
+#include "include/lighten-pch.hpp"
 #include "layer.hpp"
-namespace engine::core::_layer_stack_detail
+namespace lighten::core::_layer_stack_detail
 {
     using LayerPtrVec = std::vector<std::shared_ptr<Layer>>;
     template <typename T>
@@ -29,8 +29,8 @@ namespace engine::core::_layer_stack_detail
         Vector layers_;
         uint32_t layer_insert_index_ = 0;
     };
-} // namespace engine::core::_detail
-namespace engine::core
+} // namespace lighten::core::_detail
+namespace lighten::core
 {
     class LayerStack
         : public Layer,
@@ -69,5 +69,5 @@ namespace engine::core
         _layer_stack_detail::UnderlyingStack<Layer::HandleEvent> event_;
         _layer_stack_detail::UnderlyingStack<Layer::HandleTick> tick_;
     };
-} // namespace engine::core
+} // namespace lighten::core
 #include "layer-stack.inl"

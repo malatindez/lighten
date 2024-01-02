@@ -8,7 +8,7 @@
  * This file contains utility functions for generating random vectors in 2D, 3D, and 4D spaces.
  * It also provides Poisson Disk sampling for generating a random, yet evenly distributed set of points.
  */
-namespace engine::core::math::random
+namespace lighten::core::math::random
 {
     namespace _detail
     {
@@ -88,7 +88,7 @@ namespace engine::core::math::random
                 std::vector<U> result;
                 std::uniform_real_distribution<float> dist(0.0f, 1.0f);
                 std::vector<U> active;
-                result.push_back(::engine::core::math::random::_detail::RandomVector(gen, from, to));
+                result.push_back(::lighten::core::math::random::_detail::RandomVector(gen, from, to));
                 active.push_back(result.back());
                 while (!active.empty())
                 {
@@ -98,7 +98,7 @@ namespace engine::core::math::random
                     bool found = false;
                     for (size_t i = 0; i < max_attempts; ++i)
                     {
-                        U new_point = point + ::engine::core::math::random::_detail::RandomVector(gen, U{-min_distance}, U{min_distance});
+                        U new_point = point + ::lighten::core::math::random::_detail::RandomVector(gen, U{-min_distance}, U{min_distance});
                         if (new_point.x < from.x || new_point.x > to.x || new_point.y < from.y || new_point.y > to.y)
                             continue;
                         bool ok = true;

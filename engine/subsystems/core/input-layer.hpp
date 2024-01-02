@@ -1,6 +1,6 @@
 #pragma once
-#include "include/engine-pch.hpp"
-namespace engine::core
+#include "include/lighten-pch.hpp"
+namespace lighten::core
 {
     namespace Key
     {
@@ -212,7 +212,7 @@ namespace engine::core
         }
 
     private:
-        friend class ::engine::core::Engine;
+        friend class ::lighten::core::Engine;
 
         static void Init()
         {

@@ -1,6 +1,6 @@
 #include "camera-controller.hpp"
 #include "mal-toolkit/mal-toolkit.hpp"
-namespace engine
+namespace lighten
 {
     using namespace core;
     using namespace math;
@@ -222,4 +222,4 @@ namespace engine
         UpdateMatrices();
         flags_ = None;
     }
-} // namespace engine
+} // namespace lighten

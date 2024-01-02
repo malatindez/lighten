@@ -3,7 +3,7 @@
 #include "platform/windows/windows-window.hpp"
 #include "render/present-swapchain.hpp"
 #include "core/engine.hpp"
-using namespace engine;
+using namespace lighten;
 using namespace core;
 using namespace math;
 using namespace platform;
@@ -17,7 +17,7 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
     try
     {
 #endif
-        // Initialize in-engine layers that we need
+        // Initialize in-lighten layers that we need
         auto shader_manager = ShaderManager::instance();
         auto input_layer = InputLayer::instance();
         app.PushLayer(shader_manager);
@@ -46,13 +46,13 @@ INT WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
     catch (std::exception e)
     {
         spdlog::critical(e.what());
-        spdlog::critical("Exception occurred within the engine. Shutting down.");
+        spdlog::critical("Exception occurred within the lighten. Shutting down.");
         std::this_thread::sleep_for(std::chrono::milliseconds(5000));
         app.Exit();
     }
     catch (...)
     {
-        spdlog::critical("Unknown exception occurred within the engine. Shutting down.");
+        spdlog::critical("Unknown exception occurred within the lighten. Shutting down.");
         std::this_thread::sleep_for(std::chrono::milliseconds(5000));
         app.Exit();
     }

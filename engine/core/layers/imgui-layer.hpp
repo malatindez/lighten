@@ -1,9 +1,9 @@
 #pragma once
 #include "core/window.hpp"
-#include "include/engine-pch.hpp"
+#include "include/lighten-pch.hpp"
 #include "include/imgui.hpp"
 
-namespace engine::core
+namespace lighten::core
 {
     class ImGuiLayer final
         : public Layer,

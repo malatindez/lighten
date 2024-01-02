@@ -1,6 +1,6 @@
 #pragma once
 #include "buffer-wrapper.hpp"
-namespace engine::direct3d
+namespace lighten::direct3d
 {
     namespace _detail
     {

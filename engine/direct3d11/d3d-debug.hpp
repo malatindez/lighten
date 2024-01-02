@@ -3,7 +3,7 @@
 #include "mal-toolkit/debug.hpp"
 #include "mal-toolkit/win-utils.hpp"
 #include <system_error>
-namespace engine::direct3d
+namespace lighten::direct3d
 {
     namespace _detail
     {

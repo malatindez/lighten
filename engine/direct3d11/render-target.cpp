@@ -2,7 +2,7 @@
 #include "direct3d11/api.hpp"
 #include "direct3d11/d3d-debug.hpp"
 
-namespace engine::direct3d
+namespace lighten::direct3d
 {
     RenderTargetBase::RenderTargetBase(DXGI_FORMAT format) noexcept : format_(format),
                                                                       size_(0, 0)

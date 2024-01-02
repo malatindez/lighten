@@ -1,5 +1,5 @@
 #include "file-watcher.hpp"
-namespace engine::misc
+namespace lighten::misc
 {
     void FileWatcher::AddPathToWatch(std::filesystem::path const &path, bool recursive)
     {

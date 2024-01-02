@@ -2,7 +2,7 @@
 
 #include "../core/reflection-macro.hpp"
 #include "core/math.hpp"
-namespace engine::components
+namespace lighten::components
 {
     /// @brief Force field type
     /// @warning This class is unused for now
@@ -17,14 +17,6 @@ namespace engine::components
     LIGHTEN_COMPONENT(name = "Force Field", category = "Physics")
     struct PointForceField
     {
-        /// @brief Force field type
-        enum class Type : uint8_t
-        {
-            Point = 0,
-            Directional = 1,
-
-            OmniDirectional = 2
-        };
         /**
          * @brief Force field strength
          *
@@ -87,7 +79,7 @@ namespace engine::components
      * Works like this: \f$\mathrm{applied_force} \pluseq -\mathrm{normalized}(\mathrm{velocity.direction}) \cdot \mathrm{force}\f$
      */
     LIGHTEN_COMPONENT(name = "Force Field", category = "Physics")
-    struct OmniirectionalForceField
+    struct OmniDirectionalForceField
     {
         /**
          * @brief Force field strength
@@ -106,4 +98,4 @@ namespace engine::components
         float falloff;
     };
 
-} // namespace engine::components
+} // namespace lighten::components

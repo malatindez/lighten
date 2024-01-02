@@ -1,6 +1,6 @@
 #pragma once
 #include "components/components.hpp"
-namespace engine
+namespace lighten
 {
     class CameraController
     {
@@ -108,4 +108,4 @@ namespace engine
         bool update_basis_ = true;
         bool roll_enabled_ = false;
     };
-} // namespace engine
+} // namespace lighten

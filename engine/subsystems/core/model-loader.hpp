@@ -1,10 +1,10 @@
 #pragma once
 #include "render/model.hpp"
-namespace engine::render
+namespace lighten::render
 {
     class ModelSystem;
 }
-namespace engine::core
+namespace lighten::core
 {
     class Engine;
     class ModelLoader final
@@ -38,7 +38,7 @@ namespace engine::core
         }
 
     private:
-        friend class ::engine::core::Engine;
+        friend class ::lighten::core::Engine;
 
         static void Init()
         {
@@ -48,7 +48,7 @@ namespace engine::core
         static void Deinit() { instance_ = nullptr; }
 
     private:
-        friend class ::engine::render::ModelSystem;
+        friend class ::lighten::render::ModelSystem;
         // Helper function that is called from mmodel system if the model was deleted.
         static void UnloadModel(ModelId model_id)
         {

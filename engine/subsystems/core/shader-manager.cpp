@@ -1,6 +1,6 @@
 #include "shader-manager.hpp"
 #include <coroutine>
-namespace engine::core
+namespace lighten::core
 {
     std::shared_ptr<ShaderManager> ShaderManager::instance_ = nullptr;
 

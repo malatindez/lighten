@@ -1,15 +1,15 @@
 #pragma once
 #include "include/library-pch.hpp"
 #include "core/math.hpp"
-namespace engine::core
+namespace lighten::core
 {
     class Scene;
 }
-namespace engine::direct3d
+namespace lighten::direct3d
 {
     class RenderTarget;
 }
-namespace engine::render
+namespace lighten::render
 {
     struct PerFrame
     {

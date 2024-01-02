@@ -20,9 +20,9 @@
 #define LIGHTEN_SYSTEM(...)
 // Input: name, category, ctx_menu, button, execute_in_editor, mutator
 #define LIGHTEN_METHOD(...)
-// Input: name, category, serialize, editor_hide, editor_readonly, save_game
+// Input: name, category, serialize, editor_hide, editor_readonly, save_game, min, max, step, colorEdit
 #define LIGHTEN_PROPERTY(...)
-// Input: name, category, serialize, editor_hide, editor_readonly, save_game, mutator
+// Input: name, category, serialize, editor_hide, editor_readonly, save_game, mutator, min, max, step, colorEdit
 #define LIGHTEN_PROPERTY_GETTER(...)
 // Input: name, category, mutator
 #define LIGHTEN_PROPERTY_SETTER(...)

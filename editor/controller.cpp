@@ -3,7 +3,7 @@
 #include "object-editor.hpp"
 #include "render/renderer.hpp"
 #include "scene-viewer.hpp"
-using namespace engine;
+using namespace lighten;
 using namespace core;
 using namespace events;
 using namespace math;
@@ -776,7 +776,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             scene->renderer->decal_render_system().ScheduleInstanceUpdate();
         },
         true);
-    input.AddUpdateKeyCallback(InputLayer::KeySeq{engine::core::Key::KEY_N},
+    input.AddUpdateKeyCallback(InputLayer::KeySeq{lighten::core::Key::KEY_N},
                                [&](InputLayer::KeySeq const &, uint32_t count)
                                {
                                    if (count == std::numeric_limits<uint32_t>::max())
@@ -870,7 +870,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         false);
 
     input.AddUpdateKeyCallback(
-        InputLayer::KeySeq{engine::core::Key::KEY_H},
+        InputLayer::KeySeq{lighten::core::Key::KEY_H},
         [&, cobblestone_material](InputLayer::KeySeq const &, uint32_t count)
         {
             if (count == std::numeric_limits<uint32_t>::max())
@@ -932,13 +932,13 @@ void Controller::OnTick([[maybe_unused]] float delta_time)
         input.flush();
     }
 }
-void Controller::OnEvent(engine::core::events::Event &e)
+void Controller::OnEvent(lighten::core::events::Event &e)
 {
-    if (e.type() == engine::core::events::EventType::WindowClose) [[unlikely]]
+    if (e.type() == lighten::core::events::EventType::WindowClose) [[unlikely]]
     {
-        engine::core::Engine::Exit();
+        lighten::core::Engine::Exit();
     }
-    else if (e.type() == engine::core::events::EventType::WindowResize) [[unlikely]]
+    else if (e.type() == lighten::core::events::EventType::WindowResize) [[unlikely]]
     {
         Engine::scene()->main_camera->UpdateProjectionMatrix();
     }

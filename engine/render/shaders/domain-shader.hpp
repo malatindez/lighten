@@ -1,6 +1,6 @@
 #pragma once
 #include "shader.hpp"
-namespace engine::render
+namespace lighten::render
 {
     class DomainShader final : public Shader
     {

@@ -1,7 +1,7 @@
 #include "../components/components.hpp"
 #include <iostream>
 #include "mal-packet-weaver/packet-dispatcher.hpp"
-namespace engine::packets
+namespace lighten::packets
 {
     constexpr mal_packet_weaver::PacketSubsystemID PacketSubsystemNetwork = 0x0001;
 

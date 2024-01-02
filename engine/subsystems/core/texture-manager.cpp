@@ -1,5 +1,5 @@
 #include "texture-manager.hpp"
-namespace engine::core
+namespace lighten::core
 {
     std::unique_ptr<TextureManager> TextureManager::instance_ = nullptr;
 

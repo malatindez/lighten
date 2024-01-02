@@ -6,7 +6,7 @@
 #include "render/common.hpp"
 #include "core/math.hpp"
 
-namespace engine::core
+namespace lighten::core
 {
     class Scene;
 }
@@ -14,7 +14,7 @@ namespace engine::core
 // full GPU interpretation
 // https://github.com/GPUOpen-LibrariesAndSDKs/GPUParticles11
 
-namespace engine::render
+namespace lighten::render
 {
     namespace _emissive_particle_detail
     {
@@ -110,4 +110,4 @@ namespace engine::render
             ID3D11ShaderResourceView *noise_texture_;
         };
     } // namespace _emissive_particle_detail
-} // namespace engine::render
+} // namespace lighten::render

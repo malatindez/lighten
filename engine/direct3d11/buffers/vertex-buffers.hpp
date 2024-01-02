@@ -1,7 +1,7 @@
 #pragma once
 #include "immutable-buffer.hpp"
 #include "dynamic-buffer.hpp"
-namespace engine::direct3d
+namespace lighten::direct3d
 {
     /// @brief The immutable vertex buffer class
     /// @tparam T The type of the buffer
@@ -82,4 +82,4 @@ namespace engine::direct3d
             return DynamicBuffer<T>::Map(D3D11_MAP_WRITE_DISCARD, 0, 0);
         }
     };
-} // namespace engine::direct3d
+} // namespace lighten::direct3d

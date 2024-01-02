@@ -1,11 +1,11 @@
 #pragma once
 #include "d3d-common.hpp"
 #include "mal-toolkit/mal-toolkit.hpp"
-namespace engine::core
+namespace lighten::core
 {
     class Engine;
 }
-namespace engine::direct3d
+namespace lighten::direct3d
 {
     class Api;
     /// @brief The _api_detail namespace contains all the classes and functions related to Direct3D11 Api classs that are not meant to be used by the user
@@ -18,7 +18,7 @@ namespace engine::direct3d
         template <typename T>
         class api_readonly_wrapper final : public readonly_d3d_resource_wrapper<T>
         {
-            friend class engine::direct3d::Api;
+            friend class lighten::direct3d::Api;
             using readonly_d3d_resource_wrapper<T>::operator=;
             using readonly_d3d_resource_wrapper<T>::readonly_d3d_resource_wrapper;
         };
@@ -37,8 +37,8 @@ namespace engine::direct3d
     /// @brief The Api class is the main class for the Direct3D11 API
     /// @details This class is used to initialize and deinitialize the Direct3D11 API, and to provide global pointers to the most used Direct3D11 objects.
     /// This class is a singleton, and can be accessed using the api() function.
-    /// @warning You need to call the ::engine::core::Engine::Init() function if you want to initialize this class.
-    /// @warning You need to call the ::engine::core::Engine::Deinit() function if you want to destroy this class.
+    /// @warning You need to call the ::lighten::core::Engine::Init() function if you want to initialize this class.
+    /// @warning You need to call the ::lighten::core::Engine::Deinit() function if you want to destroy this class.
     class Api final
     {
     public:
@@ -86,16 +86,16 @@ namespace engine::direct3d
         Api &operator=(Api const &) = delete;
 
     private:
-        friend class ::engine::core::Engine;
+        friend class ::lighten::core::Engine;
         /// @brief The Init function initializes the Api class
-        /// @details This function is called by the ::engine::core::Engine::Init() function.
+        /// @details This function is called by the ::lighten::core::Engine::Init() function.
         static void Init();
         /// @brief The Deinit function deinitializes the Api class
-        /// @details This function is called by the ::engine::core::Engine::Deinit() function.
+        /// @details This function is called by the ::lighten::core::Engine::Deinit() function.
         static void Deinit();
         /// @brief The instance_ member is a pointer to the instance of the Api class
         static std::unique_ptr<Api> instance_;
     };
     /// @brief The api function returns a reference to the instance of the Api class
     [[nodiscard]] inline Api &api() { return Api::instance(); }
-} // namespace engine::direct3d
+} // namespace lighten::direct3d

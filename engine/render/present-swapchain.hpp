@@ -2,7 +2,7 @@
 #include "../subsystems/render/post-processing.hpp"
 #include "shader-program.hpp"
 #include "../subsystems/core/shader-manager.hpp"
-namespace engine::render
+namespace lighten::render
 {
     class PresentSwapchain
         : public PostProcessingLayer,

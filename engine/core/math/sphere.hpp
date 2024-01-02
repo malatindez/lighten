@@ -8,7 +8,7 @@
  *
  * @brief Defines the Sphere structure and its associated functionality.
  */
-namespace engine::core::math
+namespace lighten::core::math
 {
     /**
      * @struct Sphere

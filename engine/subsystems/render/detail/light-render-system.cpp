@@ -2,7 +2,7 @@
 #include "../model-system.hpp"
 #include "core/engine.hpp"
 #include "opaque-render-system.hpp"
-namespace engine::render::_light_detail
+namespace lighten::render::_light_detail
 {
     using namespace core::math;
     void LightRenderSystem::UpdateInstances(core::Scene *scene)

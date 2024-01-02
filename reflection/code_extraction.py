@@ -45,7 +45,7 @@ def format_diagnostics(translation_unit, file):
         out_str += "There are errors in the file. Generated reflection may be incorrect.\n"
     return out_str
 
-def parse_parameters_to_dict(parameter_tokens):
+def parse_settings_to_dict(parameter_tokens):
     settings = {}
     current_key = None
     current_value = ""
@@ -95,25 +95,25 @@ def parse_parameters_to_dict(parameter_tokens):
 
 
 
-def find_preceding_annotation_and_parameters(parent, start_location, end_location, relevant_tokens):
+def find_preceding_annotation_and_settings(parent, start_location, end_location, relevant_tokens):
     start_location = parent.extent.start if start_location is None else start_location
     search_range = clang.cindex.SourceRange.from_locations(
         start_location, end_location
     )
 
     annotation = None
-    parameters = None
+    settings = None
     location = None
     for token in parent.translation_unit.get_tokens(extent=search_range):
         token_str = token.spelling
         if token_str in relevant_tokens and (start_location is None or token.extent.start != start_location):
             annotation = token_str.split('(')[0].strip()
-            parameters = list(parent.translation_unit.get_tokens(extent=clang.cindex.SourceRange.from_locations(token.extent.start, end_location)))[1:-1]
-            parameters = parse_parameters_to_dict(parameters)
+            settings = list(parent.translation_unit.get_tokens(extent=clang.cindex.SourceRange.from_locations(token.extent.start, end_location)))[1:-1]
+            settings = parse_settings_to_dict(settings)
             location = token.extent.start
             break  # Assuming the relevant macro is the last one before the class/struct declaration
 
-    return annotation, parameters, location
+    return annotation, settings, location
 
 def find_properties_and_methods(node):
     properties = {}
@@ -130,10 +130,10 @@ def find_properties_and_methods(node):
             end = next(child.get_children(), None)
             end_location = end.extent.start if end else child.extent.start
             end_location = end_location if end_location.offset < child.extent.start.offset else child.extent.start
-            annotation, parameters, location = find_preceding_annotation_and_parameters(node, last_seen_location, end_location, ["LIGHTEN_PROPERTY"])
+            annotation, settings, location = find_preceding_annotation_and_settings(node, last_seen_location, end_location, ["LIGHTEN_PROPERTY"])
             if (last_seen_location is None and location is not None) or (location is not None and location != last_seen_location):
                 properties[child.spelling] = {
-                    "settings": parameters,
+                    "settings": settings,
                     "name": child.spelling, 
                     "type": child.type.get_canonical().spelling,
                     "fully_qualified_name": fully_qualified(child)
@@ -143,19 +143,35 @@ def find_properties_and_methods(node):
             end = next(child.get_children(), None)
             end_location = end.extent.start if end else child.extent.start
             end_location = end_location if end_location.offset < child.extent.start.offset else child.extent.start
-            annotation, parameters, location = find_preceding_annotation_and_parameters(node, last_seen_location, end_location, ["LIGHTEN_METHOD", "LIGHTEN_PROPERTY_GETTER", "LIGHTEN_PROPERTY_SETTER"])
+            annotation, settings, location = find_preceding_annotation_and_settings(node, last_seen_location, end_location, ["LIGHTEN_METHOD", "LIGHTEN_PROPERTY_GETTER", "LIGHTEN_PROPERTY_SETTER"])
             if (last_seen_location is None and location is not None) or (location is not None and location != last_seen_location):
                 method_name = child.spelling
                 method_return_type = child.result_type.spelling
-                method_info = {"name": method_name, "return_type": method_return_type, "fully_qualified_name": fully_qualified(child)}
+                is_const = None
+                try:
+                    is_const = child.is_const_method()
+                except:
+                    pass
+                parameters = {}
+                for arg in child.get_arguments():
+                    parameters[arg.spelling] = arg.type.get_canonical().spelling
+
+                method_info = {
+                    "name": method_name, 
+                    "return_type": method_return_type, 
+                    "fully_qualified_name": fully_qualified(child),
+                    "settings": settings,
+                    "is_const": is_const,
+                    "parameters": parameters
+                }
 
                 # Check if it's a getter or setter
                 if annotation == "LIGHTEN_PROPERTY_GETTER":
-                    getters[method_info["name"]] = {**method_info, "settings": parameters}
+                    getters[method_info["name"]] = method_info
                 elif annotation == "LIGHTEN_PROPERTY_SETTER":
-                    setters[method_info["name"]] = {**method_info, "settings": parameters}
+                    setters[method_info["name"]] = method_info
                 else:
-                    methods[method_info["name"]] = {**method_info, "settings": parameters}
+                    methods[method_info["name"]] = method_info
 
                 last_seen_location = location
 
@@ -173,7 +189,7 @@ def find_info(parent, whitelist, parent_namespace=''):
                 end = next(node.get_children(), None)
                 end_location = end.extent.start if end else node.extent.start
                 end_location = end_location if end_location.offset < node.extent.start.offset else node.extent.start
-                annotation, parameters, location = find_preceding_annotation_and_parameters(parent, last_seen_class_location, end_location, ["LIGHTEN_DATACLASS", "LIGHTEN_COMPONENT", "LIGHTEN_SYSTEM"])
+                annotation, settings, location = find_preceding_annotation_and_settings(parent, last_seen_class_location, end_location, ["LIGHTEN_DATACLASS", "LIGHTEN_COMPONENT", "LIGHTEN_SYSTEM"])
                 if (
                     (last_seen_class_location is None and location is not None) or (location is not None and location != last_seen_class_location)
                 ):
@@ -182,7 +198,7 @@ def find_info(parent, whitelist, parent_namespace=''):
                         "name": node.spelling,
                         "namespace": parent_namespace,
                         "fully_qualified_name": fully_qualified(node),
-                        "settings": parameters,
+                        "settings": settings,
                         "properties": properties,
                         "methods": methods,
                         "getters": getters,
@@ -192,7 +208,7 @@ def find_info(parent, whitelist, parent_namespace=''):
                     }
                     last_seen_class_location = location
                     if VERBOSE:
-                        print(f"{annotation} with parameters: {parameters}")
+                        print(f"{annotation} with settings: {settings}")
                         print(f"Class/Struct: {node.spelling}, Namespace: {parent_namespace}")
                         for property in properties:
                             print(f"  Property: {property['name']}, Type: {property['type']}, settings: {property['settings']}")

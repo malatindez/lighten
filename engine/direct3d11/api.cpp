@@ -10,7 +10,7 @@ extern "C"
     _declspec(dllexport) uint32_t AmdPowerXpressRequestHighPerformance = 1;
 }
 
-namespace engine::direct3d
+namespace lighten::direct3d
 {
     std::unique_ptr<Api> Api::instance_ = nullptr;
     void Api::Init()
@@ -79,4 +79,4 @@ namespace engine::direct3d
         }
 #endif
     }
-} // namespace engine::direct3d
+} // namespace lighten::direct3d

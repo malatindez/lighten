@@ -1,6 +1,6 @@
 #pragma once
 #include "layer-stack.hpp"
-namespace engine::core
+namespace lighten::core
 {
     namespace _layer_stack_detail
     {

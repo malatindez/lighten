@@ -1,5 +1,5 @@
 #include "d3d-common.hpp"
-namespace engine::direct3d
+namespace lighten::direct3d
 {
     /// @brief null render target view pointer
     ID3D11RenderTargetView *const null_rtv = nullptr;

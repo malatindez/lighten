@@ -1,7 +1,7 @@
 #pragma once
 #include "immutable-buffer.hpp"
 #include "dynamic-buffer.hpp"
-namespace engine::direct3d
+namespace lighten::direct3d
 {
     /// @brief The immutable index buffer class
     template <typename T>
@@ -74,4 +74,4 @@ namespace engine::direct3d
             direct3d::api().devcon->IASetIndexBuffer(ImmutableBuffer<T>::buffer(), format, offset);
         }
     };
-} // namespace engine::direct3d
+} // namespace lighten::direct3d

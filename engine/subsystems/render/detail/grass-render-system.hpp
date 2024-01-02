@@ -1,11 +1,11 @@
 #pragma once
 #include "opaque-render-system.hpp"
-namespace engine::core
+namespace lighten::core
 {
     class Scene;
-} // namespace engine::core
+} // namespace lighten::core
 
-namespace engine::render
+namespace lighten::render
 {
     class ModelSystem;
     namespace _grass_detail
@@ -109,9 +109,9 @@ namespace engine::render
 namespace std
 {
     template <>
-    struct hash<engine::render::GrassMaterial>
+    struct hash<lighten::render::GrassMaterial>
     {
-        std::size_t operator()(engine::render::GrassMaterial const &material) const
+        std::size_t operator()(lighten::render::GrassMaterial const &material) const
         {
             size_t seed = 0;
             mal_toolkit::hash_combine(seed, material.albedo_texture);
@@ -135,7 +135,7 @@ namespace std
     };
 } // namespace std
 
-namespace engine::components
+namespace lighten::components
 {
     struct GrassComponent
     {
@@ -156,13 +156,13 @@ namespace engine::components
         void Initialize(std::vector<glm::vec4> const &atlas_data);
 
     private:
-        friend class engine::render::_grass_detail::GrassRenderSystem;
+        friend class lighten::render::_grass_detail::GrassRenderSystem;
         // should be sorted by atlas id
         std::vector<GrassInstance> grass_instances_;
     };
-} // namespace engine::components
+} // namespace lighten::components
 
-namespace engine::render::_grass_detail
+namespace lighten::render::_grass_detail
 {
     using GrassPerDepthCubemap = _opaque_detail::OpaquePerDepthCubemap;
     using GrassPerDepthTexture = _opaque_detail::OpaquePerDepthTexture;
@@ -241,4 +241,4 @@ namespace engine::render::_grass_detail
 
         std::vector<MaterialInstance> materials_;
     };
-} // namespace engine::render::_grass_detail
+} // namespace lighten::render::_grass_detail

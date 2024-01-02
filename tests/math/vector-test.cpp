@@ -8,7 +8,7 @@
 #include <glm/gtx/compatibility.hpp>
 #include <glm/gtx/norm.hpp>
 
-using namespace engine::core::math;
+using namespace lighten::core::math;
 
 template <size_t size, typename T>
 void vec_test_basic_arithmetic_same_types()

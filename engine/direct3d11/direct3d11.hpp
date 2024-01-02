@@ -11,11 +11,11 @@
  * @details This namespace contains all the classes and functions related to Direct3D11
  * 
  */
-namespace engine::direct3d {}
+namespace lighten::direct3d {}
 /**
  * @brief Direct3D11 detail namespace
  * 
  * @details This namespace contains all the classes and functions related to Direct3D11 that are not meant to be used by the user
  * 
  */
-namespace engine::direct3d::_detail {}
+namespace lighten::direct3d::_detail {}

@@ -17,7 +17,7 @@
  * @see ray.hpp
  */
 
-namespace engine::core::math
+namespace lighten::core::math
 {
     /**
      * @struct Plane

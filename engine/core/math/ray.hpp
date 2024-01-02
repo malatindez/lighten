@@ -9,7 +9,7 @@
  * and direction, as well as computing a point at a parameter along the ray.
 
  */
-namespace engine::core::math
+namespace lighten::core::math
 {
     /**
      * @class Ray

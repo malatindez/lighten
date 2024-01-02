@@ -2,7 +2,7 @@
 #include "scene-viewer.hpp"
 #include "include/win.hpp"
 
-using namespace engine;
+using namespace lighten;
 using namespace core;
 using namespace events;
 using namespace math;
@@ -98,7 +98,7 @@ namespace scene_viewer
         {
             try
             {
-                if (engine::core::ModelLoader::Load(path) != std::nullopt)
+                if (lighten::core::ModelLoader::Load(path) != std::nullopt)
                 {
                     spdlog::info("Successfully loaded {}", path.string());
                 }
@@ -260,7 +260,7 @@ namespace scene_viewer
             if (ImGui::Button("Select"))
             {
                 object_editor::selected_entity = entity;
-                object_editor::selected_scene = engine::core::Engine::scene();
+                object_editor::selected_scene = lighten::core::Engine::scene();
             }
             ImGui::TreePop();
         }
@@ -269,7 +269,7 @@ namespace scene_viewer
     {
         ImGui::Begin("Scene Viewer");
         // get scene
-        auto scene = engine::core::Engine::scene();
+        auto scene = lighten::core::Engine::scene();
         auto &registry = scene->registry;
         // draw entity tree
         ImGui::BeginChild("##entity_tree", ImVec2(0, ImGui::GetWindowHeight() * 0.8f), true);
