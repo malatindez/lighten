@@ -33,7 +33,7 @@ namespace lighten
         static auto constexpr skybox_ps_shader_path = "assets/shaders/skybox/skybox-ps.hlsl";
 
         static render::GraphicsShaderProgram skybox_shader_;
-        static std::unique_ptr<direct3d::DynamicUniformBuffer<glm::mat4x3>> skybox_buffer_;
+        static std::unique_ptr<direct3d::DynamicUniformBuffer<glm::mat3x4>> skybox_buffer_;
         static direct3d::DepthStencilState skybox_depth_state;
     };
 }

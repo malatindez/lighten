@@ -3,7 +3,7 @@
 namespace lighten
 {
     render::GraphicsShaderProgram SkyboxManager::skybox_shader_;
-    std::unique_ptr<direct3d::DynamicUniformBuffer<glm::mat4x3>> SkyboxManager::skybox_buffer_;
+    std::unique_ptr<direct3d::DynamicUniformBuffer<glm::mat3x4>> SkyboxManager::skybox_buffer_;
 
     entt::entity SkyboxManager::LoadSkybox(entt::registry &registry, std::filesystem::path const &path)
     {
@@ -34,12 +34,13 @@ namespace lighten
         glm::vec4 tl4 = modified_inv_view_projection * glm::vec4(-1, 1, 1, 1);
         glm::vec4 right4 = br4 - bl4;
         glm::vec4 up4 = tl4 - bl4;
-        glm::mat4x3 modified_inv_view_projection_4x3;
-        modified_inv_view_projection_4x3[0] = glm::vec3{bl4.x, right4.x, up4.x};
-        modified_inv_view_projection_4x3[1] = glm::vec3{bl4.y, right4.y, up4.y};
-        modified_inv_view_projection_4x3[2] = glm::vec3{bl4.z, right4.z, up4.z};
-        modified_inv_view_projection_4x3[3] = glm::vec3{bl4.w, right4.w, up4.w};
-        skybox_buffer_->Update(modified_inv_view_projection_4x3);
+        glm::mat3x4 modified_inv_view_projection_3x4;
+        modified_inv_view_projection_3x4[0] = bl4;
+        modified_inv_view_projection_3x4[1] = right4;
+        modified_inv_view_projection_3x4[2] = up4;
+        float* t = reinterpret_cast<float*>(&modified_inv_view_projection_3x4[0][0]);
+        std::array<float, 12> &arr = reinterpret_cast<std::array<float, 12>&>(*t);
+        skybox_buffer_->Update(modified_inv_view_projection_3x4);
         skybox_buffer_->Bind(direct3d::ShaderType::VertexShader, 2);
         skybox_shader_.Bind();
         auto view = core::TextureManager::GetTextureView(skybox.texture_id);
@@ -65,7 +66,7 @@ namespace lighten
         auto ps = core::ShaderManager::instance()->CompilePixelShader(path / skybox_ps_shader_path);
 
         skybox_shader_.SetVertexShader(vs).SetPixelShader(ps);
-        skybox_buffer_ = std::make_unique<direct3d::DynamicUniformBuffer<glm::mat4x3>>();
+        skybox_buffer_ = std::make_unique<direct3d::DynamicUniformBuffer<glm::mat3x4>>();
     }
     void SkyboxManager::Deinit()
     {
