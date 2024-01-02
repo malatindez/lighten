@@ -29,8 +29,10 @@ def main():
 
     print(f"Files to process: {len(source_files)}")
     print("Discarding took {} seconds".format(time.time() - start))
-    
+    EXTRACT = time.time()
     data = code_extraction.process_files(include_dirs, source_files)
+    print("Extraction took {} seconds".format(time.time() - EXTRACT))
+    UI_GEN = time.time()
     yaml_data = yaml.dump(data, sort_keys=False)
     with open(os.path.join(build_dir, "reflection_data.yaml"), "w") as f:
         f.write(yaml_data)
@@ -40,8 +42,9 @@ def main():
         cpp = code_generation.generate_cpp_serialization_code(data)
         cpp += code_generation.generate_imgui_code(data)
         f.write(cpp)
-    code_generation.generate_yaml_files(data, build_dir)
-    caching.save_cache(build_dir, cache)
+    code_generation.update_yaml_files(data, build_dir)
+    print("Code generation took {} seconds".format(time.time() - UI_GEN))
+#    caching.save_cache(build_dir, cache)
     print("Total time: {} seconds".format(time.time() - start))
 if __name__ == "__main__":
     main()

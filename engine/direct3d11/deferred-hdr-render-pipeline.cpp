@@ -8,6 +8,7 @@ namespace lighten::direct3d
     DeferredHDRRenderPipeline::DeferredHDRRenderPipeline(std::shared_ptr<core::Window> window, std::shared_ptr<SwapchainRenderTarget> const &output_target)
         : core::RenderPipeline(),
           hdr_target_{DXGI_FORMAT_R16G16B16A16_FLOAT},
+          output_render_texture_{ DXGI_FORMAT_R8G8B8A8_UNORM },
           output_target_{output_target}
     {
         viewport_.MinDepth = 0.0f;
@@ -15,6 +16,7 @@ namespace lighten::direct3d
         viewport_.TopLeftX = 0;
         viewport_.TopLeftY = 0;
         hdr_target_.init();
+        output_render_texture_.init();
         InitImGuiLayer(window);
         hdr_to_ldr_layer_ = std::make_shared<render::HDRtoLDRLayer>(*output_target_);
         window_ = window;
@@ -29,10 +31,19 @@ namespace lighten::direct3d
         gbuffer_.sheen = std::make_shared<direct3d::RenderTarget>(DXGI_FORMAT_R16G16B16A16_SNORM);
         gbuffer_.emission = std::make_shared<direct3d::RenderTarget>(DXGI_FORMAT_R16G16B16A16_FLOAT);
         gbuffer_.entity_id = std::make_shared<direct3d::RenderTarget>(DXGI_FORMAT_R32_UINT);
+        imgui_layer_->BlockEvents(false);
     }
-    void DeferredHDRRenderPipeline::WindowSizeChanged(glm::ivec2 const &size)
+    void DeferredHDRRenderPipeline::WindowSizeChanged(glm::ivec2 const &input_size)
     {
+        if (framebuffer_size_.x <= 1 || framebuffer_size_.y <= 1)
+        {
+            framebuffer_size_ = input_size;
+        }
+        auto const& size = framebuffer_size_;
+
+        // TODO: rewrite system to correctly support framebuffer resizing
         hdr_target_.SizeResources(size);
+        output_render_texture_.SizeResources(size);
         output_target_->SizeResources(size);
         gbuffer_.normals->SizeResources(size);
         gbuffer_.albedo->SizeResources(size);
@@ -69,11 +80,17 @@ namespace lighten::direct3d
         // Set up the viewport.
         viewport_.Width = (float)size.x;
         viewport_.Height = (float)size.y;
+
         direct3d::api().devcon4->RSSetViewports(1, &viewport_);
     }
     void DeferredHDRRenderPipeline::OnRender()
     {
-        FrameBegin();
+        if (framebuffer_size_ != hdr_target_.size())
+        {
+            WindowSizeChanged(framebuffer_size_);
+        }
+
+        FrameBegin(); 
 
         direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
         direct3d::api().devcon4->PSSetSamplers(1, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
@@ -93,13 +110,13 @@ namespace lighten::direct3d
         scene_->FrameBegin();
 
         api().devcon4->RSSetViewports(1, &viewport_);
-        std::vector<ID3D11RenderTargetView *> gbuffer_target_views = {
+        std::vector<ID3D11RenderTargetView*> gbuffer_target_views = {
             gbuffer_.albedo->render_target_view(),
             gbuffer_.normals->render_target_view(),
             gbuffer_.roughness_metalness_transmittance_ao->render_target_view(),
             gbuffer_.sheen->render_target_view(),
             gbuffer_.emission->render_target_view(),
-            gbuffer_.entity_id->render_target_view()};
+            gbuffer_.entity_id->render_target_view() };
         api().devcon4->OMSetRenderTargets(5, gbuffer_target_views.data(), depth_stencil_.depth_stencil_view());
         direct3d::api().devcon4->OMSetDepthStencilState(direct3d::states().geq_depth_write_stencil_replace, 1);
         scene_->DeferredRender(gbuffer_);
@@ -117,12 +134,111 @@ namespace lighten::direct3d
 
         scene_->ForwardRender(per_frame_, gbuffer_, depth_stencil_.depth_stencil_view(), depth_texture_copy_srv_, normals_texture_copy_srv_);
 
-        hdr_to_ldr_layer_->OnProcess(hdr_target_);
+        hdr_to_ldr_layer_->OnProcess(hdr_target_, output_render_texture_);
 
-        // Render imgui
+        ID3D11RenderTargetView* rtv = output_target_->render_target_view();
+        api().devcon4->OMSetRenderTargets(1, &output_target_->render_target_view(), nullptr);
+
+        constexpr glm::vec4 kCleanColor{ 0.0f, 0.0f, 0.0f, 1.0f };
+        direct3d::api().devcon4->OMSetRenderTargets(1, &rtv, direct3d::null_dsv);
+        direct3d::api().devcon4->ClearRenderTargetView(rtv, reinterpret_cast<const float*>(&kCleanColor));
+
 
         imgui_layer_->Begin();
+        ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(viewport->WorkPos);
+        ImGui::SetNextWindowSize(viewport->WorkSize);
+        ImGui::SetNextWindowViewport(viewport->ID);
+
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+        window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+        window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+
+        ImGui::Begin("Main Dockspace", nullptr, window_flags);
+        ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+        ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+        ImGui::End();
+
+        ImGui::Begin("Rendered Scene");
+        auto framebuffer_size = ImGui::GetContentRegionAvail();
+
+        ID3D11ShaderResourceView* renderTextureSRV = output_render_texture_.shader_resource_view();
+        ImGui::Image((void*)renderTextureSRV, ImVec2(output_render_texture_.size().x, output_render_texture_.size().y));
+
+        framebuffer_pos_ = glm::ivec2{ ImGui::GetWindowPos().x, ImGui::GetWindowPos().y };
+        framebuffer_size_ = glm::ivec2{ framebuffer_size.x, framebuffer_size.y };
+
+        ImVec2 mousePos = ImGui::GetMousePos();
+        
+        glm::ivec2 relative_mouse_pos{ -1 };
+        // Check if the mouse is within the framebuffer area
+        if (mousePos.x >= framebuffer_pos_.x && mousePos.x <= (framebuffer_pos_.x + framebuffer_size_.x) &&
+            mousePos.y >= framebuffer_pos_.y && mousePos.y <= (framebuffer_pos_.y + framebuffer_size_.y))
+        {
+            relative_mouse_pos = glm::ivec2(mousePos.x - framebuffer_pos_.x, mousePos.y - framebuffer_pos_.y);
+        }
+
+        bool isWindowFocused = ImGui::IsWindowFocused();
+        bool isWindowHovered = ImGui::IsWindowHovered();
+
+        // Handling keyboard when the window is focused
+        if (isWindowFocused)
+        {
+            for (int key = 0; key < IM_ARRAYSIZE(ImGui::GetIO().KeysDown); ++key)
+            {
+                if (ImGui::IsKeyPressed(key))
+                {
+                    // Emit KeyPressedEvent
+                    lighten::core::events::KeyPressedEvent event(key);
+                    window_->GetEventCallback()(event); 
+                }
+            }
+        }
+
+        for (int key = 0; key < IM_ARRAYSIZE(ImGui::GetIO().KeysDown); ++key)
+        {
+            if (ImGui::IsKeyReleased(key))
+            {
+                // Emit KeyReleasedEvent
+                lighten::core::events::KeyReleasedEvent event(key);
+                window_->GetEventCallback()(event);
+            }
+        }
+        // Handling mouse clicks when the window is hovered
+        if ((isWindowHovered || isWindowFocused) && (relative_mouse_pos != glm::ivec2{-1}))
+        {
+            lighten::core::events::MouseMovedEvent mouseMovedEvent(relative_mouse_pos);
+            window_->GetEventCallback()(mouseMovedEvent);
+            for (int button = 0; button < ImGuiMouseButton_COUNT; ++button)
+            {
+                if (ImGui::IsMouseClicked(button))
+                {
+                    // Emit MouseButtonPressedEvent
+
+                    lighten::core::events::MouseButtonPressedEvent event(button, relative_mouse_pos);
+                    window_->GetEventCallback()(event);
+                }
+
+                if (ImGui::IsMouseReleased(button))
+                {
+                    // Emit MouseButtonReleasedEvent
+
+                    lighten::core::events::MouseButtonReleasedEvent event(button, relative_mouse_pos);
+                    window_->GetEventCallback()(event);
+                }
+            }
+        }
+
+        if (ImGui::GetIO().MouseWheel != 0)
+        {
+            lighten::core::events::MouseScrollEvent event(static_cast<int16_t>(ImGui::GetIO().MouseWheel * 100), relative_mouse_pos);
+            window_->GetEventCallback()(event);
+        }
+
+        ImGui::End();
+
         OnGuiRender();
+
         imgui_layer_->End();
         // End frame
         FrameEnd();
@@ -185,6 +301,13 @@ namespace lighten::direct3d
     }
     void DeferredHDRRenderPipeline::FrameEnd()
     {
+        // Update and Render additional Platform Windows
+        if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+        }
         swapchain_present_->OnFrameEnd(static_cast<direct3d::RenderTargetBase &>(*output_target_));
+
     }
-}
+} // namespace lighten::direct3d

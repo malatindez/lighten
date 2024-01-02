@@ -2,6 +2,7 @@
 #include "include/imgui.hpp"
 #include <ImGuizmo.h>
 #include "mal-toolkit/win-utils.hpp"
+#include "core/engine.hpp"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace lighten::platform::windows
@@ -73,9 +74,10 @@ namespace lighten::platform::windows
     {
         if (ImGui_ImplWin32_WndProcHandler(handle, message, w_param, l_param))
             return true;
+#if 0 // Moved to deffered render pipeline, now dependant on ImGui.
         if (message == WM_KEYDOWN)
         {
-            KeyPressedEvent event{uint32_t(w_param), LOWORD(l_param)};
+            KeyPressedEvent event{uint32_t(w_param)};
             event_callback_(event);
         }
         else if (message == WM_KEYUP)
@@ -113,19 +115,19 @@ namespace lighten::platform::windows
             MouseScrollEvent event{GET_WHEEL_DELTA_WPARAM(w_param), glm::ivec2{LOWORD(l_param), HIWORD(l_param)}};
             event_callback_(event);
         }
-        else if (message == WM_SIZE) // update the window size if it has changed
+#endif
+        if (message == WM_SIZE) // update the window size if it has changed
         {
-            if (l_param != 0)
-            {
-                WindowResizeEvent event{LOWORD(l_param), HIWORD(l_param)};
-                size_ = glm::ivec2{LOWORD(l_param), HIWORD(l_param)};
-                event_callback_(event);
-            }
+            WindowResizeEvent event{LOWORD(l_param), HIWORD(l_param)};
+            size_ = glm::ivec2{LOWORD(l_param), HIWORD(l_param)};
+            event_callback_(event);
         }
         else if (message == WM_EXITSIZEMOVE || message == WM_PAINT)
         {
             WindowResizeEvent event{size_.x, size_.y};
             event_callback_(event);
+            // a bit naughty
+            reinterpret_cast<lighten::core::LayerStackThreadsafe*>(&lighten::core::Engine::Get())->OnRender();
         }
         else if (message == WM_WINDOWPOSCHANGED) // update window position if it has changed
         {

@@ -56,6 +56,10 @@ namespace lighten::direct3d
         direct3d::ShaderResourceView depth_texture_copy_srv_;
         direct3d::Texture2D normals_texture_copy_;
         direct3d::ShaderResourceView normals_texture_copy_srv_;
+        direct3d::RenderTarget output_render_texture_;
         std::shared_ptr<core::Window> window_ = nullptr;
+        
+        glm::ivec2 framebuffer_pos_  = glm::ivec2{0};
+        glm::ivec2 framebuffer_size_ = glm::ivec2{0};
     };
 }

@@ -12,9 +12,9 @@ namespace lighten::core
         // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   // Enable Docking
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
-        // io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
-        // io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
-
+        //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
+        //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
+        
         float fontSize = 18.0f; // *2.0f;
         ImFontConfig config;
         static const ImWchar full_range[] = {0x0020, 0xFFFF, 0};
@@ -67,13 +67,6 @@ namespace lighten::core
         // Rendering
         ImGui::Render();
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-        // Update and Render additional Platform Windows
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-        {
-            ImGui::UpdatePlatformWindows();
-            ImGui::RenderPlatformWindowsDefault();
-        }
     }
 
     void ImGuiLayer::ResetTheme()
