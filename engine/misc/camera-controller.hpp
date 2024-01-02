@@ -76,8 +76,8 @@ namespace lighten
 
         [[nodiscard]] constexpr bool &roll_enabled() noexcept { return roll_enabled_; }
         [[nodiscard]] constexpr bool const &roll_enabled() const noexcept { return roll_enabled_; }
-        [[nodiscard]] constexpr float &sensivity() noexcept { return sensivity_; }
-        [[nodiscard]] constexpr float const &sensivity() const noexcept { return sensivity_; }
+        [[nodiscard]] constexpr float &sensitivity() noexcept { return sensitivity_; }
+        [[nodiscard]] constexpr float const &sensitivity() const noexcept { return sensitivity_; }
         [[nodiscard]] constexpr float &move_speed() noexcept { return move_speed_; }
         [[nodiscard]] constexpr float const &move_speed() const noexcept { return move_speed_; }
         [[nodiscard]] constexpr float &accelerated_speed() noexcept { return accelerated_speed_; }
@@ -94,7 +94,7 @@ namespace lighten
 
     private:
         uint32_t flags_ = None;
-        float sensivity_ = 8.0f;
+        float sensitivity_ = 12.0f;
         float move_speed_ = 2.0f;
         float accelerated_speed_ = 10.0f;
         float roll_speed_ = glm::radians(60.0f);

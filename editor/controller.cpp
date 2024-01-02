@@ -58,7 +58,7 @@ void Controller::OnGuiRender()
     }
     auto &camera_controller = *Engine::scene()->main_camera;
     ImGui::Checkbox("Roll enabled##roll-enabled", &camera_controller.roll_enabled());
-    ImGui::SliderFloat("Sensivity##sensivity", &camera_controller.sensivity(), 0, 100, "%.3f");
+    ImGui::SliderFloat("Sensitivity##sensitivity", &camera_controller.sensitivity(), 0, 100, "%.3f");
     ImGui::SliderFloat("Move speed##move-speed", &camera_controller.move_speed(), 0, 100, "%.3f");
     ImGui::SliderFloat("Accelerated movement speed##accelerated-speed", &camera_controller.accelerated_speed(), 0, 100, "%.3f");
     ImGui::SliderFloat("Roll speed##roll-speed", &camera_controller.roll_speed(), 0, 100, "%.3f");
@@ -163,7 +163,7 @@ void Controller::OnGuiRender()
     ImGui::End();
 
     object_editor::OnGuiRender();
-    object_editor::OnRender(hdr_render_pipeline_->window()->position(), hdr_render_pipeline_->window()->size());
+    object_editor::OnRender(hdr_render_pipeline_->window()->position(), hdr_render_pipeline_->framebuffer_size());
 
     scene_viewer::OnGuiRender();
 }
@@ -186,12 +186,11 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     main_camera_entity = registry.create();
     registry.emplace<CameraComponent>(main_camera_entity, CameraComponent());
     registry.emplace<Transform>(main_camera_entity, Transform());
-    auto &window_size = hdr_render_pipeline->window()->size();
     first_scene->main_camera = std::make_unique<CameraController>(&registry, main_camera_entity, hdr_render_pipeline_->framebuffer_size());
     Engine::SetScene(first_scene);
     Engine::scene()->main_camera->SetWorldOffset(glm::vec3{0.0f, 0.0f, 0.0f});
     Engine::scene()->main_camera->SetWorldAngles(0.0f, 0.0f, 0.0f);
-    Engine::scene()->main_camera->SetProjectionMatrix(glm::perspectiveLH_ZO(45.0f, static_cast<float>(window_size.x) / static_cast<float>(window_size.y), 0.001f, 100.0f));
+    Engine::scene()->main_camera->SetProjectionMatrix(glm::perspectiveLH_ZO(45.0f, 16.0f / 9.0f, 0.001f, 100.0f));
 
     int amount = 12;
     for (int i = 0; i < amount; i++)
@@ -249,7 +248,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     white_half_metal.reset();
     white_porcelain.reset();
     blue_rubber.reset();
-    if (false)
+    if (true)
     {
         {
             cobblestone_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_albedo.dds");
@@ -466,7 +465,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             game_object.parent = lights;
             lights_game_object.children.push_back(entity);
             auto &transform = registry.emplace<Transform>(entity);
-            transform.scale = glm::vec3{0.5f};
+            transform.scale = glm::vec3{0.1f};
             transform.position = glm::vec3{0, 0.0f, 0};
             transform.position += glm::vec3{std::cosf(float(i) / 24 * 2 * std::numbers::pi_v<float>), 0, std::sinf(float(i) / 24 * 2 * std::numbers::pi_v<float>)} * 15.0f;
             transform.UpdateMatrices();
@@ -681,8 +680,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                              { exposure -= dt; });
     input.AddTickKeyCallback({Key::KEY_NUMPAD_PLUS}, [&exposure](float dt, InputLayer::KeySeq const &, uint32_t)
                              { exposure += dt; });
-    input.AddUpdateKeyCallback(
-        {Key::KEY_F},
+    input.AddUpdateKeyCallback({Key::KEY_V}, 
         [&](InputLayer::KeySeq const &, uint32_t)
         {
             static mal_toolkit::HighResolutionTimer timer;

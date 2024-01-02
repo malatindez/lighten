@@ -192,6 +192,16 @@ namespace lighten::core
         {
             path = input_path;
         }
+        // For some reason the check above does pass if file does not exist. 
+#ifdef _DEBUG
+        {
+            std::ifstream file(path.c_str());
+            if (!file)
+            {
+                path = input_path;
+            }
+        }
+#endif
 
         if (auto it = instance_->texture_hashes_.find(std::filesystem::hash_value(path));
             it != instance_->texture_hashes_.end())

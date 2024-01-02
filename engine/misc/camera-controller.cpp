@@ -208,7 +208,7 @@ namespace lighten
         }
         glm::vec2 t{pixel_mouse_delta};
         t = -t / glm::vec2(window_size_);
-        t *= sensivity_ * camera().fovy_;
+        t *= sensitivity_ * camera().fovy_;
         yaw = t.x;
         pitch = t.y;
         if (!(roll == 0 && pitch == 0 && yaw == 0))
