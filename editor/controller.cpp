@@ -187,7 +187,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     registry.emplace<CameraComponent>(main_camera_entity, CameraComponent());
     registry.emplace<Transform>(main_camera_entity, Transform());
     auto &window_size = hdr_render_pipeline->window()->size();
-    first_scene->main_camera = std::make_unique<CameraController>(&registry, main_camera_entity, window_size);
+    first_scene->main_camera = std::make_unique<CameraController>(&registry, main_camera_entity, hdr_render_pipeline_->framebuffer_size());
     Engine::SetScene(first_scene);
     Engine::scene()->main_camera->SetWorldOffset(glm::vec3{0.0f, 0.0f, 0.0f});
     Engine::scene()->main_camera->SetWorldAngles(0.0f, 0.0f, 0.0f);
@@ -687,10 +687,6 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         {
             static mal_toolkit::HighResolutionTimer timer;
             const float kDelay = 1.0f / 15.0f;
-            if (ImGui::GetIO().WantCaptureMouse)
-            {
-                return;
-            }
             if (timer.elapsed() < kDelay)
             {
                 return;
@@ -820,10 +816,6 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             }
             static mal_toolkit::HighResolutionTimer timer;
             const float kDelay = 0.05f;
-            if (ImGui::GetIO().WantCaptureMouse)
-            {
-                return;
-            }
             if (timer.elapsed() < kDelay)
             {
                 return;
@@ -874,10 +866,6 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         [&, cobblestone_material](InputLayer::KeySeq const &, uint32_t count)
         {
             if (count == std::numeric_limits<uint32_t>::max())
-            {
-                return;
-            }
-            if (ImGui::GetIO().WantCaptureMouse)
             {
                 return;
             }

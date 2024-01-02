@@ -1115,10 +1115,6 @@ namespace object_editor
             InputLayer::KeySeq{lighten::core::Key::KEY_CONTROL, lighten::core::Key::KEY_LBUTTON},
             [&](InputLayer::KeySeq const &, uint32_t)
             {
-                if (ImGui::GetIO().WantCaptureMouse)
-                {
-                    return;
-                }
                 auto &input = *InputLayer::instance();
                 auto scene = Engine::scene();
                 Ray ray = scene->main_camera->PixelRaycast(glm::vec2{input.mouse_position()});

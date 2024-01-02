@@ -2,11 +2,11 @@
 namespace lighten::direct3d
 {
     /// @brief null render target view pointer
-    ID3D11RenderTargetView *const null_rtv = nullptr;
+    constexpr ID3D11RenderTargetView *const null_rtv = nullptr;
     /// @brief null depth stencil view pointer
-    ID3D11DepthStencilView *const null_dsv = nullptr;
+    constexpr ID3D11DepthStencilView *const null_dsv = nullptr;
     /// @brief null depth stencil state pointer
-    ID3D11ShaderResourceView *const null_srv = nullptr;
+    constexpr ID3D11ShaderResourceView *const null_srv = nullptr;
     /// @brief Shader type enum
     enum class ShaderType : uint8_t
     {

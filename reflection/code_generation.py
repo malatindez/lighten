@@ -113,6 +113,7 @@ def update_yaml_files(data, output_dir):
             file.write(yaml_content)
     index["count"] = len(index["ui_files"])
     # Delete YAML files that are not used anymore
+    os.makedirs(os.path.dirname(os.path.join(output_dir, "gui/yaml/index.yaml")), exist_ok=True)
     for file_path in os.listdir(os.path.join(output_dir, "gui/yaml")):
         if os.path.join(output_dir, "gui/yaml", file_path) not in index["ui_files"]:
             os.remove(os.path.join(output_dir, "gui/yaml", file_path))

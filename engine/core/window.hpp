@@ -24,6 +24,7 @@ namespace lighten::core
 
         [[nodiscard]] virtual void *native() = 0;
         void SetEventCallback(core::EventCallbackFn const &event_fn) noexcept { event_callback_ = event_fn; }
+        core::EventCallbackFn const& GetEventCallback() const noexcept { return event_callback_; }
 
     protected:
         core::EventCallbackFn event_callback_;
