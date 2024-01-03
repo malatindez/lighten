@@ -42,9 +42,9 @@ namespace lighten::direct3d
         UINT flag = D3D11_CREATE_DEVICE_SINGLETHREADED;
 #else
         UINT flag = D3D11_CREATE_DEVICE_DEBUG;
+        flag |= D3D11_CREATE_DEVICE_SINGLETHREADED;
 #endif
         flag |= D3D11_CREATE_DEVICE_DISABLE_GPU_TIMEOUT;
-        flag |= D3D11_CREATE_DEVICE_SINGLETHREADED;
         AlwaysAssert(D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, flag,
                                        &kFeatureLevelRequested, 1, D3D11_SDK_VERSION, &instance_->device.reset(), &featureLevelInitialized, &instance_->devcon.reset()),
                      "Failed to create device and devcon");

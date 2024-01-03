@@ -192,8 +192,25 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     Engine::scene()->main_camera->SetWorldAngles(0.0f, 0.0f, 0.0f);
     Engine::scene()->main_camera->SetProjectionMatrix(glm::perspectiveLH_ZO(45.0f, 16.0f / 9.0f, 0.001f, 100.0f));
 
-    int amount = 12;
-    for (int i = 0; i < amount; i++)
+    
+    const int amountOfModels = 12;
+    const bool loadMaterials = true;
+    const bool createCubes = true;
+    const bool createPBRTestSpheres = true;
+    const bool createFloor = true;
+    const bool createWall = true;
+    const bool addWhitePointLight = true;
+    const bool addRedPointLight = true;
+    const bool addGreenPointLight = true;
+    const int amountOfDeferredLights = 24;
+    const bool enableDirectionalLight = true;
+    const bool enableSpotLight = true;
+    const bool addSmallParticleEmitter = true;
+    const bool addBigfParticleEmitter = true;
+    const bool addGrass = true;
+    const bool addBigParticleEmitter = true;
+
+    for (int i = 0; i < amountOfModels; i++)
     {
         auto knight = registry.create();
         auto &game_object = registry.emplace<GameObject>(knight);
@@ -212,7 +229,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             model_id = ModelLoader::Load("assets\\models\\KnightHorse\\KnightHorse.fbx").value();
             game_object.name = "KnightHorse";
         }
-#if 0
+#if 1
         else if (i % 4 == 3)
         {
             model_id = ModelLoader::Load("assets\\models\\SunCityWall\\SunCityWall.fbx").value();
@@ -221,10 +238,10 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
 #endif
         ors.AddInstance(model_id, registry, knight);
         transform.position = glm::vec3{
-                                 std::sin(float(i) / amount * 2 * (float)std::numbers::pi),
+                                 std::sin(float(i) / amountOfModels * 2 * (float)std::numbers::pi),
                                  0,
-                                 std::cos(float(i) / amount * 2 * (float)std::numbers::pi)} *
-                             (float(amount) / std::sqrtf((float)amount));
+                                 std::cos(float(i) / amountOfModels * 2 * (float)std::numbers::pi)} *
+                             (float(amountOfModels) / std::sqrtf((float)amountOfModels));
         transform.rotation = glm::quat(glm::vec3(0.0f, 0.0f, glm::radians(180.0f)));
         transform.rotation *= glm::quat_cast(glm::lookAtLH(transform.position, glm::vec3{0, 0, 0}, glm::vec3{0, 1, 0}));
         transform.UpdateMatrices();
@@ -248,7 +265,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     white_half_metal.reset();
     white_porcelain.reset();
     blue_rubber.reset();
-    if (true)
+    if (loadMaterials)
     {
         {
             cobblestone_material.albedo_map = TextureManager::GetTextureView(std::filesystem::current_path() / "assets\\textures\\Cobblestone\\Cobblestone_albedo.dds");
@@ -302,7 +319,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             blue_rubber.roughness_value = 0.7f;
         }
     }
-    if (true)
+    if (createCubes)
     {
         entt::entity cubes = registry.create();
         auto &cubes_game_object = registry.emplace<GameObject>(cubes);
@@ -324,7 +341,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             ors.AddInstance(model_id, registry, cube, {materials[i]});
         }
     }
-    if (true)
+    if (createPBRTestSpheres)
     {
         entt::entity spheres = registry.create();
         auto &spheres_game_object = registry.emplace<GameObject>(spheres);
@@ -355,7 +372,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         }
     }
     // ------------------------- CUBES -------------------------
-    if (true)
+    if (createFloor)
     {
         entt::entity floor = registry.create();
         auto &floor_game_object = registry.emplace<GameObject>(floor);
@@ -375,7 +392,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             ors.AddInstance(model_id, registry, cube, {stone_material});
         }
     }
-    if (true)
+    if (createWall)
     {
         auto model_id = render::ModelSystem::GetUnitCube();
         auto wall = registry.create();
@@ -391,7 +408,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     // ------------------------- LIGHTS -------------------------
     entt::entity lights = registry.create();
     auto &lights_game_object = registry.emplace<GameObject>(lights);
-    if (true)
+    if (addWhitePointLight)
     {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
@@ -412,7 +429,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         emissive.emissive_color = point_light.color;
         emissive.power = point_light.power;
     }
-    if (true)
+    if (addRedPointLight)
     {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
@@ -433,7 +450,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         emissive.emissive_color = point_light.color;
         emissive.power = point_light.power;
     }
-    if (true)
+    if (addGreenPointLight)
     {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
@@ -454,35 +471,31 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         emissive.emissive_color = point_light.color;
         emissive.power = point_light.power;
     }
-    if (true)
+    for (int i = 0; i < amountOfDeferredLights; i++)
     {
-        for (int i = 0; i < 24; i++)
-        {
-            auto model_id = render::ModelSystem::GetUnitSphereFlat();
-            auto entity = registry.create();
-            auto &game_object = registry.emplace<GameObject>(entity);
-            game_object.name = "Point light";
-            game_object.parent = lights;
-            lights_game_object.children.push_back(entity);
-            auto &transform = registry.emplace<Transform>(entity);
-            transform.scale = glm::vec3{0.1f};
-            transform.position = glm::vec3{0, 0.0f, 0};
-            transform.position += glm::vec3{std::cosf(float(i) / 24 * 2 * std::numbers::pi_v<float>), 0, std::sinf(float(i) / 24 * 2 * std::numbers::pi_v<float>)} * 15.0f;
-            transform.UpdateMatrices();
-            auto &point_light = registry.emplace<PointLight>(entity);
-            point_light.color = glm::vec3{(i + 1) % 2, (i + 1) % 3, (i + 1) % 5};
-            point_light.color = normalize(point_light.color);
-            point_light.power = 500.0f;
-            point_light.casts_shadows = false;
-            ers.AddInstance(model_id, registry, entity);
-            auto &emissive = registry.get<EmissiveComponent>(entity);
-            emissive.emissive_color = point_light.color;
-            emissive.power = point_light.power;
-        }
+        auto model_id = render::ModelSystem::GetUnitSphereFlat();
+        auto entity = registry.create();
+        auto &game_object = registry.emplace<GameObject>(entity);
+        game_object.name = "Point light";
+        game_object.parent = lights;
+        lights_game_object.children.push_back(entity);
+        auto &transform = registry.emplace<Transform>(entity);
+        transform.scale = glm::vec3{0.1f};
+        transform.position = glm::vec3{0, 0.0f, 0};
+        transform.position += glm::vec3{std::cosf(float(i) / amountOfDeferredLights * 2 * std::numbers::pi_v<float>), 0, std::sinf(float(i) / amountOfDeferredLights * 2 * std::numbers::pi_v<float>)} * 15.0f;
+        transform.UpdateMatrices();
+        auto &point_light = registry.emplace<PointLight>(entity);
+        point_light.color = glm::vec3{(i + 1) % 2, (i + 1) % 3, (i + 1) % 5};
+        point_light.color = normalize(point_light.color);
+        point_light.power = 500.0f;
+        point_light.casts_shadows = false;
+        ers.AddInstance(model_id, registry, entity);
+        auto &emissive = registry.get<EmissiveComponent>(entity);
+        emissive.emissive_color = point_light.color;
+        emissive.power = point_light.power;
     }
 
-    // add directional light
-    if (true)
+    if (enableDirectionalLight)
     {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
@@ -505,7 +518,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         emissive.power = directional_light.power;
     }
     // add spot light
-    if (false)
+    if (enableSpotLight)
     {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
@@ -530,16 +543,18 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         emissive.emissive_color = spot_light.color;
         emissive.power = spot_light.power;
     }
-    auto prs_texture_path = std::filesystem::current_path() / "assets/textures/smoke";
-    first_scene->renderer->particle_render_system().botbf = TextureManager::GetTextureView(prs_texture_path / "BotBF.tga");
-    first_scene->renderer->particle_render_system().scatter = TextureManager::GetTextureView(prs_texture_path / "emission+scatter.tga");
-    first_scene->renderer->particle_render_system().emva1 = TextureManager::GetTextureView(prs_texture_path / "EMVA1.tga");
-    first_scene->renderer->particle_render_system().emva2 = TextureManager::GetTextureView(prs_texture_path / "EMVA2.tga");
-    first_scene->renderer->particle_render_system().rlt = TextureManager::GetTextureView(prs_texture_path / "RLT.tga");
-    first_scene->renderer->particle_render_system().atlas_size = {8, 8};
-
+    if (addSmallParticleEmitter || addBigParticleEmitter)
+    {
+        auto prs_texture_path = std::filesystem::current_path() / "assets/textures/smoke";
+        first_scene->renderer->particle_render_system().botbf = TextureManager::GetTextureView(prs_texture_path / "BotBF.tga");
+        first_scene->renderer->particle_render_system().scatter = TextureManager::GetTextureView(prs_texture_path / "emission+scatter.tga");
+        first_scene->renderer->particle_render_system().emva1 = TextureManager::GetTextureView(prs_texture_path / "EMVA1.tga");
+        first_scene->renderer->particle_render_system().emva2 = TextureManager::GetTextureView(prs_texture_path / "EMVA2.tga");
+        first_scene->renderer->particle_render_system().rlt = TextureManager::GetTextureView(prs_texture_path / "RLT.tga");
+        first_scene->renderer->particle_render_system().atlas_size = { 8, 8 };
+    }
     // add particle emitters
-    if (true)
+    if (addSmallParticleEmitter)
     {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
@@ -570,7 +585,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         particle_emitter.maximum_amount_of_particles = 200;
         ors.AddInstance(model_id, registry, entity, {white_porcelain});
     }
-    if (false)
+    if (addBigParticleEmitter)
     {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
         auto entity = registry.create();
@@ -601,7 +616,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         particle_emitter.maximum_amount_of_particles = 300;
         ors.AddInstance(model_id, registry, entity, {white_porcelain});
     }
-    if (true)
+    if (addGrass)
     {
         auto grass = registry.create();
         auto &game_object = registry.emplace<GameObject>(grass);

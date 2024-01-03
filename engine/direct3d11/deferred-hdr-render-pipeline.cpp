@@ -10,8 +10,8 @@ namespace lighten::direct3d
     DeferredHDRRenderPipeline::DeferredHDRRenderPipeline(std::shared_ptr<core::Window> window, std::shared_ptr<SwapchainRenderTarget> const &output_target)
         : core::RenderPipeline(),
           hdr_target_{DXGI_FORMAT_R16G16B16A16_FLOAT},
-          output_render_texture_{ DXGI_FORMAT_R8G8B8A8_UNORM },
-          output_target_{output_target}
+          output_target_{output_target},
+        output_render_texture_{ DXGI_FORMAT_R8G8B8A8_UNORM }
     {
         viewport_.MinDepth = 0.0f;
         viewport_.MaxDepth = 1.0f;
@@ -186,7 +186,6 @@ namespace lighten::direct3d
 
         bool isWindowFocused = ImGui::IsWindowFocused();
         bool isWindowHovered = ImGui::IsWindowHovered();
-        ImGuiIO& io = ImGui::GetIO();
         // Handling keyboard when the window is focused
         if (isWindowFocused)
         {

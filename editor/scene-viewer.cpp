@@ -14,7 +14,7 @@ void DrawPathSelector(std::vector<std::filesystem::path> &paths)
 
     for (const auto &path : paths)
     {
-        ImGui::Text(mal_toolkit::wstring_to_string(path.wstring()).c_str());
+        ImGui::Text("%s", mal_toolkit::wstring_to_string(path.wstring()).c_str());
     }
 
     ImGui::EndChild();

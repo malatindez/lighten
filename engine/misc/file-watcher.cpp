@@ -29,12 +29,18 @@ namespace lighten::misc
     void FileWatcher::OnUpdate()
     {
         std::vector<std::filesystem::path> paths;
+        static mal_toolkit::SteadyTimer timer;
         for (auto const &[file, ft] : file_map_)
         {
-            if (!std::filesystem::exists(file))
+            if (timer.elapsed() < 0.25f) [[likely]]
             {
                 continue;
             }
+            timer.reset_to_now();
+            if (!std::filesystem::exists(file)) [[unlikely]]
+            {
+				continue;
+			}
             auto current_file_last_write_time = std::filesystem::last_write_time(file);
             if (file_map_[file] != current_file_last_write_time) [[unlikely]]
             {
