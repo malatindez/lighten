@@ -10,15 +10,17 @@ namespace lighten::components
     LIGHTEN_COMPONENT(name = "Local Transform", category = "Core")
     struct Transform
     {
+        // TODO: remove default initializers
+
         /// @brief Object position in the local space
         LIGHTEN_PROPERTY(serialize, save_game, name = "Position")
-        glm::vec3 position;
+            glm::vec3 position = glm::vec3{ 0 };
         /// @brief Object scale in the local space
         LIGHTEN_PROPERTY(serialize, save_game, name = "Scale")
-        glm::vec3 scale;
+            glm::vec3 scale = glm::vec3{ 1 };
         /// @brief Object rotation in the local space
         LIGHTEN_PROPERTY(serialize, save_game, name = "Rotation")
-        glm::quat rotation;
+            glm::quat rotation = glm::quat{ 1,0,0,0 };
 
         LIGHTEN_METHOD(name = "Reset", button, mutator)
         void reset() noexcept

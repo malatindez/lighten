@@ -30,13 +30,13 @@ namespace lighten::misc
     {
         std::vector<std::filesystem::path> paths;
         static mal_toolkit::SteadyTimer timer;
+        if (timer.elapsed() < 0.25f) [[likely]]
+        {
+            return;
+        }
+        timer.reset_to_now();
         for (auto const &[file, ft] : file_map_)
         {
-            if (timer.elapsed() < 0.25f) [[likely]]
-            {
-                continue;
-            }
-            timer.reset_to_now();
             if (!std::filesystem::exists(file)) [[unlikely]]
             {
 				continue;
@@ -54,4 +54,4 @@ namespace lighten::misc
             event_callback_(fce);
         }
     }
-}
+} // namespace lighten::misc
