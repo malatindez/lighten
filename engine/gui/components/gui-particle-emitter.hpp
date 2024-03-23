@@ -4,7 +4,7 @@
 namespace lighten::gui
 {
     template<>
-    void DrawComponent<components::ParticleEmitter>(entt::registry &registry, entt::entity entity, std::string &entity_id, components::ParticleEmitter& light)
+    void DrawComponent<components::ParticleEmitter>(entt::registry &registry, entt::entity entity, std::string &entity_id, components::ParticleEmitter& emitter)
     {
         if (ImGui::CollapsingHeader(("Particle emitter##" + entity_id).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth))
         {

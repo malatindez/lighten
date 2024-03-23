@@ -51,5 +51,5 @@ namespace lighten::gui
 
 
     template<typename T>
-    void DrawComponent(entt::entity entity, std::string &entity_id, T &t);
+    void DrawComponent(entt::registry & registry, entt::entity entity, std::string &entity_str, T &t);
 }

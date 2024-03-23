@@ -2,6 +2,7 @@
 #include "misc/camera-controller.hpp"
 #include "direct3d11/deferred-hdr-render-pipeline.hpp"
 #include "core/engine.hpp"
+#include "gui/scene-tree.hpp"
 class Controller
     : public lighten::core::Layer,
       public lighten::core::Layer::HandleTick,
@@ -26,7 +27,7 @@ public:
 
 private:
     std::shared_ptr<lighten::core::Scene> first_scene;
-
+    std::unique_ptr<SceneViewer> scene_viewer_;
 private:
     std::shared_ptr<lighten::direct3d::DeferredHDRRenderPipeline> hdr_render_pipeline_;
     std::vector<UpdateCallback> update_callbacks_;

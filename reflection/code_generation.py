@@ -76,7 +76,7 @@ SYSTEM_METADATA = string.Template('        SystemMetadata { "$name", "$category"
 
 def generate_hpp_serialization_code(global_data):
     includes = {
-        "#include <cereal/cereal.hpp>",
+        "#include \"../include/cereal.hpp\"",
         "#include <tuple>",
         "#include <string>",
         "#include <array>",
@@ -127,6 +127,7 @@ def generate_hpp_serialization_code(global_data):
                     category=class_info['settings'].get('category', "Default")
                 ))
                 
+    serialization_code_parts.append("#pragma once")
     serialization_code_parts.append("\n".join(sorted(includes)))
     serialization_code_parts.append("namespace lighten::reflection {")
     serialization_code_parts.append(REFLECTION_PREDEFINED_STRUCTS)

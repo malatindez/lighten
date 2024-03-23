@@ -5,7 +5,7 @@ namespace lighten::gui
 {
 
     template<>
-    void DrawComponent<components::Camera>(entt::registry &registry, entt::entity entity, std::string &entity_id, components::GameObject& game_object)
+    void DrawComponent(entt::registry &registry, entt::entity entity, std::string &entity_id, components::GameObject& game_object)
     {
        if (ImGui::CollapsingHeader(("Game Object##" + entity_id).c_str()))
        {
@@ -22,7 +22,7 @@ namespace lighten::gui
            };
            ImGui::Text("Entity id: ");
            ImGui::SameLine();
-           ImGui::Text("%u", convert_entity_id(selected_entity));
+           ImGui::Text("%u", convert_entity_id(entity));
            ImGui::Text("Parent entity id: ");
            ImGui::SameLine();
            ImGui::Text("%u", convert_entity_id(game_object.parent));

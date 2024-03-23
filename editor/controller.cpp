@@ -4,6 +4,7 @@
 #include "render/renderer.hpp"
 #include "scene-viewer.hpp"
 #include "reflection/reflection.hpp"
+#include "gui/scene-tree.hpp"
 
 using namespace lighten;
 using namespace core;
@@ -163,7 +164,7 @@ void Controller::OnGuiRender()
     }
 #endif
     ImGui::End();
-
+    scene_viewer_->ShowEntitiesViewer();
 //    object_editor::OnGuiRender();
 //    object_editor::OnRender(hdr_render_pipeline_->window()->position(), hdr_render_pipeline_->framebuffer_size());
 
@@ -174,6 +175,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     : hdr_render_pipeline_{hdr_render_pipeline}
 {
     first_scene = std::make_shared<Scene>();
+    scene_viewer_ = std::make_unique<SceneViewer>(first_scene->registry);
     first_scene->renderer = std::make_unique<render::Renderer>();
 
     auto &ors = first_scene->renderer->opaque_render_system();
@@ -192,13 +194,12 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     Engine::SetScene(first_scene);
 
     // todo: move it to engine itself, figure out a better way to handle registry
-    mal_toolkit::constexpr_for < 0, reflection::SystemTuple::amount, 1>([&](auto i) constexpr -> bool
+    mal_toolkit::constexpr_for < 0, reflection::SystemTuple::amount, 1>([&](auto i) constexpr -> void
         {
             using T = reflection::SystemTuple::type_at<i>::type;
             std::shared_ptr<T> system = std::make_shared<T>(registry);
             // todo push to local array of systems as well
             Engine::Get().PushLayer(system);
-            return true;
         });
     Engine::scene()->main_camera->SetWorldOffset(glm::vec3{0.0f, 0.0f, 0.0f});
     Engine::scene()->main_camera->SetWorldAngles(0.0f, 0.0f, 0.0f);
