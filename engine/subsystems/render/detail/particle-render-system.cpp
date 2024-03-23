@@ -90,10 +90,10 @@ namespace lighten::render::_particle_detail
         {
             return;
         }
-        auto &camera_transform = scene->main_camera->transform();
+        auto camera_position = scene->main_camera->position();
 
-        std::sort(particles.begin(), particles.end(), [&camera_transform](const GPUParticle &a, const GPUParticle &b) noexcept -> bool
-                  { return length(a.position - camera_transform.position) > length(b.position - camera_transform.position); });
+        std::sort(particles.begin(), particles.end(), [camera_position](const GPUParticle &a, const GPUParticle &b) noexcept -> bool
+                  { return length(a.position - camera_position) > length(b.position - camera_position); });
 
         particle_buffer_.Init(std::span<GPUParticle>(particles));
         ParticlePerFrame per_frame;

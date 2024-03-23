@@ -10,7 +10,7 @@ namespace lighten::core
     }
     void LayerStack::OnPreUpdate()
     {
-        for (auto &layer : update_)
+        for (auto &layer : pre_update_)
         {
             layer->OnPreUpdate();
         }
@@ -24,7 +24,7 @@ namespace lighten::core
     }
     void LayerStack::OnPostUpdate()
     {
-        for (auto &layer : update_)
+        for (auto &layer : post_update_)
         {
             layer->OnPostUpdate();
         }

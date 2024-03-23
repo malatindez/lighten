@@ -8,15 +8,15 @@ namespace lighten::render
     namespace
     {
         bool CheckForIntersection(Model const &model,
-                                  components::Transform transform,
+                                  components::WorldTransform transform,
                                   Ray const &ray,
                                   core::MeshIntersection &nearest)
         {
             bool rv = false;
             for (auto const &mesh : model.meshes)
             {
-                glm::mat4 mat = transform.model * mesh.mesh_to_model;
-                glm::mat4 inv_mat = mesh.inv_mesh_to_model * transform.inv_model;
+                glm::mat4 mat = transform.world * mesh.mesh_to_model;
+                glm::mat4 inv_mat = mesh.inv_mesh_to_model * transform.inv_world;
                 Ray mesh_local = ray;
                 mesh_local.origin() = (inv_mat * glm::vec4{mesh_local.origin(), 1});
                 mesh_local.SetDirection((inv_mat * glm::vec4{mesh_local.direction(), 0}));
@@ -35,9 +35,9 @@ namespace lighten::render
                                                               Ray const &ray,
                                                               core::MeshIntersection &nearest)
     {
-        auto group1 = registry.group<components::OpaqueComponent>(entt::get<components::Transform>);
-        auto group2 = registry.group<components::EmissiveComponent>(entt::get<components::Transform>);
-        auto group3 = registry.group<components::DissolutionComponent>(entt::get<components::Transform>);
+        auto group1 = registry.group<components::OpaqueComponent>(entt::get<components::WorldTransform>);
+        auto group2 = registry.group<components::EmissiveComponent>(entt::get<components::WorldTransform>);
+        auto group3 = registry.group<components::DissolutionComponent>(entt::get<components::WorldTransform>);
         std::optional<entt::entity> rv = std::nullopt;
         auto const &func = [&rv, &ray, &nearest](auto const entity, auto const &model_instance, auto const &transform) -> void
         {

@@ -1,14 +1,15 @@
 #pragma once
 
 #include "../core/reflection-macro.hpp"
-#include "core/math.hpp"
+#include "../core/math.hpp"
+
 namespace lighten::components
 {
     /**
      * @brief Camera component
      */
     LIGHTEN_COMPONENT(name = "Camera", category = "Core")
-    struct CameraComponent
+    struct Camera
     {
         /// @brief View matrix
         LIGHTEN_PROPERTY(name = "View Matrix", category = "debug_matrices")

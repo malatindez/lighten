@@ -315,7 +315,7 @@ namespace lighten::render::_opaque_detail
 
         auto mapping = instance_buffer_.Map();
         OpaqueInstance *dst = static_cast<OpaqueInstance *>(mapping.pData);
-        auto instance_group = registry.group<components::OpaqueComponent>(entt::get<components::Transform>);
+        auto instance_group = registry.group<components::OpaqueComponent>(entt::get<components::WorldTransform>);
         uint32_t copiedNum = 0;
         for (auto &model_instance : model_instances_)
         {
@@ -327,7 +327,7 @@ namespace lighten::render::_opaque_detail
                     for (auto entity : instances)
                     {
                         dst[copiedNum++] = OpaqueInstance{
-                            .world_transform = instance_group.get<components::Transform>(entity).model,
+                            .world_transform = instance_group.get<components::WorldTransform>(entity).model,
                             .entity_id = static_cast<uint32_t>(entity)};
                     }
                 }

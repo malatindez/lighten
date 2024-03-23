@@ -176,10 +176,11 @@ namespace lighten::render::_emissive_particle_detail
         // but it's a quick fix for now
         auto &dissolution_component = registry.get<components::DissolutionComponent>(entity);
         auto &transform = registry.get<components::Transform>(entity);
+        auto &world_transform = registry.get<components::WorldTransform>(entity);
         auto &model = ModelSystem::GetModel(dissolution_component.model_id);
 
         PerMesh per_mesh{
-            .world_transform = transform.model,
+            .world_transform = world_transform.world,
             .time_begin = dissolution_component.time_begin,
             .object_lifetime = dissolution_component.lifetime,
             .velocity_range = {0.25f, 1.5f}, // TODO: make this the system parameter that we can change from UI
@@ -222,7 +223,7 @@ namespace lighten::render::_emissive_particle_detail
             auto &mesh = model.meshes[index];
             auto &material = materials[index];
             per_mesh.flags = material->opacity_map != nullptr ? 1 : 0;
-            per_mesh.world_transform = transform.model * mesh.mesh_to_model;
+            per_mesh.world_transform = world_transform.world * mesh.mesh_to_model;
             per_mesh_buffer_.Update(per_mesh);
             direct3d::api().devcon4->VSSetShaderResources(0, 1, &material->opacity_map);
 

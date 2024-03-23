@@ -7,18 +7,21 @@ namespace lighten
 
     CameraController::CameraController(entt::registry *registry, entt::entity entity,
                                        glm::ivec2 const &window_size)
-        : registry_(registry), camera_(entity), window_size_(window_size)
+        : registry_(registry), camera_(entity), window_size_(window_size),
+        camera_update_observer{ *registry, entt::collector.update<components::Transform>().update<components::Camera>() }
     {
         Init();
     }
     void CameraController::Init()
     {
+        local_camera_ = registry_->get<components::Camera>(camera_);
+        local_transform_ = registry_->get<components::Transform>(camera_);
         UpdateProjectionMatrix();
         UpdateMatrices();
     }
     void CameraController::UpdateProjectionMatrix()
     {
-        auto &cam = camera();
+        auto &cam = local_camera_;
         SetProjectionMatrix(glm::perspectiveLH_ZO(
             cam.fovy_,
             float(window_size_.x) / float(window_size_.y),
@@ -28,32 +31,29 @@ namespace lighten
 
     void CameraController::SetProjectionMatrix(glm::mat4 const &proj)
     {
-        auto &cam = camera();
+        auto &cam = local_camera_;
         cam.projection = proj;
         cam.inv_projection = inverse(proj);
     }
     void CameraController::SetWorldOffset(glm::vec3 const &offset)
     {
-        auto &transform_ = transform();
+        auto &transform_ = local_transform_;
         transform_.position = offset; // overwrites
-        transform_.UpdateMatrices();
         update_matrices_ = true;
     }
 
     void CameraController::AddWorldOffset(glm::vec3 const &offset)
     {
-        auto &transform_ = transform();
+        auto &transform_ = local_transform_;
         transform_.position += offset;
-        transform_.UpdateMatrices();
         update_matrices_ = true;
     }
 
     void CameraController::AddRelativeOffset(glm::vec3 const &offset)
     {
         UpdateBasis();
-        auto &transform_ = transform();
+        auto &transform_ = local_transform_;
         transform_.position += offset[0] * right() + offset[1] * up() + offset[2] * forward();
-        transform_.UpdateMatrices();
         update_matrices_ = true;
     }
 
@@ -61,7 +61,7 @@ namespace lighten
     {
         update_basis_ = true;
         update_matrices_ = true;
-        auto &transform_ = transform();
+        auto &transform_ = local_transform_;
         if (roll_enabled_)
         {
             transform_.rotation = glm::quat(glm::vec3{0.f, 0.f, roll});
@@ -75,7 +75,7 @@ namespace lighten
     {
         update_basis_ = true;
         update_matrices_ = true;
-        auto &transform_ = transform();
+        auto &transform_ = local_transform_;
         if (roll_enabled_)
         {
             transform_.rotation *= glm::quat(glm::vec3{0.f, 0.f, roll});
@@ -89,7 +89,7 @@ namespace lighten
     {
         update_basis_ = true;
         update_matrices_ = true;
-        auto &transform_ = transform();
+        auto &transform_ = local_transform_;
         if (roll_enabled_)
         {
             transform_.rotation *= glm::quat(roll * forward());
@@ -111,8 +111,8 @@ namespace lighten
             return;
         }
         update_basis_ = false;
-        auto &cam = camera();
-        auto &transform_ = transform();
+        auto &cam = local_camera_;
+        auto &transform_ = local_transform_;
         auto t = glm::transpose(glm::mat3_cast(transform_.rotation));
         for (int i = 0; i < 3; i++)
         {
@@ -132,8 +132,8 @@ namespace lighten
         update_matrices_ = false;
 
         UpdateBasis();
-        auto &cam = camera();
-        auto &transform_ = transform();
+        auto &cam = local_camera_;
+        auto &transform_ = local_transform_;
         cam.inv_view[3][0] = transform_.position.x;
         cam.inv_view[3][1] = transform_.position.y;
         cam.inv_view[3][2] = transform_.position.z;
@@ -153,6 +153,22 @@ namespace lighten
     }
     void CameraController::OnTick(float delta_time, glm::ivec2 const &pixel_mouse_delta)
     {
+        if (!camera_update_observer.empty())
+        {
+            for(auto entity : camera_update_observer)
+			{
+                if (entity != camera_)
+                {
+                    continue;
+                }
+				auto &cam = registry_->get<components::Camera>(entity);
+                auto &transform = registry_->get<components::Transform>(entity);
+				local_camera_ = cam;
+                local_transform_ = transform;
+				update_matrices_ = true;
+                update_basis_ = true;
+			}
+        }
         glm::vec3 offset{0};
         // process movement
         if (flags_ & MoveForward)
@@ -208,7 +224,7 @@ namespace lighten
         }
         glm::vec2 t{pixel_mouse_delta};
         t = -t / glm::vec2(window_size_);
-        t *= sensitivity_ * camera().fovy_;
+        t *= sensitivity_ * local_camera_.fovy_;
         yaw = t.x;
         pitch = t.y;
         if (!(roll == 0 && pitch == 0 && yaw == 0))
@@ -219,7 +235,14 @@ namespace lighten
         {
             AddRelativeOffset(move_speed_ * offset * delta_time * ((flags_ & Accelerate) ? accelerated_speed_ : move_speed_));
         }
+        bool updated = update_matrices_;
         UpdateMatrices();
+        if (update_matrices_)
+        {
+            registry_->patch<components::Camera>(camera_, [&](components::Camera &cam) { cam = local_camera_; });
+            registry_->patch<components::Transform>(camera_, [&](components::Transform& transform) { transform = local_transform_; });
+        }
+        camera_update_observer.clear();
         flags_ = None;
     }
 } // namespace lighten

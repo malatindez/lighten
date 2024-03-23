@@ -1,6 +1,5 @@
 #include "engine.hpp"
 #include "include/win-debug.hpp"
-#include "reflection/reflection.hpp"
 namespace lighten::core
 {
     using namespace events;
@@ -37,7 +36,6 @@ namespace lighten::core
         SkyboxManager::Init();
         TextureManager::Init();
         render::ModelSystem::Init();
-
     }
 
     void Engine::Deinit()

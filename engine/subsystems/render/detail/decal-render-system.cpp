@@ -46,7 +46,7 @@ namespace lighten::render::_decal_detail
     }
     void DecalRenderSystem::UpdateInstances(entt::registry &registry)
     {
-        auto group = registry.group<components::DecalComponent, components::Transform>();
+        auto group = registry.group<components::DecalComponent, components::WorldTransform>();
         material_instances_.clear();
         uint32_t instances_count = 0;
         for (auto entity : group)
@@ -66,12 +66,12 @@ namespace lighten::render::_decal_detail
             for (auto entity : group)
             {
                 auto &decal_component = group.get<components::DecalComponent>(entity);
-                auto &transform_component = group.get<components::Transform>(entity);
+                auto &transform_component = group.get<components::WorldTransform>(entity);
                 for (auto it = decal_component.decals.begin(); it != decal_component.decals.end(); ++it)
                 {
                     auto &decal = *it;
                     DecalInstance &instance = *(decal_instances++);
-                    instance.world_transform = transform_component.model * decal.mesh_transform * decal.model_to_decal;
+                    instance.world_transform = transform_component.world * decal.mesh_transform * decal.model_to_decal;
                     instance.inv_world_transform = glm::inverse(instance.world_transform);
                     instance.base_color = decal.base_color;
                     instance.roughness = decal.roughness;

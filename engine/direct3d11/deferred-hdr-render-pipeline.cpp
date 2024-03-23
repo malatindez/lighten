@@ -287,7 +287,7 @@ namespace lighten::direct3d
         api().devcon4->ClearRenderTargetView(gbuffer_.entity_id->render_target_view(), reinterpret_cast<const float *>(&empty_vec));
         api().devcon4->ClearDepthStencilView(depth_stencil_.depth_stencil_view(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0);
 
-        auto const &camera = scene_->main_camera->camera();
+        auto const &camera = scene_->main_camera->get_last_camera_state();
         per_frame_.view = camera.view;
         per_frame_.projection = camera.projection;
         per_frame_.view_projection = camera.view_projection;

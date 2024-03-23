@@ -3,6 +3,8 @@
 #include "object-editor.hpp"
 #include "render/renderer.hpp"
 #include "scene-viewer.hpp"
+#include "reflection/reflection.hpp"
+
 using namespace lighten;
 using namespace core;
 using namespace events;
@@ -53,7 +55,7 @@ void Controller::OnGuiRender()
     ImGui::SliderFloat("FOV: ", &fov, 0.0f, glm::radians(180.0f));
     if (Engine::scene()->main_camera->fovy() != fov)
     {
-        Engine::scene()->main_camera->camera().fovy_ = fov;
+        Engine::scene()->main_camera->fovy() = fov;
         Engine::scene()->main_camera->UpdateProjectionMatrix();
     }
     auto &camera_controller = *Engine::scene()->main_camera;
@@ -162,8 +164,8 @@ void Controller::OnGuiRender()
 #endif
     ImGui::End();
 
-    object_editor::OnGuiRender();
-    object_editor::OnRender(hdr_render_pipeline_->window()->position(), hdr_render_pipeline_->framebuffer_size());
+//    object_editor::OnGuiRender();
+//    object_editor::OnRender(hdr_render_pipeline_->window()->position(), hdr_render_pipeline_->framebuffer_size());
 
     scene_viewer::OnGuiRender();
 }
@@ -184,10 +186,20 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     hdr_render_pipeline->deferred_resolve()->SetPrefilteredTexture(TextureManager::GetTextureView(std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street_reflection.dds"));
     auto &registry = first_scene->registry;
     main_camera_entity = registry.create();
-    registry.emplace<CameraComponent>(main_camera_entity, CameraComponent());
+    registry.emplace<Camera>(main_camera_entity, Camera());
     registry.emplace<Transform>(main_camera_entity, Transform());
     first_scene->main_camera = std::make_unique<CameraController>(&registry, main_camera_entity, hdr_render_pipeline_->framebuffer_size());
     Engine::SetScene(first_scene);
+
+    // todo: move it to engine itself, figure out a better way to handle registry
+    mal_toolkit::constexpr_for < 0, reflection::SystemTuple::amount, 1>([&](auto i) constexpr -> bool
+        {
+            using T = reflection::SystemTuple::type_at<i>::type;
+            std::shared_ptr<T> system = std::make_shared<T>(registry);
+            // todo push to local array of systems as well
+            Engine::Get().PushLayer(system);
+            return true;
+        });
     Engine::scene()->main_camera->SetWorldOffset(glm::vec3{0.0f, 0.0f, 0.0f});
     Engine::scene()->main_camera->SetWorldAngles(0.0f, 0.0f, 0.0f);
     Engine::scene()->main_camera->SetProjectionMatrix(glm::perspectiveLH_ZO(45.0f, 16.0f / 9.0f, 0.001f, 100.0f));
@@ -244,7 +256,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                              (float(amountOfModels) / std::sqrtf((float)amountOfModels));
         transform.rotation = glm::quat(glm::vec3(0.0f, 0.0f, glm::radians(180.0f)));
         transform.rotation *= glm::quat_cast(glm::lookAtLH(transform.position, glm::vec3{0, 0, 0}, glm::vec3{0, 1, 0}));
-        transform.UpdateMatrices();
+        registry.patch<Transform>(knight, [&](Transform& transform) { });
     }
     render::OpaqueMaterial cobblestone_material;
     render::OpaqueMaterial crystal_material;
@@ -337,7 +349,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             auto &transform = registry.emplace<Transform>(cube);
             transform.position = glm::vec3{(int32_t)i - (int32_t)materials.size() / 2, 0, -8};
             transform.scale = glm::vec3{1};
-            transform.UpdateMatrices();
+            registry.patch<Transform>(cube, [&](Transform& transform) {});
             ors.AddInstance(model_id, registry, cube, {materials[i]});
         }
     }
@@ -359,7 +371,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                 auto &transform = registry.emplace<Transform>(sphere);
                 transform.position = glm::vec3{i - 5, j, 5};
                 transform.scale = glm::vec3{0.375f};
-                transform.UpdateMatrices();
+                registry.patch<Transform>(sphere, [&](Transform& transform) {});
                 render::OpaqueMaterial material;
                 material.reset();
                 material.albedo_color = glm::vec3{1};
@@ -388,7 +400,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             auto &transform = registry.emplace<Transform>(cube);
             transform.position = glm::vec3{0, -0.5f, 0} + glm::vec3{i < 2 ? -1 : 1, 0, i % 2 == 0 ? -1 : 1} * 2.5f;
             transform.scale = glm::vec3{5, 0.1, 5};
-            transform.UpdateMatrices();
+            registry.patch<Transform>(cube, [&](Transform& transform) {});
             ors.AddInstance(model_id, registry, cube, {stone_material});
         }
     }
@@ -402,7 +414,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         transform.position = glm::vec3{-5, 4.5f, 0};
         transform.scale = glm::vec3{10, 0.1, 10};
         transform.rotation = glm::quat(glm::vec3(0.0f, 0.0f, glm::radians(90.0f)));
-        transform.UpdateMatrices();
+        registry.patch<Transform>(wall, [&](Transform& transform) {});
         ors.AddInstance(model_id, registry, wall, {stone_material});
     }
     // ------------------------- LIGHTS -------------------------
@@ -419,7 +431,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         auto &transform = registry.emplace<Transform>(entity);
         transform.scale = glm::vec3{0.15f};
         transform.position = glm::vec3{0, 3, -2};
-        transform.UpdateMatrices();
+        registry.patch<Transform>(entity, [&](Transform& transform) {});
         auto &point_light = registry.emplace<PointLight>(entity);
         point_light.color = glm::vec3{0.988, 0.933, 0.655};
         point_light.power = 2e3f;
@@ -440,7 +452,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         auto &transform = registry.emplace<Transform>(entity);
         transform.scale = glm::vec3{0.15f};
         transform.position = glm::vec3{0, 3, 2};
-        transform.UpdateMatrices();
+        registry.patch<Transform>(entity, [&](Transform& transform) {});
         auto &point_light = registry.emplace<PointLight>(entity);
         point_light.color = glm::vec3{0.988, 0.233, 0.255};
         point_light.power = 2.5e3f;
@@ -461,7 +473,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         auto &transform = registry.emplace<Transform>(entity);
         transform.scale = glm::vec3{0.15f};
         transform.position = glm::vec3{0, 2, -8};
-        transform.UpdateMatrices();
+        registry.patch<Transform>(entity, [&](Transform& transform) {});
         auto &point_light = registry.emplace<PointLight>(entity);
         point_light.color = glm::vec3{0.01, 0.933, 0.255};
         point_light.power = 3e3f;
@@ -483,7 +495,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         transform.scale = glm::vec3{0.1f};
         transform.position = glm::vec3{0, 0.0f, 0};
         transform.position += glm::vec3{std::cosf(float(i) / amountOfDeferredLights * 2 * std::numbers::pi_v<float>), 0, std::sinf(float(i) / amountOfDeferredLights * 2 * std::numbers::pi_v<float>)} * 15.0f;
-        transform.UpdateMatrices();
+        registry.patch<Transform>(entity, [&](Transform& transform) {});
         auto &point_light = registry.emplace<PointLight>(entity);
         point_light.color = glm::vec3{(i + 1) % 2, (i + 1) % 3, (i + 1) % 5};
         point_light.color = normalize(point_light.color);
@@ -507,7 +519,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         transform.scale = glm::vec3{0.15f};
         transform.position = glm::vec3{0, 10, 0};
         transform.rotation = glm::quat(glm::vec3{glm::radians(-120.0f), glm::radians(-30.0f), glm::radians(-60.0f)});
-        transform.UpdateMatrices();
+        registry.patch<Transform>(entity, [&](Transform& transform) {});
         auto &directional_light = registry.emplace<DirectionalLight>(entity);
         directional_light.color = glm::vec3{0.988, 0.933, 0.455};
         directional_light.power = 10;
@@ -532,7 +544,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         transform.scale = glm::vec3{0.15f};
         transform.position = glm::vec3{0, 3, 0};
         transform.rotation = glm::quat(glm::vec3{glm::radians(-120.0f), glm::radians(-30.0f), glm::radians(-60.0f)});
-        transform.UpdateMatrices();
+        registry.patch<Transform>(entity, [&](Transform& transform) {});
         auto &spot_light = registry.emplace<SpotLight>(entity);
         spot_light.color = glm::vec3{0.988, 0.933, 0.455};
         spot_light.power = 10;
@@ -564,7 +576,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         transform.scale = glm::vec3{0.15f};
         transform.position = glm::vec3{-3.5, 2, -8};
         transform.rotation = glm::quat(glm::vec3{0, 0, glm::radians(-90.0f)});
-        transform.UpdateMatrices();
+        registry.patch<Transform>(entity, [&](Transform& transform) {});
 
         auto &particle_emitter = registry.emplace<ParticleEmitter>(entity);
         particle_emitter.position_yaw_pitch_range = glm::vec4{glm::vec2{-std::numbers::pi}, glm::vec2{std::numbers::pi_v<float>}} / 16.0f;
@@ -595,7 +607,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         transform.scale = glm::vec3{0.15f};
         transform.position = glm::vec3{4, 2, -8};
         transform.rotation = glm::quat(glm::vec3{0, 0, glm::radians(-90.0f)});
-        transform.UpdateMatrices();
+        registry.patch<Transform>(entity, [&](Transform& transform) {});
 
         auto &particle_emitter = registry.emplace<ParticleEmitter>(entity);
         particle_emitter.position_yaw_pitch_range = glm::vec4{-std::numbers::pi / 4, -std::numbers::pi / 4, std::numbers::pi / 4, std::numbers::pi / 4};
@@ -624,7 +636,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         auto &transform = registry.emplace<Transform>(grass);
         transform.scale = glm::vec3{2.0f, 0.1f, 2.0f};
         transform.position = glm::vec3{0, 0, -12};
-        transform.UpdateMatrices();
+        registry.patch<Transform>(grass, [&](Transform& transform) {});
 
         render::OpaqueMaterial grass_floor_material;
         grass_floor_material.reset();
@@ -684,8 +696,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     SkyboxManager::LoadSkybox(registry, std::filesystem::current_path() / "assets/textures/skyboxes/night_street/night_street.dds");
     first_scene->ScheduleInstanceUpdate();
     camera_movement::RegisterKeyCallbacks();
-    object_editor::RegisterKeyCallbacks();
-    auto &input = *InputLayer::instance();
+     auto &input = *InputLayer::instance();
     auto &exposure = hdr_render_pipeline_->hdr_to_ldr_layer()->exposure();
     input.AddTickKeyCallback({Key::KEY_PLUS}, [&exposure](float dt, InputLayer::KeySeq const &, uint32_t)
                              { exposure += dt; });
@@ -720,7 +731,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             {
                 return;
             }
-            auto &transform = scene->registry.get<Transform>(*entity);
+            auto &transform = scene->registry.get<WorldTransform>(*entity);
             uint32_t mesh_id = std::numeric_limits<uint32_t>::max();
             auto *model_instance = Engine::scene()->renderer->opaque_render_system().GetInstancePtr(opaque_component->model_id);
             {
@@ -747,7 +758,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
 
             DecalComponent::Decal decal{};
             decal.mesh_transform = model_instance->model.meshes[mesh_id].mesh_to_model;
-            glm::mat4 inv_mat = model_instance->model.meshes[mesh_id].inv_mesh_to_model * transform.inv_model;
+            glm::mat4 inv_mat = model_instance->model.meshes[mesh_id].inv_mesh_to_model * transform.inv_world;
             glm::vec3 relative_position = (inv_mat * glm::vec4(nearest.point, 1.0f));
 
             float texture_angle = std::uniform_real_distribution(0.0f, 2.0f * std::numbers::pi_v<float>)(core::Engine::random_engine());
@@ -812,7 +823,8 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                                        -Engine::scene()->main_camera->forward()};
                                    rotation_matrix = inverse(transpose(rotation_matrix));
                                    transform.rotation = glm::quat_cast(rotation_matrix);
-                                   transform.UpdateMatrices();
+                                   registry.patch<Transform>(knight, [&](Transform& transform) {});
+
                                    uint64_t model_id = ModelLoader::Load("assets\\models\\Knight\\Knight.fbx").value();
                                    drs.AddInstance(model_id, registry, knight, glm::vec3{0.0f}, std::uniform_real_distribution<float>(3.0f, 15.0f)(Engine::random_engine()));
                                    Engine::scene()->renderer->dissolution_render_system().ScheduleInstanceUpdate();
@@ -906,7 +918,8 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             rotation_matrix = inverse(transpose(rotation_matrix));
             transform.rotation = glm::quat_cast(rotation_matrix);
             transform.scale = glm::vec3{0.05, 0.05, 0.1f};
-            transform.UpdateMatrices();
+            registry.patch<Transform>(cube, [&](Transform& transform) {});
+
             uint64_t model_id = render::ModelSystem::GetUnitCube();
             ors.AddInstance(model_id, registry, cube, {cobblestone_material});
 

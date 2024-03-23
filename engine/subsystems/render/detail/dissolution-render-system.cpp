@@ -404,7 +404,7 @@ namespace lighten::render::_dissolution_detail
         instance_buffer_size_ = total_instances;
         auto mapping = instance_buffer_.Map();
         DissolutionInstance *dst = static_cast<DissolutionInstance *>(mapping.pData);
-        auto instance_group = registry.group<components::DissolutionComponent>(entt::get<components::Transform>);
+        auto instance_group = registry.group<components::DissolutionComponent>(entt::get<components::WorldTransform, components::Transform>);
         uint32_t copiedNum = 0;
         for (auto &model_instance : model_instances_)
         {
@@ -415,9 +415,10 @@ namespace lighten::render::_dissolution_detail
                     auto &instances = perMaterial.instances;
                     for (auto entity : instances)
                     {
+                        auto &world_transform = instance_group.get<components::WorldTransform>(entity);
                         auto &transform = instance_group.get<components::Transform>(entity);
                         auto &dissolution = instance_group.get<components::DissolutionComponent>(entity);
-                        dst[copiedNum++] = DissolutionInstance{.world_transform = transform.model,
+                        dst[copiedNum++] = DissolutionInstance{.world_transform = world_transform.world,
                                                                .time_begin = dissolution.time_begin,
                                                                .lifetime = dissolution.lifetime,
                                                                .click_point = dissolution.click_point,

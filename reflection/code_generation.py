@@ -77,18 +77,19 @@ SYSTEM_METADATA = string.Template('        SystemMetadata { "$name", "$category"
 def generate_hpp_serialization_code(global_data):
     includes = {
         "#include <cereal/cereal.hpp>",
-        "#include <variant>",
+        "#include <tuple>",
         "#include <string>",
-        "#include <array>"
+        "#include <array>",
+        "#include <mal-toolkit/template.hpp>"
     }
 
     serialization_code_parts = []
     serialization_functions = []
 
-    component_variant_strings = []
+    component_tuple_strings = []
     component_metadata_list = []
 
-    system_variant_strings = []
+    system_tuple_strings = []
     system_metadata_list = []
 
 
@@ -110,7 +111,7 @@ def generate_hpp_serialization_code(global_data):
                 ))
             
             if class_info['kind'] == 'LIGHTEN_COMPONENT':
-                component_variant_strings.append(f"        ::{class_info['namespace']}::{class_name}")
+                component_tuple_strings.append(f"        ::{class_info['namespace']}::{class_name}")
                 component_metadata_list.append(COMPONENT_METADATA.substitute(
                     name=class_info['settings'].get('name', class_name),
                     category=class_info['settings'].get('category', "Default"),
@@ -120,23 +121,23 @@ def generate_hpp_serialization_code(global_data):
                     editor_readonly=str(class_info['settings'].get('editor_readonly', 'false')).lower()
                 ))
             elif class_info['kind'] == 'LIGHTEN_SYSTEM':
-                system_variant_strings.append(f"        ::{class_info['namespace']}::{class_name}")
+                system_tuple_strings.append(f"        ::{class_info['namespace']}::{class_name}")
                 system_metadata_list.append(SYSTEM_METADATA.substitute(
                     name=class_info['settings'].get('name', class_name),
                     category=class_info['settings'].get('category', "Default")
                 ))
                 
     serialization_code_parts.append("\n".join(sorted(includes)))
-    serialization_code_parts.append("namespace lighten::serialization {")
+    serialization_code_parts.append("namespace lighten::reflection {")
     serialization_code_parts.append(REFLECTION_PREDEFINED_STRUCTS)
-    serialization_code_parts.append("    using ComponentVariant = std::variant<")
-    serialization_code_parts.append(",\n".join(component_variant_strings))
+    serialization_code_parts.append("    using ComponentTuple = mal_toolkit::parameter_pack_info<")
+    serialization_code_parts.append(",\n".join(component_tuple_strings))
     serialization_code_parts.append("    >;")
     serialization_code_parts.append("    constexpr std::array<ComponentMetadata, " + str(len(component_metadata_list)) + "> component_metadata = {")
     serialization_code_parts.extend(component_metadata_list)
     serialization_code_parts.append("    };")
-    serialization_code_parts.append("    using SystemVariant = std::variant<")
-    serialization_code_parts.append(",\n".join(system_variant_strings))
+    serialization_code_parts.append("    using SystemTuple = mal_toolkit::parameter_pack_info<")
+    serialization_code_parts.append(",\n".join(system_tuple_strings))
     serialization_code_parts.append("    >;")
     serialization_code_parts.append("    constexpr std::array<SystemMetadata, " + str(len(system_metadata_list)) + "> system_metadata = {")
     serialization_code_parts.extend(system_metadata_list)

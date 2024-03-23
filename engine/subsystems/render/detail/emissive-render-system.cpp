@@ -89,7 +89,7 @@ namespace lighten::render::_emissive_detail
 
         auto mapping = instance_buffer_.Map();
         EmissiveInstance *dst = static_cast<EmissiveInstance *>(mapping.pData);
-        auto instance_group = registry.group<components::EmissiveComponent>(entt::get<components::Transform>);
+        auto instance_group = registry.group<components::EmissiveComponent>(entt::get<components::WorldTransform>);
         for (auto &model_instance : model_instances_)
         {
             for (uint32_t meshIndex = 0; meshIndex < model_instance.mesh_instances.size(); ++meshIndex)
@@ -99,7 +99,7 @@ namespace lighten::render::_emissive_detail
                 {
                     auto &emissive_component = instance_group.get<components::EmissiveComponent>(entity);
                     *dst++ = EmissiveInstance{
-                        .world_transform = instance_group.get<components::Transform>(entity).model,
+                        .world_transform = instance_group.get<components::WorldTransform>(entity).world,
                         .emissive_color = emissive_component.emissive_color * emissive_component.power};
                 }
             }

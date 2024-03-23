@@ -114,9 +114,7 @@ namespace camera_movement
                     Ray b = scene->main_camera->PixelRaycast(glm::vec2{input.mouse_position()});
                     rb_saved_mouse_position = input.mouse_position();
                     glm::vec3 obj_offset = b.direction() * selected_distance / dot(scene->main_camera->forward(), b.direction());
-                    auto &transform = scene->registry.get<Transform>(selected_entity);
-                    transform.position = selected_object_offset + obj_offset + scene->main_camera->position();
-                    transform.UpdateMatrices();
+                    selected_scene->registry.patch<Transform>(selected_entity, [&](Transform& transform) { transform.position = selected_object_offset + obj_offset + scene->main_camera->position(); });
                     if (Engine::scene()->registry.try_get<components::OpaqueComponent>(selected_entity))
                     {
                         Engine::scene()->renderer->opaque_render_system().ScheduleInstanceUpdate();

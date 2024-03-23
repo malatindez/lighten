@@ -151,7 +151,7 @@ namespace scene_viewer
         auto &game_object = registry.emplace<GameObject>(entity);
         auto &transform = registry.emplace<Transform>(entity);
         transform.reset();
-        transform.UpdateMatrices();
+        registry.patch<Transform>(entity, [](Transform& transform) {});
         auto &model_obj = render::ModelSystem::GetModel(model_id);
         game_object.name = model_obj.name;
 
@@ -259,8 +259,8 @@ namespace scene_viewer
             ImGui::SameLine();
             if (ImGui::Button("Select"))
             {
-                object_editor::selected_entity = entity;
-                object_editor::selected_scene = lighten::core::Engine::scene();
+//                object_editor::selected_entity = entity;
+//                object_editor::selected_scene = lighten::core::Engine::scene();
             }
             ImGui::TreePop();
         }
