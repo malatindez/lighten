@@ -75,7 +75,9 @@ namespace lighten::core
 #ifdef _DEBUG
                     update_measurer.begin();
 #endif
+                    OnPreUpdate();
                     OnUpdate();
+                    OnPostUpdate();
 #ifdef _DEBUG
                     update_measurer.end();
 #endif

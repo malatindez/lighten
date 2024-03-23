@@ -44,7 +44,9 @@ namespace lighten::core
         constexpr bool StaticCheck()
         {
             return std::is_base_of_v<Layer::HandleEvent, T> ||
+                   std::is_base_of_v<Layer::HandlePreUpdate, T> ||
                    std::is_base_of_v<Layer::HandleUpdate, T> ||
+                   std::is_base_of_v<Layer::HandlePostUpdate, T> ||
                    std::is_base_of_v<Layer::HandleRender, T> ||
                    std::is_base_of_v<Layer::HandleGuiRender, T> ||
                    std::is_base_of_v<Layer::HandleTick, T>;
@@ -60,9 +62,17 @@ namespace lighten::core
             return;
         }
         all_.push_back(static_pointer_cast<Layer>(layer));
+        if constexpr (std::is_base_of_v<Layer::HandlePreUpdate, T>)
+        {
+            pre_update_.PushLayer(static_cast<Layer::HandlePreUpdate *>(layer.get()));
+        }
         if constexpr (std::is_base_of_v<Layer::HandleUpdate, T>)
         {
             update_.PushLayer(static_cast<Layer::HandleUpdate *>(layer.get()));
+        }
+        if constexpr (std::is_base_of_v<Layer::HandlePostUpdate, T>)
+        {
+            post_update_.PushLayer(static_cast<Layer::HandlePostUpdate *>(layer.get()));
         }
         if constexpr (std::is_base_of_v<Layer::HandleRender, T>)
         {
@@ -92,9 +102,18 @@ namespace lighten::core
             return;
         }
         all_.push_back(static_pointer_cast<Layer>(layer));
+        
+        if constexpr (std::is_base_of_v<Layer::HandlePreUpdate, T>)
+        {
+            pre_update_.PushOverlay(static_cast<Layer::HandlePreUpdate *>(layer.get()));
+        }
         if constexpr (std::is_base_of_v<Layer::HandleUpdate, T>)
         {
             update_.PushOverlay(static_cast<Layer::HandleUpdate *>(layer.get()));
+        }
+        if constexpr (std::is_base_of_v<Layer::HandlePostUpdate, T>)
+        {
+            post_update_.PushOverlay(static_cast<Layer::HandlePostUpdate *>(layer.get()));
         }
         if constexpr (std::is_base_of_v<Layer::HandleRender, T>)
         {
@@ -128,9 +147,17 @@ namespace lighten::core
             spdlog::warn("Warning: trying to pop layer that doesnt exist. Skipping");
             return;
         }
+        if constexpr (std::is_base_of_v<Layer::HandlePreUpdate, T>)
+        {
+            pre_update_.PopLayer(static_cast<Layer::HandlePreUpdate *>(layer.get()));
+        }
         if constexpr (std::is_base_of_v<Layer::HandleUpdate, T>)
         {
             update_.PopLayer(static_cast<Layer::HandleUpdate *>(layer.get()));
+        }
+        if constexpr (std::is_base_of_v<Layer::HandlePostUpdate, T>)
+        {
+            post_update_.PopLayer(static_cast<Layer::HandlePostUpdate *>(layer.get()));
         }
         if constexpr (std::is_base_of_v<Layer::HandleRender, T>)
         {
@@ -164,9 +191,17 @@ namespace lighten::core
             spdlog::warn("Warning: trying to pop overlay that doesnt exist. Skipping");
             return;
         }
+        if constexpr (std::is_base_of_v<Layer::HandlePreUpdate, T>)
+        {
+            pre_update_.PopOverlay(static_cast<Layer::HandlePreUpdate *>(layer.get()));
+        }
         if constexpr (std::is_base_of_v<Layer::HandleUpdate, T>)
         {
             update_.PopOverlay(static_cast<Layer::HandleUpdate *>(layer.get()));
+        }
+        if constexpr (std::is_base_of_v<Layer::HandlePostUpdate, T>)
+        {
+            post_update_.PopOverlay(static_cast<Layer::HandlePostUpdate *>(layer.get()));
         }
         if constexpr (std::is_base_of_v<Layer::HandleRender, T>)
         {

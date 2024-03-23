@@ -35,7 +35,9 @@ namespace lighten::core
     class LayerStack
         : public Layer,
           public Layer::HandleEvent,
+          public Layer::HandlePreUpdate,
           public Layer::HandleUpdate,
+          public Layer::HandlePostUpdate,
           public Layer::HandleRender,
           public Layer::HandleGuiRender,
           public Layer::HandleTick
@@ -55,7 +57,9 @@ namespace lighten::core
         template <typename T>
         bool HasLayer(std::shared_ptr<T> layer);
 
+        void OnPreUpdate() override;
         void OnUpdate() override;
+        void OnPostUpdate() override;
         void OnRender() override;
         void OnGuiRender() override;
         void OnEvent(events::Event &e) override;
@@ -63,7 +67,9 @@ namespace lighten::core
 
     protected:
         std::vector<std::shared_ptr<Layer>> all_;
+        _layer_stack_detail::UnderlyingStack<Layer::HandlePreUpdate> pre_update_;
         _layer_stack_detail::UnderlyingStack<Layer::HandleUpdate> update_;
+        _layer_stack_detail::UnderlyingStack<Layer::HandlePostUpdate> post_update_;
         _layer_stack_detail::UnderlyingStack<Layer::HandleRender> render_;
         _layer_stack_detail::UnderlyingStack<Layer::HandleGuiRender> gui_render_;
         _layer_stack_detail::UnderlyingStack<Layer::HandleEvent> event_;

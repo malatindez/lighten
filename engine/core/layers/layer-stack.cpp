@@ -8,11 +8,25 @@ namespace lighten::core
             layer->OnDetach();
         }
     }
+    void LayerStack::OnPreUpdate()
+    {
+        for (auto &layer : update_)
+        {
+            layer->OnPreUpdate();
+        }
+    }
     void LayerStack::OnUpdate()
     {
         for (auto &layer : update_)
         {
             layer->OnUpdate();
+        }
+    }
+    void LayerStack::OnPostUpdate()
+    {
+        for (auto &layer : update_)
+        {
+            layer->OnPostUpdate();
         }
     }
     void LayerStack::OnRender()

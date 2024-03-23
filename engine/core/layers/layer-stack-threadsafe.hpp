@@ -18,7 +18,9 @@ namespace lighten::core
         template <typename T>
         bool HasLayer(std::shared_ptr<T> layer);
 
+        void OnPreUpdate() override;
         void OnUpdate() override;
+        void OnPostUpdate() override;
         void OnRender() override;
         void OnGuiRender() override;
         void OnEvent(events::Event &e) override;
