@@ -203,6 +203,17 @@ cython_debug/
 runtime_directory/logs
 runtime_directory/particles_dump_data
 runtime_directory/imgui.ini
+runtime_directory/gui/yaml/
 docs/reference
 docs/latex
 binary/
+
+lighten_reflection_file_parse_cache.json
+lighten_reflection_data.json
+lighten_reflection_data.yaml
+lighten_reflection_serialization.*
+lighten_reflection_gui.*
+runtime_directory/reflection/
+.vs
+
+engine/reflection/reflection.hpp

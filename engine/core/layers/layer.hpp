@@ -26,9 +26,17 @@ namespace lighten::core
         {
             virtual void OnEvent([[maybe_unused]] events::Event &event) = 0;
         };
+        struct HandlePreUpdate
+        {
+            virtual void OnPreUpdate() = 0;
+        };
         struct HandleUpdate
         {
             virtual void OnUpdate() = 0;
+        };
+        struct HandlePostUpdate
+        {
+            virtual void OnPostUpdate() = 0;
         };
         struct HandleRender
         {

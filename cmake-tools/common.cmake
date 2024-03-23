@@ -126,15 +126,21 @@ function(run_reflection_tool TARGET)
     # Retrieve the aggregated include directories
     get_target_property(INPUT_TARGET_INCLUDES ${TARGET} REFLECTION_${TARGET}_INCLUDE_DIRECTORIES)
     get_target_property(INPUT_TARGET_SOURCES ${TARGET} SOURCES)
-    get_target_property(INPUT_TARGET_BINARY_DIR ${TARGET} BINARY_DIR)
+    get_target_property(INPUT_TARGET_SOURCE_DIR ${TARGET} SOURCE_DIR)
+
+    set(CODE_DIR "${CMAKE_SOURCE_DIR}")
 
     # Run custom command with the aggregated include directories
     add_custom_command(
         TARGET "${TARGET}" PRE_BUILD
         COMMAND python \"${CMAKE_CURRENT_LIST_DIR}/../reflection/main.py\"
-                        --build_dir \"${INPUT_TARGET_BINARY_DIR}\"
+                        --global_reflection_output_file "${GLOBAL_REFLECTION_OUTPUT_FILE}"
+                        --global_reflection_cache_dir "${GLOBAL_REFLECTION_CACHE_DIR}"
+                        --code_dir "${INPUT_TARGET_SOURCE_DIR}"
+                        --runtime_dir "${GLOBAL_RUNTIME_DIRECTORY}/reflection/${TARGET}/"
                         --include_dirs "${INPUT_TARGET_INCLUDES}"
                         --source_files "${INPUT_TARGET_SOURCES}"
         COMMENT "Running reflection tool for ${TARGET}"
     )
+
 endfunction(run_reflection_tool)

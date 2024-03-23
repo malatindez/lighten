@@ -7,14 +7,9 @@ import sys
 import time
 import multiprocessing
 import tempfile
-ENABLE_MULTIPROCESSING = True
-ENABLE_UNITY_BUILD = True
-VERBOSE_TIMINGS = True
-VERBOSE = False
+from config import ENABLE_MULTIPROCESSING, ENABLE_UNITY_BUILD, VERBOSE_TIMINGS, VERBOSE
 
 PATTERN_DISCARD_FROM_UNITY_BUILD = re.compile(r'LIGHTEN_REFLECTION_DISCARD_FILE_FROM_UNITY_BUILD')
-
-
 
 
 def fully_qualified(c):
@@ -31,7 +26,7 @@ def fully_qualified(c):
 def format_diagnostics(translation_unit, file):
     nb_diag = translation_unit.diagnostics
     if len(nb_diag) == 0:
-        return ""
+        return (False, "")
     out_str = f"There are {len(nb_diag)} diagnostics for {file}:\n"
 
     found_error = False
@@ -42,8 +37,8 @@ def format_diagnostics(translation_unit, file):
         out_str += error_string + "\n"
 
     if found_error:
-        out_str += "There are errors in the file. Generated reflection may be incorrect.\n"
-    return out_str
+        out_str += "There are errors in the file. Stopping reflection generator.\n"
+    return (found_error, out_str)
 
 def parse_settings_to_dict(parameter_tokens):
     settings = {}
@@ -91,8 +86,6 @@ def parse_settings_to_dict(parameter_tokens):
                 settings[key] = float(value)
 
     return settings
-
-
 
 
 def find_preceding_annotation_and_settings(parent, start_location, end_location, relevant_tokens):
@@ -181,8 +174,12 @@ def find_properties_and_methods(node):
 def find_info(parent, whitelist, parent_namespace=''):
     last_seen_class_location = None
     rv_data = {}
+    skipped_files = []
     for node in parent.get_children():
-        if node.location.file.name not in whitelist:
+        if os.path.normpath(node.location.file.name) not in whitelist:
+            if VERBOSE and node.location.file.name not in skipped_files:
+                print(f"Skipping file: {node.location.file.name}")
+                skipped_files.append(node.location.file.name)
             continue
         try:
             if node.kind in [clang.cindex.CursorKind.CLASS_DECL, clang.cindex.CursorKind.STRUCT_DECL]:
@@ -210,7 +207,7 @@ def find_info(parent, whitelist, parent_namespace=''):
                     if VERBOSE:
                         print(f"{annotation} with settings: {settings}")
                         print(f"Class/Struct: {node.spelling}, Namespace: {parent_namespace}")
-                        for property in properties:
+                        for property in properties.values():
                             print(f"  Property: {property['name']}, Type: {property['type']}, settings: {property['settings']}")
                         for method in methods:
                             print(f"  Method: {method['name']}, Return type: {method['return_type']}, settings: {method['settings']}")
@@ -218,6 +215,12 @@ def find_info(parent, whitelist, parent_namespace=''):
                             print(f"  Getter: {getter['name']}, Return type: {getter['return_type']}, settings: {getter['settings']}")
                         for setter in setters:
                             print(f"  Setter: {setter['name']}, Return type: {setter['return_type']}, settings: {setter['settings']}")
+                    
+                    for property in properties.values():
+                        if property['settings'].get('serialize', False):
+                            rv_data[node.spelling]['settings']['serialize'] = True
+                        if property['settings'].get('save_game', False):
+                            rv_data[node.spelling]['settings']['save_game'] = True
             elif node.kind == clang.cindex.CursorKind.NAMESPACE:
                 new_namespace = f"{parent_namespace}::{node.spelling}" if parent_namespace else node.spelling
                 rv_data.update(find_info(node, whitelist, new_namespace))
@@ -236,13 +239,16 @@ def process_file(args):
         tu = index.parse(file, args=['-std=c++20'] + [f'-I{include_dir}' for include_dir in include_dirs])
         duration = time.time() - start_time
         out_str = f"Translation unit made in {duration:.3f}s: {file}\n"
-        out_str += format_diagnostics(tu, file)
+        error, diagnostics_str = format_diagnostics(tu, file)
+        out_str += diagnostics_str
         start_time = time.time()
         rv_data.update(find_info(tu.cursor, whitelist))
         duration = time.time() - start_time
         out_str += f"Python Processing Time: {duration:.3f}"
-        if VERBOSE_TIMINGS:
+        if VERBOSE_TIMINGS or error:
             print(out_str)
+            if error:
+                exit(-1)
     except:
         print(traceback.format_exc())
         return (-1, rv_data)
@@ -288,7 +294,7 @@ def process_files(include_dirs, source_files):
     for file in excluded_files:
         files_to_process.append(file)
         whitelist.append([file])  # The file's whitelist contains only itself
-
+    whitelist = [[os.path.normpath(file) for file in sublist] for sublist in whitelist]
     output = [0, {}]
     if ENABLE_MULTIPROCESSING and len(files_to_process) > 1:
         with multiprocessing.Pool() as pool:

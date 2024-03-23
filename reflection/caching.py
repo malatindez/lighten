@@ -20,8 +20,8 @@ def md5_speedcheck(path, size):
             b = f.read(size)
     return m.hexdigest()
 
-def load_cache(build_dir):
-    cache_path = os.path.join(build_dir, "file_parse_cache.json")
+def load_cache(global_reflection_cache_dir):
+    cache_path = os.path.join(global_reflection_cache_dir, "lighten_reflection_file_parse_cache.json")
     try:
         if os.path.exists(cache_path):
             with open(cache_path, "r") as f:
@@ -30,8 +30,8 @@ def load_cache(build_dir):
         pass
     return {}
 
-def save_cache(build_dir, cache):
-    cache_path = os.path.join(build_dir, "file_parse_cache.json")
+def save_cache(global_reflection_cache_dir, cache):
+    cache_path = os.path.join(global_reflection_cache_dir, "lighten_reflection_file_parse_cache.json")
     with open(cache_path, "w") as f:
         json.dump(cache, f, indent=4, sort_keys=True)
 
@@ -59,6 +59,7 @@ def filter_processed_files(cache, file_paths):
             file_cache["hash"] = hash
             output.append(file)
     return output
+
 def discard_files(file_paths):
     output = []
     for file in file_paths:

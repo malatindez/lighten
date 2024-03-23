@@ -60,4 +60,12 @@ target_compile_definitions(lighten PUBLIC _SILENCE_ALL_MS_EXT_DEPRECATION_WARNIN
 target_compile_options(lighten PRIVATE ${INLINING_FLAG} ${MAXIMUM_WARNING_FLAG} /MP)
 update_runtime_directory_msvc(lighten "${CMAKE_CURRENT_SOURCE_DIR}/../runtime_directory")
 
+
+get_filename_component(output_dir "${GLOBAL_REFLECTION_OUTPUT_FILE}" DIRECTORY)
+file(MAKE_DIRECTORY "${output_dir}")
+if(NOT EXISTS "${GLOBAL_REFLECTION_OUTPUT_FILE}")
+    file(TOUCH "${GLOBAL_REFLECTION_OUTPUT_FILE}")
+endif()
+target_sources(lighten PRIVATE "${GLOBAL_REFLECTION_OUTPUT_FILE}")
+
 run_reflection_tool(lighten)

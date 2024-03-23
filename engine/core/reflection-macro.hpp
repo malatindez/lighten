@@ -20,12 +20,24 @@
 #define LIGHTEN_SYSTEM(...)
 // Input: name, category, ctx_menu, button, execute_in_editor, mutator
 #define LIGHTEN_METHOD(...)
-// Input: name, category, serialize, editor_hide, editor_readonly, save_game, min, max, step, colorEdit
+// Input: name, category, serialize, editor_hide, editor_readonly, save_game
 #define LIGHTEN_PROPERTY(...)
-// Input: name, category, serialize, editor_hide, editor_readonly, save_game, mutator, min, max, step, colorEdit
+// Input: name, category, serialize, editor_hide, editor_readonly, save_game, mutator
 #define LIGHTEN_PROPERTY_GETTER(...)
 // Input: name, category, mutator
 #define LIGHTEN_PROPERTY_SETTER(...)
+
+// Input: name, types..., arg2 = "...", arg3 = "..."
+#define LIGHTEN_DEFAULT_DRAW(...)
+// example:
+//
+//    LIGHTEN_DEFAULT_DRAW("InputFloat",
+//                           glm::lowp_fvec1, glm::lowp_fvec2, glm::lowp_fvec3, glm::lowp_fvec4,
+//                           glm::mediump_fvec1, glm::mediump_fvec2, glm::mediump_fvec3, glm::mediump_fvec4,
+//                           glm::highp_fvec1, glm::highp_fvec2, glm::highp_fvec3, glm::highp_fvec4,
+//                           arg2 = "name"
+//                           )
+//    void DefaultDraw(glm::vec<length, vector_type, Q> &value, std::string_view const name)
 
 /* ideas:
 // Maximum amount of categories: 64

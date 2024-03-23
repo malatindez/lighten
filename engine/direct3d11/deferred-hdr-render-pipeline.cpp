@@ -169,6 +169,7 @@ namespace lighten::direct3d
 
         framebuffer_pos_ = glm::ivec2{ ImGui::GetWindowPos().x, ImGui::GetWindowPos().y };
         framebuffer_size_ = glm::ivec2{ framebuffer_size.x, framebuffer_size.y };
+        framebuffer_size_ = glm::max(framebuffer_size_, glm::ivec2{16});
 
         framebuffer_pos_ += glm::ivec2{ ImGui::GetWindowContentRegionMin().x, ImGui::GetWindowContentRegionMin().y };
 
