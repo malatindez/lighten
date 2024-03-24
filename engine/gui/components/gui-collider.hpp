@@ -7,7 +7,7 @@ namespace lighten::gui
     template<>
     inline void DrawComponent<components::BoxCollider>(entt::registry &, entt::entity, std::string &entity_id, components::BoxCollider& collider)
     {
-        if (ImGui::CollapsingHeader(("Box Collider##" + entity_id).c_str()))
+        if (ImGui::CollapsingHeader("Box Collider"))
         {
             ImGui::Text("Half extents: ");
             ImGui::SameLine();
@@ -18,7 +18,7 @@ namespace lighten::gui
     template<>
     inline void DrawComponent<components::SphereCollider>(entt::registry &, entt::entity, std::string &entity_id,components::SphereCollider& collider)
     {
-        if (ImGui::CollapsingHeader(("Sphere Collider##" + entity_id).c_str()))
+        if (ImGui::CollapsingHeader("Sphere Collider"))
         {
             ImGui::Text("Radius: ");
             ImGui::SameLine();

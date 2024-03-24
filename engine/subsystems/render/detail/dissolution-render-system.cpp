@@ -146,13 +146,6 @@ namespace lighten::render::_dissolution_detail
         dissolution_shader_.Bind();
 
         direct3d::api().devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
-        direct3d::api().devcon4->PSSetSamplers(1, 1, &direct3d::states().bilinear_clamp_sampler.ptr());
-        direct3d::api().devcon4->PSSetSamplers(2, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
-        direct3d::api().devcon4->PSSetSamplers(3, 1, &direct3d::states().anisotropic_clamp_sampler.ptr());
-        direct3d::api().devcon4->PSSetSamplers(4, 1, &direct3d::states().point_wrap_sampler.ptr());
-        direct3d::api().devcon4->PSSetSamplers(5, 1, &direct3d::states().point_clamp_sampler.ptr());
-        direct3d::api().devcon4->PSSetSamplers(6, 1, &direct3d::states().comparison_linear_clamp_sampler.ptr());
         direct3d::api().devcon4->OMSetBlendState(nullptr, nullptr, 0xffffffff); // use default blend mode (i.e. disable)
 
         mesh_to_model_buffer_.Bind(direct3d::ShaderType::VertexShader, 2);

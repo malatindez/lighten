@@ -6,7 +6,7 @@ namespace lighten::gui
     template<>
     inline void DrawComponent<components::Transform>(entt::registry &registry, entt::entity entity, std::string &entity_id, components::Transform& transform)
     {
-        if (ImGui::CollapsingHeader(("Transform##" + entity_id).c_str()))
+        if (ImGui::CollapsingHeader("Transform"))
         {
             ImGui::Text("Position: ");
             ImGui::SameLine();
@@ -26,7 +26,7 @@ namespace lighten::gui
     template<>
     inline void DrawComponent<components::WorldTransform>(entt::registry &, entt::entity, std::string &entity_id, components::WorldTransform& transform)
     {
-        if (ImGui::CollapsingHeader(("WorldTransform##" + entity_id).c_str()))
+        if (ImGui::CollapsingHeader("WorldTransform"))
         {
             ImGui::Text("World matrix: ");
             std::string world = FormatMatrixToString(transform.world);

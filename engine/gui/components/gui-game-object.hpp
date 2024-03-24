@@ -7,7 +7,7 @@ namespace lighten::gui
     template<>
     inline void DrawComponent(entt::registry &, entt::entity entity, std::string &entity_id, components::GameObject& game_object)
     {
-       if (ImGui::CollapsingHeader(("Game Object##" + entity_id).c_str()))
+       if (ImGui::CollapsingHeader("Game Object"))
        {
            ImGui::Text("Name: ");
            game_object.name.reserve(game_object.name.size() + 1);

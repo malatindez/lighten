@@ -6,7 +6,7 @@ namespace lighten::gui
     template<>
     inline void DrawComponent<components::ParticleEmitter>(entt::registry &, entt::entity, std::string &entity_id, components::ParticleEmitter& emitter)
     {
-        if (ImGui::CollapsingHeader(("Particle emitter##" + entity_id).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth))
+        if (ImGui::CollapsingHeader("Particle emitter", ImGuiTreeNodeFlags_SpanAvailWidth))
         {
             ImGui::Checkbox("Freeze: ", &emitter.freeze);
         

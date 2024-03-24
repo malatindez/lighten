@@ -93,21 +93,30 @@ namespace lighten::direct3d
         }
 
         FrameBegin(); 
-
+        
         direct3d::api().devcon4->PSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
-        direct3d::api().devcon4->PSSetSamplers(1, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
-        direct3d::api().devcon4->PSSetSamplers(2, 1, &direct3d::states().bilinear_clamp_sampler.ptr());
-        direct3d::api().devcon4->PSSetSamplers(3, 1, &direct3d::states().comparison_linear_clamp_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(1, 1, &direct3d::states().bilinear_clamp_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(2, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(3, 1, &direct3d::states().anisotropic_clamp_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(4, 1, &direct3d::states().point_wrap_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(5, 1, &direct3d::states().point_clamp_sampler.ptr());
+        direct3d::api().devcon4->PSSetSamplers(6, 1, &direct3d::states().comparison_linear_clamp_sampler.ptr());
 
         direct3d::api().devcon4->VSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
         direct3d::api().devcon4->VSSetSamplers(1, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
         direct3d::api().devcon4->VSSetSamplers(2, 1, &direct3d::states().bilinear_clamp_sampler.ptr());
         direct3d::api().devcon4->VSSetSamplers(3, 1, &direct3d::states().comparison_linear_clamp_sampler.ptr());
+        direct3d::api().devcon4->VSSetSamplers(4, 1, &direct3d::states().point_wrap_sampler.ptr());
+        direct3d::api().devcon4->VSSetSamplers(5, 1, &direct3d::states().point_clamp_sampler.ptr());
+        direct3d::api().devcon4->VSSetSamplers(6, 1, &direct3d::states().comparison_linear_clamp_sampler.ptr());
 
         direct3d::api().devcon4->CSSetSamplers(0, 1, &direct3d::states().bilinear_wrap_sampler.ptr());
         direct3d::api().devcon4->CSSetSamplers(1, 1, &direct3d::states().anisotropic_wrap_sampler.ptr());
         direct3d::api().devcon4->CSSetSamplers(2, 1, &direct3d::states().bilinear_clamp_sampler.ptr());
         direct3d::api().devcon4->CSSetSamplers(3, 1, &direct3d::states().comparison_linear_clamp_sampler.ptr());
+        direct3d::api().devcon4->CSSetSamplers(4, 1, &direct3d::states().point_wrap_sampler.ptr());
+        direct3d::api().devcon4->CSSetSamplers(5, 1, &direct3d::states().point_clamp_sampler.ptr());
+        direct3d::api().devcon4->CSSetSamplers(6, 1, &direct3d::states().comparison_linear_clamp_sampler.ptr());
 
         scene_->FrameBegin();
 

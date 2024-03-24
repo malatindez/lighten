@@ -153,7 +153,7 @@ namespace lighten::render
             for (auto &mesh : sphere.meshes)
             {
                 direct3d::api().devcon4->DrawIndexedInstanced(mesh.mesh_range.index_count,
-                                                              point_light_instance_buffer_.size(),
+                                                              spot_light_instance_buffer_.size(),
                                                               mesh.mesh_range.index_offset,
                                                               mesh.mesh_range.vertex_offset, 0);
             }

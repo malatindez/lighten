@@ -6,7 +6,7 @@ namespace lighten::gui
     template<>
     inline void DrawComponent<components::Camera>(entt::registry &registry, entt::entity entity, std::string &entity_id, components::Camera& camera)
     {
-        if (ImGui::CollapsingHeader(("Camera##" + entity_id).c_str()))
+        if (ImGui::CollapsingHeader("Camera"))
         {
             bool changed = false;
             ImGui::Text("Field of view: ");
@@ -23,7 +23,7 @@ namespace lighten::gui
                 registry.patch<components::Camera>(entity, [&camera](components::Camera &) {});
             }
         }
-        if (ImGui::CollapsingHeader(("Camera data: ##" + entity_id).c_str()))
+        if (ImGui::CollapsingHeader("Camera data: "))
         {
             std::string view = FormatMatrixToString(camera.view);
             std::string projection = FormatMatrixToString(camera.view);

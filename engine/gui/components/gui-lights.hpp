@@ -6,7 +6,7 @@ namespace lighten::gui
     template<>
     inline void DrawComponent<components::DirectionalLight>(entt::registry &, entt::entity, std::string &entity_id, components::DirectionalLight& light)
     {
-        if (ImGui::CollapsingHeader(("Directional light##" + entity_id).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth))
+        if (ImGui::CollapsingHeader("Directional light", ImGuiTreeNodeFlags_SpanAvailWidth))
         {
             ImGui::ColorEdit3(("Color##" + entity_id).c_str(), reinterpret_cast<float *>(&light.color));
             ImGui::SliderFloat(("Power##" + entity_id).c_str(), &light.power, 0, 1e6f, "%.3f", ImGuiSliderFlags_Logarithmic);
@@ -17,7 +17,7 @@ namespace lighten::gui
     template<>
     inline void DrawComponent<components::PointLight>(entt::registry &, entt::entity, std::string &entity_id, components::PointLight& light)
     {
-          if (ImGui::CollapsingHeader(("Point light##" + entity_id).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth))
+          if (ImGui::CollapsingHeader("Point light", ImGuiTreeNodeFlags_SpanAvailWidth))
         {
             ImGui::ColorEdit3(("Color##" + entity_id).c_str(), reinterpret_cast<float *>(&light.color));
             ImGui::SliderFloat(("Power##" + entity_id).c_str(), &light.power, 0, 1e6f, "%.3f", ImGuiSliderFlags_Logarithmic);
@@ -27,7 +27,7 @@ namespace lighten::gui
     template<>
     inline void DrawComponent<components::SpotLight>(entt::registry &, entt::entity, std::string &entity_id, components::SpotLight& light)
     {
-        if (ImGui::CollapsingHeader(("Spot light##" + entity_id).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth))
+        if (ImGui::CollapsingHeader("Spot light", ImGuiTreeNodeFlags_SpanAvailWidth))
         {
             ImGui::ColorEdit3(("Color##" + entity_id).c_str(), reinterpret_cast<float *>(&light.color));
             ImGui::SliderFloat(("Power##" + entity_id).c_str(), &light.power, 0, 1e6f, "%.3f", ImGuiSliderFlags_Logarithmic);
