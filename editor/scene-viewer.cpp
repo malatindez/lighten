@@ -151,7 +151,7 @@ namespace scene_viewer
         auto &game_object = registry.emplace<GameObject>(entity);
         auto &transform = registry.emplace<Transform>(entity);
         transform.reset();
-        registry.patch<Transform>(entity, [](Transform& transform) {});
+        registry.patch<Transform>(entity, [](Transform&) {});
         auto &model_obj = render::ModelSystem::GetModel(model_id);
         game_object.name = model_obj.name;
 

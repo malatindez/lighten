@@ -327,7 +327,7 @@ namespace lighten::render::_opaque_detail
                     for (auto entity : instances)
                     {
                         dst[copiedNum++] = OpaqueInstance{
-                            .world_transform = instance_group.get<components::WorldTransform>(entity).model,
+                            .world_transform = instance_group.get<components::WorldTransform>(entity).world,
                             .entity_id = static_cast<uint32_t>(entity)};
                     }
                 }

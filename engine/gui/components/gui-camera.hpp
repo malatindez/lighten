@@ -4,7 +4,7 @@
 namespace lighten::gui
 {
     template<>
-    void DrawComponent<components::Camera>(entt::registry &registry, entt::entity entity, std::string &entity_id, components::Camera& camera)
+    inline void DrawComponent<components::Camera>(entt::registry &registry, entt::entity entity, std::string &entity_id, components::Camera& camera)
     {
         if (ImGui::CollapsingHeader(("Camera##" + entity_id).c_str()))
         {
@@ -20,7 +20,7 @@ namespace lighten::gui
             changed |= ImGui::SliderFloat(("##far-plane" + entity_id).c_str(), &camera.z_far_, 0, 2000, "%.3f");
             if (changed)
             {
-                registry.patch<components::Camera>(entity, [&camera](components::Camera &c) {});
+                registry.patch<components::Camera>(entity, [&camera](components::Camera &) {});
             }
         }
         if (ImGui::CollapsingHeader(("Camera data: ##" + entity_id).c_str()))

@@ -38,8 +38,7 @@ namespace lighten
         modified_inv_view_projection_3x4[0] = bl4;
         modified_inv_view_projection_3x4[1] = right4;
         modified_inv_view_projection_3x4[2] = up4;
-        float* t = reinterpret_cast<float*>(&modified_inv_view_projection_3x4[0][0]);
-        std::array<float, 12> &arr = reinterpret_cast<std::array<float, 12>&>(*t);
+//        float* t = reinterpret_cast<float*>(&modified_inv_view_projection_3x4[0][0]);
         skybox_buffer_->Update(modified_inv_view_projection_3x4);
         skybox_buffer_->Bind(direct3d::ShaderType::VertexShader, 2);
         skybox_shader_.Bind();

@@ -10,6 +10,11 @@ namespace lighten::components
     LIGHTEN_COMPONENT(name = "Local Transform", category = "Core")
     struct Transform
     {
+        static inline Transform Default() noexcept
+        {
+            static Transform default_transform = Transform{ .position = glm::vec3{0}, .scale = glm::vec3{1}, .rotation = glm::quat{1, 0, 0, 0} };
+            return default_transform;
+        }
         /// @brief Object position in the local space
         LIGHTEN_PROPERTY(serialize, save_game, name = "Position")
         glm::vec3 position;

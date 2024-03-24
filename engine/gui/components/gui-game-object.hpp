@@ -5,7 +5,7 @@ namespace lighten::gui
 {
 
     template<>
-    void DrawComponent(entt::registry &registry, entt::entity entity, std::string &entity_id, components::GameObject& game_object)
+    inline void DrawComponent(entt::registry &, entt::entity entity, std::string &entity_id, components::GameObject& game_object)
     {
        if (ImGui::CollapsingHeader(("Game Object##" + entity_id).c_str()))
        {

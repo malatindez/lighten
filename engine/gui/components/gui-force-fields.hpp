@@ -5,7 +5,7 @@
 namespace lighten::gui
 {
     template<>
-    void DrawComponent<components::PointForceField>(entt::registry &, entt::entity,  std::string &entity_id, components::PointForceField& force_field)
+    inline void DrawComponent<components::PointForceField>(entt::registry &, entt::entity,  std::string &entity_id, components::PointForceField& force_field)
     {
         if (ImGui::CollapsingHeader(("Point Force Field##" + entity_id).c_str()))
         {
@@ -22,7 +22,7 @@ namespace lighten::gui
     }
     
     template<>
-    void DrawComponent<components::DirectionalForceField>(entt::registry &, entt::entity,  std::string &entity_id, components::DirectionalForceField& force_field)
+    inline void DrawComponent<components::DirectionalForceField>(entt::registry &, entt::entity,  std::string &entity_id, components::DirectionalForceField& force_field)
     {
         if (ImGui::CollapsingHeader(("Directional Force Field##" + entity_id).c_str()))
         {
@@ -39,7 +39,7 @@ namespace lighten::gui
     }
 
     template<>
-    void DrawComponent<components::OmniDirectionalForceField>(entt::registry &, entt::entity,  std::string &entity_id, components::OmniDirectionalForceField& force_field)
+    inline void DrawComponent<components::OmniDirectionalForceField>(entt::registry &, entt::entity,  std::string &entity_id, components::OmniDirectionalForceField& force_field)
     {
         if (ImGui::CollapsingHeader(("Omni Directional Force Field##" + entity_id).c_str()))
         {

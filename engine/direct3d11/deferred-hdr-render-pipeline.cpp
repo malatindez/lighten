@@ -165,7 +165,9 @@ namespace lighten::direct3d
         auto framebuffer_size = ImGui::GetContentRegionAvail();
 
         ID3D11ShaderResourceView* renderTextureSRV = output_render_texture_.shader_resource_view();
-        ImGui::Image((void*)renderTextureSRV, ImVec2(output_render_texture_.size().x, output_render_texture_.size().y));
+        ImGui::Image((void*)renderTextureSRV, ImVec2(
+                                        static_cast<float>(output_render_texture_.size().x), 
+                                        static_cast<float>(output_render_texture_.size().y)));
 
         framebuffer_pos_ = glm::ivec2{ ImGui::GetWindowPos().x, ImGui::GetWindowPos().y };
         framebuffer_size_ = glm::ivec2{ framebuffer_size.x, framebuffer_size.y };
@@ -192,7 +194,10 @@ namespace lighten::direct3d
         {
             if (show_focus_rect)
             {
-                ImGui::GetForegroundDrawList()->AddRect(ImVec2(framebuffer_pos_.x, framebuffer_pos_.y), ImVec2(framebuffer_end.x, framebuffer_end.y), IM_COL32(255, 255, 0, 255));
+                ImGui::GetForegroundDrawList()->AddRect(
+                    ImVec2(static_cast<float>(framebuffer_pos_.x), static_cast<float>(framebuffer_pos_.y)),
+                    ImVec2(static_cast<float>(framebuffer_end.x), static_cast<float>(framebuffer_end.y)),
+                    IM_COL32(255, 255, 0, 255));
             }
             for (int key = 0; key < IM_ARRAYSIZE(ImGui::GetIO().KeysDown); ++key)
             {
@@ -225,7 +230,7 @@ namespace lighten::direct3d
                 {
                     // Emit MouseButtonPressedEvent
 
-                    lighten::core::events::MouseButtonPressedEvent event(button, relative_mouse_pos);
+                    lighten::core::events::MouseButtonPressedEvent event(static_cast<uint16_t>(button), relative_mouse_pos);
                     window_->GetEventCallback()(event);
                 }
 
@@ -233,7 +238,7 @@ namespace lighten::direct3d
                 {
                     // Emit MouseButtonReleasedEvent
 
-                    lighten::core::events::MouseButtonReleasedEvent event(button, relative_mouse_pos);
+                    lighten::core::events::MouseButtonReleasedEvent event(static_cast<uint16_t>(button), relative_mouse_pos);
                     window_->GetEventCallback()(event);
                 }
             }

@@ -4,7 +4,7 @@
 namespace lighten::gui
 {
     template<>
-    void DrawComponent<components::DirectionalLight>(entt::registry &registry, entt::entity entity, std::string &entity_id, components::DirectionalLight& light)
+    inline void DrawComponent<components::DirectionalLight>(entt::registry &, entt::entity, std::string &entity_id, components::DirectionalLight& light)
     {
         if (ImGui::CollapsingHeader(("Directional light##" + entity_id).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth))
         {
@@ -15,7 +15,7 @@ namespace lighten::gui
     }
 
     template<>
-    void DrawComponent<components::PointLight>(entt::registry &registry, entt::entity entity, std::string &entity_id, components::PointLight& light)
+    inline void DrawComponent<components::PointLight>(entt::registry &, entt::entity, std::string &entity_id, components::PointLight& light)
     {
           if (ImGui::CollapsingHeader(("Point light##" + entity_id).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth))
         {
@@ -25,7 +25,7 @@ namespace lighten::gui
     }
 
     template<>
-    void DrawComponent<components::SpotLight>(entt::registry &registry, entt::entity entity, std::string &entity_id, components::SpotLight& light)
+    inline void DrawComponent<components::SpotLight>(entt::registry &, entt::entity, std::string &entity_id, components::SpotLight& light)
     {
         if (ImGui::CollapsingHeader(("Spot light##" + entity_id).c_str(), ImGuiTreeNodeFlags_SpanAvailWidth))
         {

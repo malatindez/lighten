@@ -4,7 +4,7 @@
 namespace lighten::gui
 {
     template<>
-    void DrawComponent<components::Transform>(entt::registry &registry, entt::entity entity, std::string &entity_id, components::Transform& transform)
+    inline void DrawComponent<components::Transform>(entt::registry &registry, entt::entity entity, std::string &entity_id, components::Transform& transform)
     {
         if (ImGui::CollapsingHeader(("Transform##" + entity_id).c_str()))
         {
@@ -19,12 +19,12 @@ namespace lighten::gui
             changed |= ImGui::DragFloat3(("##scale" + entity_id).c_str(), &transform.scale.x, 0.1f, 0.0f, 1000.0f, "%.3f");
             if (changed)
             {
-                registry.patch<components::Transform>(entity, [&transform](components::Transform &t) {});
+                registry.patch<components::Transform>(entity, [&transform](components::Transform &) {});
             }
         }
     }
     template<>
-    void DrawComponent<components::WorldTransform>(entt::registry &registry, entt::entity entity, std::string &entity_id, components::WorldTransform& transform)
+    inline void DrawComponent<components::WorldTransform>(entt::registry &, entt::entity, std::string &entity_id, components::WorldTransform& transform)
     {
         if (ImGui::CollapsingHeader(("WorldTransform##" + entity_id).c_str()))
         {

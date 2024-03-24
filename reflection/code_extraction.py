@@ -32,7 +32,7 @@ def format_diagnostics(translation_unit, file):
     found_error = False
     for diagnostic in nb_diag:
         error_string = str(diagnostic)
-        if "error:" in error_string:
+        if diagnostic.severity >= clang.cindex.Diagnostic.Error:
             found_error = True
         out_str += error_string + "\n"
 

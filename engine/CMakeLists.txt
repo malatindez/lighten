@@ -47,13 +47,15 @@ target_link_libraries(lighten PUBLIC
 )
 
 target_sources(lighten PUBLIC "${IMGUI_DIR}/backends/imgui_impl_dx11.cpp" "${IMGUI_DIR}/backends/imgui_impl_win32.cpp")
+set_source_files_properties("${IMGUI_DIR}/backends/imgui_impl_dx11.cpp" PROPERTIES SKIP_UNITY_BUILD_INCLUSION TRUE)
+set_source_files_properties("${IMGUI_DIR}/backends/imgui_impl_win32.cpp" PROPERTIES SKIP_UNITY_BUILD_INCLUSION TRUE)
 
 set_target_properties(lighten PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
 set_target_properties(lighten PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
 
 set_target_properties(lighten PROPERTIES UNITY_BUILD TRUE)
 set_target_properties(lighten PROPERTIES UNITY_BUILD_MODE BATCH)
-set_target_properties(lighten PROPERTIES UNITY_BUILD_BATCH_SIZE 4)
+set_target_properties(lighten PROPERTIES UNITY_BUILD_BATCH_SIZE 8)
 
 target_compile_definitions(lighten PUBLIC _SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS)
 

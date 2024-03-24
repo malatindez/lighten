@@ -4,7 +4,7 @@
 #include "render/renderer.hpp"
 #include "scene-viewer.hpp"
 #include "reflection/reflection.hpp"
-#include "gui/scene-tree.hpp"
+#include "gui/scene-viewer.hpp"
 
 using namespace lighten;
 using namespace core;
@@ -164,10 +164,10 @@ void Controller::OnGuiRender()
     }
 #endif
     ImGui::End();
-    scene_viewer_->ShowEntitiesViewer();
+    scene_viewer_->Render();
 //    object_editor::OnGuiRender();
 //    object_editor::OnRender(hdr_render_pipeline_->window()->position(), hdr_render_pipeline_->framebuffer_size());
-
+    ImGui::ShowDemoWindow();
     scene_viewer::OnGuiRender();
 }
 
@@ -175,7 +175,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     : hdr_render_pipeline_{hdr_render_pipeline}
 {
     first_scene = std::make_shared<Scene>();
-    scene_viewer_ = std::make_unique<SceneViewer>(first_scene->registry);
+    scene_viewer_ = std::make_unique<gui::SceneViewer>(first_scene->registry);
     first_scene->renderer = std::make_unique<render::Renderer>();
 
     auto &ors = first_scene->renderer->opaque_render_system();
@@ -219,9 +219,8 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     const bool enableDirectionalLight = true;
     const bool enableSpotLight = true;
     const bool addSmallParticleEmitter = true;
-    const bool addBigfParticleEmitter = true;
-    const bool addGrass = true;
     const bool addBigParticleEmitter = true;
+    const bool addGrass = true;
 
     for (int i = 0; i < amountOfModels; i++)
     {
@@ -257,7 +256,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                              (float(amountOfModels) / std::sqrtf((float)amountOfModels));
         transform.rotation = glm::quat(glm::vec3(0.0f, 0.0f, glm::radians(180.0f)));
         transform.rotation *= glm::quat_cast(glm::lookAtLH(transform.position, glm::vec3{0, 0, 0}, glm::vec3{0, 1, 0}));
-        registry.patch<Transform>(knight, [&](Transform& transform) { });
+        registry.patch<Transform>(knight, [&](Transform&) { });
     }
     render::OpaqueMaterial cobblestone_material;
     render::OpaqueMaterial crystal_material;
@@ -337,6 +336,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         entt::entity cubes = registry.create();
         auto &cubes_game_object = registry.emplace<GameObject>(cubes);
         cubes_game_object.name = "Cubes";
+        registry.emplace<Transform>(cubes, Transform::Default());
         std::vector<render::OpaqueMaterial> materials = {cobblestone_material, crystal_material, mud_material, mudroad_material, stone_material, blue_metal, white_half_metal, white_porcelain, blue_rubber};
         std::vector<std::string> material_names = {"Cobblestone cube", "Crystal cube", "Mud cube", "MudRoad cube", "Stone cube", "BlueMetal cube", "WhiteHalfMetal cube", "WhitePorcelain cube", "BlueRubber cube"};
         for (size_t i = 0; i < materials.size(); i++)
@@ -350,7 +350,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             auto &transform = registry.emplace<Transform>(cube);
             transform.position = glm::vec3{(int32_t)i - (int32_t)materials.size() / 2, 0, -8};
             transform.scale = glm::vec3{1};
-            registry.patch<Transform>(cube, [&](Transform& transform) {});
+            registry.patch<Transform>(cube, [&](Transform&) {});
             ors.AddInstance(model_id, registry, cube, {materials[i]});
         }
     }
@@ -358,6 +358,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     {
         entt::entity spheres = registry.create();
         auto &spheres_game_object = registry.emplace<GameObject>(spheres);
+        registry.emplace<Transform>(spheres, Transform::Default());
         spheres_game_object.name = "Spheres";
         for (int i = 0; i < 10; i++)
         {
@@ -372,7 +373,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                 auto &transform = registry.emplace<Transform>(sphere);
                 transform.position = glm::vec3{i - 5, j, 5};
                 transform.scale = glm::vec3{0.375f};
-                registry.patch<Transform>(sphere, [&](Transform& transform) {});
+                registry.patch<Transform>(sphere, [&](Transform&) {});
                 render::OpaqueMaterial material;
                 material.reset();
                 material.albedo_color = glm::vec3{1};
@@ -389,6 +390,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     {
         entt::entity floor = registry.create();
         auto &floor_game_object = registry.emplace<GameObject>(floor);
+        registry.emplace<Transform>(floor, Transform::Default());
         floor_game_object.name = "Floor";
         for (int i = 0; i < 4; i++)
         {
@@ -401,7 +403,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             auto &transform = registry.emplace<Transform>(cube);
             transform.position = glm::vec3{0, -0.5f, 0} + glm::vec3{i < 2 ? -1 : 1, 0, i % 2 == 0 ? -1 : 1} * 2.5f;
             transform.scale = glm::vec3{5, 0.1, 5};
-            registry.patch<Transform>(cube, [&](Transform& transform) {});
+            registry.patch<Transform>(cube, [&](Transform&) {});
             ors.AddInstance(model_id, registry, cube, {stone_material});
         }
     }
@@ -415,12 +417,14 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         transform.position = glm::vec3{-5, 4.5f, 0};
         transform.scale = glm::vec3{10, 0.1, 10};
         transform.rotation = glm::quat(glm::vec3(0.0f, 0.0f, glm::radians(90.0f)));
-        registry.patch<Transform>(wall, [&](Transform& transform) {});
+        registry.patch<Transform>(wall, [&](Transform&) {});
         ors.AddInstance(model_id, registry, wall, {stone_material});
     }
     // ------------------------- LIGHTS -------------------------
     entt::entity lights = registry.create();
+    registry.emplace<Transform>(lights, Transform::Default());
     auto &lights_game_object = registry.emplace<GameObject>(lights);
+    lights_game_object.name = "Lights";
     if (addWhitePointLight)
     {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
@@ -432,7 +436,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         auto &transform = registry.emplace<Transform>(entity);
         transform.scale = glm::vec3{0.15f};
         transform.position = glm::vec3{0, 3, -2};
-        registry.patch<Transform>(entity, [&](Transform& transform) {});
+        registry.patch<Transform>(entity, [&](Transform&) {});
         auto &point_light = registry.emplace<PointLight>(entity);
         point_light.color = glm::vec3{0.988, 0.933, 0.655};
         point_light.power = 2e3f;
@@ -453,7 +457,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         auto &transform = registry.emplace<Transform>(entity);
         transform.scale = glm::vec3{0.15f};
         transform.position = glm::vec3{0, 3, 2};
-        registry.patch<Transform>(entity, [&](Transform& transform) {});
+        registry.patch<Transform>(entity, [&](Transform&) {});
         auto &point_light = registry.emplace<PointLight>(entity);
         point_light.color = glm::vec3{0.988, 0.233, 0.255};
         point_light.power = 2.5e3f;
@@ -474,7 +478,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         auto &transform = registry.emplace<Transform>(entity);
         transform.scale = glm::vec3{0.15f};
         transform.position = glm::vec3{0, 2, -8};
-        registry.patch<Transform>(entity, [&](Transform& transform) {});
+        registry.patch<Transform>(entity, [&](Transform&) {});
         auto &point_light = registry.emplace<PointLight>(entity);
         point_light.color = glm::vec3{0.01, 0.933, 0.255};
         point_light.power = 3e3f;
@@ -484,6 +488,11 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         emissive.emissive_color = point_light.color;
         emissive.power = point_light.power;
     }
+    entt::entity deferred_lights = registry.create();
+    registry.emplace<Transform>(deferred_lights, Transform::Default());
+    auto &deferred_lights_game_object = registry.emplace<GameObject>(deferred_lights);
+    deferred_lights_game_object.name = "Deferred lights";
+
     for (int i = 0; i < amountOfDeferredLights; i++)
     {
         auto model_id = render::ModelSystem::GetUnitSphereFlat();
@@ -491,12 +500,12 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         auto &game_object = registry.emplace<GameObject>(entity);
         game_object.name = "Point light";
         game_object.parent = lights;
-        lights_game_object.children.push_back(entity);
+        deferred_lights_game_object.children.push_back(entity);
         auto &transform = registry.emplace<Transform>(entity);
         transform.scale = glm::vec3{0.1f};
         transform.position = glm::vec3{0, 0.0f, 0};
         transform.position += glm::vec3{std::cosf(float(i) / amountOfDeferredLights * 2 * std::numbers::pi_v<float>), 0, std::sinf(float(i) / amountOfDeferredLights * 2 * std::numbers::pi_v<float>)} * 15.0f;
-        registry.patch<Transform>(entity, [&](Transform& transform) {});
+        registry.patch<Transform>(entity, [&](Transform&) {});
         auto &point_light = registry.emplace<PointLight>(entity);
         point_light.color = glm::vec3{(i + 1) % 2, (i + 1) % 3, (i + 1) % 5};
         point_light.color = normalize(point_light.color);
@@ -520,7 +529,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         transform.scale = glm::vec3{0.15f};
         transform.position = glm::vec3{0, 10, 0};
         transform.rotation = glm::quat(glm::vec3{glm::radians(-120.0f), glm::radians(-30.0f), glm::radians(-60.0f)});
-        registry.patch<Transform>(entity, [&](Transform& transform) {});
+        registry.patch<Transform>(entity, [&](Transform&) {});
         auto &directional_light = registry.emplace<DirectionalLight>(entity);
         directional_light.color = glm::vec3{0.988, 0.933, 0.455};
         directional_light.power = 10;
@@ -545,7 +554,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         transform.scale = glm::vec3{0.15f};
         transform.position = glm::vec3{0, 3, 0};
         transform.rotation = glm::quat(glm::vec3{glm::radians(-120.0f), glm::radians(-30.0f), glm::radians(-60.0f)});
-        registry.patch<Transform>(entity, [&](Transform& transform) {});
+        registry.patch<Transform>(entity, [&](Transform&) {});
         auto &spot_light = registry.emplace<SpotLight>(entity);
         spot_light.color = glm::vec3{0.988, 0.933, 0.455};
         spot_light.power = 10;
@@ -577,7 +586,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         transform.scale = glm::vec3{0.15f};
         transform.position = glm::vec3{-3.5, 2, -8};
         transform.rotation = glm::quat(glm::vec3{0, 0, glm::radians(-90.0f)});
-        registry.patch<Transform>(entity, [&](Transform& transform) {});
+        registry.patch<Transform>(entity, [&](Transform&) {});
 
         auto &particle_emitter = registry.emplace<ParticleEmitter>(entity);
         particle_emitter.position_yaw_pitch_range = glm::vec4{glm::vec2{-std::numbers::pi}, glm::vec2{std::numbers::pi_v<float>}} / 16.0f;
@@ -608,7 +617,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         transform.scale = glm::vec3{0.15f};
         transform.position = glm::vec3{4, 2, -8};
         transform.rotation = glm::quat(glm::vec3{0, 0, glm::radians(-90.0f)});
-        registry.patch<Transform>(entity, [&](Transform& transform) {});
+        registry.patch<Transform>(entity, [&](Transform&) {});
 
         auto &particle_emitter = registry.emplace<ParticleEmitter>(entity);
         particle_emitter.position_yaw_pitch_range = glm::vec4{-std::numbers::pi / 4, -std::numbers::pi / 4, std::numbers::pi / 4, std::numbers::pi / 4};
@@ -637,7 +646,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
         auto &transform = registry.emplace<Transform>(grass);
         transform.scale = glm::vec3{2.0f, 0.1f, 2.0f};
         transform.position = glm::vec3{0, 0, -12};
-        registry.patch<Transform>(grass, [&](Transform& transform) {});
+        registry.patch<Transform>(grass, [&](Transform&) {});
 
         render::OpaqueMaterial grass_floor_material;
         grass_floor_material.reset();
@@ -824,7 +833,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                                        -Engine::scene()->main_camera->forward()};
                                    rotation_matrix = inverse(transpose(rotation_matrix));
                                    transform.rotation = glm::quat_cast(rotation_matrix);
-                                   registry.patch<Transform>(knight, [&](Transform& transform) {});
+                                   registry.patch<Transform>(knight, [&](Transform&) {});
 
                                    uint64_t model_id = ModelLoader::Load("assets\\models\\Knight\\Knight.fbx").value();
                                    drs.AddInstance(model_id, registry, knight, glm::vec3{0.0f}, std::uniform_real_distribution<float>(3.0f, 15.0f)(Engine::random_engine()));
@@ -919,7 +928,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
             rotation_matrix = inverse(transpose(rotation_matrix));
             transform.rotation = glm::quat_cast(rotation_matrix);
             transform.scale = glm::vec3{0.05, 0.05, 0.1f};
-            registry.patch<Transform>(cube, [&](Transform& transform) {});
+            registry.patch<Transform>(cube, [&](Transform&) {});
 
             uint64_t model_id = render::ModelSystem::GetUnitCube();
             ors.AddInstance(model_id, registry, cube, {cobblestone_material});
