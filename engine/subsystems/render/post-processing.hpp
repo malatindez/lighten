@@ -6,7 +6,7 @@ namespace lighten::render
     class PostProcessingLayer : public core::Layer
     {
     public:
-        explicit PostProcessingLayer(int64_t weight) : kWeight(weight) {}
+        explicit PostProcessingLayer(int64_t weight) : core::Layer("Post processing"), kWeight(weight) {}
         virtual ~PostProcessingLayer() = default;
         PostProcessingLayer(PostProcessingLayer const &) = delete;
         PostProcessingLayer &operator=(PostProcessingLayer const &) = delete;

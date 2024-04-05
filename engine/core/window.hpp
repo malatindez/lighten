@@ -14,7 +14,7 @@ namespace lighten::core
             glm::ivec2 position;
             Props(std::string_view title = "Engine", glm::ivec2 size = glm::ivec2{1200, 720}, glm::ivec2 position = glm::ivec2{100, 100}) : title{title}, size{size}, position{position} {}
         };
-        Window(Props const &props) : title_{props.title}, size_{props.size}, position_{props.position} {}
+        Window(Props const &props) : Layer(props.title), title_{props.title}, size_{props.size}, position_{props.position} {}
         virtual ~Window() = default;
 
         [[nodiscard]] inline glm::ivec2 const &size() const noexcept { return size_; }

@@ -1,8 +1,6 @@
 #include "model-loader.hpp"
 
-#include <assimp\Importer.hpp>
-#include <assimp\postprocess.h>
-#include <assimp\scene.h>
+#include "include/assimp.hpp"
 
 #include "texture-manager.hpp"
 #include "../render/model-system.hpp"

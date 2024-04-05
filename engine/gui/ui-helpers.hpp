@@ -52,4 +52,25 @@ namespace lighten::gui
 
     template<typename T>
     inline void DrawComponent(entt::registry & registry, entt::entity entity, std::string &entity_str, T &t);
+
+    template <typename vector_type, glm::qualifier Q>
+    inline ImVec2 convert_to_imvec(glm::vec<2, vector_type, Q> const &vec)
+    {
+        return ImVec2{static_cast<float>(vec.x), static_cast<float>(vec.y)};
+    }
+    template <typename vector_type, glm::qualifier Q>
+    inline ImVec4 convert_to_imvec(glm::vec<4, vector_type, Q> const &vec)
+    {
+        return ImVec4{static_cast<float>(vec.x), static_cast<float>(vec.y), static_cast<float>(vec.z), static_cast<float>(vec.w)};
+    }
+
+    inline glm::vec2 convert_to_vec(ImVec2 const & vec)
+    {
+        return glm::vec2{vec.x, vec.y};
+    }
+    template <typename vector_type, glm::qualifier Q>
+    inline glm::vec4 convert_to_vec(ImVec4 const & vec)
+    {
+        return glm::vec4{vec.x, vec.y, vec.z, vec.w};
+    }
 }

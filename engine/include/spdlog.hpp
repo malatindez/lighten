@@ -17,6 +17,7 @@
 #endif
 
 #pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 
 #elif defined(__GNUC__) || defined(__GNUG__)
 // TODO
@@ -34,6 +35,7 @@
 #pragma warning(disable : 26498)
 #pragma warning(disable : 26800)
 #endif
+#include <spdlog/fmt/bundled/format.h>
 #include <spdlog/async.h>
 #include <spdlog/sinks/ansicolor_sink.h>
 #include <spdlog/sinks/basic_file_sink.h>

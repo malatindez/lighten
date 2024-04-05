@@ -1,6 +1,6 @@
 #pragma once
 #include "../../components/particle-emitter.hpp"
-#include "../gui/ui-helpers.hpp"
+#include "../ui-helpers.hpp"
 namespace lighten::gui
 {
     template<>

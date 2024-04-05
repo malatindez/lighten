@@ -134,7 +134,7 @@ namespace lighten::render
         {
             auto render_pass = static_pointer_cast<RenderPass>(ptr);
             mal_toolkit::SortedInsert<std::shared_ptr<RenderPass>>(render_passes_, std::move(render_pass),
-                                                                   [](auto const &lhs, auto const &rhs) __lambda_force_inline -> bool
+                                                                   [](auto const &lhs, auto const &rhs) __mal_toolkit_lambda_force_inline  -> bool
                                                                    { return lhs->kPriority < rhs->kPriority; });
         }
         template <typename T>
@@ -142,7 +142,7 @@ namespace lighten::render
         {
             auto render_pass = static_pointer_cast<RenderPass>(ptr);
             mal_toolkit::SortedErase<std::shared_ptr<RenderPass>>(render_passes_, std::move(render_pass),
-                                                                  [](auto const &lhs, auto const &rhs) __lambda_force_inline -> bool
+                                                                  [](auto const &lhs, auto const &rhs) __mal_toolkit_lambda_force_inline  -> bool
                                                                   { return lhs->kPriority < rhs->kPriority; });
         }
         void FrameBegin(core::Scene *scene);

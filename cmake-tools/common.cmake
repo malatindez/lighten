@@ -144,3 +144,42 @@ function(run_reflection_tool TARGET)
     )
 
 endfunction(run_reflection_tool)
+
+function(save_target_data TARGET)
+    # Aggregate include directories
+    aggregate_include_directories(${TARGET})
+
+    # Retrieve the aggregated include directories
+    get_target_property(INPUT_TARGET_INCLUDES ${TARGET} REFLECTION_${TARGET}_INCLUDE_DIRECTORIES)
+    get_target_property(INPUT_TARGET_SOURCES ${TARGET} SOURCES)
+    get_target_property(INPUT_TARGET_SOURCE_DIR ${TARGET} SOURCE_DIR)
+    
+    # save data under binary directory
+    set(TARGET_DATA_FILE "${GLOBAL_BINARY_DIRECTORY}/target_data_cache/${TARGET}.json")
+
+    # Format the data into a JSON structure
+    set(JSON_CONTENT "{\n")
+    set(JSON_CONTENT "${JSON_CONTENT}    \"include_directories\": [")
+    foreach(DIR IN LISTS INPUT_TARGET_INCLUDES)
+        set(JSON_CONTENT "${JSON_CONTENT}\n        \"${DIR}\",")
+    endforeach()
+    # Remove the last comma if the list is not empty
+    if(INPUT_TARGET_INCLUDES)
+        string(LENGTH "${JSON_CONTENT}" JSON_CONTENT_LENGTH)
+        math(EXPR NEW_LENGTH "${JSON_CONTENT_LENGTH} - 1")
+        string(SUBSTRING "${JSON_CONTENT}" 0 ${NEW_LENGTH} JSON_CONTENT)
+    endif()
+    set(JSON_CONTENT "${JSON_CONTENT}\n    ],\n    \"sources\": [")
+    foreach(SOURCE IN LISTS INPUT_TARGET_SOURCES)
+        set(JSON_CONTENT "${JSON_CONTENT}\n        \"${SOURCE}\",")
+    endforeach()
+    if(INPUT_TARGET_SOURCES)
+        string(LENGTH "${JSON_CONTENT}" JSON_CONTENT_LENGTH)
+        math(EXPR NEW_LENGTH "${JSON_CONTENT_LENGTH} - 1")
+        string(SUBSTRING "${JSON_CONTENT}" 0 ${NEW_LENGTH} JSON_CONTENT)
+    endif()
+    set(JSON_CONTENT "${JSON_CONTENT}\n    ],\n    \"source_dir\": \"${INPUT_TARGET_SOURCE_DIR}\"\n}")
+    
+    # Write the JSON content to file
+    file(WRITE ${TARGET_DATA_FILE} ${JSON_CONTENT})
+endfunction(save_target_data)

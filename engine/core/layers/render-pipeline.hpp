@@ -7,12 +7,8 @@ namespace lighten::core
     class RenderPipeline : public LayerStack
     {
     public:
-        RenderPipeline() : LayerStack("RenderPipeline") {}
+        RenderPipeline(std::string_view pipeline_name) : LayerStack(pipeline_name) {}
         void OnRender() = 0;
-        void SetScene(std::shared_ptr<Scene> const &scene) { scene_ = scene; }
-        [[nodiscard]] inline std::shared_ptr<Scene> const &scene() const noexcept { return scene_; }
-        [[nodiscard]] inline std::shared_ptr<Scene> &scene() noexcept { return scene_; }
-
     protected:
         void InitImGuiLayer(std::shared_ptr<core::Window> window)
         {
@@ -21,7 +17,6 @@ namespace lighten::core
         }
         virtual void FrameBegin() = 0;
         virtual void FrameEnd() = 0;
-        std::shared_ptr<Scene> scene_ = nullptr;
         std::shared_ptr<ImGuiLayer> imgui_layer_ = nullptr;
     };
 } // namespace lighten::core

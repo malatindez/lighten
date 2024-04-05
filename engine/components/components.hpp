@@ -12,6 +12,7 @@
 #include "force-fields.hpp"
 #include "lights.hpp"
 #include "particle-emitter.hpp"
+#include "scene.hpp"
 /**
  * @brief The components namespace contains all the components that can be used in the lighten
  * @todo Every component should inherit from Component class

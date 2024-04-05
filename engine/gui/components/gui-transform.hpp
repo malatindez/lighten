@@ -1,6 +1,6 @@
 #pragma once
 #include "../../components/transform.hpp"
-#include "../gui/ui-helpers.hpp"
+#include "../ui-helpers.hpp"
 namespace lighten::gui
 {
     template<>
@@ -19,12 +19,12 @@ namespace lighten::gui
             changed |= ImGui::DragFloat3(("##scale" + entity_id).c_str(), &transform.scale.x, 0.1f, 0.0f, 1000.0f, "%.3f");
             if (changed)
             {
-                registry.patch<components::Transform>(entity, [&transform](components::Transform &) {});
+                registry.patch<components::Transform>(entity, [&](components::Transform &) {});
             }
         }
     }
     template<>
-    inline void DrawComponent<components::WorldTransform>(entt::registry &, entt::entity, std::string &entity_id, components::WorldTransform& transform)
+    inline void DrawComponent<components::WorldTransform>(entt::registry &, entt::entity, std::string &, components::WorldTransform& transform)
     {
         if (ImGui::CollapsingHeader("WorldTransform"))
         {

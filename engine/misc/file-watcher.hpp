@@ -6,7 +6,7 @@ namespace lighten::misc
     {
     public:
         explicit FileWatcher(core::EventCallbackFn const &event_callback)
-            : event_callback_{event_callback} {}
+            : core::Layer("File Watcher"), event_callback_{event_callback} {}
         void AddPathToWatch(std::filesystem::path const &path, bool recursive = true);
         void OnUpdate() override;
 

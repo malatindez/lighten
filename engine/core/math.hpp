@@ -1,10 +1,37 @@
 #pragma once
+
+#if defined(__clang__)
+
+#pragma clang diagnostic push
+
+#elif defined(__GNUC__) || defined(__GNUG__)
+// TODO
+#elif defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4201)
+#endif
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+
+#if defined(__clang__)
+
+#pragma clang diagnostic pop
+
+#if !KEEP_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
+#undef _SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
+#endif
+#undef KEEP_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
+
+#elif defined(__GNUC__) || defined(__GNUG__)
+// TODO
+#elif defined(_MSC_VER)
+#pragma warning(pop)
+#endif
+
 #include "../include/cereal.hpp"
 namespace cereal {
     template<class Archive, glm::length_t length, typename vector_type, glm::qualifier Q>

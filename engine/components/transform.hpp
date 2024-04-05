@@ -12,7 +12,7 @@ namespace lighten::components
     {
         static inline Transform Default() noexcept
         {
-            static Transform default_transform = Transform{ .position = glm::vec3{0}, .scale = glm::vec3{1}, .rotation = glm::quat{1, 0, 0, 0} };
+            static Transform default_transform = Transform{ .position = glm::vec3{0},.scale = glm::vec3{1},.rotation = glm::quat{1, 0, 0, 0} };
             return default_transform;
         }
         /// @brief Object position in the local space

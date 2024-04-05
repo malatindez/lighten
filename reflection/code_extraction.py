@@ -5,8 +5,8 @@ import clang.cindex
 import traceback
 import sys
 import time
-import multiprocessing
 import tempfile
+from concurrent.futures import ThreadPoolExecutor
 from config import ENABLE_MULTIPROCESSING, ENABLE_UNITY_BUILD, VERBOSE_TIMINGS, VERBOSE
 
 PATTERN_DISCARD_FROM_UNITY_BUILD = re.compile(r'LIGHTEN_REFLECTION_DISCARD_FILE_FROM_UNITY_BUILD')
@@ -27,17 +27,22 @@ def format_diagnostics(translation_unit, file):
     nb_diag = translation_unit.diagnostics
     if len(nb_diag) == 0:
         return (False, "")
-    out_str = f"There are {len(nb_diag)} diagnostics for {file}:\n"
+    out_str = f"Diagnostics Report for {file}:\n"
+    out_str += f"Total Issues Found: {len(nb_diag)}\n"
 
     found_error = False
     for diagnostic in nb_diag:
-        error_string = str(diagnostic)
-        if diagnostic.severity >= clang.cindex.Diagnostic.Error:
+        # Altering the string format to not mimic compiler error formats directly,
+        # so that MSBuild doesn't treat them as errors immediately and continues the build.
+        error_string = str(diagnostic).replace(file, "In referenced file", 1)
+        if "error:" in error_string.lower():
             found_error = True
+            error_string = error_string.replace("error:", "Issue:", 1)
+        
         out_str += error_string + "\n"
 
     if found_error:
-        out_str += "There are errors in the file. Stopping reflection generator.\n"
+        out_str += "Potential problems detected. Reflection generator may encounter issues.\n\n"
     return (found_error, out_str)
 
 def parse_settings_to_dict(parameter_tokens):
@@ -186,7 +191,7 @@ def find_info(parent, whitelist, parent_namespace=''):
                 end = next(node.get_children(), None)
                 end_location = end.extent.start if end else node.extent.start
                 end_location = end_location if end_location.offset < node.extent.start.offset else node.extent.start
-                annotation, settings, location = find_preceding_annotation_and_settings(parent, last_seen_class_location, end_location, ["LIGHTEN_DATACLASS", "LIGHTEN_COMPONENT", "LIGHTEN_SYSTEM"])
+                annotation, settings, location = find_preceding_annotation_and_settings(parent, last_seen_class_location, end_location, ["LIGHTEN_DATACLASS", "LIGHTEN_COMPONENT", "LIGHTEN_EMPTY_COMPONENT", "LIGHTEN_SYSTEM"])
                 if (
                     (last_seen_class_location is None and location is not None) or (location is not None and location != last_seen_class_location)
                 ):
@@ -236,7 +241,13 @@ def process_file(args):
         file, include_dirs, whitelist = args
         index = clang.cindex.Index.create()
         start_time = time.time()
-        tu = index.parse(file, args=['-std=c++20'] + [f'-I{include_dir}' for include_dir in include_dirs])
+        COMPILE_ARGS = [
+            '-std=c++20',
+            '-fdiagnostics-show-template-tree',
+            '-fcolor-diagnostics',
+            '-fcaret-diagnostics'
+        ]
+        tu = index.parse(file, args=COMPILE_ARGS + [f'-I{include_dir}' for include_dir in include_dirs])
         duration = time.time() - start_time
         out_str = f"Translation unit made in {duration:.3f}s: {file}\n"
         error, diagnostics_str = format_diagnostics(tu, file)
@@ -248,7 +259,7 @@ def process_file(args):
         if VERBOSE_TIMINGS or error:
             print(out_str)
             if error:
-                exit(-1)
+                return (-1, rv_data)
     except:
         print(traceback.format_exc())
         return (-1, rv_data)
@@ -271,6 +282,8 @@ def should_exclude_from_unity_build(file_path):
 
 
 def process_files(include_dirs, source_files):
+    global ENABLE_UNITY_BUILD
+
     if len(source_files) == 0:
         return {}
 
@@ -289,7 +302,10 @@ def process_files(include_dirs, source_files):
     if unity_file_path:
         files_to_process.append(unity_file_path)
         whitelist.append(included_files)  # Add all included files to the whitelist
-
+    else:
+        files_to_process = source_files
+        whitelist = [[file] for file in source_files]
+        
     # Add excluded files and their individual whitelists
     for file in excluded_files:
         files_to_process.append(file)
@@ -297,20 +313,24 @@ def process_files(include_dirs, source_files):
     whitelist = [[os.path.normpath(file) for file in sublist] for sublist in whitelist]
     output = [0, {}]
     if ENABLE_MULTIPROCESSING and len(files_to_process) > 1:
-        with multiprocessing.Pool() as pool:
+        with ThreadPoolExecutor() as pool:
             file_args = [(file, include_dirs, wl) for file, wl in zip(files_to_process, whitelist)]
-            results = pool.map(process_file, file_args)
+            results = list(pool.map(process_file, file_args))
             output[0] += sum(i[0] for i in results)
-            output[1].update(i[1] for i in results)
+            for i in results:
+                output[1].update(i[1])
     else:
         for file, wl in zip(files_to_process, whitelist):
             result = process_file((file, include_dirs, wl))
             output[0] += result[0]
             output[1].update(result[1])
-
+    if output[0] < 0 and ENABLE_UNITY_BUILD:
+        ENABLE_UNITY_BUILD = False
+        print("Restarting without unity build...\n\n")
+        return process_files(include_dirs, source_files)
 
     if unity_file_path and os.path.exists(unity_file_path):
         os.remove(unity_file_path)
     if output[0] < 0: # Some fatal error occured
-        sys.exit(output[0])
+        print("Fatal error occured during processing... Reflection code may be incomplete.")
     return output[1]

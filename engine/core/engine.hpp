@@ -6,6 +6,7 @@
 #include "subsystems/core/core.hpp"
 #include "subsystems/render/render.hpp"
 #include "mal-toolkit/mal-toolkit.hpp"
+#include "world.hpp"
 namespace lighten::core
 {
     // TODO: move to config file
@@ -63,14 +64,14 @@ namespace lighten::core
         [[nodiscard]] static inline spdlog::logger &logger() { return *application_->logger_; }
 
         /**
-         * @brief Get the Scene pointer
+         * @brief Get the World pointer
          *
-         * Returns the pointer to the current selected scene.
+         * Returns the pointer to the world.
          *
-         * @return std::shared_ptr<Scene>
+         * @return std::shared_ptr<World>
          */
 
-        [[nodiscard]] static inline std::shared_ptr<Scene> scene() { return application_->scene_; }
+        [[nodiscard]] static inline std::shared_ptr<World> world() { return application_->world_; }
 
         /**
          * @brief Get the Time From Start of the lighten
@@ -86,12 +87,6 @@ namespace lighten::core
          * @brief Stops the lighten entirely
          */
         static void Exit();
-        /**
-         * @brief Set the Scene object
-         *
-         * @param scene Scene that will be set as the current scene.
-         */
-        static void SetScene(std::shared_ptr<Scene> scene) { application_->scene_ = scene; }
 
         /**
          * @brief Set the tickrate value
@@ -216,7 +211,7 @@ namespace lighten::core
         Engine &operator=(Engine const &) = delete;
         std::unique_ptr<std::mt19937> random_engine_;
 
-        std::shared_ptr<Scene> scene_ = nullptr;
+        std::shared_ptr<World> world_ = nullptr;
 
         bool running_ = true;
 

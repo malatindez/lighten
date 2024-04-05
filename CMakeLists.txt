@@ -8,6 +8,8 @@ cmake_policy(SET CMP0060 NEW)
 # Symlinks to the yaml files are created in the runtime directory so the engine can find them.
 set(GLOBAL_RUNTIME_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/runtime_directory)
 
+set(GLOBAL_BINARY_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+
 set(GLOBAL_REFLECTION_OUTPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/engine/reflection/reflection.hpp)
 set(GLOBAL_REFLECTION_CACHE_DIR ${CMAKE_CURRENT_BINARY_DIR}/reflection_cache)
 
@@ -19,3 +21,6 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/editor")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/tests")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/server")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/benchmarks")
+
+save_target_data(lighten)
+save_target_data(editor)

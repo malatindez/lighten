@@ -95,7 +95,6 @@ namespace lighten
         void OnTick(float delta_time, glm::ivec2 const &pixel_mouse_delta);
 
     private:
-        entt::observer camera_update_observer;
         uint32_t flags_ = None;
         float sensitivity_ = 12.0f;
         float move_speed_ = 2.0f;
@@ -105,10 +104,12 @@ namespace lighten
         components::Camera local_camera_;
         components::Transform local_transform_;
 
-    public:
+
         entt::registry *registry_;
         entt::entity camera_;
         glm::ivec2 const &window_size_;
+
+        entt::observer camera_update_observer;
 
         bool update_matrices_ = true;
         bool update_basis_ = true;

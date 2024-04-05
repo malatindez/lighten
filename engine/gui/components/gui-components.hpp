@@ -11,3 +11,4 @@
 #include "gui-lights.hpp"
 #include "gui-particle-emitter.hpp"
 #include "gui-transform.hpp"
+#include "gui-scene.hpp"

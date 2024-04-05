@@ -10,8 +10,13 @@
 /**
  * @brief Declare a class that is used as a component.
  */
-// Input: name, category, editor hide, editor readonly, save game
+ // Input: name, category, editor hide, editor readonly, save game
 #define LIGHTEN_COMPONENT(...)
+/**
+ * @brief Declare a class that is an empty component (aka tag).
+ */
+ // Input: name, category
+#define LIGHTEN_EMPTY_COMPONENT(...)
 /**
  * @brief Declare a system which processes component(or components)
  * @details This macro is used to declare a system class which has methods

@@ -5,6 +5,7 @@ import re
 
 pattern_dataclass = re.compile(r'\s*LIGHTEN_DATACLASS(?:\((.*?)\))?\s*(?:\n\s*)?(class|struct)\s+(\w+)')
 pattern_component = re.compile(r'\s*LIGHTEN_COMPONENT(?:\((.*?)\))?\s*(?:\n\s*)?(class|struct)\s+(\w+)')
+pattern_empty_component = re.compile(r'\s*LIGHTEN_EMPTY_COMPONENT(?:\((.*?)\))?\s*(?:\n\s*)?(class|struct)\s+(\w+)')
 pattern_system = re.compile(r'\s*LIGHTEN_SYSTEM(?:\((.*?)\))?\s*(?:\n\s*)?(class|struct)\s+(\w+)')
 pattern_method = re.compile(r'\s*LIGHTEN_METHOD(?:\((.*?)\))?\s*\n?\s*(\w+)\s+(\w+)\((.*?)\)\s*((?:[_a-zA-Z0-9]+\s*)*)?\s*(?:{|;)')
 pattern_property = re.compile(r'\s*LIGHTEN_PROPERTY\((.*?)\)\s*\n\s*(\w+)\s+(\w+);')
@@ -38,19 +39,19 @@ def save_cache(global_reflection_cache_dir, cache):
 
 def filter_processed_files(cache, file_paths):
     output = []
-    if "files" not in cache:
-        cache["files"] = {}
+    if "__files_cache" not in cache:
+        cache["__files_cache"] = {}
     for file in file_paths:
         if not os.path.exists(file):
             continue
         last_time_modified = os.path.getmtime(file)
-        if file not in cache["files"]:
-            cache["files"][file] = {}
-            cache["files"][file]["last_time_modified"] = last_time_modified
-            cache["files"][file]["hash"] = md5_speedcheck(file, 0x10000)
+        if file not in cache["__files_cache"]:
+            cache["__files_cache"][file] = {}
+            cache["__files_cache"][file]["last_time_modified"] = last_time_modified
+            cache["__files_cache"][file]["hash"] = md5_speedcheck(file, 0x10000)
             output.append(file)
             continue
-        file_cache = cache["files"][file]
+        file_cache = cache["__files_cache"][file]
         if file_cache["last_time_modified"] == last_time_modified:
             continue
         hash = md5_speedcheck(file, 0x10000)
@@ -67,6 +68,7 @@ def discard_files(file_paths):
             content = f.read()
             if (not pattern_dataclass.search(content) and 
                 not pattern_component.search(content) and 
+                not pattern_empty_component.search(content) and 
                 not pattern_system.search(content)):
                 continue
         output.append(file)

@@ -223,7 +223,7 @@ namespace lighten::core
 
     private:
         bool attached_ = false;
-        InputLayer() = default;
+        InputLayer() : Layer("InputLayer") {}
         InputLayer(InputLayer &&) = delete;
         InputLayer(InputLayer const &) = delete;
         InputLayer &operator=(InputLayer &&) = delete;

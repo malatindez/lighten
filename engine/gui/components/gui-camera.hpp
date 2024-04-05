@@ -1,6 +1,6 @@
 #pragma once
 #include "../../components/camera.hpp"
-#include "../gui/ui-helpers.hpp"
+#include "../ui-helpers.hpp"
 namespace lighten::gui
 {
     template<>
@@ -18,9 +18,12 @@ namespace lighten::gui
             ImGui::Text("Far plane: ");
             ImGui::SameLine();
             changed |= ImGui::SliderFloat(("##far-plane" + entity_id).c_str(), &camera.z_far_, 0, 2000, "%.3f");
+            ImGui::Text("Aspect ratio: ");
+            ImGui::SameLine();
+            changed |= ImGui::SliderFloat(("##aspect-ratio" + entity_id).c_str(), &camera.aspect_ratio_, 0, 5, "%.3f");
             if (changed)
             {
-                registry.patch<components::Camera>(entity, [&camera](components::Camera &) {});
+                registry.patch<components::Camera>(entity, [&](components::Camera &) {});
             }
         }
         if (ImGui::CollapsingHeader("Camera data: "))

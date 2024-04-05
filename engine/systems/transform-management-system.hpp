@@ -3,6 +3,11 @@
 #include "components/transform.hpp"
 #include "components/game-object.hpp"
 #include "core/layers/layer.hpp"
+#include "../core/world.hpp"
+namespace lighten::core
+{
+    class Engine;
+}
 
 namespace lighten::systems
 {
@@ -11,12 +16,14 @@ namespace lighten::systems
         public core::Layer,
         public core::Layer::HandlePreUpdate
     {
-        TransformManagementSystem(entt::registry &registry) noexcept;
-        using TransformView = entt::basic_view<entt::entity, entt::type_list<components::Transform, components::WorldTransform, components::GameObject>, entt::type_list<>>;
+        TransformManagementSystem(std::shared_ptr<core::World> world) noexcept;
 
         void OnPreUpdate() noexcept override;
    private:
+        friend class ::lighten::core::Engine;
+        using core::Layer::Layer;
+        
         entt::observer observer;
-        entt::registry &registry;
+        std::shared_ptr<core::World> world_;
     };
 } // namespace lighten::systems

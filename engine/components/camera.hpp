@@ -52,6 +52,9 @@ namespace lighten::components
         LIGHTEN_PROPERTY(serialize, name = "Far Plane", category = "Camera Settings")
         float z_far_ = 0.02f;
 
+        LIGHTEN_PROPERTY(serialize, name = "Aspect Ratio", category = "Camera Settings")
+        float aspect_ratio_ = 1.0f;
+
         /**
          * @brief Returns the right vector of the camera
          *

@@ -1,13 +1,13 @@
 #pragma once
 #include "core/events.hpp"
-
 namespace lighten::core
 {
     class Layer
     {
     public:
-        explicit Layer(std::string_view name = "Layer") : debug_name_(name) {}
+        explicit Layer(std::string_view name) : debug_name_(name) {}
         virtual ~Layer() = default;
+        
         Layer(Layer const &) = delete;
         Layer &operator=(Layer const &) = delete;
         Layer(Layer &&) = delete;

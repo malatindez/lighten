@@ -1,4 +1,5 @@
 import argparse
+from copy import deepcopy
 import os
 import os.path
 import caching
@@ -7,6 +8,8 @@ import yaml
 import json
 import code_extraction
 import code_generation
+import sys
+
 REFLECTION_FOLDER = os.path.dirname(os.path.abspath(__file__))
 HEADER_EXTENSIONS = [".h", ".hpp", ".inl", ".hxx", ".hh", ".inc", ".ipp", ".ixx", ".i++", ".h++"]
 
@@ -37,6 +40,8 @@ def main():
     code_cache = global_cache.get(code_dir, {})
     
     source_files = caching.filter_processed_files(code_cache, source_files)
+    global_cache[code_dir] = code_cache
+
     source_files = caching.discard_files(source_files)
 
     print(f"Files to process: {len(source_files)}")
@@ -53,8 +58,10 @@ def main():
     if os.path.exists(LIGHTEN_REFLECTION_YAML):
         with open(LIGHTEN_REFLECTION_YAML, "r") as f:
             current_data = yaml.safe_load(f) or {}
-
-    code_generation.update_yaml_files(extracted_data, code_dir, runtime_dir, global_reflection_cache_dir)
+    tmp = deepcopy(current_data[code_dir]) if current_data.get(code_dir) else {}
+    tmp.update(extracted_data)
+    extracted_data = tmp
+    #code_generation.update_yaml_files(extracted_data, code_dir, runtime_dir, global_reflection_cache_dir)
 
     current_data[code_dir] = extracted_data
 
@@ -74,7 +81,8 @@ def main():
 #   code_generation.create_hard_link(os.path.join(code_dir, "lighten_reflection_data.json"), os.path.join(runtime_dir, "reflection/lighten_reflection_data.json"))
 
     print("Code generation took {} seconds".format(time.time() - UI_GEN))
-    caching.save_cache(global_reflection_cache_dir, current_data)
+    caching.save_cache(global_reflection_cache_dir, global_cache)
     print("Total time: {} seconds".format(time.time() - start))
 if __name__ == "__main__":
     main()
+    sys.exit(0)

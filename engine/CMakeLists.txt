@@ -46,7 +46,9 @@ target_link_libraries(lighten PUBLIC
     ${CEREAL_LIBRARIES}
 )
 
+
 target_sources(lighten PUBLIC "${IMGUI_DIR}/backends/imgui_impl_dx11.cpp" "${IMGUI_DIR}/backends/imgui_impl_win32.cpp")
+
 set_source_files_properties("${IMGUI_DIR}/backends/imgui_impl_dx11.cpp" PROPERTIES SKIP_UNITY_BUILD_INCLUSION TRUE)
 set_source_files_properties("${IMGUI_DIR}/backends/imgui_impl_win32.cpp" PROPERTIES SKIP_UNITY_BUILD_INCLUSION TRUE)
 

@@ -1,88 +1,22 @@
 #include "scene-viewer.hpp"
 namespace lighten::gui
 {
-    SceneViewer::SceneViewer(entt::registry &registry) : registry_{registry}, observer{registry, entt::collector.update<::lighten::components::GameObject>().group<::lighten::components::GameObject>()}
+    SceneViewer::SceneViewer(std::shared_ptr<core::World> world) : 
+            world_{world}
     {
-        registry.on_destroy<::lighten::components::GameObject>().connect<&SceneViewer::OnDestroy>(*this);
         renaming_buffer.resize(128);
     }
-    void SceneViewer::OnDestroy(entt::registry &, entt::entity entity)
-    {
-        if (entity == selected_entity_)
-        {
-            selected_entity_ = entt::null;
-        }
-        if (entity == currently_renaming_entity)
-        {
-            currently_renaming_entity = entt::null;
-        }
-        auto &game_object = registry_.get<::lighten::components::GameObject>(entity);
-        if (game_object.parent != entt::null)
-        {
-            auto &parent_game_object = registry_.get<::lighten::components::GameObject>(game_object.parent);
-            parent_game_object.children.erase(std::remove(parent_game_object.children.begin(), parent_game_object.children.end(), entity), parent_game_object.children.end());
-        }
-        for (auto child : game_object.children)
-        {
-            auto &child_game_object = registry_.get<::lighten::components::GameObject>(child);
-            child_game_object.parent = game_object.parent;
-        }
-        destroy_observer.push_back(entity);
-    }
     void SceneViewer::AddEntity(entt::entity parent) {
-        auto entity = registry_.create();
-        lighten::components::GameObject game_object{};
-        if (parent != entt::null) {
-            game_object.parent = parent;
-            game_object.name = "New Entity";
-            auto& parent_game_object = registry_.get<components::GameObject>(parent);
-            parent_game_object.children.push_back(entity);
-        }
-        registry_.emplace<components::GameObject>(entity, std::move(game_object));
-        registry_.emplace<components::Transform>(entity, components::Transform::Default());
+        auto entity = world_->CreateGameObject("New Entity", parent);
         selected_entity_ = entity;
         currently_renaming_entity = entity;
-        renaming_buffer = game_object.name;
+        renaming_buffer = "New Entity";
     }
     void SceneViewer::RemoveEntity(entt::entity entity) {
-        // This assumes OnDestroy handles cleaning up relationships and other components as needed
-        registry_.destroy(entity);
+        world_->registry().destroy(entity);
     }
     void SceneViewer::Render()
     {
-        if (!destroy_observer.empty())
-        {
-            std::sort(
-                destroy_observer.begin(),
-                destroy_observer.end(),
-                std::greater<entt::entity>());
-            for (int i = 0; i < destroy_observer.size(); i++)
-            {
-                root_entities.erase(std::remove_if(root_entities.begin(), root_entities.end(),
-                                                   [this](const entt::entity value)
-                                                   {
-                                                       // Check if value is in elemsToRemove
-                                                       return std::binary_search(destroy_observer.begin(), destroy_observer.end(), value);
-                                                   }),
-                                    root_entities.end());
-            }
-            destroy_observer.clear();
-        }
-        if (observer.size() > 0)
-        {
-            observer.each([this](auto entity)
-                          {
-					auto& game_object = registry_.get<components::GameObject>(entity);
-					if (game_object.parent == entt::null)
-					{
-						root_entities.push_back(entity);
-					}
-                    else
-                    {
-                        destroy_observer.push_back(entity);
-                    } });
-            observer.clear();
-        }
         ShowEntityViewer();
         ShowInspector();
     }
@@ -91,11 +25,9 @@ namespace lighten::gui
     {
         if (ImGui::Begin("Entity Viewer"))
         {
-            for (auto entity : root_entities)
-            {
-                auto entity_id = std::to_string(static_cast<uint32_t>(entity));
-                DrawEntityTree(entity, entity_id);
-            }
+            entt::entity entity = world_->world_scene();
+            auto entity_id = std::to_string(static_cast<uint32_t>(entity));
+            DrawEntityTree(entity, entity_id);
             EntityViewerContextMenu();
         }
         ImGui::End();
@@ -105,39 +37,42 @@ namespace lighten::gui
     {
         if (ImGui::Begin("Inspector"))
         {
-            if (selected_entity_ != entt::null)
+            bool is_null = selected_entity_ == entt::null;
+            if (!is_null && !world_->registry().valid(selected_entity_))
             {
-                std::string entity_id = std::to_string(static_cast<uint32_t>(selected_entity_));
-                mal_toolkit::constexpr_for<0, reflection::ComponentTuple::amount, 1>([this, &entity_id](auto index) constexpr -> void {
-					using ComponentType = reflection::ComponentTuple::type_at<index>::type;
-					if (auto* component = registry_.try_get<ComponentType>(selected_entity_); component) {
-						DrawComponent(registry_, selected_entity_, entity_id, *component);
-					} 
-                });
+                selected_entity_ = entt::null;
+                is_null = true;
             }
-            else
+            if (is_null)
             {
                 ImGui::AlignTextToFramePadding();
                 ImGui::TextDisabled("No entity selected.");
+                return;
             }
+            std::string entity_id = std::to_string(static_cast<uint32_t>(selected_entity_));
+            mal_toolkit::constexpr_for<0, reflection::ComponentTuple::amount, 1>([this, &entity_id](auto index) constexpr -> void {
+            	using ComponentType = reflection::ComponentTuple::type_at<index>::type;
+            	if (ComponentType* component = world_->registry().try_get<ComponentType>(selected_entity_); 
+                    component) {
+            		DrawComponent(world_->registry(), selected_entity_, entity_id, *component);
+            	} 
+            });
         }
         ImGui::End();
     }
 
     void SceneViewer::EntityViewerContextMenu(entt::entity parent, const std::string_view name)
     {
-        // context menu
-        if (!ImGui::BeginPopupContextItem())
-        {
-            return;
-        }
-
-        if (ImGui::MenuItem("Add Child Entity"))
+        // context menu 
+        bool is_orphan = parent == entt::null;
+        static const char* parented_str = "Add child entity";
+        static const char* orphan_str = "Create new entity";
+        if (ImGui::MenuItem(is_orphan ? orphan_str : parented_str))
         {
             AddEntity(parent);
         }
-
-        if (parent != entt::null)
+        
+        if (!is_orphan)
         {
             ImGui::Separator();
             if (ImGui::MenuItem("Rename"))
@@ -146,11 +81,13 @@ namespace lighten::gui
                 renaming_buffer = name;
             }
         }
+
         // TODO
 //        if (ImGui::MenuItemDisabled("Duplicate"))
 //        {
 //            DuplicateEntity(entity);
 //        }
+
         ImGui::Separator();
         if (ImGui::MenuItem("Remove Entity"))
         {
@@ -164,7 +101,8 @@ namespace lighten::gui
 
     void SceneViewer::DrawEntityTree(entt::entity entity, std::string &entity_id)
     {
-        auto &game_object = registry_.get<components::GameObject>(entity);
+        auto &registry = world_->registry();
+        auto &game_object = registry.get<components::GameObject>(entity);
         bool isRenaming = (currently_renaming_entity == entity);
         std::string node_label = game_object.name + "##" + entity_id;
         if (isRenaming)
@@ -222,19 +160,19 @@ namespace lighten::gui
                         assert(payload->DataSize == sizeof(entt::entity));
 
                         entt::entity dragged_entity = *static_cast<const entt::entity *>(payload->Data);
-                        auto &dragged_obj = registry_.get<components::GameObject>(dragged_entity);
+                        auto &dragged_obj = registry.get<components::GameObject>(dragged_entity);
 
-                        auto *dragged_entity_old_parent_obj = dragged_obj.parent == entt::null ? nullptr : registry_.try_get<components::GameObject>(dragged_obj.parent);
+                        auto *dragged_entity_old_parent_obj = dragged_obj.parent == entt::null ? nullptr : registry.try_get<components::GameObject>(dragged_obj.parent);
 
-                        if (auto *dragged_world_transform = registry_.try_get<components::WorldTransform>(dragged_entity);
+                        if (auto *dragged_world_transform = registry.try_get<components::WorldTransform>(dragged_entity);
                             dragged_world_transform)
                         {
-                            auto* new_parent_transform = registry_.try_get<components::WorldTransform>(entity);
+                            auto* new_parent_transform = registry.try_get<components::WorldTransform>(entity);
 
                             // local -> world -> new_local
                             glm::mat4 conversion_matrix = (new_parent_transform ? new_parent_transform->inv_world : glm::mat4{ 1.0f }) * dragged_world_transform->world;
 
-                            registry_.patch<::lighten::components::Transform>(dragged_entity, [&conversion_matrix](auto &transform)
+                            registry.patch<::lighten::components::Transform>(dragged_entity, [&conversion_matrix](auto &transform)
                                                                             {
                                     transform.position = glm::vec3(conversion_matrix[3]);
                                     transform.rotation = glm::quat_cast(conversion_matrix);
@@ -242,8 +180,7 @@ namespace lighten::gui
                                                                 glm::length(glm::vec3(conversion_matrix[1])), 
                                                                 glm::length(glm::vec3(conversion_matrix[2]))); });
                         }
-                        // finish up..
-
+                        
                         if (dragged_entity_old_parent_obj)
                         {
                             auto &children = dragged_entity_old_parent_obj->children;
@@ -253,8 +190,8 @@ namespace lighten::gui
                         dragged_obj.parent = entity;
                         game_object.children.push_back(dragged_entity);
 
-                        registry_.patch<::lighten::components::GameObject>(dragged_entity, [](auto &) {});
-                        registry_.patch<::lighten::components::GameObject>(entity, [](auto &) {});
+                        registry.patch<::lighten::components::GameObject>(dragged_entity, [](auto &) {});
+                        registry.patch<::lighten::components::GameObject>(entity, [](auto &) {});
                     }
                 ImGui::EndDragDropTarget();
             }

@@ -122,8 +122,11 @@ namespace lighten::render::_light_detail
             scene->renderer->grass_render_system().RenderDepthOnly(opaque_per_texture_, scene);
         }
     }
-    void LightRenderSystem::ProcessDirectionalLights(core::Scene *scene)
+    void LightRenderSystem::ProcessDirectionalLights(core::Scene *)
     {
+
+        // We need to get global location for camera from this pass and use it for this code, for now it's not possible
+#if 0
         auto &registry = scene->registry;
         std::vector<_opaque_detail::OpaquePerDepthTexture> opaque_per_texture_;
         directional_light_shadow_matrices_.clear();
@@ -150,6 +153,7 @@ namespace lighten::render::_light_detail
             scene->renderer->dissolution_render_system().RenderDepthOnly(opaque_per_texture_, scene);
             scene->renderer->grass_render_system().RenderDepthOnly(opaque_per_texture_, scene);
         }
+#endif
     }
     void LightRenderSystem::OnRender(core::Scene *scene)
     {

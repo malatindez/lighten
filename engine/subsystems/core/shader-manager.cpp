@@ -18,7 +18,7 @@ namespace lighten::core
                     continue;
                 }
                 std::mutex compile_mutex;
-                auto const recompile_task = [&](std::shared_ptr<render::Shader> const &shader) __lambda_force_inline -> void
+                auto const recompile_task = [&](std::shared_ptr<render::Shader> const &shader) __mal_toolkit_lambda_force_inline  -> void
                 {
                     {
                         std::lock_guard<std::mutex> lock(compile_mutex);

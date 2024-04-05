@@ -20,7 +20,7 @@ namespace lighten::components
 
     private:
         // aligning to 4 bytes
-        float padding;
+        [[maybe_unused]] float padding;
     };
 
     /**

@@ -63,7 +63,9 @@ namespace lighten::core
         static void Deinit() { instance_ = nullptr; }
 
     private:
-        ShaderManager() : watcher_{[this](events::Event &e) __lambda_force_inline
+        ShaderManager() :
+            core::Layer("ShaderManager"),
+            watcher_{[this](events::Event &e) __mal_toolkit_lambda_force_inline 
                                    { OnEvent(e); }}
         {
         }

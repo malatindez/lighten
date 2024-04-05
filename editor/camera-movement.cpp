@@ -20,6 +20,7 @@ namespace camera_movement
     void RegisterKeyCallbacks()
     {
         auto input = InputLayer::instance();
+        
         input->AddUpdateKeyCallback(
             InputLayer::KeySeq{lighten::core::Key::KEY_W},
             [&](InputLayer::KeySeq const &, uint32_t)
@@ -69,7 +70,7 @@ namespace camera_movement
                 if (count == std::numeric_limits<uint32_t>::max() || InputLayer::instance()->key_state(lighten::core::Key::KEY_CONTROL))
                 {
                     rb_saved_mouse_position = glm::ivec2{-1};
-                    if (moving && Engine::scene()->registry.valid(selected_entity))
+                    if (moving && Engine::world()->registry().valid(selected_entity))
                     {
                         moving = false;
                         if (Engine::scene()->registry.try_get<components::OpaqueComponent>(selected_entity) != nullptr ||

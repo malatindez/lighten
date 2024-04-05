@@ -2,17 +2,22 @@
 #include "core/engine.hpp"
 namespace lighten::systems
 {
-    TransformManagementSystem::TransformManagementSystem(entt::registry &registry) noexcept : registry{registry},
-                                                                                              observer{registry, entt::collector.update<components::Transform>().group<components::WorldTransform, components::GameObject>()}
+    using TransformView = entt::basic_view<entt::entity, entt::type_list<components::Transform, components::WorldTransform, components::GameObject>, entt::type_list<>>;
+
+    TransformManagementSystem::TransformManagementSystem(std::shared_ptr<core::World> world) noexcept : 
+                                core::Layer("Transform Management System"),
+                                observer{world->registry(), 
+                                         entt::collector.update<components::Transform>().group<components::WorldTransform, components::GameObject>()
+                                        },
+                                world_{ world }
     {
-        registry.on_construct<components::Transform>().connect<&entt::registry::emplace_or_replace<components::WorldTransform>>();
-        registry.on_destroy<components::Transform>().connect<&entt::registry::remove<components::WorldTransform>>();
+        world->registry().on_construct<components::Transform>().connect<&entt::registry::emplace_or_replace<components::WorldTransform>>();
+        world->registry().on_destroy<components::Transform>().connect<&entt::registry::remove<components::WorldTransform>>();
     }
-    void UpdateTree(std::unordered_map<entt::entity, uint32_t> &updated,
-                                                      TransformManagementSystem::TransformView &view,
+    void UpdateTree(std::unordered_set<entt::entity> &updated,
+                                                      TransformView &view,
                                                       entt::entity entity,
-                                                      components::WorldTransform *parent_world,
-                                                      uint32_t function_depth = 0)
+                                                      components::WorldTransform *parent_world)
     {
         auto &transform = view.get<components::Transform>(entity);
         auto &world = view.get<components::WorldTransform>(entity);
@@ -27,10 +32,10 @@ namespace lighten::systems
             world.UpdateWorldMatrices();
         }
 
-        updated.emplace(entity, function_depth);
+        updated.emplace(entity);
         for (auto child : game_object.children)
         {
-            UpdateTree(updated, view, child, &world, function_depth + 1u);
+            UpdateTree(updated, view, child, &world);
         }
     }
 
@@ -40,29 +45,31 @@ namespace lighten::systems
         {
             return;
         }
-        std::unordered_map<entt::entity, uint32_t> updated;
+        std::unordered_set<entt::entity> updated;
         updated.reserve(observer.size()); // minimum observer size
 
-        auto view = registry.view<components::Transform, components::WorldTransform, components::GameObject>();
+        auto view = world_->registry().view<components::Transform, components::WorldTransform, components::GameObject>();
         observer.each([&view, &updated](auto entity)
                       {
                 if (auto it = updated.find(entity); it == updated.end())
                 {
                     auto& game_object = view.get<components::GameObject>(entity);
                     components::WorldTransform *parent_world = nullptr;
-                    if (game_object.parent != entt::null && view.contains(game_object.parent))
-                    {
-                        parent_world = &view.get<components::WorldTransform>(game_object.parent);
-                    }
+                    // If you get an exception here, it means that the object was unlawfully created from other part of the code. 
+                    // Any game object should have Transform. WorldTransform is generated automatically.
+                    // In nearly all cases you should use CreateGameObject from core::World.
+                    parent_world = &view.get<components::WorldTransform>(game_object.parent);
+
                     UpdateTree(updated, view, entity, parent_world);
                 } });
         observer.clear();
-
-        core::Engine::scene()->renderer->emissive_render_system().ScheduleInstanceUpdate();
-        core::Engine::scene()->renderer->light_render_system().ScheduleInstanceUpdate();
-        core::Engine::scene()->renderer->opaque_render_system().ScheduleInstanceUpdate();
-        core::Engine::scene()->renderer->dissolution_render_system().ScheduleInstanceUpdate();
-        core::Engine::scene()->renderer->decal_render_system().ScheduleInstanceUpdate();
+        // TODO: 
+        // remove scheduling, add observers in render systems
+        //core::Engine::scene()->renderer->emissive_render_system().ScheduleInstanceUpdate();
+        //core::Engine::scene()->renderer->light_render_system().ScheduleInstanceUpdate();
+        //core::Engine::scene()->renderer->opaque_render_system().ScheduleInstanceUpdate();
+        //core::Engine::scene()->renderer->dissolution_render_system().ScheduleInstanceUpdate();
+        //core::Engine::scene()->renderer->decal_render_system().ScheduleInstanceUpdate();
     }
   
 } // namespace lighten::systems

@@ -15,7 +15,7 @@ namespace lighten::core
         Config::Init();
 
         application_ = std::unique_ptr<Engine>(new Engine{});
-        debug::RedirectOutputDebugString([&](std::string_view view) __lambda_force_inline
+        debug::RedirectOutputDebugString([&](std::string_view view) __mal_toolkit_lambda_force_inline 
                                          { application_->logger_->info(view); });
         if (config()["Logger"]["console_enabled"].as_boolean())
         {
@@ -36,6 +36,7 @@ namespace lighten::core
         SkyboxManager::Init();
         TextureManager::Init();
         render::ModelSystem::Init();
+        application_->world_ = std::make_shared<World>();
     }
 
     void Engine::Deinit()
@@ -126,10 +127,10 @@ namespace lighten::core
         }
 #endif
     }
-    Engine::Engine()
+    Engine::Engine() : LayerStackThreadsafe("Engine core")
     {
         random_engine_ = std::make_unique<std::mt19937>(static_cast<uint32_t>(random_seed()));
-        event_function_ = std::bind_front([this](Event &e) __lambda_force_inline
+        event_function_ = std::bind_front([this](Event &e) __mal_toolkit_lambda_force_inline 
                                           { OnEvent(e); });
         std::filesystem::path target_folder;
         if (!config()["Logger"]["is_absolute"].as_boolean())

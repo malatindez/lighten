@@ -24,7 +24,7 @@ namespace lighten
         auto &cam = local_camera_;
         SetProjectionMatrix(glm::perspectiveLH_ZO(
             cam.fovy_,
-            16.0f / 9.0f, //float(window_size_.x) / float(window_size_.y),
+            cam.aspect_ratio_,
             cam.z_near_, cam.z_far_));
         update_matrices_ = true;
     }
@@ -237,7 +237,7 @@ namespace lighten
         }
         bool updated = update_matrices_;
         UpdateMatrices();
-        if (update_matrices_)
+        if (updated)
         {
             registry_->patch<components::Camera>(camera_, [&](components::Camera &cam) { cam = local_camera_; });
             registry_->patch<components::Transform>(camera_, [&](components::Transform& transform) { transform = local_transform_; });

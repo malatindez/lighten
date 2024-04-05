@@ -189,7 +189,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
     auto &registry = first_scene->registry;
     main_camera_entity = registry.create();
     registry.emplace<Camera>(main_camera_entity, Camera());
-    registry.emplace<Transform>(main_camera_entity, Transform());
+    registry.emplace<Transform>(main_camera_entity, Transform::Default());
     first_scene->main_camera = std::make_unique<CameraController>(&registry, main_camera_entity, hdr_render_pipeline_->framebuffer_size());
     Engine::SetScene(first_scene);
 
@@ -878,7 +878,7 @@ Controller::Controller(std::shared_ptr<direct3d::DeferredHDRRenderPipeline> hdr_
                     instance_info.materials.begin(),
                     instance_info.materials.end(),
                     std::back_inserter(dissolution_materials),
-                    [](render::OpaqueMaterial const *material) __lambda_force_inline -> render::DissolutionMaterial
+                    [](render::OpaqueMaterial const *material) __mal_toolkit_lambda_force_inline  -> render::DissolutionMaterial
                     {
                         auto rv = render::DissolutionMaterial::FromOpaqueMaterial(*material);
                         rv.emissive = true;

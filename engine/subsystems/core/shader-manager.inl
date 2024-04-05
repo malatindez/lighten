@@ -10,7 +10,7 @@ namespace lighten::core
         mal_toolkit::Assert(mal_toolkit::for_each_true(
                                 dependent_files.cbegin(),
                                 dependent_files.cend(),
-                                [](auto const &it) __lambda_force_inline -> bool
+                                [](auto const &it) __mal_toolkit_lambda_force_inline  -> bool
                                 {
                                     return it->is_absolute();
                                 }),

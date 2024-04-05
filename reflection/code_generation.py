@@ -60,6 +60,15 @@ REFLECTION_PREDEFINED_STRUCTS = """
         const bool editor_readonly;
     };
 
+    struct EmptyComponentMetadata
+    {
+        consteval EmptyComponentMetadata(
+            const char* const name,
+            const char* const category) : name(name), category(category) {}
+        const char* const name;
+        const char* const category;
+    };
+
     // Compile-time reflection metadata for systems
     struct SystemMetadata
     {
@@ -72,6 +81,7 @@ REFLECTION_PREDEFINED_STRUCTS = """
 """
 
 COMPONENT_METADATA = string.Template('        ComponentMetadata { "$name", "$category", $serialize, $save_game, $editor_hide, $editor_readonly },')
+EMPTY_COMPONENT_METADATA = string.Template('        EmptyComponentMetadata { "$name", "$category" },')
 SYSTEM_METADATA = string.Template('        SystemMetadata { "$name", "$category" },')
 
 def generate_hpp_serialization_code(global_data):
@@ -88,6 +98,9 @@ def generate_hpp_serialization_code(global_data):
 
     component_tuple_strings = []
     component_metadata_list = []
+    
+    empty_component_tuple_strings = []
+    empty_component_metadata_list = []
 
     system_tuple_strings = []
     system_metadata_list = []
@@ -120,6 +133,12 @@ def generate_hpp_serialization_code(global_data):
                     editor_hide=str(class_info['settings'].get('editor_hide', 'false')).lower(),
                     editor_readonly=str(class_info['settings'].get('editor_readonly', 'false')).lower()
                 ))
+            if class_info['kind'] == 'LIGHTEN_EMPTY_COMPONENT':
+                empty_component_tuple_strings.append(f"        ::{class_info['namespace']}::{class_name}")
+                empty_component_metadata_list.append(EMPTY_COMPONENT_METADATA.substitute(
+                    name=class_info['settings'].get('name', class_name),
+                    category=class_info['settings'].get('category', "Default")
+                ))
             elif class_info['kind'] == 'LIGHTEN_SYSTEM':
                 system_tuple_strings.append(f"        ::{class_info['namespace']}::{class_name}")
                 system_metadata_list.append(SYSTEM_METADATA.substitute(
@@ -136,6 +155,12 @@ def generate_hpp_serialization_code(global_data):
     serialization_code_parts.append("    >;")
     serialization_code_parts.append("    constexpr std::array<ComponentMetadata, " + str(len(component_metadata_list)) + "> component_metadata = {")
     serialization_code_parts.extend(component_metadata_list)
+    serialization_code_parts.append("    };")
+    serialization_code_parts.append("    using EmptyComponentTuple = mal_toolkit::parameter_pack_info<")
+    serialization_code_parts.append(",\n".join(empty_component_tuple_strings))
+    serialization_code_parts.append("    >;")
+    serialization_code_parts.append("    constexpr std::array<EmptyComponentMetadata, " + str(len(empty_component_metadata_list)) + "> empty_component_metadata = {")
+    serialization_code_parts.extend(empty_component_metadata_list)
     serialization_code_parts.append("    };")
     serialization_code_parts.append("    using SystemTuple = mal_toolkit::parameter_pack_info<")
     serialization_code_parts.append(",\n".join(system_tuple_strings))
@@ -213,6 +238,8 @@ def generate_hpp_gui_code(data, code_dir):
 
 
 def update_yaml_files(data, code_dir, runtime_dir, build_dir):
+    # NOT USED FOR NOW
+    return
     index = {}
     index["ui_files"] = []
     for component_name, component_data in data.items():
@@ -255,7 +282,7 @@ def update_yaml_files(data, code_dir, runtime_dir, build_dir):
                 elif category != "properties" and (existing_data.get(category, {}).get(item_name, {}).get('return_type', None) == item_data.get('return_type')):
                     yaml_data[category][item_name] = existing_data[category][item_name]
                 else:
-                    yaml_data[category][item_name] = item_data["settings"]
+                    yaml_data[category][item_name] = item_data
                     if category == "properties":
                         type_hint = item_data["type"]
                         yaml_data[category][item_name]['type'] = type_hint
