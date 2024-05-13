@@ -26,9 +26,8 @@ struct PS_OUTPUT
 {
     float4 albedo : SV_TARGET0;
     float4 normals : SV_TARGET1;
-    float4 roughness_metalness_transmittance_ao : SV_TARGET3;
-    float4 sheen : SV_TARGET4;
-    float4 emission : SV_TARGET5;
+    float4 roughness_metalness_transmittance_ao : SV_TARGET2;
+    float4 emission : SV_TARGET3;
 };
 
 PS_OUTPUT ps_main(PS_INPUT input, bool is_front_face: SV_IsFrontFace)
@@ -100,6 +99,5 @@ PS_OUTPUT ps_main(PS_INPUT input, bool is_front_face: SV_IsFrontFace)
     input.roughness = 1.0f;
     input.metalness = 0.3f;
     output.roughness_metalness_transmittance_ao = float4(input.roughness, input.metalness, input.transmittance, input.ambient_occlusion);
-    output.sheen = float4(0,0,0,0);
     return output;
 }

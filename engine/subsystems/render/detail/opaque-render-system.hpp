@@ -25,15 +25,12 @@ namespace lighten::render
         ID3D11ShaderResourceView *normal_map = nullptr;
         ID3D11ShaderResourceView *metalness_map = nullptr;
         ID3D11ShaderResourceView *roughness_map = nullptr;
-        ID3D11ShaderResourceView *sheen_map = nullptr;
 
         // Used only to discard pixels with opacity < 0.5
         ID3D11ShaderResourceView *opacity_map = nullptr;
         glm::vec3 albedo_color{0.0f};
         float metalness_value = 0.0f;
         float roughness_value = 0.0f;
-        glm::vec3 sheen_color{0.0f};
-        float sheen_roughness = 0.0f;
         uint32_t texture_flags;
         bool reverse_normal_y = false;
         bool twosided = true;
@@ -53,8 +50,6 @@ namespace lighten::render
             albedo_color = glm::vec3{0.0f};
             metalness_value = 0.01f;
             roughness_value = 0.01f;
-            sheen_color = glm::vec3{0.0f};
-            sheen_roughness = 0.00f;
             texture_flags = 0;
             reverse_normal_y = false;
             twosided = true;
@@ -126,8 +121,6 @@ namespace lighten::render::_opaque_detail
         glm::vec3 albedo_color;
         float metalness;
         float roughness;
-        glm::vec3 sheen_color;
-        float sheen;
         uint32_t enabled_texture_flags;
         glm::vec2 uv_multiplier;
     };

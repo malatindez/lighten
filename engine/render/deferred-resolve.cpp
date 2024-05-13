@@ -108,7 +108,6 @@ namespace lighten::render
         direct3d::api().devcon4->PSSetShaderResources(5, 1, &irradiance_texture_);
         direct3d::api().devcon4->PSSetShaderResources(6, 1, &prefiltered_texture_);
         direct3d::api().devcon4->PSSetShaderResources(7, 1, &brdf_texture_);
-        direct3d::api().devcon4->PSSetShaderResources(11, 1, &g_buffer.sheen->shader_resource_view());
         lrs.BindPointShadowMaps(8);
         lrs.BindSpotShadowMaps(9);
         lrs.BindDirectionalShadowMaps(10);

@@ -30,7 +30,6 @@ namespace lighten::direct3d
         gbuffer_.normals = std::make_shared<direct3d::RenderTarget>(DXGI_FORMAT_R16G16B16A16_SNORM);
         gbuffer_.albedo = std::make_shared<direct3d::RenderTarget>(DXGI_FORMAT_R16G16B16A16_FLOAT);
         gbuffer_.roughness_metalness_transmittance_ao = std::make_shared<direct3d::RenderTarget>(DXGI_FORMAT_R16G16B16A16_SNORM);
-        gbuffer_.sheen = std::make_shared<direct3d::RenderTarget>(DXGI_FORMAT_R16G16B16A16_SNORM);
         gbuffer_.emission = std::make_shared<direct3d::RenderTarget>(DXGI_FORMAT_R16G16B16A16_FLOAT);
         gbuffer_.entity_id = std::make_shared<direct3d::RenderTarget>(DXGI_FORMAT_R32_UINT);
         imgui_layer_->BlockEvents(false);
@@ -50,7 +49,6 @@ namespace lighten::direct3d
         gbuffer_.normals->SizeResources(size);
         gbuffer_.albedo->SizeResources(size);
         gbuffer_.roughness_metalness_transmittance_ao->SizeResources(size);
-        gbuffer_.sheen->SizeResources(size);
         gbuffer_.emission->SizeResources(size);
         gbuffer_.entity_id->SizeResources(size);
 
@@ -125,7 +123,6 @@ namespace lighten::direct3d
             gbuffer_.albedo->render_target_view(),
             gbuffer_.normals->render_target_view(),
             gbuffer_.roughness_metalness_transmittance_ao->render_target_view(),
-            gbuffer_.sheen->render_target_view(),
             gbuffer_.emission->render_target_view(),
             gbuffer_.entity_id->render_target_view() };
         api().devcon4->OMSetRenderTargets(5, gbuffer_target_views.data(), depth_stencil_.depth_stencil_view());
@@ -134,6 +131,8 @@ namespace lighten::direct3d
 
         direct3d::api().devcon4->CopyResource(depth_texture_copy_, depth_stencil_.depth_buffer());
         direct3d::api().devcon4->CopyResource(normals_texture_copy_, gbuffer_.normals->render_target());
+
+        LayerStack::OnRender();
 
         scene_->DeferredRender(gbuffer_, depth_stencil_.depth_stencil_view(), depth_texture_copy_srv_, normals_texture_copy_srv_);
 
@@ -296,7 +295,6 @@ namespace lighten::direct3d
         api().devcon4->ClearRenderTargetView(gbuffer_.normals->render_target_view(), reinterpret_cast<const float *>(&empty_vec));
         api().devcon4->ClearRenderTargetView(gbuffer_.albedo->render_target_view(), reinterpret_cast<const float *>(&empty_vec));
         api().devcon4->ClearRenderTargetView(gbuffer_.roughness_metalness_transmittance_ao->render_target_view(), reinterpret_cast<const float *>(&empty_vec));
-        api().devcon4->ClearRenderTargetView(gbuffer_.sheen->render_target_view(), reinterpret_cast<const float *>(&empty_vec));
         api().devcon4->ClearRenderTargetView(gbuffer_.emission->render_target_view(), reinterpret_cast<const float *>(&empty_vec));
         api().devcon4->ClearRenderTargetView(gbuffer_.entity_id->render_target_view(), reinterpret_cast<const float *>(&empty_vec));
         api().devcon4->ClearDepthStencilView(depth_stencil_.depth_stencil_view(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0);

@@ -175,4 +175,5 @@ namespace lighten::core
     Engine::~Engine()
     {
     }
-} // namespace lighten::core
+}
+// namespace lighten::core

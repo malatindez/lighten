@@ -46,7 +46,7 @@ namespace lighten::components
 
         /// @brief near plane Z coordinate
         LIGHTEN_PROPERTY(serialize, name = "Near Plane", category = "Camera Settings")
-        float z_near_ = 2000.0f;
+        float z_near_ = 20000.0f;
 
         /// @brief far plane Z coordinate
         LIGHTEN_PROPERTY(serialize, name = "Far Plane", category = "Camera Settings")

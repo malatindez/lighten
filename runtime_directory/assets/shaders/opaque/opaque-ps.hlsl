@@ -8,9 +8,6 @@ cbuffer OpaquePerMaterial : register(b2)
     float g_metalness_value;
 
     float g_roughness_value;
-    float3 g_sheen_color;
-
-    float g_sheen_roughness;
     
     uint g_enabled_texture_flags;
     float2 g_uv_multiplier;
@@ -21,14 +18,12 @@ Texture2D<float3> g_normal : register(t1);
 Texture2D<float> g_metalness : register(t2);
 Texture2D<float> g_roughness : register(t3);
 Texture2D<float> g_opacity : register(t4);
-Texture2D<float3> g_sheen : register(t15);
 
 static const uint TEXTURE_ENABLED_ALBEDO = 1;
 static const uint TEXTURE_ENABLED_NORMAL = 1 << 1;
 static const uint TEXTURE_ENABLED_METALNESS = 1 << 2;
 static const uint TEXTURE_ENABLED_ROUGHNESS = 1 << 3;
 static const uint TEXTURE_ENABLED_OPACITY = 1 << 4;
-static const uint TEXTURE_ENABLED_SHEEN = 1 << 5;
 static const uint TEXTURE_NORMAL_REVERSE_Y = 1 << 24;
 
 struct PS_IN
@@ -47,9 +42,8 @@ struct PS_OUTPUT
     float4 albedo : SV_TARGET0;
     float4 normals : SV_TARGET1;
     float4 roughness_metalness_transmittance_ao : SV_TARGET2;
-    float4 sheen_color_sheen_roughness : SV_TARGET3;
-    float4 emission : SV_TARGET4;
-    uint entity_id : SV_TARGET5;
+    float4 emission : SV_TARGET3;
+    uint entity_id : SV_TARGET4;
 };
 
 PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
@@ -100,16 +94,6 @@ PS_OUTPUT ps_main(PS_IN input, bool is_front_face: SV_IsFrontFace)
     {
         output.roughness_metalness_transmittance_ao.g = g_metalness_value;
     }
-    
-    if (g_enabled_texture_flags & TEXTURE_ENABLED_SHEEN)
-    {
-        output.sheen_color_sheen_roughness.rgb = g_sheen.Sample(g_bilinear_wrap_sampler, input.texcoord).rgb;
-    }
-    else
-    {
-        output.sheen_color_sheen_roughness.rgb = g_sheen_color;
-    }
-    output.sheen_color_sheen_roughness.w = g_sheen_roughness;
     
 
     output.roughness_metalness_transmittance_ao.b = 0.0f;

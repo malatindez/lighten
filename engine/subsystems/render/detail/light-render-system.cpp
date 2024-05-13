@@ -163,6 +163,7 @@ namespace lighten::render::_light_detail
         {
             shadow_map_update_timer_.reset();
             should_update = false;
+            return;
         }
         else
         {

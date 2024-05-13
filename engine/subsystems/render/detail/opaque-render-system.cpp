@@ -15,7 +15,6 @@ namespace lighten::render
         texture_flags |= (metalness_map != nullptr) ? 1 << 2 : 0;
         texture_flags |= (roughness_map != nullptr) ? 1 << 3 : 0;
         texture_flags |= (opacity_map != nullptr) ? 1 << 4 : 0;
-        texture_flags |= (sheen_map != nullptr) ? 1 << 5 : 0;
         texture_flags |= (reverse_normal_y) ? 1 << 24 : 0;
     }
     void OpaqueMaterial::BindTextures() const
@@ -40,10 +39,6 @@ namespace lighten::render
         {
             direct3d::api().devcon4->PSSetShaderResources(4, 1, &opacity_map);
         }
-        if (sheen_map != nullptr)
-        {
-            direct3d::api().devcon4->PSSetShaderResources(15, 1, &sheen_map);
-        }
     }
     void OpaqueMaterial::Bind(direct3d::DynamicUniformBuffer<_opaque_detail::OpaquePerMaterial> &uniform_buffer) const
     {
@@ -51,8 +46,6 @@ namespace lighten::render
         temporary.albedo_color = albedo_color;
         temporary.metalness = metalness_value;
         temporary.roughness = roughness_value;
-        temporary.sheen_color = sheen_color;
-        temporary.sheen = sheen_roughness;
         temporary.enabled_texture_flags = texture_flags;
         temporary.uv_multiplier = uv_multiplier;
         uniform_buffer.Update(temporary);
@@ -83,16 +76,11 @@ namespace lighten::render
         {
             opacity_map = material.opacity_textures.front();
         }
-        if (material.sheen_textures.size() > 0)
-        {
-            sheen_map = material.sheen_textures.front();
-        }
         texture_flags = 0;
         UpdateTextureFlags();
         albedo_color = material.diffuse_color;
         metalness_value = material.metalness;
         roughness_value = material.roughness;
-        sheen_color = material.sheen_color;
         twosided = material.twosided;
     }
 }

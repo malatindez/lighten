@@ -11,7 +11,7 @@ namespace lighten::render
     public:
         struct Buffer
         {
-            float exposure = -1.0f;
+            float exposure = -5.0f;
             float gamma = 1.0f;
             glm::vec2 padding;
         };

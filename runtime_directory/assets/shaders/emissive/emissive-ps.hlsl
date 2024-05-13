@@ -17,9 +17,8 @@ struct PS_OUTPUT
     float4 albedo : SV_TARGET0;
     float4 normals : SV_TARGET1;
     float4 roughness_metalness_transmittance_ao : SV_TARGET2;
-    float4 sheen : SV_TARGET3;
-    float4 emission : SV_TARGET4;
-    uint object_id : SV_TARGET5;
+    float4 emission : SV_TARGET3;
+    uint object_id : SV_TARGET4;
 };
 
 PS_OUTPUT ps_main(PS_INPUT input)
@@ -36,7 +35,6 @@ PS_OUTPUT ps_main(PS_INPUT input)
     output.emission = float4(lerp(normedEmission, emission, pow(max(0.0, NoV), 5)), 1);
     output.albedo = float4(0, 0, 0, 0);
     output.roughness_metalness_transmittance_ao = float4(0.01f, 0.01f, 0.0f, 0.0f);
-    output.sheen = float4(0.00f, 0.00f, 0.0f, 0.0f);
 
     output.normals.xy = packOctahedron(normal);
     output.normals.zw = packOctahedron(input.normal);

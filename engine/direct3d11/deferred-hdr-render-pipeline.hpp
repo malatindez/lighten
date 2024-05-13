@@ -34,6 +34,7 @@ namespace lighten::direct3d
 
         glm::ivec2 const &framebuffer_size() const { return framebuffer_size_; }
 
+    
     public:
         void FrameBegin() override;
         void FrameEnd() override;

@@ -81,8 +81,6 @@ struct PBR_Material {
   float metalness;
   float transmittance;
   float ao;
-  float3 sheen_color;
-  float sheen_roughness;
 };
 
 struct PBR_CommonData {
@@ -118,41 +116,6 @@ float CalculateSolidAngle(float length, float radius, out float sina,
   return 2.0f * PI * (1.0f - cosa);
 }
 
-float sheen_l(float x, float alphaG)
-{
-    float oneMinusAlphaSq = (1.0 - alphaG) * (1.0 - alphaG);
-    float a = lerp(21.5473, 25.3245, oneMinusAlphaSq);
-    float b = lerp(3.82987, 3.32435, oneMinusAlphaSq);
-    float c = lerp(0.19823, 0.16801, oneMinusAlphaSq);
-    float d = lerp(-1.97760, -1.27393, oneMinusAlphaSq);
-    float e = lerp(-4.32054, -4.85967, oneMinusAlphaSq);
-    return a / (1.0 + b * pow(x, c)) + d * x + e;
-}
-
-float lambdaSheen(float cosTheta, float alphaG)
-{
-    return abs(cosTheta) < 0.5 ? exp(sheen_l(cosTheta, alphaG)) : exp(2.0 * sheen_l(0.5, alphaG) - sheen_l(1.0 - cosTheta, alphaG));
-}
-
-float sheenVisibility(float ndotv, float ndotl, float sheen_roughness)
-{
-    float alphaG = sheen_roughness * sheen_roughness;
-    return 1.0 / ((1.0 + lambdaSheen(ndotv, alphaG) + lambdaSheen(ndotl, alphaG)) * (4.0 * ndotv * ndotl));
-}
-
-float sheenDistribution(float sheen_roughness, float3 V_norm, float3 normal, float3 specL)
-{
-  float3 H = normalize(specL + V_norm);
-  float ndoth = max(dot(normal, H), clampVal);
-  float alphaG = sheen_roughness * sheen_roughness;
-  float invR = 1 / alphaG;
-  float cos2h = ndoth * ndoth;
-  float sin2h = 1 - cos2h;
-  float sheen_dist = (2 + invR) * pow(sin2h, invR * 0.5) / (2 * PI);
-  return sheen_dist;
-}
-
-
 float3 Lambert(PBR_Material material, float ndotl, float solid_angle) {
   float3 diffuse = saturate(F_Schlick(ndotl, material.f0));
   diffuse = 1 - diffuse;
@@ -178,15 +141,11 @@ float3 CookTorrance(PBR_Material material, float3 V_norm, float3 normal,
 
 float3 Illuminate(PBR_Material material, float3 light_energy, float3 V_norm,
                   float3 normal, float3 specL, float ndotl, float solid_angle) {
-  if(material.sheen_roughness == 0)
-  {
-    float3 diffuse = Lambert(material, ndotl, solid_angle);
-    float3 spec = CookTorrance(material, V_norm, normal, specL, solid_angle);
-    //  float3 spec = float3(0,0,0);
-    float3 brdf_result = (diffuse * ndotl + spec) * light_energy;
-    return brdf_result;
-  }
-  return 0.0f;
+  float3 diffuse = Lambert(material, ndotl, solid_angle);
+  float3 spec = CookTorrance(material, V_norm, normal, specL, solid_angle);
+  //  float3 spec = float3(0,0,0);
+  float3 brdf_result = (diffuse * ndotl + spec) * light_energy;
+  return brdf_result;
 }
 
 uint selectCubeFace(float3 unitDir) {

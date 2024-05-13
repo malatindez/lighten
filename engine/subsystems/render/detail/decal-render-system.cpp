@@ -99,7 +99,6 @@ namespace lighten::render::_decal_detail
             buffer.albedo->render_target_view(),
             buffer.normals->render_target_view(),
             buffer.roughness_metalness_transmittance_ao->render_target_view(),
-            buffer.sheen->render_target_view(),
             buffer.emission->render_target_view(),
             nullptr};
         direct3d::api().devcon4->OMSetRenderTargets(5, rtvs.data(), dsv);

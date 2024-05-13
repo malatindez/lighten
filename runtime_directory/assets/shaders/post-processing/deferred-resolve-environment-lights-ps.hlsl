@@ -23,8 +23,6 @@ TextureCubeArray g_point_shadow_maps : register(t8);
 Texture2DArray g_spot_shadow_maps : register(t9);
 Texture2DArray g_directional_shadow_maps : register(t10);
 
-Texture2D<float4> g_sheen : register(t11);
-
 struct PS_INPUT
 {
     float4 posVS : SV_POSITION;
@@ -44,7 +42,6 @@ float4 ps_main(PS_INPUT input)
     float4 albedo = g_albedo.Sample(g_point_clamp_sampler, input.uv);
     float4 normals = g_normals.Sample(g_point_clamp_sampler, input.uv);
     float4 roughness_metalness_transmittance_ao = g_roughness_metalness_transmittance_ao.Sample(g_point_clamp_sampler, input.uv);
-    float4 sheen = g_sheen.Sample(g_point_clamp_sampler, input.uv);
     float4 emission = g_emission.Sample(g_point_clamp_sampler, input.uv);
     float depth = g_depth.Sample(g_point_clamp_sampler, input.uv);
 
@@ -52,8 +49,6 @@ float4 ps_main(PS_INPUT input)
     material.albedo = albedo.rgb;
     material.roughness = roughness_metalness_transmittance_ao.x;
     material.metalness = roughness_metalness_transmittance_ao.y;
-    material.sheen_color = sheen.rgb;
-    material.sheen_roughness = sheen.w;
     material.f0 = lerp(float3(0.04f, 0.04f, 0.04f), albedo.rgb, material.metalness);
     material.transmittance = roughness_metalness_transmittance_ao.z;
     material.ao = roughness_metalness_transmittance_ao.w;
